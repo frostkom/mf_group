@@ -1,13 +1,15 @@
 <?php
 /*
 Plugin Name: MF Group
-Plugin URI: 
+Plugin URI: https://github.com/frostkom/mf_group
 Description: 
-Version: 3.0.14
+Version: 3.0.15
 Author: Martin Fors
 Author URI: http://frostkom.se
 Text Domain: lang_group
 Domain Path: /lang
+
+GitHub Plugin URI: frostkom/mf_group
 */
 
 include_once("include/classes.php");
