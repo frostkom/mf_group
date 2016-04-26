@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: 
-Version: 3.0.15
+Version: 3.0.16
 Author: Martin Fors
 Author URI: http://frostkom.se
 Text Domain: lang_group
@@ -82,12 +82,6 @@ function activate_group()
 	$arr_add_column[$wpdb->base_prefix."group_queue"]['queueReceived'] = "ALTER TABLE [table] ADD [column] ENUM('-1', '0','1') NOT NULL DEFAULT '0' AFTER queueSent";
 
 	add_columns($arr_add_column);
-
-	$arr_update_existing_columns = array();
-
-	//$arr_update_existing_columns[$wpdb->base_prefix."group_message"]['queryTypePublic'] = "ALTER TABLE [table] DROP [column]";
-
-	update_columns($arr_update_existing_columns);
 }
 
 function uninstall_group()
