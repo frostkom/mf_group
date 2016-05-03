@@ -122,28 +122,18 @@ function setting_group_import_callback()
 	$setting_key = get_setting_key(__FUNCTION__);
 	$option = get_option($setting_key);
 
-	$obj_group = new mf_group();
+	$arr_data = array();
+	$arr_data[''] = "-- ".__("Choose here", 'lang_group')." --";
 
+	$obj_group = new mf_group();
 	$result = $obj_group->get_groups(array('where' => " AND post_status != 'trash'", 'order' => "post_title ASC"));
 
-	if(count($result) > 0)
+	foreach($result as $r)
 	{
-		$arr_data = array();
-
-		$arr_data[''] = "-- ".__("Choose here", 'lang_group')." --";
-
-		foreach($result as $r)
-		{
-			$arr_data[$r->ID] = $r->post_title;
-		}
-
-		echo show_select(array('data' => $arr_data, 'name' => $setting_key, 'compare' => $option));
+		$arr_data[$r->ID] = $r->post_title;
 	}
 
-	else
-	{
-		echo "<p><a href='admin.php?page=mf_group/create/index.php'>".__("Add New", 'lang_group')."</a></p>";
-	}
+	echo show_select(array('data' => $arr_data, 'name' => $setting_key, 'compare' => $option, 'suffix' => "<a href='".admin_url("admin.php?page=mf_group/create/index.php")."'><i class='fa fa-lg fa-plus'></i></a>"));
 }
 
 function setting_group_see_other_roles_callback()
