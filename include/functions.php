@@ -262,105 +262,95 @@ function cron_group()
 		$strMessageText = $r->messageText;
 		$strMessageAttachment = $r->messageAttachment;
 
-		/*$resultUnsent = $wpdb->get_var($wpdb->prepare("SELECT queueSent FROM ".$wpdb->base_prefix."group_queue WHERE queueID = '%d' AND queueSent = '0' LIMIT 0, 1", $intQueueID));
+		//$resultUnsent = $wpdb->get_var($wpdb->prepare("SELECT queueSent FROM ".$wpdb->base_prefix."group_queue WHERE queueID = '%d' AND queueSent = '0' LIMIT 0, 1", $intQueueID));
 
-		if($resultUnsent == 0)
-		{*/
-			if($strMessageType == "email")
+		if($strMessageType == "email")
+		{
+			$strMessageFromName = "";
+
+			if(preg_match("/\|/", $strMessageFrom))
 			{
-				$strMessageFromName = "";
-
-				if(preg_match("/\|/", $strMessageFrom))
-				{
-					list($strMessageFromName, $strMessageFrom) = explode("|", $strMessageFrom);
-				}
-
-				else
-				{
-					$strMessageFromName = $strMessageFrom;
-				}
-
-				$mail_headers = "From: ".$strMessageFromName." <".$strMessageFrom.">\r\n";
-
-				if($strAddressEmail != '' && is_domain_valid($strAddressEmail))
-				{
-					$mail_to = $strAddressEmail;
-					$mail_subject = $strMessageName;
-					$mail_content = stripslashes(apply_filters('the_content', $strMessageText));
-
-					$unsubscribe_link = get_email_link(array('type' => "unsubscribe", 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID)); 
-					$verify_link = get_email_link(array('type' => "verify", 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
-
-					$mail_content = str_replace("[unsubscribe_link]", $unsubscribe_link, $mail_content);
-
-					$mail_content .= "<img src='".$verify_link."' style='height: 0; visibility: hidden; width: 0'>";
-
-					$mail_attachment = get_attachment_to_send($strMessageAttachment);
-
-					add_filter('wp_mail_content_type', 'set_html_content_type');
-
-					$sent = wp_mail($mail_to, $mail_subject, $mail_content, $mail_headers, $mail_attachment);
-
-					if($sent)
-					{
-						$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->base_prefix."group_queue SET queueSent = '1', queueSentTime = NOW() WHERE queueID = '%d'", $intQueueID));
-
-						$mail_sent++;
-
-						do_log("Not sent to ".$mail_to, "trash");
-					}
-
-					else
-					{
-						do_log("Not sent to ".$mail_to.", ".$mail_subject.", ".substr(htmlspecialchars($mail_content), 0, 20)."..., ".htmlspecialchars($mail_headers).", ".var_export($mail_attachment, true));
-					}
-				}
-
-				else
-				{
-					$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->base_prefix."group_queue WHERE queueID = '%d'", $intQueueID));
-				}
+				list($strMessageFromName, $strMessageFrom) = explode("|", $strMessageFrom);
 			}
 
-			else if($strMessageType == "sms")
+			else
 			{
-				//Must be here to make sure that send_sms() is loaded
-				##################
-				include_once(ABSPATH."wp-admin/includes/plugin.php");
+				$strMessageFromName = $strMessageFrom;
+			}
 
-				if(is_plugin_active("mf_sms/index.php"))
+			$mail_headers = "From: ".$strMessageFromName." <".$strMessageFrom.">\r\n";
+
+			if($strAddressEmail != '' && is_domain_valid($strAddressEmail))
+			{
+				$mail_to = $strAddressEmail;
+				$mail_subject = $strMessageName;
+				$mail_content = stripslashes(apply_filters('the_content', $strMessageText));
+
+				$unsubscribe_link = get_email_link(array('type' => "unsubscribe", 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID)); 
+				$verify_link = get_email_link(array('type' => "verify", 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
+
+				$mail_content = str_replace("[unsubscribe_link]", $unsubscribe_link, $mail_content);
+
+				$mail_content .= "<img src='".$verify_link."' style='height: 0; visibility: hidden; width: 0'>";
+
+				$mail_attachment = get_attachment_to_send($strMessageAttachment);
+
+				add_filter('wp_mail_content_type', 'set_html_content_type');
+
+				$sent = wp_mail($mail_to, $mail_subject, $mail_content, $mail_headers, $mail_attachment);
+
+				if($sent)
 				{
-					include_once(ABSPATH."wp-content/plugins/mf_sms/include/functions.php");
-				}
-				##################
-
-				$sent = send_sms(array('from' => $strMessageFrom, 'to' => $strAddressCellNo, 'text' => $strMessageText));
-
-				if($sent == "OK")
-				{
-					echo "OK...";
-
 					$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->base_prefix."group_queue SET queueSent = '1', queueSentTime = NOW() WHERE queueID = '%d'", $intQueueID));
 
-					$sms_sent++;
+					$mail_sent++;
+
+					do_log("Not sent to ".$mail_to, "trash");
 				}
 
 				else
 				{
-					do_log("Not sent to ".$strAddressCellNo.", ".substr(htmlspecialchars($strMessageText), 0, 20)."...");
+					do_log("Not sent to ".$mail_to.", ".$mail_subject.", ".substr(htmlspecialchars($mail_content), 0, 20)."..., ".htmlspecialchars($mail_headers).", ".var_export($mail_attachment, true));
 				}
 			}
-		/*}
 
-		else
+			else
+			{
+				$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->base_prefix."group_queue WHERE queueID = '%d'", $intQueueID));
+			}
+		}
+
+		else if($strMessageType == "sms")
 		{
-			do_log("No rows when running: ".$wpdb->prepare("SELECT queueSent FROM ".$wpdb->base_prefix."group_queue WHERE queueID = '%d' AND queueSent = '0' LIMIT 0, 1", $intQueueID));
-		}*/
+			//Must be here to make sure that send_sms() is loaded
+			##################
+			include_once(ABSPATH."wp-admin/includes/plugin.php");
+
+			if(is_plugin_active("mf_sms/index.php"))
+			{
+				include_once(ABSPATH."wp-content/plugins/mf_sms/include/functions.php");
+			}
+			##################
+
+			$sent = send_sms(array('from' => $strMessageFrom, 'to' => $strAddressCellNo, 'text' => $strMessageText));
+
+			if($sent == "OK")
+			{
+				echo "OK...";
+
+				$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->base_prefix."group_queue SET queueSent = '1', queueSentTime = NOW() WHERE queueID = '%d'", $intQueueID));
+
+				$sms_sent++;
+			}
+
+			else
+			{
+				do_log("Not sent to ".$strAddressCellNo.", ".substr(htmlspecialchars($strMessageText), 0, 20)."...");
+			}
+		}
 
 		$i++;
 	}
-
-	//do_log(__("E-mails sent", 'lang_group').": ".$mail_sent.", ".__("SMS sent", 'lang_group').": ".$sms_sent);
 }
 
 function show_group_registration_form($post_id)

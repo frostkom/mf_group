@@ -39,14 +39,30 @@ get_header();
 
 								if($wpdb->num_rows > 0)
 								{
-									foreach($result as $r)
+									if(isset($_POST['btnUnsubscribe']))
 									{
-										$intAddressID = $r->addressID;
+										foreach($result as $r)
+										{
+											$intAddressID = $r->addressID;
 
-										$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->base_prefix."address2group SET groupUnsubscribed = '1' WHERE groupID = '%d' AND addressID = '%d'", $intGroupID, $intAddressID));
+											$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->base_prefix."address2group SET groupUnsubscribed = '1' WHERE groupID = '%d' AND addressID = '%d'", $intGroupID, $intAddressID));
+										}
+
+										$out .= __("You have been successfully unsubscribed", 'lang_group');
 									}
 
-									$out .= __("You have been successfully unsubscribed", 'lang_group');
+									else
+									{
+										$out .= "<form method='post' action='' class='mf_form'>
+											<p>".__("Are you sure that you want to unsubscribe?", 'lang_group')."</p>
+											<div class='form_button'>"
+												.show_submit(array('name' => "btnUnsubscribe", 'text' => __("Unsubscribe", 'lang_group')))
+											."</div>"
+											.input_hidden(array('name' => 'unsubscribe', 'value' => $strUnsubscribeHash))
+											.input_hidden(array('name' => 'gid', 'value' => $intGroupID))
+											.input_hidden(array('name' => 'aem', 'value' => $strAddressEmail))
+										."</form>";
+									}
 								}
 
 								else
