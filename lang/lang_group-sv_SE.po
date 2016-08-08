@@ -2,6 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-06-22 11:33+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -74,30 +75,38 @@ msgstr "Kontaktsida"
 #: ../create/index.php:141
 #: ../create/index.php:146
 #: ../include/classes.php:302
+#: ../include/functions.php:498
 msgid "Name"
 msgstr "Namn"
 
 #: ../create/index.php:147
+#: ../include/functions.php:503
 msgid "Address"
 msgstr "Adress"
 
 #: ../create/index.php:148
+#: ../include/functions.php:508
 msgid "Zip Code"
 msgstr "Postnummer"
 
 #: ../create/index.php:149
+#: ../include/functions.php:513
 msgid "City"
 msgstr "Stad"
 
 #: ../create/index.php:150
+#: ../include/functions.php:518
 msgid "Phone Number"
 msgstr "Telefonnummer"
 
 #: ../create/index.php:151
+#: ../include/functions.php:523
+#: ../include/functions.php:534
 msgid "E-mail"
 msgstr "E-post"
 
 #: ../create/index.php:152
+#: ../include/functions.php:528
 msgid "Extra"
 msgstr "Extra"
 
@@ -261,12 +270,15 @@ msgstr "Lägg till ny"
 msgid "Send New"
 msgstr "Skicka nytt"
 
+#: ../include/functions.php:437
 msgid "The information that you entered is not in our register. Please contact the admin of this page to get your information submitted."
 msgstr "Informationen som du angav finns inte med i vårt register. Var vänlig kontakta oss så lägger vi in det."
 
+#: ../include/functions.php:480
 msgid "Thank you for showing your interest. You have been added to the group"
 msgstr "Tack för visat intresse. Du har lagts till i gruppen"
 
+#: ../include/functions.php:538
 msgid "Join"
 msgstr "Gå med"
 

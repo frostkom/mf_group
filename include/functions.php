@@ -536,9 +536,9 @@ function show_group_registration_form($post_id)
 
 			$out .= "<div class='form_button'>"
 				.show_submit(array('name' => "btnGroupJoin", 'text' => __("Join", 'lang_group')))
-				.wp_nonce_field('group_join', '_wpnonce', true, false)
-			."</div>
-		</form>";
+			."</div>"
+			.wp_nonce_field('group_join', '_wpnonce', true, false)
+		."</form>";
 	}
 
 	return $out;

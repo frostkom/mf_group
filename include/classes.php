@@ -79,9 +79,12 @@ class mf_group
 	{
 		global $wpdb;
 
-		$intAddressID = $wpdb->get_var("SELECT addressID FROM ".$wpdb->base_prefix."address WHERE addressDeleted = '0' AND ".$query_where);
+		if($query_where != '')
+		{
+			$intAddressID = $wpdb->get_var("SELECT addressID FROM ".$wpdb->base_prefix."address WHERE addressDeleted = '0' AND ".$query_where);
 
-		return $intAddressID;
+			return $intAddressID;
+		}
 	}
 
 	function add_address($data)
