@@ -9,20 +9,25 @@ if(!IS_EDITOR)
 
 $type = check_var('type', 'char', true, 'email');
 $intGroupID = check_var('intGroupID');
+$arrGroupID = check_var('arrGroupID');
 $intMessageID = check_var('intMessageID');
 $strMessageFrom = check_var('strMessageFrom');
 $strMessageName = check_var('strMessageName');
 $strMessageText_orig = $strMessageText = check_var('strMessageText', 'raw');
 $strMessageAttachment = check_var('strMessageAttachment');
-
 $intEmailTextSource = check_var('intEmailTextSource');
 
-if(isset($_POST['btnGroupSend']) && $intGroupID > 0 && wp_verify_nonce($_POST['_wpnonce'], 'group_send'))
+if($intGroupID > 0 && !in_array($intGroupID, $arrGroupID))
 {
-	$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE post_type = 'mf_group' AND ID = '%d'".$query_xtra." LIMIT 0, 1", $intGroupID));
+	$arrGroupID[] = $intGroupID;
+}
+
+if(isset($_POST['btnGroupSend']) && count($arrGroupID) > 0 && wp_verify_nonce($_POST['_wpnonce'], 'group_send')) // && $intGroupID > 0
+{
+	/*$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE post_type = 'mf_group' AND ID = '%d'".$query_xtra." LIMIT 0, 1", $intGroupID));
 
 	if($wpdb->num_rows > 0)
-	{
+	{*/
 		if($strMessageText == '')
 		{
 			$error_text = __("You have to enter a text to send", 'lang_group');
@@ -30,55 +35,63 @@ if(isset($_POST['btnGroupSend']) && $intGroupID > 0 && wp_verify_nonce($_POST['_
 
 		else if($type == "email" || $type == "sms")
 		{
-			$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->base_prefix."group_message SET groupID = '%d', messageType = %s, messageFrom = %s, messageName = %s, messageText = %s, messageAttachment = %s, messageCreated = NOW(), userID = '%d'", $intGroupID, $type, $strMessageFrom, $strMessageName, $strMessageText, $strMessageAttachment, get_current_user_id()));
+			$message_recepients = 0;
 
-			$intMessageID = $wpdb->insert_id;
-
-			if($intMessageID > 0)
+			foreach($arrGroupID as $intGroupID)
 			{
-				$message_recepients = 0;
+				$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE post_type = 'mf_group' AND ID = '%d'".$query_xtra." LIMIT 0, 1", $intGroupID));
 
-				$result = $wpdb->get_results($wpdb->prepare("SELECT addressID, addressEmail, addressCellNo FROM ".$wpdb->base_prefix."address INNER JOIN ".$wpdb->base_prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' AND groupUnsubscribed = '0'", $intGroupID));
-
-				foreach($result as $r)
+				if($wpdb->num_rows > 0)
 				{
-					$intAddressID = $r->addressID;
-					$strAddressEmail = $r->addressEmail;
-					$strAddressCellNo = $r->addressCellNo;
+					$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->base_prefix."group_message SET groupID = '%d', messageType = %s, messageFrom = %s, messageName = %s, messageText = %s, messageAttachment = %s, messageCreated = NOW(), userID = '%d'", $intGroupID, $type, $strMessageFrom, $strMessageName, $strMessageText, $strMessageAttachment, get_current_user_id()));
 
-					if($type == "email" && $strAddressEmail != "" || $type == "sms" && $strAddressCellNo != "")
+					$intMessageID = $wpdb->insert_id;
+
+					if($intMessageID > 0)
 					{
-						$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->base_prefix."group_queue SET addressID = '%d', messageID = '%d', queueCreated = NOW()", $intAddressID, $intMessageID));
+						$result = $wpdb->get_results($wpdb->prepare("SELECT addressID, addressEmail, addressCellNo FROM ".$wpdb->base_prefix."address INNER JOIN ".$wpdb->base_prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' AND groupUnsubscribed = '0'", $intGroupID));
 
-						if($wpdb->rows_affected > 0)
+						foreach($result as $r)
 						{
-							$message_recepients++;
+							$intAddressID = $r->addressID;
+							$strAddressEmail = $r->addressEmail;
+							$strAddressCellNo = $r->addressCellNo;
+
+							if($type == "email" && $strAddressEmail != "" || $type == "sms" && $strAddressCellNo != "")
+							{
+								$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->base_prefix."group_queue SET addressID = '%d', messageID = '%d', queueCreated = NOW()", $intAddressID, $intMessageID));
+
+								if($wpdb->rows_affected > 0)
+								{
+									$message_recepients++;
+								}
+							}
 						}
 					}
-				}
 
-				if($message_recepients > 0)
-				{
-					mf_redirect("/wp-admin/admin.php?page=mf_group/list/index.php&sent");
+					else
+					{
+						$error_text = __("There was an error when saving the message", 'lang_group');
+					}
 				}
+			}
 
-				else
-				{
-					$error_text = __("The message was not sent to anybody", 'lang_group');
-				}
+			if($message_recepients > 0)
+			{
+				mf_redirect("/wp-admin/admin.php?page=mf_group/list/index.php&sent");
 			}
 
 			else
 			{
-				$error_text = __("There was an error when saving the message", 'lang_group');
+				$error_text = __("The message was not sent to anybody", 'lang_group');
 			}
 		}
-	}
+	/*}
 
 	else
 	{
 		$error_text = __("There was no group to send to", 'lang_group');
-	}
+	}*/
 }
 
 else if($intEmailTextSource > 0)
@@ -99,7 +112,7 @@ else if($intMessageID > 0)
 }
 
 echo "<div class='wrap'>
-	<h2>".__("Send to", 'lang_group')." ".get_group_name($intGroupID)."</h2>"
+	<h2>".__("Send message", 'lang_group')."</h2>" //." ".get_group_name($intGroupID)
 	.get_notification()
 	."<div id='poststuff'>
 		<form action='#' method='post' class='mf_form mf_settings'>
@@ -164,11 +177,14 @@ echo "<div class='wrap'>
 									}
 								}
 
-								echo "<div class='flex_flow'>"
-									.show_select(array('data' => $arr_data_from, 'name' => 'strMessageFrom', 'text' => __("From", 'lang_group'), 'compare' => $strMessageFrom, 'required' => true))
-									.show_select(array('data' => $arr_data_to, 'name' => 'intGroupID', 'text' => __("To", 'lang_group'), 'compare' => $intGroupID))
+								echo "<div class='flex_flow'>
+									<div>"
+										.show_select(array('data' => $arr_data_from, 'name' => 'strMessageFrom', 'text' => __("From", 'lang_group'), 'compare' => $strMessageFrom, 'required' => true))
+										.show_textfield(array('name' => "strMessageName", 'text' => __("Subject", 'lang_group'), 'value' => $strMessageName, 'required' => true))
+									."</div>"
+									//.show_select(array('data' => $arr_data_to, 'name' => 'intGroupID', 'text' => __("To", 'lang_group'), 'compare' => $intGroupID))
+									.show_select(array('data' => $arr_data_to, 'name' => 'arrGroupID[]', 'text' => __("To", 'lang_group'), 'compare' => $arrGroupID, 'maxsize' => 5))
 								."</div>"
-								.show_textfield(array('name' => "strMessageName", 'text' => __("Subject", 'lang_group'), 'value' => $strMessageName, 'required' => true))
 								.mf_editor($strMessageText, "strMessageText");
 							}
 
@@ -194,10 +210,9 @@ echo "<div class='wrap'>
 									$arr_data_from[$sms_phone] = $sms_phone;
 								}
 
-								echo "<div class='flex_flow'>"
-									.show_select(array('data' => $arr_data_from, 'name' => 'strMessageFrom', 'text' => __("From", 'lang_group'), 'compare' => $strMessageFrom, 'required' => true))
-									.show_select(array('data' => $arr_data_to, 'name' => 'intGroupID', 'text' => __("To", 'lang_group'), 'compare' => $intGroupID))
-								."</div>"
+								echo show_select(array('data' => $arr_data_from, 'name' => 'strMessageFrom', 'text' => __("From", 'lang_group'), 'compare' => $strMessageFrom, 'required' => true))
+								//.show_select(array('data' => $arr_data_to, 'name' => 'intGroupID', 'text' => __("To", 'lang_group'), 'compare' => $intGroupID))
+								.show_select(array('data' => $arr_data_to, 'name' => 'arrGroupID[]', 'text' => __("To", 'lang_group'), 'compare' => $arrGroupID, 'maxsize' => 5))
 								.show_textarea(array('name' => "strMessageText", 'text' => __("Message", 'lang_group'), 'value' => $strMessageText, 'required' => true));
 							}
 
