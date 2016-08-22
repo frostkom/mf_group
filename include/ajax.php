@@ -28,7 +28,7 @@ if(get_current_user_id() > 0)
 		$obj_group = new mf_group();
 
 		$result = $obj_group->get_groups(array('where' => " AND (post_title LIKE '%".$strSearch."%')", 'limit' => 0, 'amount' => 10));
-		
+
 		foreach($result as $r)
 		{
 			$json_output[] = $r->post_title;

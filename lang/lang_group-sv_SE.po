@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-06-22 11:33+0100\n"
+"POT-Creation-Date: 2016-08-22 11:34+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -22,8 +22,8 @@ msgid "The information was not submitted, contact an admin if this persists"
 msgstr "Informationen las inte in, kontakta en administratör om problemet kvarstår"
 
 #: ../create/index.php:79
-#: ../include/classes.php:170
-#: ../include/classes.php:221
+#: ../include/classes.php:173
+#: ../include/classes.php:224
 #: ../include/functions.php:71
 #: ../include/functions.php:72
 #: ../include/functions.php:73
@@ -50,7 +50,7 @@ msgid "No"
 msgstr "Nej"
 
 #: ../create/index.php:121
-#: ../include/classes.php:294
+#: ../include/classes.php:297
 msgid "Public"
 msgstr "Publik"
 
@@ -60,11 +60,11 @@ msgstr "Verifiera att adress finns i Adressboken"
 
 #: ../create/index.php:130
 #: ../create/index.php:166
-#: ../include/classes.php:223
+#: ../include/classes.php:226
 #: ../include/functions.php:126
-#: ../send/index.php:139
-#: ../send/index.php:182
-#: ../send/index.php:215
+#: ../send/index.php:152
+#: ../send/index.php:198
+#: ../send/index.php:230
 msgid "Choose here"
 msgstr "Välj här"
 
@@ -74,7 +74,7 @@ msgstr "Kontaktsida"
 
 #: ../create/index.php:141
 #: ../create/index.php:146
-#: ../include/classes.php:302
+#: ../include/classes.php:305
 #: ../include/functions.php:498
 msgid "Name"
 msgstr "Namn"
@@ -140,7 +140,7 @@ msgstr "Gruppen uppdaterades inte med någon adress"
 
 #: ../import/index.php:108
 #: ../import/index.php:115
-#: ../include/classes.php:357
+#: ../include/classes.php:360
 #: ../include/functions.php:187
 msgid "Import"
 msgstr "Importera"
@@ -169,67 +169,67 @@ msgstr "Gruppen skapades"
 msgid "The group was updated"
 msgstr "Gruppen uppdaterades"
 
-#: ../include/classes.php:165
+#: ../include/classes.php:168
 msgid "Display a group registration form"
 msgstr "Visa ett registreringsformulär till en grupp"
 
-#: ../include/classes.php:217
+#: ../include/classes.php:220
 msgid "Heading"
 msgstr "Rubrik"
 
-#: ../include/classes.php:293
+#: ../include/classes.php:296
 msgid "All"
 msgstr "Alla"
 
-#: ../include/classes.php:295
+#: ../include/classes.php:298
 msgid "Trash"
 msgstr "Papperskorg"
 
-#: ../include/classes.php:303
+#: ../include/classes.php:306
 msgid "Amount"
 msgstr "Antal"
 
-#: ../include/classes.php:304
+#: ../include/classes.php:307
 msgid "Unsubscribed"
 msgstr "Avregistrerade"
 
-#: ../include/classes.php:305
+#: ../include/classes.php:308
 msgid "User"
 msgstr "Användare"
 
-#: ../include/classes.php:306
-#: ../include/classes.php:431
+#: ../include/classes.php:309
+#: ../include/classes.php:434
 #: ../include/functions.php:186
 #: ../sent/index.php:21
 #: ../sent/index.php:31
 msgid "Sent"
 msgstr "Skickat"
 
-#: ../include/classes.php:349
+#: ../include/classes.php:352
 msgid "Edit"
 msgstr "Redigera"
 
-#: ../include/classes.php:353
+#: ../include/classes.php:356
 msgid "Delete"
 msgstr "Radera"
 
-#: ../include/classes.php:356
+#: ../include/classes.php:359
 msgid "Add or remove"
 msgstr "Lägg till/ta bort"
 
-#: ../include/classes.php:359
+#: ../include/classes.php:362
 msgid "CSV"
 msgstr ""
 
-#: ../include/classes.php:363
+#: ../include/classes.php:366
 msgid "XLS"
 msgstr ""
 
-#: ../include/classes.php:369
+#: ../include/classes.php:372
 msgid "Recover"
 msgstr "Återställ"
 
-#: ../include/classes.php:421
+#: ../include/classes.php:424
 msgid "Test Unregistration"
 msgstr "Testa avregistrering"
 
@@ -282,57 +282,53 @@ msgstr "Tack för visat intresse. Du har lagts till i gruppen"
 msgid "Join"
 msgstr "Gå med"
 
-#: ../send/index.php:28
+#: ../send/index.php:33
 msgid "You have to enter a text to send"
 msgstr "Du måste fylla i en text att skicka"
 
-#: ../send/index.php:67
-msgid "The message was not sent to anybody"
-msgstr "Meddelandet skickades inte till någon"
-
-#: ../send/index.php:73
+#: ../send/index.php:74
 msgid "There was an error when saving the message"
 msgstr "Det blev ett fel när meddelandet skulle sparas"
 
-#: ../send/index.php:80
-msgid "There was no group to send to"
-msgstr "Det fanns ingen grupp att skicka meddelandet till"
+#: ../send/index.php:86
+msgid "The message was not sent to anybody"
+msgstr "Meddelandet skickades inte till någon"
 
-#: ../send/index.php:102
-msgid "Send to"
-msgstr "Skicka till"
+#: ../send/index.php:115
+msgid "Send message"
+msgstr "Skicka meddelande"
 
-#: ../send/index.php:109
-#: ../send/index.php:201
+#: ../send/index.php:122
+#: ../send/index.php:216
 msgid "Message"
 msgstr "Meddelande"
 
-#: ../send/index.php:127
+#: ../send/index.php:140
 msgid "If you don't want to get these messages in the future click this link to unsubscribe"
 msgstr "Om du inte vill ha dessa meddelanden i framtiden, klicka på länken för att avregistrera dig"
 
-#: ../send/index.php:168
-#: ../send/index.php:198
+#: ../send/index.php:182
+#: ../send/index.php:213
 #: ../sent/index.php:29
 msgid "From"
 msgstr "Från"
 
-#: ../send/index.php:169
-#: ../send/index.php:199
-msgid "To"
-msgstr "Till"
-
-#: ../send/index.php:171
+#: ../send/index.php:183
 #: ../sent/index.php:30
 msgid "Subject"
 msgstr "Ämne"
 
-#: ../send/index.php:209
-#: ../send/index.php:223
+#: ../send/index.php:186
+#: ../send/index.php:215
+msgid "To"
+msgstr "Till"
+
+#: ../send/index.php:224
+#: ../send/index.php:238
 msgid "Send"
 msgstr "Skicka"
 
-#: ../send/index.php:219
+#: ../send/index.php:234
 msgid "Text Source"
 msgstr "Textkälla"
 
@@ -395,6 +391,12 @@ msgstr "Antingen var du inte med i gruppen eller så har du redan avregistrerat 
 #: ../templates/single-mf_group.php:76
 msgid "Something went wrong. Please contact an admin if the problem persists"
 msgstr "Något gick snett. Var vänlig kontakta en admin ifall problemet kvarstår"
+
+#~ msgid "There was no group to send to"
+#~ msgstr "Det fanns ingen grupp att skicka meddelandet till"
+
+#~ msgid "Send to"
+#~ msgstr "Skicka till"
 
 #~ msgid "Settings"
 #~ msgstr "Inställningar"
@@ -476,9 +478,6 @@ msgstr "Något gick snett. Var vänlig kontakta en admin ifall problemet kvarst�
 
 #~ msgid "Change name"
 #~ msgstr "Ändra namn"
-
-#~ msgid "Send text message"
-#~ msgstr "Skicka SMS"
 
 #~ msgid "The information was not sent, contact an admin if this persisits"
 #~ msgstr ""
