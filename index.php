@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: 
-Version: 3.2.4
+Version: 3.2.9
 Author: Martin Fors
 Author URI: http://frostkom.se
 Text Domain: lang_group
@@ -82,6 +82,35 @@ function activate_group()
 	$arr_add_column[$wpdb->base_prefix."group_queue"]['queueReceived'] = "ALTER TABLE [table] ADD [column] ENUM('-1', '0','1') NOT NULL DEFAULT '0' AFTER queueSent";
 
 	add_columns($arr_add_column);
+
+	//Update DB with post author if not present
+	###############################
+	/*$result = $wpdb->get_results("SELECT ".$wpdb->posts.".ID AS post_id, post_author, display_name, post_content FROM ".$wpdb->posts." LEFT JOIN ".$wpdb->users." ON ".$wpdb->posts.".post_author = ".$wpdb->users.".ID WHERE post_type = 'mf_sms' AND post_author = '0'");
+
+	$i = 0;
+
+	foreach($result as $r)
+	{
+		$post_id = $r->post_id;
+		$post_author = $r->post_author;
+		$post_content = $r->post_content;
+
+		if($post_author == 0 && $i < 10)
+		{
+			$intUserID = $wpdb->get_var($wpdb->prepare("SELECT userID FROM wp_group_message WHERE messageType = 'sms' AND messageText = %s", $post_content));
+
+			if($intUserID > 0)
+			{
+				$query = $wpdb->prepare("UPDATE ".$wpdb->posts." SET post_author = '%d' WHERE ID = '%d'", $intUserID, $post_id);
+				$wpdb->query($query);
+
+				//do_log("SMS Update: ".$query);
+
+				$i++;
+			}
+		}
+	}*/
+	###############################
 }
 
 function uninstall_group()

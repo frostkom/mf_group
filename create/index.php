@@ -118,11 +118,11 @@ echo "<div class='wrap'>
 							'draft' => __("No", 'lang_group'),
 						);
 
-						echo show_select(array('data' => $arr_data, 'name' => 'strGroupPublic', 'text' => __("Public", 'lang_group'), 'compare' => $strGroupPublic));
+						echo show_select(array('data' => $arr_data, 'name' => 'strGroupPublic', 'text' => __("Public", 'lang_group'), 'value' => $strGroupPublic));
 
 						if($strGroupPublic == "publish")
 						{
-							echo show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupVerifyAddress', 'text' => __("Verify that address is in Address book", 'lang_group'), 'compare' => $strGroupVerifyAddress));
+							echo show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupVerifyAddress', 'text' => __("Verify that address is in Address book", 'lang_group'), 'value' => $strGroupVerifyAddress));
 
 							if($strGroupVerifyAddress == "yes")
 							{
@@ -131,7 +131,7 @@ echo "<div class='wrap'>
 
 								get_post_children(array('output_array' => true), $arr_data);
 
-								echo show_select(array('data' => $arr_data, 'name' => 'intGroupContactPage', 'text' => __("Contact Page", 'lang_group'), 'compare' => $intGroupContactPage));
+								echo show_select(array('data' => $arr_data, 'name' => 'intGroupContactPage', 'text' => __("Contact Page", 'lang_group'), 'value' => $intGroupContactPage));
 							}
 						}
 
@@ -152,7 +152,7 @@ echo "<div class='wrap'>
 						'extra' => get_option_or_default('setting_address_extra', __("Extra", 'lang_group')),
 					);
 
-					echo show_select(array('data' => $arr_data, 'name' => 'arrGroupRegistrationFields[]', 'text' => __("Registration Fields", 'lang_group'), 'compare' => $arrGroupRegistrationFields));
+					echo show_select(array('data' => $arr_data, 'name' => 'arrGroupRegistrationFields[]', 'text' => __("Registration Fields", 'lang_group'), 'value' => $arrGroupRegistrationFields));
 				}
 
 				if(!($intGroupID > 0))

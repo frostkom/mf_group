@@ -133,7 +133,7 @@ function setting_group_import_callback()
 		$arr_data[$r->ID] = $r->post_title;
 	}
 
-	echo show_select(array('data' => $arr_data, 'name' => $setting_key, 'compare' => $option, 'suffix' => "<a href='".admin_url("admin.php?page=mf_group/create/index.php")."'><i class='fa fa-lg fa-plus'></i></a>"));
+	echo show_select(array('data' => $arr_data, 'name' => $setting_key, 'value' => $option, 'suffix' => "<a href='".admin_url("admin.php?page=mf_group/create/index.php")."'><i class='fa fa-lg fa-plus'></i></a>"));
 }
 
 function setting_group_see_other_roles_callback()
@@ -141,7 +141,7 @@ function setting_group_see_other_roles_callback()
 	$setting_key = get_setting_key(__FUNCTION__);
 	$option = get_option($setting_key, 'yes');
 
-	echo show_select(array('data' => get_yes_no_for_select(), 'name' => $setting_key, 'compare' => $option));
+	echo show_select(array('data' => get_yes_no_for_select(), 'name' => $setting_key, 'value' => $option));
 }
 
 function setting_emails_per_hour_callback()
@@ -178,13 +178,23 @@ function menu_group()
 
 	$count_message = count_unsent_group();
 
-	add_menu_page("", __("Groups", 'lang_group').$count_message, $menu_capability, $menu_start, '', 'dashicons-groups');
+	$menu_title = __("Groups", 'lang_group');
+	add_menu_page("", $menu_title.$count_message, $menu_capability, $menu_start, '', 'dashicons-groups');
 
-	add_submenu_page($menu_start, __("List", 'lang_group'), __("List", 'lang_group'), $menu_capability, $menu_start);
-	add_submenu_page($menu_start, __("Add New", 'lang_group'), __("Add New", 'lang_group'), $menu_capability, $menu_root."create/index.php");
-	add_submenu_page($menu_start, __("Send New", 'lang_group'), __("Send New", 'lang_group'), $menu_capability, $menu_root."send/index.php");
-	add_submenu_page($menu_root, __("Sent", 'lang_group'), __("Sent", 'lang_group'), $menu_capability, $menu_root."sent/index.php");
-	add_submenu_page($menu_root, __("Import", 'lang_group'), __("Import", 'lang_group'), $menu_capability, $menu_root."import/index.php");
+	$menu_title = __("List", 'lang_group');
+	add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, $menu_start);
+
+	$menu_title = __("Add New", 'lang_group');
+	add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, $menu_root."create/index.php");
+
+	$menu_title = __("Send New", 'lang_group');
+	add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, $menu_root."send/index.php");
+
+	$menu_title = __("Sent", 'lang_group');
+	add_submenu_page($menu_root, $menu_title, $menu_title, $menu_capability, $menu_root."sent/index.php");
+
+	$menu_title = __("Import", 'lang_group');
+	add_submenu_page($menu_root, $menu_title, $menu_title, $menu_capability, $menu_root."import/index.php");
 }
 
 function get_group_name($id)
@@ -241,7 +251,7 @@ function cron_group()
 		$query_limit = " LIMIT 0, ".$emails_left_to_send;
 	}
 
-	$result = $wpdb->get_results("SELECT groupID, addressEmail, addressCellNo, queueID, messageType, messageFrom, messageName, messageText, messageAttachment FROM ".$wpdb->base_prefix."address INNER JOIN ".$wpdb->base_prefix."group_queue USING (addressID) INNER JOIN ".$wpdb->base_prefix."group_message USING (messageID) WHERE queueSent = '0' ORDER BY messageType ASC, queueCreated ASC".$query_limit);
+	$result = $wpdb->get_results("SELECT groupID, addressEmail, addressCellNo, queueID, messageType, messageFrom, messageName, messageText, messageAttachment, ".$wpdb->base_prefix."group_message.userID FROM ".$wpdb->base_prefix."address INNER JOIN ".$wpdb->base_prefix."group_queue USING (addressID) INNER JOIN ".$wpdb->base_prefix."group_message USING (messageID) WHERE queueSent = '0' ORDER BY messageType ASC, queueCreated ASC".$query_limit);
 
 	$i = 0;
 
@@ -261,6 +271,7 @@ function cron_group()
 		$strMessageName = $r->messageName;
 		$strMessageText = $r->messageText;
 		$strMessageAttachment = $r->messageAttachment;
+		$intUserID = $r->userID;
 
 		//$resultUnsent = $wpdb->get_var($wpdb->prepare("SELECT queueSent FROM ".$wpdb->base_prefix."group_queue WHERE queueID = '%d' AND queueSent = '0' LIMIT 0, 1", $intQueueID));
 
@@ -332,7 +343,7 @@ function cron_group()
 			}
 			##################
 
-			$sent = send_sms(array('from' => $strMessageFrom, 'to' => $strAddressCellNo, 'text' => $strMessageText));
+			$sent = send_sms(array('from' => $strMessageFrom, 'to' => $strAddressCellNo, 'text' => $strMessageText, 'user_id' => $intUserID));
 
 			if($sent == "OK")
 			{

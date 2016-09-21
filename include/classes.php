@@ -216,31 +216,29 @@ class widget_group extends WP_Widget
 
 		$instance = wp_parse_args((array)$instance, $defaults);
 
-		echo "<p>
-			<label for='".$this->get_field_id('group_heading')."'>".__("Heading", 'lang_group')."</label>
-			<input type='text' name='".$this->get_field_name('group_heading')."' value='".$instance['group_heading']."' class='widefat'>
-		</p>
-		<p>
-			<label for='".$this->get_field_id('group_id')."'>".__("Group", 'lang_group')."</label>
-			<select name='".$this->get_field_name('group_id')."' id='".$this->get_field_id('group_id')."' class='widefat'>
-				<option value=''>-- ".__("Choose here", 'lang_group')." --</option>";
+		$arr_data = array();
+		$arr_data[''] = "-- ".__("Choose here", 'lang_group')." --";
 
-				$query_xtra = "";
+		$query_xtra = "";
 
-				if(!IS_EDITOR)
-				{
-					$query_xtra .= " AND post_author = '".get_current_user_id()."'";
-				}
+		if(!IS_EDITOR)
+		{
+			$query_xtra .= " AND post_author = '".get_current_user_id()."'";
+		}
 
-				$result = $wpdb->get_results("SELECT ID, post_title FROM ".$wpdb->posts." WHERE post_type = 'mf_group' AND post_status != 'trash'".$query_xtra." ORDER BY post_status ASC, post_title ASC");
+		$result = $wpdb->get_results("SELECT ID, post_title FROM ".$wpdb->posts." WHERE post_type = 'mf_group' AND post_status != 'trash'".$query_xtra." ORDER BY post_status ASC, post_title ASC");
 
-				foreach($result as $r)
-				{
-					echo "<option value='".$r->ID."'".($instance['group_id'] == $r->ID ? " selected" : "").">".$r->post_title."</option>";
-				}
+		foreach($result as $r)
+		{
+			$arr_data[$r->ID] = $r->post_title;
+		}
 
-			echo "</select>
-		</p>";
+		echo "<p>"
+			.show_textfield(array('name' => $this->get_field_name('group_heading'), 'text' => __("Heading", 'lang_group'), 'value' => $instance['group_heading'], 'xtra' => "class='widefat'"))
+		."</p>
+		<p>"
+			.show_select(array('data' => $arr_data, 'name' => $this->get_field_name('group_id'), 'text' => __("Group", 'lang_group'), 'value' => $instance['group_id'], 'xtra' => " class='widefat'"))
+		."</p>";
 	}
 }
 

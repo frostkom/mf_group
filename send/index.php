@@ -179,11 +179,10 @@ echo "<div class='wrap'>
 
 								echo "<div class='flex_flow'>
 									<div>"
-										.show_select(array('data' => $arr_data_from, 'name' => 'strMessageFrom', 'text' => __("From", 'lang_group'), 'compare' => $strMessageFrom, 'required' => true))
+										.show_select(array('data' => $arr_data_from, 'name' => 'strMessageFrom', 'text' => __("From", 'lang_group'), 'value' => $strMessageFrom, 'required' => true))
 										.show_textfield(array('name' => "strMessageName", 'text' => __("Subject", 'lang_group'), 'value' => $strMessageName, 'required' => true))
 									."</div>"
-									//.show_select(array('data' => $arr_data_to, 'name' => 'intGroupID', 'text' => __("To", 'lang_group'), 'compare' => $intGroupID))
-									.show_select(array('data' => $arr_data_to, 'name' => 'arrGroupID[]', 'text' => __("To", 'lang_group'), 'compare' => $arrGroupID, 'maxsize' => 5))
+									.show_select(array('data' => $arr_data_to, 'name' => 'arrGroupID[]', 'text' => __("To", 'lang_group'), 'value' => $arrGroupID, 'maxsize' => 5))
 								."</div>"
 								.mf_editor($strMessageText, "strMessageText");
 							}
@@ -210,9 +209,8 @@ echo "<div class='wrap'>
 									$arr_data_from[$sms_phone] = $sms_phone;
 								}
 
-								echo show_select(array('data' => $arr_data_from, 'name' => 'strMessageFrom', 'text' => __("From", 'lang_group'), 'compare' => $strMessageFrom, 'required' => true))
-								//.show_select(array('data' => $arr_data_to, 'name' => 'intGroupID', 'text' => __("To", 'lang_group'), 'compare' => $intGroupID))
-								.show_select(array('data' => $arr_data_to, 'name' => 'arrGroupID[]', 'text' => __("To", 'lang_group'), 'compare' => $arrGroupID, 'maxsize' => 5))
+								echo show_select(array('data' => $arr_data_from, 'name' => 'strMessageFrom', 'text' => __("From", 'lang_group'), 'value' => $strMessageFrom, 'required' => true))
+								.show_select(array('data' => $arr_data_to, 'name' => 'arrGroupID[]', 'text' => __("To", 'lang_group'), 'value' => $arrGroupID, 'maxsize' => 5))
 								.show_textarea(array('name' => "strMessageText", 'text' => __("Message", 'lang_group'), 'value' => $strMessageText, 'required' => true));
 							}
 
