@@ -2,7 +2,7 @@
 
 class mf_group
 {
-	function mf_group($id = 0)
+	function __construct($id = 0)
 	{
 		if($id > 0)
 		{
