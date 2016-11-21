@@ -233,7 +233,7 @@ echo "<div class='wrap'>
 								.get_media_button(array('name' => "strMessageAttachment", 'value' => $strMessageAttachment));
 							}
 
-							echo show_submit(array('name' => "btnGroupSend", 'text' => __("Send", 'lang_group')))
+							echo show_button(array('name' => "btnGroupSend", 'text' => __("Send", 'lang_group')))
 							.wp_nonce_field('group_send', '_wpnonce', true, false);
 
 							if($type == "sms")

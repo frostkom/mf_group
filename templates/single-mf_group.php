@@ -56,7 +56,7 @@ get_header();
 										$out .= "<form method='post' action='' class='mf_form'>
 											<p>".__("Are you sure that you want to unsubscribe?", 'lang_group')."</p>
 											<div class='form_button'>"
-												.show_submit(array('name' => "btnUnsubscribe", 'text' => __("Unsubscribe", 'lang_group')))
+												.show_button(array('name' => "btnUnsubscribe", 'text' => __("Unsubscribe", 'lang_group')))
 											."</div>"
 											.input_hidden(array('name' => 'unsubscribe', 'value' => $strUnsubscribeHash))
 											.input_hidden(array('name' => 'gid', 'value' => $intGroupID))

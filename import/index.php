@@ -112,7 +112,7 @@ echo "<div class='wrap'>
 		<div class='inside'>
 			<form action='#' method='post' class='mf_form mf_settings'>"
 				.show_textarea(array('name' => "strGroupImport", 'text' => __("Text", 'lang_group'), 'value' => $strGroupImport, 'xtra' => "autofocus", 'placeholder' => __("Enter social security numbers or e-mail addresses on separate rows for import", 'lang_group')))
-				.show_submit(array('name' => "btnGroupImport", 'text' => __("Import", 'lang_group')))
+				.show_button(array('name' => "btnGroupImport", 'text' => __("Import", 'lang_group')))
 				.input_hidden(array('name' => "intGroupID", 'value' => $intGroupID))
 				.wp_nonce_field('group_import', '_wpnonce', true, false)
 			."</form>

@@ -304,7 +304,7 @@ function cron_group()
 
 				$mail_content .= "<img src='".$verify_link."' style='height: 0; visibility: hidden; width: 0'>";
 
-				$mail_attachment = get_attachment_to_send($strMessageAttachment);
+				list($mail_attachment, $rest) = get_attachment_to_send($strMessageAttachment);
 
 				add_filter('wp_mail_content_type', 'set_html_content_type');
 
@@ -546,7 +546,7 @@ function show_group_registration_form($post_id)
 			}
 
 			$out .= "<div class='form_button'>"
-				.show_submit(array('name' => "btnGroupJoin", 'text' => __("Join", 'lang_group')))
+				.show_button(array('name' => "btnGroupJoin", 'text' => __("Join", 'lang_group')))
 			."</div>"
 			.wp_nonce_field('group_join', '_wpnonce', true, false)
 		."</form>";

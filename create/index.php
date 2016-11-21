@@ -174,7 +174,7 @@ echo "<div class='wrap'>
 					}
 				}
 
-				echo show_submit(array('name' => "btnGroupCreate", 'text' => __("Save", 'lang_group')))
+				echo show_button(array('name' => "btnGroupCreate", 'text' => __("Save", 'lang_group')))
 				.input_hidden(array('name' => "intGroupID", 'value' => $intGroupID))
 			."</form>
 		</div>
