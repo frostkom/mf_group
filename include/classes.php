@@ -154,6 +154,7 @@ class mf_group_export extends mf_export
 				$r->addressCellNo,
 				$r->addressWorkNo,
 				$r->addressEmail,
+				$r->addressExtra,
 			);
 		}
 	}
@@ -357,11 +358,17 @@ class mf_group_table extends mf_list_table
 					$actions['addnremove'] = "<a href='?page=mf_address/list/index.php&intGroupID=".$post_id."'>".__("Add or remove", 'lang_group')."</a>";
 					$actions['import'] = "<a href='?page=mf_group/import/index.php&intGroupID=".$post_id."'>".__("Import", 'lang_group')."</a>";
 
-					$actions['export_csv'] = "<a href='".wp_nonce_url("?page=mf_group/list/index.php&btnExportRun&intExportType=".$post_id."&strExportAction=csv", 'export_run')."'>".__("CSV", 'lang_group')."</a>";
+					$obj_group = new mf_group($post_id);
+					$amount = $obj_group->amount_in_group();
 
-					if(is_plugin_active("mf_phpexcel/index.php"))
+					if($amount > 0)
 					{
-						$actions['export_xls'] = "<a href='".wp_nonce_url("?page=mf_group/list/index.php&btnExportRun&intExportType=".$post_id."&strExportAction=xls", 'export_run')."'>".__("XLS", 'lang_group')."</a>";
+						$actions['export_csv'] = "<a href='".wp_nonce_url("?page=mf_group/list/index.php&btnExportRun&intExportType=".$post_id."&strExportAction=csv", 'export_run')."'>".__("CSV", 'lang_group')."</a>";
+
+						if(is_plugin_active("mf_phpexcel/index.php"))
+						{
+							$actions['export_xls'] = "<a href='".wp_nonce_url("?page=mf_group/list/index.php&btnExportRun&intExportType=".$post_id."&strExportAction=xls", 'export_run')."'>".__("XLS", 'lang_group')."</a>";
+						}
 					}
 				}
 
@@ -381,8 +388,6 @@ class mf_group_table extends mf_list_table
 			break;
 
 			case 'amount':
-				//$amount = $item[$column_name];
-
 				$obj_group = new mf_group($post_id);
 				$amount = $obj_group->amount_in_group();
 
