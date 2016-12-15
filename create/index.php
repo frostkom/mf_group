@@ -127,9 +127,7 @@ echo "<div class='wrap'>
 							if($strGroupVerifyAddress == "yes")
 							{
 								$arr_data = array();
-								$arr_data[''] = "-- ".__("Choose here", 'lang_group')." --";
-
-								get_post_children(array('output_array' => true), $arr_data);
+								get_post_children(array('add_choose_here' => true, 'output_array' => true), $arr_data);
 
 								echo show_select(array('data' => $arr_data, 'name' => 'intGroupContactPage', 'text' => __("Contact Page", 'lang_group'), 'value' => $intGroupContactPage));
 							}

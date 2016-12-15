@@ -462,7 +462,7 @@ function show_group_registration_form($post_id)
 
 					if($obj_form->id > 0)
 					{
-						$form_field_id = $obj_form->get_form_email_field();
+						$form_field_id = $obj_form->get_post_info()."_".$obj_form->get_form_email_field();
 
 						if($form_field_id != '')
 						{

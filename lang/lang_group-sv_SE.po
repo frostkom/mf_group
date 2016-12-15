@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-09-10 16:56+0100\n"
+"POT-Creation-Date: 2016-12-15 11:32+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -22,8 +22,8 @@ msgid "The information was not submitted, contact an admin if this persists"
 msgstr "Informationen las inte in, kontakta en administratör om problemet kvarstår"
 
 #: ../create/index.php:79
-#: ../include/classes.php:173
-#: ../include/classes.php:240
+#: ../include/classes.php:174
+#: ../include/classes.php:241
 #: ../include/functions.php:71
 #: ../include/functions.php:72
 #: ../include/functions.php:73
@@ -50,7 +50,7 @@ msgid "No"
 msgstr "Nej"
 
 #: ../create/index.php:121
-#: ../include/classes.php:295
+#: ../include/classes.php:296
 msgid "Public"
 msgstr "Publik"
 
@@ -58,67 +58,65 @@ msgstr "Publik"
 msgid "Verify that address is in Address book"
 msgstr "Verifiera att adress finns i Adressboken"
 
-#: ../create/index.php:130
-#: ../create/index.php:166
-#: ../include/classes.php:220
-#: ../include/functions.php:126
-#: ../send/index.php:152
-#: ../send/index.php:198
-#: ../send/index.php:230
-msgid "Choose here"
-msgstr "Välj här"
-
-#: ../create/index.php:134
+#: ../create/index.php:132
 msgid "Contact Page"
 msgstr "Kontaktsida"
 
-#: ../create/index.php:141
-#: ../create/index.php:146
-#: ../include/classes.php:303
-#: ../include/functions.php:508
+#: ../create/index.php:139
+#: ../create/index.php:144
+#: ../include/classes.php:304
+#: ../include/functions.php:509
 msgid "Name"
 msgstr "Namn"
 
-#: ../create/index.php:147
-#: ../include/functions.php:513
+#: ../create/index.php:145
+#: ../include/functions.php:514
 msgid "Address"
 msgstr "Adress"
 
-#: ../create/index.php:148
-#: ../include/functions.php:518
+#: ../create/index.php:146
+#: ../include/functions.php:519
 msgid "Zip Code"
 msgstr "Postnummer"
 
-#: ../create/index.php:149
-#: ../include/functions.php:523
+#: ../create/index.php:147
+#: ../include/functions.php:524
 msgid "City"
 msgstr "Stad"
 
-#: ../create/index.php:150
-#: ../include/functions.php:528
+#: ../create/index.php:148
+#: ../include/functions.php:529
 msgid "Phone Number"
 msgstr "Telefonnummer"
 
-#: ../create/index.php:151
-#: ../include/functions.php:533
-#: ../include/functions.php:544
+#: ../create/index.php:149
+#: ../include/functions.php:534
+#: ../include/functions.php:545
 msgid "E-mail"
 msgstr "E-post"
 
-#: ../create/index.php:152
-#: ../include/functions.php:538
+#: ../create/index.php:150
+#: ../include/functions.php:539
 msgid "Extra"
 msgstr "Extra"
 
-#: ../create/index.php:155
+#: ../create/index.php:153
 msgid "Registration Fields"
 msgstr "Fält för registrering"
 
-#: ../create/index.php:173
+#: ../create/index.php:164
+#: ../include/classes.php:221
+#: ../include/functions.php:126
+#: ../send/index.php:152
+#: ../send/index.php:197
+msgid "Choose here"
+msgstr "Välj här"
+
+#: ../create/index.php:171
 msgid "Copy addresses from"
 msgstr "Kopiera adresser från"
 
-#: ../create/index.php:177
+#: ../create/index.php:175
 msgid "Save"
 msgstr "Spara"
 
@@ -140,7 +138,7 @@ msgstr "Gruppen uppdaterades inte med någon adress"
 
 #: ../import/index.php:108
 #: ../import/index.php:115
-#: ../include/classes.php:358
+#: ../include/classes.php:359
 #: ../include/functions.php:196
 msgid "Import"
 msgstr "Importera"
@@ -169,67 +167,67 @@ msgstr "Gruppen skapades"
 msgid "The group was updated"
 msgstr "Gruppen uppdaterades"
 
-#: ../include/classes.php:168
+#: ../include/classes.php:169
 msgid "Display a group registration form"
 msgstr "Visa ett registreringsformulär till en grupp"
 
-#: ../include/classes.php:237
+#: ../include/classes.php:238
 msgid "Heading"
 msgstr "Rubrik"
 
-#: ../include/classes.php:294
+#: ../include/classes.php:295
 msgid "All"
 msgstr "Alla"
 
-#: ../include/classes.php:296
+#: ../include/classes.php:297
 msgid "Trash"
 msgstr "Papperskorg"
 
-#: ../include/classes.php:304
+#: ../include/classes.php:305
 msgid "Amount"
 msgstr "Antal"
 
-#: ../include/classes.php:305
+#: ../include/classes.php:306
 msgid "Unsubscribed"
 msgstr "Avregistrerade"
 
-#: ../include/classes.php:306
+#: ../include/classes.php:307
 msgid "User"
 msgstr "Användare"
 
-#: ../include/classes.php:307
-#: ../include/classes.php:432
+#: ../include/classes.php:308
+#: ../include/classes.php:437
 #: ../include/functions.php:193
 #: ../sent/index.php:21
 #: ../sent/index.php:31
 msgid "Sent"
 msgstr "Skickat"
 
-#: ../include/classes.php:350
+#: ../include/classes.php:351
 msgid "Edit"
 msgstr "Redigera"
 
-#: ../include/classes.php:354
+#: ../include/classes.php:355
 msgid "Delete"
 msgstr "Radera"
 
-#: ../include/classes.php:357
+#: ../include/classes.php:358
 msgid "Add or remove"
 msgstr "Lägg till/ta bort"
 
-#: ../include/classes.php:360
+#: ../include/classes.php:366
 msgid "CSV"
 msgstr ""
 
-#: ../include/classes.php:364
+#: ../include/classes.php:370
 msgid "XLS"
 msgstr ""
 
-#: ../include/classes.php:370
+#: ../include/classes.php:377
 msgid "Recover"
 msgstr "Återställ"
 
-#: ../include/classes.php:422
+#: ../include/classes.php:427
 msgid "Test Unregistration"
 msgstr "Testa avregistrering"
 
@@ -270,15 +268,15 @@ msgstr "Lägg till ny"
 msgid "Send New"
 msgstr "Skicka nytt"
 
-#: ../include/functions.php:447
+#: ../include/functions.php:448
 msgid "The information that you entered is not in our register. Please contact the admin of this page to get your information submitted."
 msgstr "Informationen som du angav finns inte med i vårt register. Var vänlig kontakta oss så lägger vi in det."
 
-#: ../include/functions.php:490
+#: ../include/functions.php:491
 msgid "Thank you for showing your interest. You have been added to the group"
 msgstr "Tack för visat intresse. Du har lagts till i gruppen"
 
-#: ../include/functions.php:548
+#: ../include/functions.php:549
 msgid "Join"
 msgstr "Gå med"
 
@@ -299,7 +297,7 @@ msgid "Send message"
 msgstr "Skicka meddelande"
 
 #: ../send/index.php:122
-#: ../send/index.php:216
+#: ../send/index.php:214
 msgid "Message"
 msgstr "Meddelande"
 
@@ -308,7 +306,7 @@ msgid "If you don't want to get these messages in the future click this link to 
 msgstr "Om du inte vill ha dessa meddelanden i framtiden, klicka på länken för att avregistrera dig"
 
 #: ../send/index.php:182
-#: ../send/index.php:213
+#: ../send/index.php:212
 #: ../sent/index.php:29
 msgid "From"
 msgstr "Från"
@@ -318,17 +316,17 @@ msgstr "Från"
 msgid "Subject"
 msgstr "Ämne"
 
-#: ../send/index.php:186
-#: ../send/index.php:215
+#: ../send/index.php:185
+#: ../send/index.php:213
 msgid "To"
 msgstr "Till"
 
-#: ../send/index.php:224
-#: ../send/index.php:238
+#: ../send/index.php:222
+#: ../send/index.php:234
 msgid "Send"
 msgstr "Skicka"
 
-#: ../send/index.php:234
+#: ../send/index.php:230
 msgid "Text Source"
 msgstr "Textkälla"
 
