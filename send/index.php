@@ -184,7 +184,7 @@ echo "<div class='wrap'>
 									."</div>"
 									.show_select(array('data' => $arr_data_to, 'name' => 'arrGroupID[]', 'text' => __("To", 'lang_group'), 'value' => $arrGroupID, 'maxsize' => 5))
 								."</div>"
-								.mf_editor($strMessageText, "strMessageText");
+								.show_wp_editor(array('name' => 'strMessageText', 'value' => $strMessageText));
 							}
 
 							else if($type == "sms")
