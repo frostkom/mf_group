@@ -8,10 +8,9 @@ function delete_group($post_id)
 	{
 		$mail_to = "martin.fors@frostkom.se";
 		$mail_headers = "From: ".get_bloginfo('name')." <".get_bloginfo('admin_email').">\r\n";
-		$mail_subject = "Delete postID (#".$post_id.") from ".$wpdb->base_prefix."group_message etc.";
-		$mail_content = $mail_subject;
+		$mail_content = $mail_subject = "Delete postID (#".$post_id.") from ".$wpdb->base_prefix."group_message etc.";
 
-		wp_mail($mail_to, $mail_subject, $mail_content, $mail_headers);
+		send_email(array('to' => $mail_to, 'subject' => $mail_subject, 'content' => $mail_content, 'headers' => $mail_headers));
 
 		/*$result = $wpdb->get_results($wpdb->prepare("SELECT messageID FROM ".$wpdb->base_prefix."group_message WHERE groupID = '%d'", $post_id));
 
@@ -228,7 +227,7 @@ function get_email_link($data)
 
 function cron_group()
 {
-	global $wpdb;
+	global $wpdb, $error_text;
 
 	$obj_cron = new mf_cron();
 
@@ -301,14 +300,11 @@ function cron_group()
 				$verify_link = get_email_link(array('type' => "verify", 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
 
 				$mail_content = str_replace("[unsubscribe_link]", $unsubscribe_link, $mail_content);
-
 				$mail_content .= "<img src='".$verify_link."' style='height: 0; visibility: hidden; width: 0'>";
 
 				list($mail_attachment, $rest) = get_attachment_to_send($strMessageAttachment);
 
-				add_filter('wp_mail_content_type', 'set_html_content_type');
-
-				$sent = wp_mail($mail_to, $mail_subject, $mail_content, $mail_headers, $mail_attachment);
+				$sent = send_email(array('to' => $mail_to, 'subject' => $mail_subject, 'content' => $mail_content, 'headers' => $mail_headers, 'attachment' => $mail_attachment));
 
 				if($sent)
 				{
@@ -321,7 +317,8 @@ function cron_group()
 
 				else
 				{
-					do_log("Not sent to ".$mail_to.", ".$mail_subject.", ".substr(htmlspecialchars($mail_content), 0, 20)."..., ".htmlspecialchars($mail_headers).", ".var_export($mail_attachment, true));
+					//do_log("Not sent to ".$mail_to.", ".$mail_subject.", ".substr(htmlspecialchars($mail_content), 0, 20)."..., ".htmlspecialchars($mail_headers).", ".var_export($mail_attachment, true));
+					do_log($error_text);
 				}
 			}
 
