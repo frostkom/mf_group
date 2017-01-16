@@ -96,9 +96,9 @@ function settings_group()
 	add_settings_section($options_area, "", $options_area."_callback", BASE_OPTIONS_PAGE);
 
 	$arr_settings = array(
-		"setting_emails_per_hour" => __("Outgoing e-mails per hour", 'lang_group'),
-		"setting_group_see_other_roles" => __("See groups created by other roles", 'lang_group'),
-		"setting_group_import" => __("Add all imported to this group", 'lang_group'),
+		'setting_emails_per_hour' => __("Outgoing e-mails per hour", 'lang_group'),
+		'setting_group_see_other_roles' => __("See groups created by other roles", 'lang_group'),
+		'setting_group_import' => __("Add all imported to this group", 'lang_group'),
 	);
 
 	foreach($arr_settings as $handle => $text)
