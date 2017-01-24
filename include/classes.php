@@ -31,6 +31,9 @@ class mf_group
 		{
 			if(wp_trash_post($this->id))
 			{
+				$obj_group = new mf_group();
+				$obj_group->remove_all_address($this->id);
+
 				$done_text = __("The information was deleted", 'lang_group');
 			}
 		}

@@ -20,7 +20,9 @@ function delete_group($post_id)
 		}
 
 		$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->base_prefix."group_message WHERE groupID = '%d'", $post_id));
-		$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->base_prefix."address2group WHERE groupID = '%d'", $post_id));*/
+
+		$obj_group = new mf_group();
+		$obj_group->remove_all_address($post_id);*/
 	}
 }
 

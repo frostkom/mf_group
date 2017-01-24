@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: 
-Version: 3.3.7
+Version: 3.4.0
 Author: Martin Fors
 Author URI: http://frostkom.se
 Text Domain: lang_group
@@ -83,33 +83,21 @@ function activate_group()
 
 	add_columns($arr_add_column);
 
-	//Update DB with post author if not present
+	//Remove connection between address and group if group has been deleted
 	###############################
-	/*$result = $wpdb->get_results("SELECT ".$wpdb->posts.".ID AS post_id, post_author, display_name, post_content FROM ".$wpdb->posts." LEFT JOIN ".$wpdb->users." ON ".$wpdb->posts.".post_author = ".$wpdb->users.".ID WHERE post_type = 'mf_sms' AND post_author = '0'");
+	$obj_group = new mf_group();
 
-	$i = 0;
+	$result = $wpdb->get_results("SELECT groupID FROM ".$wpdb->posts." RIGHT JOIN ".$wpdb->base_prefix."address2group ON ".$wpdb->posts.".ID = ".$wpdb->base_prefix."address2group.groupID WHERE ID IS null");
 
 	foreach($result as $r)
 	{
-		$post_id = $r->post_id;
-		$post_author = $r->post_author;
-		$post_content = $r->post_content;
+		$intGroupID = $r->groupID;
 
-		if($post_author == 0 && $i < 10)
-		{
-			$intUserID = $wpdb->get_var($wpdb->prepare("SELECT userID FROM wp_group_message WHERE messageType = 'sms' AND messageText = %s", $post_content));
-
-			if($intUserID > 0)
-			{
-				$query = $wpdb->prepare("UPDATE ".$wpdb->posts." SET post_author = '%d' WHERE ID = '%d'", $intUserID, $post_id);
-				$wpdb->query($query);
-
-				//do_log("SMS Update: ".$query);
-
-				$i++;
-			}
+		if($intGroupID > 0)
+		{			
+			$obj_group->remove_all_address($intGroupID);
 		}
-	}*/
+	}
 	###############################
 }
 
