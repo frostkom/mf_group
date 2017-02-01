@@ -409,7 +409,7 @@ class mf_group_table extends mf_list_table
 					}
 				}
 
-				$out .= "<a href='?page=mf_address/list/index.php&intGroupID=".$post_id."&is_part_of_group=1&no_ses'>".$amount."</a>"
+				$out .= "<a href='?page=mf_address/list/index.php&intGroupID=".$post_id."&no_ses&is_part_of_group=1'>".$amount."</a>"
 				.count_unsent_group($post_id)
 				.$this->row_actions($actions);
 			break;
