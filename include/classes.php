@@ -109,12 +109,16 @@ class mf_group
 	{
 		global $wpdb;
 
+		do_log("Deleted (".$address_id.", ".$group_id.")");
+
 		$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->base_prefix."address2group WHERE addressID = '%d'".($group_id > 0 ? " AND groupID = '".$group_id."'" : ""), $address_id));
 	}
 
 	function remove_all_address($group_id = 0)
 	{
 		global $wpdb;
+
+		do_log("Deleted all (".$group_id.")");
 
 		$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->base_prefix."address2group WHERE groupID = '%d'", $group_id));
 	}
@@ -165,7 +169,7 @@ class mf_group_export extends mf_export
 
 class widget_group extends WP_Widget
 {
-	function widget_group()
+	function __construct()
 	{
 		$widget_ops = array(
 			'classname' => 'group',
@@ -174,7 +178,7 @@ class widget_group extends WP_Widget
 
 		$control_ops = array('id_base' => 'group-widget');
 
-		$this->__construct('group-widget', __("Group", 'lang_group'), $widget_ops, $control_ops);
+		parent::__construct('group-widget', __("Group", 'lang_group'), $widget_ops, $control_ops);
 	}
 
 	function widget($args, $instance)

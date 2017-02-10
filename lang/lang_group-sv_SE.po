@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2016-12-15 11:32+0100\n"
+"POT-Creation-Date: 2017-02-01 11:24+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -22,12 +22,12 @@ msgid "The information was not submitted, contact an admin if this persists"
 msgstr "Informationen las inte in, kontakta en administratör om problemet kvarstår"
 
 #: ../create/index.php:79
-#: ../include/classes.php:174
-#: ../include/classes.php:241
-#: ../include/functions.php:71
+#: ../include/classes.php:177
+#: ../include/classes.php:244
 #: ../include/functions.php:72
 #: ../include/functions.php:73
-#: ../include/functions.php:117
+#: ../include/functions.php:74
+#: ../include/functions.php:118
 #: ../list/index.php:9
 msgid "Group"
 msgstr "Grupp"
@@ -50,7 +50,7 @@ msgid "No"
 msgstr "Nej"
 
 #: ../create/index.php:121
-#: ../include/classes.php:296
+#: ../include/classes.php:299
 msgid "Public"
 msgstr "Publik"
 
@@ -64,39 +64,39 @@ msgstr "Kontaktsida"
 
 #: ../create/index.php:139
 #: ../create/index.php:144
-#: ../include/classes.php:304
-#: ../include/functions.php:509
+#: ../include/classes.php:307
+#: ../include/functions.php:508
 msgid "Name"
 msgstr "Namn"
 
 #: ../create/index.php:145
-#: ../include/functions.php:514
+#: ../include/functions.php:513
 msgid "Address"
 msgstr "Adress"
 
 #: ../create/index.php:146
-#: ../include/functions.php:519
+#: ../include/functions.php:518
 msgid "Zip Code"
 msgstr "Postnummer"
 
 #: ../create/index.php:147
-#: ../include/functions.php:524
+#: ../include/functions.php:523
 msgid "City"
 msgstr "Stad"
 
 #: ../create/index.php:148
-#: ../include/functions.php:529
+#: ../include/functions.php:528
 msgid "Phone Number"
 msgstr "Telefonnummer"
 
 #: ../create/index.php:149
-#: ../include/functions.php:534
-#: ../include/functions.php:545
+#: ../include/functions.php:533
+#: ../include/functions.php:544
 msgid "E-mail"
 msgstr "E-post"
 
 #: ../create/index.php:150
-#: ../include/functions.php:539
+#: ../include/functions.php:538
 msgid "Extra"
 msgstr "Extra"
 
@@ -105,8 +105,8 @@ msgid "Registration Fields"
 msgstr "Fält för registrering"
 
 #: ../create/index.php:164
-#: ../include/classes.php:221
-#: ../include/functions.php:126
+#: ../include/classes.php:224
+#: ../include/functions.php:127
 #: ../send/index.php:152
 #: ../send/index.php:197
 msgid "Choose here"
@@ -138,8 +138,8 @@ msgstr "Gruppen uppdaterades inte med någon adress"
 
 #: ../import/index.php:108
 #: ../import/index.php:115
-#: ../include/classes.php:359
-#: ../include/functions.php:196
+#: ../include/classes.php:362
+#: ../include/functions.php:197
 msgid "Import"
 msgstr "Importera"
 
@@ -151,132 +151,132 @@ msgstr "Text"
 msgid "Enter social security numbers or e-mail addresses on separate rows for import"
 msgstr "Lägg in personnummer eller e-postaddresser på separata rader för att importera"
 
-#: ../include/classes.php:34
+#: ../include/classes.php:37
 msgid "The information was deleted"
 msgstr "Informationen raderades"
 
-#: ../include/classes.php:40
+#: ../include/classes.php:43
 msgid "The information was sent"
 msgstr "Informationen skickades"
 
-#: ../include/classes.php:45
+#: ../include/classes.php:48
 msgid "The group was created"
 msgstr "Gruppen skapades"
 
-#: ../include/classes.php:50
+#: ../include/classes.php:53
 msgid "The group was updated"
 msgstr "Gruppen uppdaterades"
 
-#: ../include/classes.php:169
+#: ../include/classes.php:172
 msgid "Display a group registration form"
 msgstr "Visa ett registreringsformulär till en grupp"
 
-#: ../include/classes.php:238
+#: ../include/classes.php:241
 msgid "Heading"
 msgstr "Rubrik"
 
-#: ../include/classes.php:295
+#: ../include/classes.php:298
 msgid "All"
 msgstr "Alla"
 
-#: ../include/classes.php:297
+#: ../include/classes.php:300
 msgid "Trash"
 msgstr "Papperskorg"
 
-#: ../include/classes.php:305
+#: ../include/classes.php:308
 msgid "Amount"
 msgstr "Antal"
 
-#: ../include/classes.php:306
+#: ../include/classes.php:309
 msgid "Unsubscribed"
 msgstr "Avregistrerade"
 
-#: ../include/classes.php:307
+#: ../include/classes.php:310
 msgid "User"
 msgstr "Användare"
 
-#: ../include/classes.php:308
-#: ../include/classes.php:437
-#: ../include/functions.php:193
+#: ../include/classes.php:311
+#: ../include/classes.php:440
+#: ../include/functions.php:194
 #: ../sent/index.php:21
 #: ../sent/index.php:31
 msgid "Sent"
 msgstr "Skickat"
 
-#: ../include/classes.php:351
+#: ../include/classes.php:354
 msgid "Edit"
 msgstr "Redigera"
 
-#: ../include/classes.php:355
+#: ../include/classes.php:358
 msgid "Delete"
 msgstr "Radera"
 
-#: ../include/classes.php:358
+#: ../include/classes.php:361
 msgid "Add or remove"
 msgstr "Lägg till/ta bort"
 
-#: ../include/classes.php:366
+#: ../include/classes.php:369
 msgid "CSV"
 msgstr ""
 
-#: ../include/classes.php:370
+#: ../include/classes.php:373
 msgid "XLS"
 msgstr ""
 
-#: ../include/classes.php:377
+#: ../include/classes.php:380
 msgid "Recover"
 msgstr "Återställ"
 
-#: ../include/classes.php:427
+#: ../include/classes.php:430
 msgid "Test Unregistration"
 msgstr "Testa avregistrering"
 
-#: ../include/functions.php:61
+#: ../include/functions.php:62
 msgid "There were unsent messages"
 msgstr "Det finns oskickade meddelanden"
 
-#: ../include/functions.php:81
+#: ../include/functions.php:82
 msgid "group"
 msgstr "grupp"
 
-#: ../include/functions.php:100
+#: ../include/functions.php:101
 msgid "Outgoing e-mails per hour"
 msgstr "Utgående e-post per timme"
 
-#: ../include/functions.php:101
+#: ../include/functions.php:102
 msgid "See groups created by other roles"
 msgstr "Se grupper skapade av andra roller"
 
-#: ../include/functions.php:102
+#: ../include/functions.php:103
 msgid "Add all imported to this group"
 msgstr "Lägg till alla importerade i denna grupp"
 
-#: ../include/functions.php:181
+#: ../include/functions.php:182
 msgid "Groups"
 msgstr "Grupper"
 
-#: ../include/functions.php:184
+#: ../include/functions.php:185
 msgid "List"
 msgstr "Lista"
 
-#: ../include/functions.php:187
+#: ../include/functions.php:188
 #: ../list/index.php:10
 msgid "Add New"
 msgstr "Lägg till ny"
 
-#: ../include/functions.php:190
+#: ../include/functions.php:191
 msgid "Send New"
 msgstr "Skicka nytt"
 
-#: ../include/functions.php:448
+#: ../include/functions.php:447
 msgid "The information that you entered is not in our register. Please contact the admin of this page to get your information submitted."
 msgstr "Informationen som du angav finns inte med i vårt register. Var vänlig kontakta oss så lägger vi in det."
 
-#: ../include/functions.php:491
+#: ../include/functions.php:490
 msgid "Thank you for showing your interest. You have been added to the group"
 msgstr "Tack för visat intresse. Du har lagts till i gruppen"
 
-#: ../include/functions.php:549
+#: ../include/functions.php:548
 msgid "Join"
 msgstr "Gå med"
 
@@ -390,421 +390,3 @@ msgstr "Antingen var du inte med i gruppen eller så har du redan avregistrerat 
 msgid "Something went wrong. Please contact an admin if the problem persists"
 msgstr "Något gick snett. Var vänlig kontakta en admin ifall problemet kvarstår"
 
-#~ msgid "There was no group to send to"
-#~ msgstr "Det fanns ingen grupp att skicka meddelandet till"
-
-#~ msgid "Send to"
-#~ msgstr "Skicka till"
-
-#~ msgid "Settings"
-#~ msgstr "Inställningar"
-
-#~ msgid ""
-#~ "Could not create a folder in uploads. Please add the correct rights for "
-#~ "the script to create a new subfolder"
-#~ msgstr ""
-#~ "Det gick inte att skapa en mapp i uploads. Lägg till rätt behörigheter "
-#~ "för mappen uploads så att det går att skapa en undermapp"
-
-#~ msgid "There was nothing to export"
-#~ msgstr "Det finns inget att exportera"
-
-#~ msgid "Download the exported file here"
-#~ msgstr "Ladda ner den exporterade filen här"
-
-#~ msgid "Export"
-#~ msgstr "Exportera"
-
-#~ msgid "Scheduled to run"
-#~ msgstr "Schemalagd att köras"
-
-#~ msgid "Next scheduled %s"
-#~ msgstr "Nästa schemaläggning %s"
-
-#~ msgid "Run schedule manually"
-#~ msgstr "Kör schema manuellt"
-
-#~ msgid "E-mails sent"
-#~ msgstr "E-post skickade"
-
-#~ msgid "SMS sent"
-#~ msgstr "SMS skickade"
-
-#~ msgid ""
-#~ "It seams like you haven't chosen a group to send to. If the problem "
-#~ "persists, contact an admin about the problem"
-#~ msgstr ""
-#~ "Det verkar som att du inte har valt en grupp att skicka till. Om "
-#~ "problemet kvarstår, kontakta en admin om problemet"
-
-#~ msgid "Manually"
-#~ msgstr "Manuellt"
-
-#~ msgid "Every 2 Minutes"
-#~ msgstr "Var annan minut"
-
-#~ msgid "Every 10 Minutes"
-#~ msgstr "Var tionde minut"
-
-#~ msgid "Search"
-#~ msgstr "Sök"
-
-#~ msgid "Content"
-#~ msgstr "Innehåll"
-
-#~ msgid "The address already existed in the group"
-#~ msgstr "Adressen fanns redan i gruppen"
-
-#~ msgid ""
-#~ "You have to enter social security numbers on separate rows to import to "
-#~ "the group"
-#~ msgstr ""
-#~ "Du måste lägga in personnummer på separata rader för att importera till "
-#~ "gruppen"
-
-#~ msgid "The address had no birth date"
-#~ msgstr "Adressen hade inget personnummer"
-
-#~ msgid "Add Attachment"
-#~ msgstr "Bifoga fil"
-
-#~ msgid "The information was submited"
-#~ msgstr "Informationen las in"
-
-#~ msgid "Received"
-#~ msgstr "Mottagna"
-
-#~ msgid "Change name"
-#~ msgstr "Ändra namn"
-
-#~ msgid "The information was not sent, contact an admin if this persisits"
-#~ msgstr ""
-#~ "Informationen skickades inte, kontakta en administratör om problemet "
-#~ "kvarstår"
-
-#~ msgid "Submit"
-#~ msgstr "Skicka"
-
-#~ msgid "URL"
-#~ msgstr "URL"
-
-#~ msgid "Password"
-#~ msgstr "Lösenord"
-
-#~ msgid "Senders"
-#~ msgstr "Avsändare"
-
-#~ msgid ""
-#~ "One or more numbers/names separated by comma, is used for selecting which "
-#~ "number/name is displayed to the recipient"
-#~ msgstr ""
-#~ "Ett eller flera nummer/namn separerat av komma, används för att kunna "
-#~ "välja avsändare"
-
-#~ msgid "Send SMS"
-#~ msgstr "Skicka SMS"
-
-#~ msgid "Profile"
-#~ msgstr "Profil"
-
-#~ msgid "or"
-#~ msgstr "eller"
-
-#~ msgid "You have to"
-#~ msgstr "Du måste"
-
-#~ msgid "Add your phone number in the profile"
-#~ msgstr "Lägga till ditt telefonnummer i profilen"
-
-#~ msgid "Add URL, Username & Password in the settings page"
-#~ msgstr "Lägga till URL, användarnamn och lösenord på inställningssidan"
-
-#~ msgid "for this to work"
-#~ msgstr "för att detta ska fungera"
-
-#~ msgid "Date"
-#~ msgstr "Datum"
-
-#~ msgid "Slideshows"
-#~ msgstr "Bildspel"
-
-#~ msgid "Slideshow"
-#~ msgstr "Bildspel"
-
-#~ msgid "Parent"
-#~ msgstr "Förälder"
-
-#~ msgid "Height"
-#~ msgstr "Höjd"
-
-#~ msgid "Decimal number"
-#~ msgstr "Decimaltal"
-
-#~ msgid "Checkbox"
-#~ msgstr "Kryssruta"
-
-#~ msgid "Input field"
-#~ msgstr "Textrad"
-
-#~ msgid "Space"
-#~ msgstr "mellanrum"
-
-#~ msgid "Datepicker"
-#~ msgstr "Datumväljare"
-
-#~ msgid "Radio button"
-#~ msgstr "Flervalsalternativ"
-
-#~ msgid "Referer URL"
-#~ msgstr "Referens-URL"
-
-#~ msgid "Dropdown"
-#~ msgstr "Rullgardin"
-
-#~ msgid "Multiple selection"
-#~ msgstr "Rullgardin (flerval)"
-
-#~ msgid "Social security number"
-#~ msgstr "Personnummer"
-
-#~ msgid "digits"
-#~ msgstr "siffror"
-
-#~ msgid "All Forms"
-#~ msgstr "Alla formulär"
-
-#, fuzzy
-#~ msgid "Last Answers"
-#~ msgstr "Senaste svaren"
-
-#, fuzzy
-#~ msgid "Edit Last Answer"
-#~ msgstr "Senaste svaren"
-
-#~ msgid "Answers in"
-#~ msgstr "Svar i"
-
-#~ msgid "Payment"
-#~ msgstr "Betalning"
-
-#~ msgid "Please, enter all required fields"
-#~ msgstr "Var vänlig fyll i alla obligatoriska fält"
-
-#~ msgid "Couldn't update the field"
-#~ msgstr "Det gick inte att uppdatera fältet"
-
-#~ msgid "Couldn't insert the new field"
-#~ msgstr "Det gick inte att lägga in det nya fältet"
-
-#~ msgid "Custom CSS class"
-#~ msgstr "Anpassad CSS-klass"
-
-#~ msgid "Validate as"
-#~ msgstr "Validera som"
-
-#~ msgid "Min value"
-#~ msgstr "Minsta värde"
-
-#~ msgid "Max value"
-#~ msgstr "Högsta värde"
-
-#~ msgid "Default value"
-#~ msgstr "Standardvärde"
-
-#~ msgid "Value"
-#~ msgstr "Värde"
-
-#~ msgid "Cancel"
-#~ msgstr "Avbryt"
-
-#~ msgid "Preview"
-#~ msgstr "Förhandsgranska"
-
-#~ msgid "Choose page here"
-#~ msgstr "Välj sida här"
-
-#~ msgid "Send e-mail confirmation to questionnaire"
-#~ msgstr "Skicka e-postbekräftelse till besökaren"
-
-#~ msgid "E-mail confirmation content"
-#~ msgstr "Innehåll för e-postbekräftelse"
-
-#~ msgid "Encrypted"
-#~ msgstr "Krypterade svar"
-
-#, fuzzy
-#~ msgid "Deny Duplicates"
-#~ msgstr "Spärra dubletter"
-
-#~ msgid "Improve UX"
-#~ msgstr "Förbättra användarupplevelsen"
-
-#, fuzzy
-#~ msgid "Show Answers"
-#~ msgstr "Visa svar"
-
-#~ msgid "Payment (DIBS)"
-#~ msgstr "Betalning (DIBS)"
-
-#~ msgid "Merchant ID"
-#~ msgstr "Butiks-ID"
-
-#~ msgid "HMAC key"
-#~ msgstr "HMAC-nyckel"
-
-#~ msgid "Field for accepting payment"
-#~ msgstr "Fält för att acceptera betalning"
-
-#~ msgid "Field for payment cost"
-#~ msgstr "Fält för kostnad"
-
-#~ msgid "Thank you!"
-#~ msgstr "Tack så mycket!"
-
-#~ msgid "space"
-#~ msgstr "mellanslag"
-
-#~ msgid "Required"
-#~ msgstr "Obligatoriskt"
-
-#~ msgid "Autofocus"
-#~ msgstr "Fokusera automatiskt"
-
-#~ msgid "Perform test payment"
-#~ msgstr "Utför testbetalning"
-
-#~ msgid "See DIBS test info"
-#~ msgstr "Se DIBS testinfo"
-
-#~ msgid "Send in test mode (No money will be charged)"
-#~ msgstr "Skicka i testläge (Pengar kommer ej att dras)"
-
-#~ msgid "Back"
-#~ msgstr "Bakåt"
-
-#~ msgid "There were no answers to export"
-#~ msgstr "Det fanns inga svar att exportera"
-
-#~ msgid "Row count"
-#~ msgstr "Antal rader"
-
-#~ msgid "It was not possible to export all answers from"
-#~ msgstr "Det gick inte att exportera alla svar från"
-
-#~ msgid ""
-#~ "Something went wrong. Contact your admin and add this URL as reference"
-#~ msgstr ""
-#~ "Något gick fel. Kontakta en administratör och skicka med denna URL som "
-#~ "referens"
-
-#, fuzzy
-#~ msgid "All forms"
-#~ msgstr "Alla formulär"
-
-#~ msgid "Shortcode"
-#~ msgstr "Kortkod"
-
-#~ msgid "Answers"
-#~ msgstr "Svar"
-
-#~ msgid "Deleted"
-#~ msgstr "Borttagen"
-
-#~ msgid "Copy"
-#~ msgstr "Kopiera"
-
-#, fuzzy
-#~ msgid "Edit Page"
-#~ msgstr "Redigera sida"
-
-#~ msgid "View page"
-#~ msgstr "Visa sida"
-
-#, fuzzy
-#~ msgid "Add New Page"
-#~ msgstr "Lägg till ny sida"
-
-#~ msgid "Export Answers"
-#~ msgstr "Exportera svar"
-
-#, fuzzy
-#~ msgid "Searchability"
-#~ msgstr "Sök"
-
-#, fuzzy
-#~ msgid "Frames"
-#~ msgstr "formulär"
-
-#, fuzzy
-#~ msgid "HTML row count"
-#~ msgstr "Antal rader"
-
-#, fuzzy
-#~ msgid "The widget area"
-#~ msgstr "Textfält"
-
-#, fuzzy
-#~ msgid "Footer"
-#~ msgstr "formulär"
-
-#, fuzzy
-#~ msgid "Edit post"
-#~ msgstr "Redigera sida"
-
-#, fuzzy
-#~ msgid "Export options"
-#~ msgstr "Exportera svar"
-
-#~ msgid "Show answers"
-#~ msgstr "Visa svar"
-
-#~ msgid "Upgrade user"
-#~ msgstr "Uppgradera användare"
-
-#~ msgid "No results"
-#~ msgstr "Det finns inga användare att visa"
-
-#~ msgid "The user has been upgraded to"
-#~ msgstr "Användaren har blivit uppgraderad till"
-
-#~ msgid "Search in education group"
-#~ msgstr "Sök i utbildningsgrupp"
-
-#~ msgid "Start typing a name"
-#~ msgstr "Börja skriva ett namn"
-
-#~ msgid "Choose users"
-#~ msgstr "Välj användare"
-
-#~ msgid "Select/deselect users"
-#~ msgstr "Markera/avmarkera användare"
-
-#~ msgid "User missing info"
-#~ msgstr ""
-#~ "Om personen du söker saknas i listan har denne sannolikt inte registrerat "
-#~ "sig och finns inte i systemet."
-
-#~ msgid "Action"
-#~ msgstr "Åtgärd"
-
-#~ msgid "Upgrade user to"
-#~ msgstr "Uppgradera användare till"
-
-#~ msgid "instructor-trainee"
-#~ msgstr "instruktor-trainee"
-
-#~ msgid "Change role info"
-#~ msgstr ""
-#~ "Diplomerad MediYoga Instruktör uppgraderas till Instruktör från "
-#~ "Instruktör Trainee. Under utbildning till Mediyogaterapeut uppgraderas "
-#~ "till Yogaterapeut Trainee. Diplomerad Mediyogaterapeut uppgraderas till "
-#~ "Yogaterapeut. "
-
-#~ msgid "Confirm"
-#~ msgstr "Bekräfta"
-
-#~ msgid "...or"
-#~ msgstr "...eller"
-
-#~ msgid "Change group"
-#~ msgstr "Byt grupp"

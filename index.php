@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: 
-Version: 3.4.1
+Version: 3.4.4
 Author: Martin Fors
 Author URI: http://frostkom.se
 Text Domain: lang_group
@@ -85,7 +85,7 @@ function activate_group()
 
 	//Remove connection between address and group if group has been deleted
 	###############################
-	$obj_group = new mf_group();
+	/*$obj_group = new mf_group();
 
 	$result = $wpdb->get_results("SELECT groupID FROM ".$wpdb->posts." RIGHT JOIN ".$wpdb->base_prefix."address2group ON ".$wpdb->posts.".ID = ".$wpdb->base_prefix."address2group.groupID WHERE ID IS null");
 
@@ -94,15 +94,17 @@ function activate_group()
 		$intGroupID = $r->groupID;
 
 		if($intGroupID > 0)
-		{			
+		{
 			$obj_group->remove_all_address($intGroupID);
 		}
-	}
+	}*/
 	###############################
 }
 
 function uninstall_group()
 {
+	do_log("Uninstalled group");
+
 	mf_uninstall_plugin(array(
 		'uploads' => 'mf_group',
 		'options' => array('setting_emails_per_hour', 'setting_group_see_other_roles', 'setting_group_import'),

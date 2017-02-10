@@ -14,8 +14,7 @@ echo "<div class='wrap'>
 	$tbl_group = new mf_group_table();
 
 	$tbl_group->select_data(array(
-		'select' => "ID, post_status, post_name, post_title, post_modified, post_author", //, COUNT(addressID) AS amount
-		//'join' => " LEFT JOIN ".$wpdb->base_prefix."address2group ON ".$wpdb->posts.".ID = ".$wpdb->base_prefix."address2group.groupID",
+		'select' => "ID, post_status, post_name, post_title, post_modified, post_author",
 	));
 
 	$tbl_group->do_display();
