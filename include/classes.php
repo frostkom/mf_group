@@ -109,7 +109,7 @@ class mf_group
 	{
 		global $wpdb;
 
-		do_log("Deleted (".$address_id.", ".$group_id.")");
+		do_log("Deleted (AID: ".$address_id.", GID: ".$group_id.")");
 
 		$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->base_prefix."address2group WHERE addressID = '%d'".($group_id > 0 ? " AND groupID = '".$group_id."'" : ""), $address_id));
 	}
@@ -118,7 +118,7 @@ class mf_group
 	{
 		global $wpdb;
 
-		do_log("Deleted all (".$group_id.")");
+		do_log("Deleted all (GID: ".$group_id.")");
 
 		$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->base_prefix."address2group WHERE groupID = '%d'", $group_id));
 	}

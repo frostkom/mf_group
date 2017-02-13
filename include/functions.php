@@ -10,7 +10,7 @@ function delete_group($post_id)
 		$mail_headers = "From: ".get_bloginfo('name')." <".get_bloginfo('admin_email').">\r\n";
 		$mail_content = $mail_subject = "Delete postID (#".$post_id.") from ".$wpdb->base_prefix."group_message etc.";
 
-		send_email(array('to' => $mail_to, 'subject' => $mail_subject, 'content' => $mail_content, 'headers' => $mail_headers));
+		$sent = send_email(array('to' => $mail_to, 'subject' => $mail_subject, 'content' => $mail_content, 'headers' => $mail_headers));
 
 		/*$result = $wpdb->get_results($wpdb->prepare("SELECT messageID FROM ".$wpdb->base_prefix."group_message WHERE groupID = '%d'", $post_id));
 
