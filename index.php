@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: 
-Version: 3.4.6
+Version: 3.4.7
 Author: Martin Fors
 Author URI: http://frostkom.se
 Text Domain: lang_group
@@ -15,8 +15,8 @@ GitHub Plugin URI: frostkom/mf_group
 include_once("include/classes.php");
 include_once("include/functions.php");
 
-add_action('cron_base', 'activate_group');
-add_action('cron_base', 'cron_group');
+add_action('cron_base', 'activate_group', mt_rand(1, 10));
+add_action('cron_base', 'cron_group', mt_rand(1, 10));
 
 add_action('init', 'init_group');
 add_action('widgets_init', 'widgets_group');
