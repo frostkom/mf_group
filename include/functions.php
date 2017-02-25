@@ -7,7 +7,7 @@ function delete_group($post_id)
 	if($post_type == 'mf_group')
 	{
 		$mail_to = "martin.fors@frostkom.se";
-		$mail_headers = "From: ".get_bloginfo('name')." <".get_bloginfo('admin_email').">\r\n";
+		//$mail_headers = "From: ".get_bloginfo('name')." <".get_bloginfo('admin_email').">\r\n";
 		$mail_content = $mail_subject = "Delete postID (#".$post_id.") from ".$wpdb->base_prefix."group_message etc.";
 
 		$sent = send_email(array('to' => $mail_to, 'subject' => $mail_subject, 'content' => $mail_content, 'headers' => $mail_headers));
@@ -258,7 +258,7 @@ function cron_group()
 
 	foreach($result as $r)
 	{
-		if($obj_cron->has_expired(array('margin' => .90)))
+		if($obj_cron->has_expired(array('margin' => .9)))
 		{
 			break;
 		}
