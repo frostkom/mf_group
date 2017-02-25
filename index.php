@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: 
-Version: 3.4.9
+Version: 3.5.0
 Author: Martin Fors
 Author URI: http://frostkom.se
 Text Domain: lang_group
@@ -31,7 +31,12 @@ if(is_admin())
 	add_action('admin_notices', 'notices_group');
 	add_action('before_delete_post', 'delete_group');
 	add_action('deleted_user', 'deleted_user_group');
+
+	add_filter('count_shortcode_button', 'count_shortcode_button_group');
+	add_filter('get_shortcode_output', 'get_shortcode_output_group');
 }
+
+add_shortcode('mf_group', 'shortcode_group');
 
 add_filter('single_template', 'custom_templates_group');
 
@@ -110,6 +115,15 @@ function uninstall_group()
 		'options' => array('setting_emails_per_hour', 'setting_group_see_other_roles', 'setting_group_import'),
 		'tables' => array('group_message', 'group_queue', 'address2group'),
 	));
+}
+
+function shortcode_group($atts)
+{
+	extract(shortcode_atts(array(
+		'id' => ''
+	), $atts));
+
+	return show_group_registration_form($id);
 }
 
 function custom_templates_group($single_template)

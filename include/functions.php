@@ -1,5 +1,51 @@
 <?php
 
+function count_shortcode_button_group($count)
+{
+	if($count == 0)
+	{
+		$tbl_group = new mf_group_table();
+
+		$tbl_group->select_data(array(
+			'select' => "ID",
+			'limit' => 0, 'amount' => 1,
+		));
+
+		if(count($tbl_group->data) > 0)
+		{
+			$count++;
+		}
+	}
+
+	return $count;
+}
+
+function get_shortcode_output_group($out)
+{
+	$tbl_group = new mf_group_table();
+
+	$tbl_group->select_data(array(
+		'select' => "ID, post_title",
+	));
+
+	if(count($tbl_group->data) > 0)
+	{
+		$out .= "<h3>".__("Choose a Group", 'lang_group')."</h3>";
+
+		$arr_data = array();
+		$arr_data[''] = "-- ".__("Choose here", 'lang_group')." --";
+
+		foreach($tbl_group->data as $template)
+		{
+			$arr_data[$template['ID']] = $template['post_title'];
+		}
+
+		$out .= show_select(array('data' => $arr_data, 'name' => 'select_form_id', 'xtra' => " rel='mf_group'"));
+	}
+
+	return $out;
+}
+
 function delete_group($post_id)
 {
 	global $post_type;
