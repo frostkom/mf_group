@@ -124,6 +124,7 @@ function init_group()
 		'labels' => $labels,
 		'public' => true,
 		'show_in_menu' => false,
+		'exclude_from_search' => true,
 		'rewrite' => array(
 			'slug' => __("group", 'lang_group'),
 		),
@@ -392,7 +393,7 @@ function cron_group()
 
 			if($sent == "OK")
 			{
-				echo "OK...";
+				//echo "OK...";
 
 				$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->base_prefix."group_queue SET queueSent = '1', queueSentTime = NOW() WHERE queueID = '%d'", $intQueueID));
 
