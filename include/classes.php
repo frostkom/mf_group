@@ -27,7 +27,7 @@ class mf_group
 
 		$out = "";
 
-		if(isset($_REQUEST['btnGroupDelete']) && $this->id > 0 && wp_verify_nonce($_REQUEST['_wpnonce'], 'group_delete'))
+		if(isset($_REQUEST['btnGroupDelete']) && $this->id > 0 && wp_verify_nonce($_REQUEST['_wpnonce'], 'group_delete_'.$this->id))
 		{
 			if(wp_trash_post($this->id))
 			{
@@ -359,7 +359,7 @@ class mf_group_table extends mf_list_table
 
 					if($post_author == get_current_user_id() || IS_ADMIN)
 					{
-						$actions['delete'] = "<a href='".wp_nonce_url("?page=mf_group/list/index.php&btnGroupDelete&intGroupID=".$post_id, 'group_delete')."'>".__("Delete", 'lang_group')."</a>";
+						$actions['delete'] = "<a href='".wp_nonce_url("?page=mf_group/list/index.php&btnGroupDelete&intGroupID=".$post_id, 'group_delete_'.$post_id)."'>".__("Delete", 'lang_group')."</a>";
 					}
 
 					$actions['addnremove'] = "<a href='?page=mf_address/list/index.php&intGroupID=".$post_id."'>".__("Add or remove", 'lang_group')."</a>";

@@ -366,7 +366,6 @@ function cron_group()
 
 				else
 				{
-					//do_log("Not sent to ".$mail_to.", ".$mail_subject.", ".substr(htmlspecialchars($mail_content), 0, 20)."..., ".htmlspecialchars($mail_headers).", ".var_export($mail_attachment, true));
 					do_log($error_text);
 				}
 			}
@@ -402,7 +401,7 @@ function cron_group()
 
 			else
 			{
-				do_log("Not sent to ".$strAddressCellNo.", ".substr(htmlspecialchars($strMessageText), 0, 20)."...");
+				do_log("Not sent to ".$strAddressCellNo.", ".shorten_text(array('string' => htmlspecialchars($strMessageText), 'limit' => 10)));
 			}
 		}
 

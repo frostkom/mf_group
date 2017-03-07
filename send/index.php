@@ -22,76 +22,66 @@ if($intGroupID > 0 && !in_array($intGroupID, $arrGroupID))
 	$arrGroupID[] = $intGroupID;
 }
 
-if(isset($_POST['btnGroupSend']) && count($arrGroupID) > 0 && wp_verify_nonce($_POST['_wpnonce'], 'group_send')) // && $intGroupID > 0
+if(isset($_POST['btnGroupSend']) && count($arrGroupID) > 0 && wp_verify_nonce($_POST['_wpnonce'], 'group_send'))
 {
-	/*$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE post_type = 'mf_group' AND ID = '%d'".$query_xtra." LIMIT 0, 1", $intGroupID));
+	if($strMessageText == '')
+	{
+		$error_text = __("You have to enter a text to send", 'lang_group');
+	}
 
-	if($wpdb->num_rows > 0)
-	{*/
-		if($strMessageText == '')
+	else if($type == "email" || $type == "sms")
+	{
+		$message_recepients = 0;
+
+		foreach($arrGroupID as $intGroupID)
 		{
-			$error_text = __("You have to enter a text to send", 'lang_group');
-		}
+			$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE post_type = 'mf_group' AND ID = '%d'".$query_xtra." LIMIT 0, 1", $intGroupID));
 
-		else if($type == "email" || $type == "sms")
-		{
-			$message_recepients = 0;
-
-			foreach($arrGroupID as $intGroupID)
+			if($wpdb->num_rows > 0)
 			{
-				$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE post_type = 'mf_group' AND ID = '%d'".$query_xtra." LIMIT 0, 1", $intGroupID));
+				$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->base_prefix."group_message SET groupID = '%d', messageType = %s, messageFrom = %s, messageName = %s, messageText = %s, messageAttachment = %s, messageCreated = NOW(), userID = '%d'", $intGroupID, $type, $strMessageFrom, $strMessageName, $strMessageText, $strMessageAttachment, get_current_user_id()));
 
-				if($wpdb->num_rows > 0)
+				$intMessageID = $wpdb->insert_id;
+
+				if($intMessageID > 0)
 				{
-					$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->base_prefix."group_message SET groupID = '%d', messageType = %s, messageFrom = %s, messageName = %s, messageText = %s, messageAttachment = %s, messageCreated = NOW(), userID = '%d'", $intGroupID, $type, $strMessageFrom, $strMessageName, $strMessageText, $strMessageAttachment, get_current_user_id()));
+					$result = $wpdb->get_results($wpdb->prepare("SELECT addressID, addressEmail, addressCellNo FROM ".$wpdb->base_prefix."address INNER JOIN ".$wpdb->base_prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' AND groupUnsubscribed = '0'", $intGroupID));
 
-					$intMessageID = $wpdb->insert_id;
-
-					if($intMessageID > 0)
+					foreach($result as $r)
 					{
-						$result = $wpdb->get_results($wpdb->prepare("SELECT addressID, addressEmail, addressCellNo FROM ".$wpdb->base_prefix."address INNER JOIN ".$wpdb->base_prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' AND groupUnsubscribed = '0'", $intGroupID));
+						$intAddressID = $r->addressID;
+						$strAddressEmail = $r->addressEmail;
+						$strAddressCellNo = $r->addressCellNo;
 
-						foreach($result as $r)
+						if($type == "email" && $strAddressEmail != "" || $type == "sms" && $strAddressCellNo != "")
 						{
-							$intAddressID = $r->addressID;
-							$strAddressEmail = $r->addressEmail;
-							$strAddressCellNo = $r->addressCellNo;
+							$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->base_prefix."group_queue SET addressID = '%d', messageID = '%d', queueCreated = NOW()", $intAddressID, $intMessageID));
 
-							if($type == "email" && $strAddressEmail != "" || $type == "sms" && $strAddressCellNo != "")
+							if($wpdb->rows_affected > 0)
 							{
-								$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->base_prefix."group_queue SET addressID = '%d', messageID = '%d', queueCreated = NOW()", $intAddressID, $intMessageID));
-
-								if($wpdb->rows_affected > 0)
-								{
-									$message_recepients++;
-								}
+								$message_recepients++;
 							}
 						}
 					}
+				}
 
-					else
-					{
-						$error_text = __("There was an error when saving the message", 'lang_group');
-					}
+				else
+				{
+					$error_text = __("There was an error when saving the message", 'lang_group');
 				}
 			}
-
-			if($message_recepients > 0)
-			{
-				mf_redirect("/wp-admin/admin.php?page=mf_group/list/index.php&sent");
-			}
-
-			else
-			{
-				$error_text = __("The message was not sent to anybody", 'lang_group');
-			}
 		}
-	/*}
 
-	else
-	{
-		$error_text = __("There was no group to send to", 'lang_group');
-	}*/
+		if($message_recepients > 0)
+		{
+			mf_redirect("/wp-admin/admin.php?page=mf_group/list/index.php&sent");
+		}
+
+		else
+		{
+			$error_text = __("The message was not sent to anybody", 'lang_group');
+		}
+	}
 }
 
 else if($intEmailTextSource > 0)

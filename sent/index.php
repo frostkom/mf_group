@@ -10,7 +10,7 @@ if(!IS_EDITOR)
 $intGroupID = check_var('intGroupID');
 $intMessageID = check_var('intMessageID');
 
-if(isset($_REQUEST['btnMessageAbort']) && $intMessageID > 0 && wp_verify_nonce($_REQUEST['_wpnonce'], 'message_abort'))
+if(isset($_REQUEST['btnMessageAbort']) && $intMessageID > 0 && wp_verify_nonce($_REQUEST['_wpnonce'], 'message_abort_'.$intMessageID))
 {
 	$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->base_prefix."group_queue WHERE messageID = '%d' AND queueSent = '0'", $intMessageID));
 
@@ -91,7 +91,7 @@ echo "<div class='wrap'>
 							if($intMessageNotSent > 0)
 							{
 								echo "<div class='row-actions'>
-									<a href='".wp_nonce_url("?page=mf_group/sent/index.php&btnMessageAbort&intGroupID=".$intGroupID."&intMessageID=".$intMessageID2, 'message_abort')."'>".__("Abort", 'lang_group')."</a>
+									<a href='".wp_nonce_url("?page=mf_group/sent/index.php&btnMessageAbort&intGroupID=".$intGroupID."&intMessageID=".$intMessageID2, 'message_abort_'.$intMessageID2)."'>".__("Abort", 'lang_group')."</a>
 								</div>";
 							}
 
