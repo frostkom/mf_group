@@ -22,7 +22,7 @@ if($intGroupID > 0 && !in_array($intGroupID, $arrGroupID))
 	$arrGroupID[] = $intGroupID;
 }
 
-if(isset($_POST['btnGroupSend']) && count($arrGroupID) > 0 && wp_verify_nonce($_POST['_wpnonce'], 'group_send'))
+if(isset($_POST['btnGroupSend']) && count($arrGroupID) > 0 && wp_verify_nonce($_POST['_wpnonce'], 'group_send_'.$type))
 {
 	if($strMessageText == '')
 	{
@@ -222,7 +222,7 @@ echo "<div class='wrap'>
 							}
 
 							echo show_button(array('name' => "btnGroupSend", 'text' => __("Send", 'lang_group')))
-							.wp_nonce_field('group_send', '_wpnonce', true, false);
+							.wp_nonce_field('group_send_'.$type, '_wpnonce', true, false);
 
 							if($type == "sms")
 							{
