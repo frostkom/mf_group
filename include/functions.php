@@ -587,7 +587,7 @@ function show_group_registration_form($post_id)
 
 			else
 			{
-				$out .= show_textfield(array('name' => "strAddressEmail", 'text' => __("E-mail", 'lang_group'), 'value' => $strAddressEmail, 'required' => true));
+				$out .= show_textfield(array('name' => "strAddressEmail", 'placeholder' => __("Your Email Address", 'lang_group'), 'value' => $strAddressEmail, 'required' => true));
 			}
 
 			$out .= "<div class='form_button'>"

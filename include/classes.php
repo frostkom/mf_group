@@ -178,7 +178,7 @@ class widget_group extends WP_Widget
 
 		$control_ops = array('id_base' => 'group-widget');
 
-		parent::__construct('group-widget', __("Group", 'lang_group'), $widget_ops, $control_ops);
+		parent::__construct('group-widget', __("Group", 'lang_group')." / ".__("Newsletter", 'lang_group'), $widget_ops, $control_ops);
 	}
 
 	function widget($args, $instance)
