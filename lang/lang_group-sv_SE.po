@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-03-16 16:23+0100\n"
+"POT-Creation-Date: 2017-03-19 12:08+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -270,7 +270,7 @@ msgstr "Lista"
 #: ../include/functions.php:235
 #: ../list/index.php:10
 msgid "Add New"
-msgstr "Lägg till ny"
+msgstr "Skapa ny"
 
 #: ../include/functions.php:238
 msgid "Send New"
