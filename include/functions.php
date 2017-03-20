@@ -40,7 +40,7 @@ function get_shortcode_output_group($out)
 			$arr_data[$template['ID']] = $template['post_title'];
 		}
 
-		$out .= show_select(array('data' => $arr_data, 'name' => 'select_form_id', 'xtra' => " rel='mf_group'"));
+		$out .= show_select(array('data' => $arr_data, 'xtra' => " rel='mf_group'"));
 	}
 
 	return $out;
