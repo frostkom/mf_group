@@ -389,9 +389,9 @@ class mf_group_table extends mf_list_table
 			break;
 
 			case 'post_author':
-				$user_data = get_userdata($item[$column_name]);
+				//$user_data = get_userdata($item[$column_name]);
 
-				$out .= $user_data->display_name;
+				$out .= get_user_info(array('id' => $item[$column_name]));
 			break;
 
 			case 'amount':

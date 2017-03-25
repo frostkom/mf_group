@@ -215,7 +215,7 @@ echo "<div class='wrap'>
 							if($type == "email")
 							{
 								$arr_data_source = array();
-								get_post_children(array('add_choose_here' => true, 'output_array' => true), $arr_data_source);
+								get_post_children(array('add_choose_here' => true), $arr_data_source);
 
 								echo show_select(array('data' => $arr_data_source, 'name' => 'intEmailTextSource', 'text' => __("Text Source", 'lang_group'), 'xtra' => " rel='submit_change'"))
 								.get_media_button(array('name' => "strMessageAttachment", 'value' => $strMessageAttachment));
