@@ -109,7 +109,7 @@ class mf_group
 	{
 		global $wpdb;
 
-		do_log("Deleted (AID: ".$address_id.", GID: ".$group_id.")");
+		//do_log("Deleted (AID: ".$address_id.", GID: ".$group_id.")");
 
 		$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->base_prefix."address2group WHERE addressID = '%d'".($group_id > 0 ? " AND groupID = '".$group_id."'" : ""), $address_id));
 	}
@@ -245,7 +245,7 @@ class widget_group extends WP_Widget
 			.show_textfield(array('name' => $this->get_field_name('group_heading'), 'text' => __("Heading", 'lang_group'), 'value' => $instance['group_heading'], 'xtra' => "class='widefat'"))
 		."</p>
 		<p>"
-			.show_select(array('data' => $arr_data, 'name' => $this->get_field_name('group_id'), 'text' => __("Group", 'lang_group'), 'value' => $instance['group_id'], 'xtra' => " class='widefat'"))
+			.show_select(array('data' => $arr_data, 'name' => $this->get_field_name('group_id'), 'text' => __("Group", 'lang_group'), 'value' => $instance['group_id'], 'xtra' => "class='widefat'"))
 		."</p>";
 	}
 }

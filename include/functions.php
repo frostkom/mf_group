@@ -40,7 +40,7 @@ function get_shortcode_output_group($out)
 			$arr_data[$template['ID']] = $template['post_title'];
 		}
 
-		$out .= show_select(array('data' => $arr_data, 'xtra' => " rel='mf_group'"));
+		$out .= show_select(array('data' => $arr_data, 'xtra' => "rel='mf_group'"));
 	}
 
 	return $out;
@@ -340,7 +340,7 @@ function cron_group()
 				$mail_subject = $strMessageName;
 				$mail_content = stripslashes(apply_filters('the_content', $strMessageText));
 
-				$unsubscribe_link = get_email_link(array('type' => "unsubscribe", 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID)); 
+				$unsubscribe_link = get_email_link(array('type' => "unsubscribe", 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
 				$verify_link = get_email_link(array('type' => "verify", 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
 
 				$mail_content = str_replace("[unsubscribe_link]", $unsubscribe_link, $mail_content);
@@ -356,7 +356,7 @@ function cron_group()
 
 					$mail_sent++;
 
-					do_log("Not sent to ".$mail_to, "trash");
+					do_log("Not sent to ".$mail_to, 'trash');
 				}
 
 				else
