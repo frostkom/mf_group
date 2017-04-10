@@ -64,7 +64,22 @@ echo "<div class='wrap'>
 					$intMessageErrors = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->base_prefix."group_queue WHERE messageID = '%d' AND queueReceived = '-1'", $intMessageID2));
 					$intMessageReceived = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->base_prefix."group_queue WHERE messageID = '%d' AND queueReceived = '1'", $intMessageID2));
 
-					echo "<tr id='message_".$intMessageID2."'>
+					$class = "";
+
+					if($intMessageSent == 0)
+					{
+						if($intMessageNotSent == 0)
+						{
+							$class = "red";
+						}
+
+						else
+						{
+							$class = "yellow";
+						}
+					}
+
+					echo "<tr id='message_".$intMessageID2."'".($class != '' ? " class='".$class."'" : "").">
 						<td>"
 							.$strMessageType
 							."<div class='row-actions'>

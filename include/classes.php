@@ -389,8 +389,6 @@ class mf_group_table extends mf_list_table
 			break;
 
 			case 'post_author':
-				//$user_data = get_userdata($item[$column_name]);
-
 				$out .= get_user_info(array('id' => $item[$column_name]));
 			break;
 
@@ -406,7 +404,7 @@ class mf_group_table extends mf_list_table
 					{
 						$actions['send_email'] = "<a href='?page=mf_group/send/index.php&intGroupID=".$post_id."&type=email'><i class='fa fa-lg fa-envelope-o'></i></a>";
 
-						if(is_plugin_active("mf_sms/index.php"))
+						if(is_plugin_active("mf_sms/index.php") && sms_is_active())
 						{
 							$actions['send_sms'] = "<a href='?page=mf_group/send/index.php&intGroupID=".$post_id."&type=sms'><i class='fa fa-lg fa-mobile'></i></a>";
 						}
@@ -421,11 +419,11 @@ class mf_group_table extends mf_list_table
 			case 'unsubscribed':
 				$rowsAddressesUnsubscribed = $wpdb->get_var($wpdb->prepare("SELECT COUNT(addressID) FROM ".$wpdb->base_prefix."address INNER JOIN ".$wpdb->base_prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' AND groupUnsubscribed = '1'", $post_id));
 
-				$post_sent = $wpdb->get_var($wpdb->prepare("SELECT messageCreated FROM ".$wpdb->base_prefix."group_message WHERE groupID = '%d' ORDER BY messageCreated DESC", $post_id));
+				$dteMessageCreated = $wpdb->get_var($wpdb->prepare("SELECT messageCreated FROM ".$wpdb->base_prefix."group_message WHERE groupID = '%d' ORDER BY messageCreated DESC", $post_id));
 
 				$out .= $rowsAddressesUnsubscribed;
 
-				if($post_status == 'publish' || $post_sent != '')
+				if($post_status == 'publish' || $dteMessageCreated != '')
 				{
 					$current_user = wp_get_current_user();
 					$user_email = $current_user->user_email;
@@ -437,14 +435,42 @@ class mf_group_table extends mf_list_table
 			break;
 
 			case 'sent':
-				$post_sent = $wpdb->get_var($wpdb->prepare("SELECT messageCreated FROM ".$wpdb->base_prefix."group_message WHERE groupID = '%d' ORDER BY messageCreated DESC", $post_id));
+				$result = $wpdb->get_results($wpdb->prepare("SELECT messageID, messageCreated FROM ".$wpdb->base_prefix."group_message WHERE groupID = '%d' ORDER BY messageCreated DESC LIMIT 0, 1", $post_id));
 
-				if($post_sent != '')
+				foreach($result as $r)
 				{
-					$actions['sent'] = "<a href='?page=mf_group/sent/index.php&intGroupID=".$post_id."'>".__("Sent", 'lang_group')."</a>";
+					$intMessageID = $r->messageID;
+					$dteMessageCreated = $r->messageCreated;
 
-					$out .= format_date($post_sent)
-					.$this->row_actions($actions);
+					if($dteMessageCreated != '')
+					{
+						$actions['sent'] = "<a href='?page=mf_group/sent/index.php&intGroupID=".$post_id."'>".__("Sent", 'lang_group')."</a>";
+
+						$intMessageSent = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->base_prefix."group_queue WHERE messageID = '%d' AND queueSent = '1'", $intMessageID));
+						$intMessageNotSent = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->base_prefix."group_queue WHERE messageID = '%d' AND queueSent = '0'", $intMessageID));
+
+						if($intMessageSent == 0)
+						{
+							if($intMessageNotSent == 0)
+							{
+								$out .= format_date($dteMessageCreated)
+								."<i class='set_tr_color' rel='red'></i>";
+							}
+
+							else
+							{
+								$out .= "<i class='fa fa-spinner fa-spin fa-lg'></i>"
+								."<i class='set_tr_color' rel='yellow'></i>";
+							}
+						}
+
+						else
+						{
+							$out .= format_date($dteMessageCreated);
+						}
+
+						$out .= $this->row_actions($actions);
+					}
 				}
 			break;
 

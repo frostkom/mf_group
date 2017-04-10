@@ -387,11 +387,11 @@ function cron_group()
 
 			if($sent == "OK")
 			{
-				//echo "OK...";
-
 				$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->base_prefix."group_queue SET queueSent = '1', queueSentTime = NOW() WHERE queueID = '%d'", $intQueueID));
 
 				$sms_sent++;
+
+				do_log("Not sent to ".$strAddressCellNo, 'trash');
 			}
 
 			else

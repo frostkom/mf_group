@@ -179,7 +179,7 @@ echo "<div class='wrap'>
 
 							else if($type == "sms")
 							{
-								$sms_senders = get_option('mf_sms_senders');
+								$sms_senders = get_option('setting_sms_senders');
 								$sms_phone = get_user_meta(get_current_user_id(), 'mf_sms_phone', true);
 
 								$arr_data_from = array();
