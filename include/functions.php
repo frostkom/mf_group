@@ -46,6 +46,26 @@ function get_shortcode_output_group($out)
 	return $out;
 }
 
+function get_shortcode_list_group($data)
+{
+	$post_id = $data[0];
+	$content_list = $data[1];
+
+	if($post_id > 0)
+	{
+		$post_content = mf_get_post_content($post_id);
+
+		$group_id = get_match("/\[mf_group id=(.*?)\]/", $post_content, false);
+
+		if($group_id > 0)
+		{
+			$content_list .= "<li><a href='".admin_url("admin.php?page=mf_group/create/index.php&intGroupID=".$group_id)."'>".get_post_title($group_id)." -> [mf_group id=".$group_id."]</a></li>";
+		}
+	}
+
+	return array($post_id, $content_list);
+}
+
 function delete_group($post_id)
 {
 	global $post_type;

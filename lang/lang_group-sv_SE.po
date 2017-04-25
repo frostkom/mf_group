@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-03-19 12:08+0100\n"
+"POT-Creation-Date: 2017-04-25 17:30+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -23,11 +23,11 @@ msgstr "Informationen las inte in, kontakta en administratör om problemet kvars
 
 #: ../create/index.php:79
 #: ../include/classes.php:181
-#: ../include/classes.php:248
-#: ../include/functions.php:118
-#: ../include/functions.php:119
-#: ../include/functions.php:120
-#: ../include/functions.php:165
+#: ../include/classes.php:246
+#: ../include/functions.php:138
+#: ../include/functions.php:139
+#: ../include/functions.php:140
+#: ../include/functions.php:180
 #: ../list/index.php:9
 msgid "Group"
 msgstr "Grupp"
@@ -42,81 +42,87 @@ msgid "Add"
 msgstr "Lägg till"
 
 #: ../create/index.php:117
-msgid "Yes"
-msgstr "Ja"
-
-#: ../create/index.php:118
-msgid "No"
-msgstr "Nej"
-
-#: ../create/index.php:121
-#: ../include/classes.php:303
+#: ../include/classes.php:301
 msgid "Public"
 msgstr "Publik"
 
-#: ../create/index.php:125
+#: ../create/index.php:118
+#: ../include/classes.php:302
+msgid "Not Public"
+msgstr "Inte publik"
+
+#: ../create/index.php:119
+#: ../include/classes.php:303
+msgid "Inactive"
+msgstr "Inaktiv"
+
+#: ../create/index.php:122
+msgid "Status"
+msgstr "Status"
+
+#: ../create/index.php:126
 msgid "Verify that address is in Address book"
 msgstr "Verifiera att adress finns i Adressboken"
 
-#: ../create/index.php:132
+#: ../create/index.php:133
 msgid "Contact Page"
 msgstr "Kontaktsida"
 
-#: ../create/index.php:139
-#: ../create/index.php:144
+#: ../create/index.php:140
+#: ../create/index.php:145
 #: ../include/classes.php:311
-#: ../include/functions.php:554
+#: ../include/functions.php:569
 msgid "Name"
 msgstr "Namn"
 
-#: ../create/index.php:145
-#: ../include/functions.php:559
+#: ../create/index.php:146
+#: ../include/functions.php:574
 msgid "Address"
 msgstr "Adress"
 
-#: ../create/index.php:146
-#: ../include/functions.php:564
+#: ../create/index.php:147
+#: ../include/functions.php:579
 msgid "Zip Code"
 msgstr "Postnummer"
 
-#: ../create/index.php:147
-#: ../include/functions.php:569
+#: ../create/index.php:148
+#: ../include/functions.php:584
 msgid "City"
 msgstr "Stad"
 
-#: ../create/index.php:148
-#: ../include/functions.php:574
+#: ../create/index.php:149
+#: ../include/functions.php:589
 msgid "Phone Number"
 msgstr "Telefonnummer"
 
-#: ../create/index.php:149
-#: ../include/functions.php:579
+#: ../create/index.php:150
+#: ../include/functions.php:594
 msgid "E-mail"
 msgstr "E-post"
 
-#: ../create/index.php:150
-#: ../include/functions.php:584
+#: ../create/index.php:151
+#: ../include/functions.php:599
 msgid "Extra"
 msgstr "Extra"
 
-#: ../create/index.php:153
+#: ../create/index.php:154
 msgid "Registration Fields"
 msgstr "Fält för registrering"
 
-#: ../create/index.php:164
-#: ../include/classes.php:228
+#: ../create/index.php:165
+#: ../include/classes.php:237
 #: ../include/functions.php:36
-#: ../include/functions.php:174
+#: ../include/functions.php:189
 #: ../send/index.php:142
 #: ../send/index.php:187
 msgid "Choose here"
 msgstr "Välj här"
 
-#: ../create/index.php:171
+#: ../create/index.php:172
 msgid "Copy addresses from"
 msgstr "Kopiera adresser från"
 
-#: ../create/index.php:175
+#: ../create/index.php:176
 msgid "Save"
 msgstr "Spara"
 
@@ -139,7 +145,7 @@ msgstr "Gruppen uppdaterades inte med någon adress"
 #: ../import/index.php:108
 #: ../import/index.php:115
 #: ../include/classes.php:366
-#: ../include/functions.php:244
+#: ../include/functions.php:259
 msgid "Import"
 msgstr "Importera"
 
@@ -179,7 +185,7 @@ msgstr "Nyhetsbrev"
 msgid "Heading"
 msgstr "Rubrik"
 
-#: ../include/classes.php:302
+#: ../include/classes.php:300
 msgid "All"
 msgstr "Alla"
 
@@ -200,8 +206,8 @@ msgid "User"
 msgstr "Användare"
 
 #: ../include/classes.php:315
-#: ../include/classes.php:444
-#: ../include/functions.php:241
+#: ../include/classes.php:447
+#: ../include/functions.php:256
 #: ../sent/index.php:21
 #: ../sent/index.php:31
 msgid "Sent"
@@ -221,17 +227,17 @@ msgstr "Lägg till/ta bort"
 
 #: ../include/classes.php:373
 msgid "CSV"
-msgstr ""
+msgstr "CSV"
 
 #: ../include/classes.php:377
 msgid "XLS"
-msgstr ""
+msgstr "XLS"
 
 #: ../include/classes.php:384
 msgid "Recover"
 msgstr "Återställ"
 
-#: ../include/classes.php:434
+#: ../include/classes.php:432
 msgid "Test Unregistration"
 msgstr "Testa avregistrering"
 
@@ -239,56 +245,56 @@ msgstr "Testa avregistrering"
 msgid "Choose a Group"
 msgstr "Välj en grupp"
 
-#: ../include/functions.php:108
+#: ../include/functions.php:128
 msgid "There were unsent messages"
 msgstr "Det finns oskickade meddelanden"
 
-#: ../include/functions.php:129
+#: ../include/functions.php:149
 msgid "group"
 msgstr "grupp"
 
-#: ../include/functions.php:148
+#: ../include/functions.php:168
 msgid "Outgoing e-mails per hour"
 msgstr "Utgående e-post per timme"
 
-#: ../include/functions.php:149
+#: ../include/functions.php:169
 msgid "See groups created by other roles"
 msgstr "Se grupper skapade av andra roller"
 
-#: ../include/functions.php:150
+#: ../include/functions.php:170
 msgid "Add all imported to this group"
 msgstr "Lägg till alla importerade i denna grupp"
 
-#: ../include/functions.php:229
+#: ../include/functions.php:244
 msgid "Groups"
 msgstr "Grupper"
 
-#: ../include/functions.php:232
+#: ../include/functions.php:247
 msgid "List"
 msgstr "Lista"
 
-#: ../include/functions.php:235
+#: ../include/functions.php:250
 #: ../list/index.php:10
 msgid "Add New"
 msgstr "Skapa ny"
 
-#: ../include/functions.php:238
+#: ../include/functions.php:253
 msgid "Send New"
 msgstr "Skicka nytt"
 
-#: ../include/functions.php:493
+#: ../include/functions.php:508
 msgid "The information that you entered is not in our register. Please contact the admin of this page to get your information submitted."
 msgstr "Informationen som du angav finns inte med i vårt register. Var vänlig kontakta oss så lägger vi in det."
 
-#: ../include/functions.php:536
+#: ../include/functions.php:551
 msgid "Thank you for showing your interest. You have been added to the group"
 msgstr "Tack för visat intresse. Du har lagts till i gruppen"
 
-#: ../include/functions.php:590
+#: ../include/functions.php:605
 msgid "Your Email Address"
 msgstr "Din epost"
 
-#: ../include/functions.php:594
+#: ../include/functions.php:609
 msgid "Join"
 msgstr "Gå med"
 
@@ -358,27 +364,27 @@ msgstr "Skapad"
 msgid "There is nothing to show"
 msgstr "Det finns inget att visa"
 
-#: ../sent/index.php:71
+#: ../sent/index.php:86
 msgid "View content"
 msgstr "Visa innehåll"
 
-#: ../sent/index.php:72
+#: ../sent/index.php:87
 msgid "Send to group again"
 msgstr "Skicka till grupp igen"
 
-#: ../sent/index.php:73
+#: ../sent/index.php:88
 msgid "Send to e-mail"
 msgstr "Skicka till e-post"
 
-#: ../sent/index.php:94
+#: ../sent/index.php:109
 msgid "Abort"
 msgstr "Avbryt"
 
-#: ../sent/index.php:104
+#: ../sent/index.php:119
 msgid "Errors"
 msgstr "Fel"
 
-#: ../sent/index.php:109
+#: ../sent/index.php:124
 msgid "Read"
 msgstr "Lästa"
 
@@ -402,3 +408,8 @@ msgstr "Antingen var du inte med i gruppen eller så har du redan avregistrerat 
 msgid "Something went wrong. Please contact an admin if the problem persists"
 msgstr "Något gick snett. Var vänlig kontakta en admin ifall problemet kvarstår"
 
+#~ msgid "Yes"
+#~ msgstr "Ja"
+
+#~ msgid "No"
+#~ msgstr "Nej"

@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: 
-Version: 3.7.2
+Version: 3.7.4
 Author: Martin Fors
 Author URI: http://frostkom.se
 Text Domain: lang_group
@@ -34,6 +34,7 @@ if(is_admin())
 
 	add_filter('count_shortcode_button', 'count_shortcode_button_group');
 	add_filter('get_shortcode_output', 'get_shortcode_output_group');
+	add_filter('get_shortcode_list', 'get_shortcode_list_group');
 }
 
 add_shortcode('mf_group', 'shortcode_group');

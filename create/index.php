@@ -114,11 +114,12 @@ echo "<div class='wrap'>
 					echo "<div class='flex_flow'>";
 
 						$arr_data = array(
-							'publish' => __("Yes", 'lang_group'),
-							'draft' => __("No", 'lang_group'),
+							'publish' => __("Public", 'lang_group'),
+							'draft' => __("Not Public", 'lang_group'),
+							'ignore' => __("Inactive", 'lang_group'),
 						);
 
-						echo show_select(array('data' => $arr_data, 'name' => 'strGroupPublic', 'text' => __("Public", 'lang_group'), 'value' => $strGroupPublic));
+						echo show_select(array('data' => $arr_data, 'name' => 'strGroupPublic', 'text' => __("Status", 'lang_group'), 'value' => $strGroupPublic));
 
 						if($strGroupPublic == "publish")
 						{

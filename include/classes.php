@@ -299,6 +299,8 @@ class mf_group_table extends mf_list_table
 			'types' => array(
 				'all' => __("All", 'lang_group'),
 				'publish' => __("Public", 'lang_group'),
+				'draft' => __("Not Public", 'lang_group'),
+				'ignore' => __("Inactive", 'lang_group'),
 				'trash' => __("Trash", 'lang_group')
 			),
 		));
