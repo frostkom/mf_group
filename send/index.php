@@ -32,7 +32,7 @@ if(isset($_POST['btnGroupSend']) && count($arrGroupID) > 0 && wp_verify_nonce($_
 	else if($type == "email" || $type == "sms")
 	{
 		$attachments_size = 0;
-		$attachments_size_limit = 10 * pow(1024, 2);
+		$attachments_size_limit = 5 * pow(1024, 2);
 
 		if($strMessageAttachment != '')
 		{
