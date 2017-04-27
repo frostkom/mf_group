@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-04-25 17:30+0100\n"
+"POT-Creation-Date: 2017-04-27 10:07+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -24,10 +24,10 @@ msgstr "Informationen las inte in, kontakta en administratör om problemet kvars
 #: ../create/index.php:79
 #: ../include/classes.php:181
 #: ../include/classes.php:246
-#: ../include/functions.php:138
-#: ../include/functions.php:139
-#: ../include/functions.php:140
-#: ../include/functions.php:180
+#: ../include/functions.php:154
+#: ../include/functions.php:155
+#: ../include/functions.php:156
+#: ../include/functions.php:196
 #: ../list/index.php:9
 msgid "Group"
 msgstr "Grupp"
@@ -71,37 +71,37 @@ msgstr "Kontaktsida"
 #: ../create/index.php:140
 #: ../create/index.php:145
 #: ../include/classes.php:311
-#: ../include/functions.php:569
+#: ../include/functions.php:589
 msgid "Name"
 msgstr "Namn"
 
 #: ../create/index.php:146
-#: ../include/functions.php:574
+#: ../include/functions.php:594
 msgid "Address"
 msgstr "Adress"
 
 #: ../create/index.php:147
-#: ../include/functions.php:579
+#: ../include/functions.php:599
 msgid "Zip Code"
 msgstr "Postnummer"
 
 #: ../create/index.php:148
-#: ../include/functions.php:584
+#: ../include/functions.php:604
 msgid "City"
 msgstr "Stad"
 
 #: ../create/index.php:149
-#: ../include/functions.php:589
+#: ../include/functions.php:609
 msgid "Phone Number"
 msgstr "Telefonnummer"
 
 #: ../create/index.php:150
-#: ../include/functions.php:594
+#: ../include/functions.php:614
 msgid "E-mail"
 msgstr "E-post"
 
 #: ../create/index.php:151
-#: ../include/functions.php:599
+#: ../include/functions.php:619
 msgid "Extra"
 msgstr "Extra"
 
@@ -111,10 +111,10 @@ msgstr "Fält för registrering"
 
 #: ../create/index.php:165
 #: ../include/classes.php:237
-#: ../include/functions.php:36
-#: ../include/functions.php:189
-#: ../send/index.php:142
-#: ../send/index.php:187
+#: ../include/functions.php:52
+#: ../include/functions.php:205
+#: ../send/index.php:163
+#: ../send/index.php:208
 msgid "Choose here"
 msgstr "Välj här"
 
@@ -145,7 +145,7 @@ msgstr "Gruppen uppdaterades inte med någon adress"
 #: ../import/index.php:108
 #: ../import/index.php:115
 #: ../include/classes.php:366
-#: ../include/functions.php:259
+#: ../include/functions.php:275
 msgid "Import"
 msgstr "Importera"
 
@@ -207,7 +207,7 @@ msgstr "Användare"
 
 #: ../include/classes.php:315
 #: ../include/classes.php:447
-#: ../include/functions.php:256
+#: ../include/functions.php:272
 #: ../sent/index.php:21
 #: ../sent/index.php:31
 msgid "Sent"
@@ -241,60 +241,60 @@ msgstr "Återställ"
 msgid "Test Unregistration"
 msgstr "Testa avregistrering"
 
-#: ../include/functions.php:33
+#: ../include/functions.php:49
 msgid "Choose a Group"
 msgstr "Välj en grupp"
 
-#: ../include/functions.php:128
+#: ../include/functions.php:144
 msgid "There were unsent messages"
 msgstr "Det finns oskickade meddelanden"
 
-#: ../include/functions.php:149
+#: ../include/functions.php:165
 msgid "group"
 msgstr "grupp"
 
-#: ../include/functions.php:168
+#: ../include/functions.php:184
 msgid "Outgoing e-mails per hour"
 msgstr "Utgående e-post per timme"
 
-#: ../include/functions.php:169
+#: ../include/functions.php:185
 msgid "See groups created by other roles"
 msgstr "Se grupper skapade av andra roller"
 
-#: ../include/functions.php:170
+#: ../include/functions.php:186
 msgid "Add all imported to this group"
 msgstr "Lägg till alla importerade i denna grupp"
 
-#: ../include/functions.php:244
+#: ../include/functions.php:260
 msgid "Groups"
 msgstr "Grupper"
 
-#: ../include/functions.php:247
+#: ../include/functions.php:263
 msgid "List"
 msgstr "Lista"
 
-#: ../include/functions.php:250
+#: ../include/functions.php:266
 #: ../list/index.php:10
 msgid "Add New"
 msgstr "Skapa ny"
 
-#: ../include/functions.php:253
+#: ../include/functions.php:269
 msgid "Send New"
 msgstr "Skicka nytt"
 
-#: ../include/functions.php:508
+#: ../include/functions.php:528
 msgid "The information that you entered is not in our register. Please contact the admin of this page to get your information submitted."
 msgstr "Informationen som du angav finns inte med i vårt register. Var vänlig kontakta oss så lägger vi in det."
 
-#: ../include/functions.php:551
+#: ../include/functions.php:571
 msgid "Thank you for showing your interest. You have been added to the group"
 msgstr "Tack för visat intresse. Du har lagts till i gruppen"
 
-#: ../include/functions.php:605
+#: ../include/functions.php:625
 msgid "Your Email Address"
 msgstr "Din epost"
 
-#: ../include/functions.php:609
+#: ../include/functions.php:629
 msgid "Join"
 msgstr "Gå med"
 
@@ -302,49 +302,54 @@ msgstr "Gå med"
 msgid "You have to enter a text to send"
 msgstr "Du måste fylla i en text att skicka"
 
-#: ../send/index.php:70
+#: ../send/index.php:49
+#, php-format
+msgid "You are trying to send attachments of a total of %s. I suggest that you send the attachments as inline links instead of attachments. This way I don't have to send too much data which might slow down the server or make it timeout due to memory limits and it also makes the recipients not have to recieve that much in their inboxes."
+msgstr "Du försöker skicka bifogade filer som totalt är på %s. Jag föreslår att du skickar bifogade filer som länkar i texten istället. På det sättet behöver inte jag skicka för mycket data som kan slöa ner servern eller tom. göra så att jag slår i serverns tak för minne och det gör också att mottagarna inte behöver ta emot så mycket i deras inkorg."
+
+#: ../send/index.php:90
 msgid "There was an error when saving the message"
 msgstr "Det blev ett fel när meddelandet skulle sparas"
 
-#: ../send/index.php:82
+#: ../send/index.php:102
 msgid "The message was not sent to anybody"
 msgstr "Meddelandet skickades inte till någon"
 
-#: ../send/index.php:105
+#: ../send/index.php:126
 msgid "Send message"
 msgstr "Skicka meddelande"
 
-#: ../send/index.php:112
-#: ../send/index.php:204
+#: ../send/index.php:133
+#: ../send/index.php:225
 msgid "Message"
 msgstr "Meddelande"
 
-#: ../send/index.php:130
+#: ../send/index.php:151
 msgid "If you don't want to get these messages in the future click this link to unsubscribe"
 msgstr "Om du inte vill ha dessa meddelanden i framtiden, klicka på länken för att avregistrera dig"
 
-#: ../send/index.php:172
-#: ../send/index.php:202
+#: ../send/index.php:193
+#: ../send/index.php:223
 #: ../sent/index.php:29
 msgid "From"
 msgstr "Från"
 
-#: ../send/index.php:173
+#: ../send/index.php:194
 #: ../sent/index.php:30
 msgid "Subject"
 msgstr "Ämne"
 
-#: ../send/index.php:175
-#: ../send/index.php:203
+#: ../send/index.php:196
+#: ../send/index.php:224
 msgid "To"
 msgstr "Till"
 
-#: ../send/index.php:212
-#: ../send/index.php:224
+#: ../send/index.php:233
+#: ../send/index.php:245
 msgid "Send"
 msgstr "Skicka"
 
-#: ../send/index.php:220
+#: ../send/index.php:241
 msgid "Text Source"
 msgstr "Textkälla"
 

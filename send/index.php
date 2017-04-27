@@ -31,55 +31,76 @@ if(isset($_POST['btnGroupSend']) && count($arrGroupID) > 0 && wp_verify_nonce($_
 
 	else if($type == "email" || $type == "sms")
 	{
-		$message_recepients = 0;
+		$attachments_size = 0;
+		$attachments_size_limit = 10 * pow(1024, 2);
 
-		foreach($arrGroupID as $intGroupID)
+		if($strMessageAttachment != '')
 		{
-			$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE post_type = 'mf_group' AND ID = '%d'".$query_xtra." LIMIT 0, 1", $intGroupID));
+			list($mail_attachment, $rest) = get_attachment_to_send($strMessageAttachment);
 
-			if($wpdb->num_rows > 0)
+			foreach($mail_attachment as $file)
 			{
-				$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->base_prefix."group_message SET groupID = '%d', messageType = %s, messageFrom = %s, messageName = %s, messageText = %s, messageAttachment = %s, messageCreated = NOW(), userID = '%d'", $intGroupID, $type, $strMessageFrom, $strMessageName, $strMessageText, $strMessageAttachment, get_current_user_id()));
-
-				$intMessageID = $wpdb->insert_id;
-
-				if($intMessageID > 0)
-				{
-					$result = $wpdb->get_results($wpdb->prepare("SELECT addressID, addressEmail, addressCellNo FROM ".$wpdb->base_prefix."address INNER JOIN ".$wpdb->base_prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' AND groupUnsubscribed = '0'", $intGroupID));
-
-					foreach($result as $r)
-					{
-						$intAddressID = $r->addressID;
-						$strAddressEmail = $r->addressEmail;
-						$strAddressCellNo = $r->addressCellNo;
-
-						if($type == "email" && $strAddressEmail != "" || $type == "sms" && $strAddressCellNo != "")
-						{
-							$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->base_prefix."group_queue SET addressID = '%d', messageID = '%d', queueCreated = NOW()", $intAddressID, $intMessageID));
-
-							if($wpdb->rows_affected > 0)
-							{
-								$message_recepients++;
-							}
-						}
-					}
-				}
-
-				else
-				{
-					$error_text = __("There was an error when saving the message", 'lang_group');
-				}
+				$attachments_size += filesize($file);
 			}
 		}
 
-		if($message_recepients > 0)
+		if($attachments_size > $attachments_size_limit)
 		{
-			mf_redirect("/wp-admin/admin.php?page=mf_group/list/index.php&sent");
+			$error_text = sprintf(__("You are trying to send attachments of a total of %s. I suggest that you send the attachments as inline links instead of attachments. This way I don't have to send too much data which might slow down the server or make it timeout due to memory limits and it also makes the recipients not have to recieve that much in their inboxes.", 'lang_group'), show_final_size($attachments_size));
 		}
 
 		else
 		{
-			$error_text = __("The message was not sent to anybody", 'lang_group');
+			$message_recepients = 0;
+
+			foreach($arrGroupID as $intGroupID)
+			{
+				$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE post_type = 'mf_group' AND ID = '%d'".$query_xtra." LIMIT 0, 1", $intGroupID));
+
+				if($wpdb->num_rows > 0)
+				{
+					$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->base_prefix."group_message SET groupID = '%d', messageType = %s, messageFrom = %s, messageName = %s, messageText = %s, messageAttachment = %s, messageCreated = NOW(), userID = '%d'", $intGroupID, $type, $strMessageFrom, $strMessageName, $strMessageText, $strMessageAttachment, get_current_user_id()));
+
+					$intMessageID = $wpdb->insert_id;
+
+					if($intMessageID > 0)
+					{
+						$result = $wpdb->get_results($wpdb->prepare("SELECT addressID, addressEmail, addressCellNo FROM ".$wpdb->base_prefix."address INNER JOIN ".$wpdb->base_prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' AND groupUnsubscribed = '0'", $intGroupID));
+
+						foreach($result as $r)
+						{
+							$intAddressID = $r->addressID;
+							$strAddressEmail = $r->addressEmail;
+							$strAddressCellNo = $r->addressCellNo;
+
+							if($type == "email" && $strAddressEmail != "" || $type == "sms" && $strAddressCellNo != "")
+							{
+								$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->base_prefix."group_queue SET addressID = '%d', messageID = '%d', queueCreated = NOW()", $intAddressID, $intMessageID));
+
+								if($wpdb->rows_affected > 0)
+								{
+									$message_recepients++;
+								}
+							}
+						}
+					}
+
+					else
+					{
+						$error_text = __("There was an error when saving the message", 'lang_group');
+					}
+				}
+			}
+
+			if($message_recepients > 0)
+			{
+				mf_redirect("/wp-admin/admin.php?page=mf_group/list/index.php&sent");
+			}
+
+			else
+			{
+				$error_text = __("The message was not sent to anybody", 'lang_group');
+			}
 		}
 	}
 }

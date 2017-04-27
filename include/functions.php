@@ -1,5 +1,21 @@
 <?php
 
+function show_final_size($in)
+{
+	$arr_suffix = array("B", "kB", "MB", "GB", "TB");
+
+	$count_temp = count($arr_suffix);
+
+	for($i = 0; ($in > 1024 || $i < 1) && $i < $count_temp; $i++) //Forces at least kB
+	{
+		$in /= 1024;
+	}
+
+	$out = strlen(round($in)) < 3 ? round($in, 1) : round($in); //If less than 3 digits, show one decimal aswell
+
+	return $out."&nbsp;".$arr_suffix[$i];
+}
+
 function count_shortcode_button_group($count)
 {
 	if($count == 0)
@@ -314,113 +330,117 @@ function cron_group()
 		$query_limit = " LIMIT 0, ".$emails_left_to_send;
 	}
 
-	$result = $wpdb->get_results("SELECT groupID, addressEmail, addressCellNo, queueID, messageType, messageFrom, messageName, messageText, messageAttachment, ".$wpdb->base_prefix."group_message.userID FROM ".$wpdb->base_prefix."address INNER JOIN ".$wpdb->base_prefix."group_queue USING (addressID) INNER JOIN ".$wpdb->base_prefix."group_message USING (messageID) WHERE queueSent = '0' ORDER BY messageType ASC, queueCreated ASC".$query_limit);
-
 	$i = 0;
+
+	$result = $wpdb->get_results("SELECT groupID FROM ".$wpdb->base_prefix."group_queue INNER JOIN ".$wpdb->base_prefix."group_message USING (messageID) WHERE queueSent = '0' GROUP BY groupID ORDER BY RAND()");
 
 	foreach($result as $r)
 	{
-		if($obj_cron->has_expired(array('margin' => .9)))
-		{
-			break;
-		}
-
 		$intGroupID = $r->groupID;
-		$intQueueID = $r->queueID;
-		$strAddressEmail = trim($r->addressEmail);
-		$strAddressCellNo = $r->addressCellNo;
-		$strMessageType = $r->messageType;
-		$strMessageFrom = $r->messageFrom;
-		$strMessageName = $r->messageName;
-		$strMessageText = $r->messageText;
-		$strMessageAttachment = $r->messageAttachment;
-		$intUserID = $r->userID;
 
-		//$resultUnsent = $wpdb->get_var($wpdb->prepare("SELECT queueSent FROM ".$wpdb->base_prefix."group_queue WHERE queueID = '%d' AND queueSent = '0' LIMIT 0, 1", $intQueueID));
+		$resultMessages = $wpdb->get_results($wpdb->prepare("SELECT addressEmail, addressCellNo, queueID, messageType, messageFrom, messageName, messageText, messageAttachment, ".$wpdb->base_prefix."group_message.userID FROM ".$wpdb->base_prefix."address INNER JOIN ".$wpdb->base_prefix."group_queue USING (addressID) INNER JOIN ".$wpdb->base_prefix."group_message USING (messageID) WHERE groupID = '%d' AND queueSent = '0' ORDER BY messageType ASC, queueCreated ASC".$query_limit, $intGroupID));
 
-		if($strMessageType == "email")
+		foreach($resultMessages as $r)
 		{
-			$strMessageFromName = "";
-
-			if(preg_match("/\|/", $strMessageFrom))
+			if($obj_cron->has_expired(array('margin' => .9)))
 			{
-				list($strMessageFromName, $strMessageFrom) = explode("|", $strMessageFrom);
+				break;
 			}
 
-			else
+			$intQueueID = $r->queueID;
+			$strAddressEmail = trim($r->addressEmail);
+			$strAddressCellNo = $r->addressCellNo;
+			$strMessageType = $r->messageType;
+			$strMessageFrom = $r->messageFrom;
+			$strMessageName = $r->messageName;
+			$strMessageText = $r->messageText;
+			$strMessageAttachment = $r->messageAttachment;
+			$intUserID = $r->userID;
+
+			if($strMessageType == "email")
 			{
-				$strMessageFromName = $strMessageFrom;
-			}
+				$strMessageFromName = "";
 
-			$mail_headers = "From: ".$strMessageFromName." <".$strMessageFrom.">\r\n";
-
-			if($strAddressEmail != '' && is_domain_valid($strAddressEmail))
-			{
-				$mail_to = $strAddressEmail;
-				$mail_subject = $strMessageName;
-				$mail_content = stripslashes(apply_filters('the_content', $strMessageText));
-
-				$unsubscribe_link = get_email_link(array('type' => "unsubscribe", 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
-				$verify_link = get_email_link(array('type' => "verify", 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
-
-				$mail_content = str_replace("[unsubscribe_link]", $unsubscribe_link, $mail_content);
-				$mail_content .= "<img src='".$verify_link."' style='height: 0; visibility: hidden; width: 0'>";
-
-				list($mail_attachment, $rest) = get_attachment_to_send($strMessageAttachment);
-
-				$sent = send_email(array('to' => $mail_to, 'subject' => $mail_subject, 'content' => $mail_content, 'headers' => $mail_headers, 'attachment' => $mail_attachment));
-
-				if($sent)
+				if(preg_match("/\|/", $strMessageFrom))
 				{
-					$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->base_prefix."group_queue SET queueSent = '1', queueSentTime = NOW() WHERE queueID = '%d'", $intQueueID));
-
-					$mail_sent++;
-
-					do_log("Not sent to ".$mail_to, 'trash');
+					list($strMessageFromName, $strMessageFrom) = explode("|", $strMessageFrom);
 				}
 
 				else
 				{
-					do_log($error_text);
+					$strMessageFromName = $strMessageFrom;
+				}
+
+				$mail_headers = "From: ".$strMessageFromName." <".$strMessageFrom.">\r\n";
+
+				if($strAddressEmail != '' && is_domain_valid($strAddressEmail))
+				{
+					$mail_to = $strAddressEmail;
+					$mail_subject = $strMessageName;
+					$mail_content = stripslashes(apply_filters('the_content', $strMessageText));
+
+					$unsubscribe_link = get_email_link(array('type' => "unsubscribe", 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
+					$verify_link = get_email_link(array('type' => "verify", 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
+
+					$mail_content = str_replace("[unsubscribe_link]", $unsubscribe_link, $mail_content);
+					$mail_content .= "<img src='".$verify_link."' style='height: 0; visibility: hidden; width: 0'>";
+
+					list($mail_attachment, $rest) = get_attachment_to_send($strMessageAttachment);
+
+					$sent = send_email(array('to' => $mail_to, 'subject' => $mail_subject, 'content' => $mail_content, 'headers' => $mail_headers, 'attachment' => $mail_attachment));
+
+					if($sent)
+					{
+						$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->base_prefix."group_queue SET queueSent = '1', queueSentTime = NOW() WHERE queueID = '%d'", $intQueueID));
+
+						$mail_sent++;
+
+						do_log("Not sent to ".$mail_to, 'trash');
+					}
+
+					else
+					{
+						do_log($error_text);
+					}
+				}
+
+				else
+				{
+					$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->base_prefix."group_queue WHERE queueID = '%d'", $intQueueID));
 				}
 			}
 
-			else
+			else if($strMessageType == "sms")
 			{
-				$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->base_prefix."group_queue WHERE queueID = '%d'", $intQueueID));
+				//Must be here to make sure that send_sms() is loaded
+				##################
+				include_once(ABSPATH."wp-admin/includes/plugin.php");
+
+				if(is_plugin_active("mf_sms/index.php"))
+				{
+					include_once(ABSPATH."wp-content/plugins/mf_sms/include/functions.php");
+				}
+				##################
+
+				$sent = send_sms(array('from' => $strMessageFrom, 'to' => $strAddressCellNo, 'text' => $strMessageText, 'user_id' => $intUserID));
+
+				if($sent == "OK")
+				{
+					$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->base_prefix."group_queue SET queueSent = '1', queueSentTime = NOW() WHERE queueID = '%d'", $intQueueID));
+
+					$sms_sent++;
+
+					do_log("Not sent to ".$strAddressCellNo, 'trash');
+				}
+
+				else
+				{
+					do_log("Not sent to ".$strAddressCellNo.", ".shorten_text(array('string' => htmlspecialchars($strMessageText), 'limit' => 10)));
+				}
 			}
+
+			$i++;
 		}
-
-		else if($strMessageType == "sms")
-		{
-			//Must be here to make sure that send_sms() is loaded
-			##################
-			include_once(ABSPATH."wp-admin/includes/plugin.php");
-
-			if(is_plugin_active("mf_sms/index.php"))
-			{
-				include_once(ABSPATH."wp-content/plugins/mf_sms/include/functions.php");
-			}
-			##################
-
-			$sent = send_sms(array('from' => $strMessageFrom, 'to' => $strAddressCellNo, 'text' => $strMessageText, 'user_id' => $intUserID));
-
-			if($sent == "OK")
-			{
-				$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->base_prefix."group_queue SET queueSent = '1', queueSentTime = NOW() WHERE queueID = '%d'", $intQueueID));
-
-				$sms_sent++;
-
-				do_log("Not sent to ".$strAddressCellNo, 'trash');
-			}
-
-			else
-			{
-				do_log("Not sent to ".$strAddressCellNo.", ".shorten_text(array('string' => htmlspecialchars($strMessageText), 'limit' => 10)));
-			}
-		}
-
-		$i++;
 	}
 }
 
