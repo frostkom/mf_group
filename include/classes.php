@@ -78,6 +78,13 @@ class mf_group
 		);
 	}
 
+	function get_from_last()
+	{
+		global $wpdb;
+
+		return $wpdb->get_var("SELECT messageFrom FROM ".$wpdb->base_prefix."group_message INNER JOIN ".$wpdb->posts." ON ".$wpdb->base_prefix."group_message.groupID = ".$wpdb->posts.".ID AND post_type = 'mf_group' ORDER BY messageCreated DESC LIMIT 0, 1");
+	}
+
 	function check_if_address_exists($query_where)
 	{
 		global $wpdb;

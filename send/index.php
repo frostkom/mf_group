@@ -1,5 +1,7 @@
 <?php
 
+$obj_group = new mf_group();
+
 $query_xtra = "";
 
 if(!IS_EDITOR)
@@ -11,7 +13,7 @@ $type = check_var('type', 'char', true, 'email');
 $intGroupID = check_var('intGroupID');
 $arrGroupID = check_var('arrGroupID');
 $intMessageID = check_var('intMessageID');
-$strMessageFrom = check_var('strMessageFrom');
+$strMessageFrom = check_var('strMessageFrom', 'char', true, $obj_group->get_from_last());
 $strMessageName = check_var('strMessageName');
 $strMessageText_orig = $strMessageText = check_var('strMessageText', 'raw');
 $strMessageAttachment = check_var('strMessageAttachment');
@@ -123,7 +125,7 @@ else if($intMessageID > 0)
 }
 
 echo "<div class='wrap'>
-	<h2>".__("Send message", 'lang_group')."</h2>" //." ".get_group_name($intGroupID)
+	<h2>".__("Send message", 'lang_group')."</h2>"
 	.get_notification()
 	."<div id='poststuff'>
 		<form action='#' method='post' class='mf_form mf_settings'>
@@ -136,7 +138,6 @@ echo "<div class='wrap'>
 							$arr_data_to = array();
 
 							$obj_group = new mf_group();
-
 							$result = $obj_group->get_groups();
 
 							foreach($result as $r)
@@ -146,45 +147,38 @@ echo "<div class='wrap'>
 
 							if($type == "email")
 							{
-								if($type == "email" && $strMessageText_orig == '')
+								if($strMessageText_orig == '')
 								{
 									$strMessageText .= "<p>&nbsp;</p><p><a href='[unsubscribe_link]'>".__("If you don't want to get these messages in the future click this link to unsubscribe", 'lang_group')."</a></p>";
 								}
 
-								$current_user = wp_get_current_user();
-
-								$user_name = $current_user->display_name;
-								$user_email = $current_user->user_email;
-								$admin_name = get_bloginfo('name');
-								$admin_email = get_bloginfo('admin_email');
-
-								$arr_data_from = array();
-
-								$arr_data_from[''] = "-- ".__("Choose here", 'lang_group')." --";
-
-								if($user_email != '')
-								{
-									$arr_data_from[$user_name."|".$user_email] = $user_name." (".$user_email.")";
-								}
-
-								if($admin_email != '' && $admin_email != $user_email)
-								{
-									$arr_data_from[$admin_name."|".$admin_email] = $admin_name." (".$admin_email.")";
-								}
-
 								if(is_plugin_active("mf_email/index.php"))
 								{
-									$result = $wpdb->get_results("SELECT emailAddress, emailName FROM ".$wpdb->base_prefix."email_users RIGHT JOIN ".$wpdb->base_prefix."email USING (emailID) WHERE (emailPublic = '1' OR emailRoles LIKE '%".get_current_user_role()."%' OR ".$wpdb->base_prefix."email.userID = '".get_current_user_id()."' OR ".$wpdb->base_prefix."email_users.userID = '".get_current_user_id()."') AND emailDeleted = '0' ORDER BY emailUsername ASC"); // AND emailVerified = '1'
+									$obj_email = new mf_email();
+									$arr_data_from = $obj_email->get_from_for_select(array('index' => 'address'));
+								}
 
-									foreach($result as $r)
+								else
+								{
+									$current_user = wp_get_current_user();
+
+									$user_name = $current_user->display_name;
+									$user_email = $current_user->user_email;
+									$admin_name = get_bloginfo('name');
+									$admin_email = get_bloginfo('admin_email');
+
+									$arr_data_from = array();
+
+									$arr_data_from[''] = "-- ".__("Choose here", 'lang_group')." --";
+
+									if($user_email != '')
 									{
-										$strEmailAddress = $r->emailAddress;
-										$strEmailName = $r->emailName;
+										$arr_data_from[$user_name."|".$user_email] = $user_name." (".$user_email.")";
+									}
 
-										if($strEmailAddress != $user_email && $strEmailAddress != $admin_email)
-										{
-											$arr_data_from[$strEmailName."|".$strEmailAddress] = $strEmailName." (".$strEmailAddress.")";
-										}
+									if($admin_email != '' && $admin_email != $user_email)
+									{
+										$arr_data_from[$admin_name."|".$admin_email] = $admin_name." (".$admin_email.")";
 									}
 								}
 
