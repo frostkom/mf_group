@@ -121,27 +121,36 @@ function notices_group()
 
 	if(IS_ADMIN)
 	{
-		$result = $wpdb->get_results("SELECT messageType, addressID, addressFirstName, addressSurName, addressEmail, addressCellNo FROM ".$wpdb->base_prefix."group_message INNER JOIN ".$wpdb->base_prefix."group_queue USING (messageID) INNER JOIN ".$wpdb->base_prefix."address USING (addressID) WHERE queueSent = '0' AND queueCreated < DATE_SUB(NOW(), INTERVAL 3 HOUR) LIMIT 0, 5");
+		$result = $wpdb->get_results("SELECT messageType, addressID, addressFirstName, addressSurName, addressEmail, addressCellNo FROM ".$wpdb->base_prefix."group_message INNER JOIN ".$wpdb->base_prefix."group_queue USING (messageID) INNER JOIN ".$wpdb->base_prefix."address USING (addressID) WHERE queueSent = '0' AND queueCreated < DATE_SUB(NOW(), INTERVAL 3 HOUR) LIMIT 0, 6");
 
-		if($wpdb->num_rows > 0)
+		$rows = $wpdb->num_rows;
+
+		if($rows > 0)
 		{
 			$unsent_links = "";
 
+			$i = 0;
+
 			foreach($result as $r)
 			{
-				$strMessageType = $r->messageType;
-				$intAddressID = $r->addressID;
-				$strAddressFirstName = $r->addressFirstName;
-				$strAddressSurName = $r->addressSurName;
-				$emlAddressEmail = $r->addressEmail;
-				$strAddressCellNo = $r->addressCellNo;
+				if($i < 5)
+				{
+					$strMessageType = $r->messageType;
+					$intAddressID = $r->addressID;
+					$strAddressFirstName = $r->addressFirstName;
+					$strAddressSurName = $r->addressSurName;
+					$emlAddressEmail = $r->addressEmail;
+					$strAddressCellNo = $r->addressCellNo;
 
-				$strAddressName = $strAddressFirstName." ".$strAddressSurName." &lt;".($strMessageType == "email" ? $emlAddressEmail : $strAddressCellNo)."&gt;";
+					$strAddressName = $strAddressFirstName." ".$strAddressSurName." &lt;".($strMessageType == "email" ? $emlAddressEmail : $strAddressCellNo)."&gt;";
 
-				$unsent_links .= ($unsent_links != '' ? ", " : "")."<a href='".admin_url("admin.php?page=mf_address/create/index.php&intAddressID=".$intAddressID)."'>".$strAddressName."</a>";
+					$unsent_links .= ($unsent_links != '' ? ", " : "")."<a href='".admin_url("admin.php?page=mf_address/create/index.php&intAddressID=".$intAddressID)."'>".$strAddressName."</a>";
+
+					$i++;
+				}
 			}
 
-			$error_text = __("There were unsent messages", 'lang_group')." (".$unsent_links.")";
+			$error_text = __("There were unsent messages", 'lang_group')." (".$unsent_links.($rows == 6 ? "&hellip;" : "").")";
 
 			echo get_notification();
 		}
@@ -276,12 +285,12 @@ function menu_group()
 	add_submenu_page($menu_root, $menu_title, $menu_title, $menu_capability, $menu_root."import/index.php");
 }
 
-function get_group_name($id)
+/*function get_group_name($id)
 {
 	global $wpdb;
 
 	return $wpdb->get_var($wpdb->prepare("SELECT post_title FROM ".$wpdb->posts." WHERE post_type = 'mf_group' AND ID = '%d'", $id));
-}
+}*/
 
 function get_email_link($data)
 {
@@ -310,6 +319,7 @@ function cron_group()
 	global $wpdb, $error_text;
 
 	$obj_cron = new mf_cron();
+	$obj_group = new mf_group();
 
 	$mail_sent = $sms_sent = 0;
 
@@ -395,11 +405,16 @@ function cron_group()
 
 						$mail_sent++;
 
-						do_log("Not sent to ".$mail_to, 'trash');
+						//do_log("Not sent to ".$mail_to, 'trash');
 					}
 
 					else
 					{
+						if($error_text == '')
+						{
+							$error_text = sprintf(__("The message from %s in the group %s could not be sent", 'lang_group'), $strMessageFrom, $obj_group->get_name($intGroupID));
+						}
+
 						do_log($error_text);
 					}
 				}

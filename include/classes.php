@@ -85,6 +85,18 @@ class mf_group
 		return $wpdb->get_var("SELECT messageFrom FROM ".$wpdb->base_prefix."group_message INNER JOIN ".$wpdb->posts." ON ".$wpdb->base_prefix."group_message.groupID = ".$wpdb->posts.".ID AND post_type = 'mf_group' ORDER BY messageCreated DESC LIMIT 0, 1");
 	}
 
+	function get_name($id = 0)
+	{
+		global $wpdb;
+
+		if($id > 0)
+		{
+			$this->id = $id;
+		}
+
+		return $wpdb->get_var($wpdb->prepare("SELECT post_title FROM ".$wpdb->posts." WHERE post_type = 'mf_group' AND ID = '%d'", $this->id));
+	}
+
 	function check_if_address_exists($query_where)
 	{
 		global $wpdb;
@@ -149,7 +161,9 @@ class mf_group_export extends mf_export
 	{
 		global $wpdb, $error_text;
 
-		$this->name = $wpdb->get_var($wpdb->prepare("SELECT post_title FROM ".$wpdb->posts." WHERE ID = '%d' AND post_type = 'mf_group'", $this->type));
+		//$this->name = $wpdb->get_var($wpdb->prepare("SELECT post_title FROM ".$wpdb->posts." WHERE ID = '%d' AND post_type = 'mf_group'", $this->type));
+		$obj_group = new mf_group();
+		$this->name = $obj_group->get_name($this->type);
 
 		$result = $wpdb->get_results($wpdb->prepare("SELECT * FROM ".$wpdb->base_prefix."address INNER JOIN ".$wpdb->base_prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' GROUP BY addressID ORDER BY addressPublic ASC, addressSurName ASC, addressFirstName ASC", $this->type));
 
@@ -314,8 +328,8 @@ class mf_group_table extends mf_list_table
 
 		$this->set_columns(array(
 			'cb' => '<input type="checkbox">',
-			'post_status' => "",
 			'post_title' => __("Name", 'lang_group'),
+			'post_status' => "",
 			'amount' => __("Amount", 'lang_group'),
 			'unsubscribed' => __("Unsubscribed", 'lang_group'),
 			'post_author' => __("User", 'lang_group'),
