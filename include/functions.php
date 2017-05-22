@@ -193,6 +193,7 @@ function settings_group()
 		'setting_emails_per_hour' => __("Outgoing e-mails per hour", 'lang_group'),
 		'setting_group_see_other_roles' => __("See groups created by other roles", 'lang_group'),
 		'setting_group_import' => __("Add all imported to this group", 'lang_group'),
+		'setting_group_acceptance_email' => __("Send acceptance e-mail before adding to a group", 'lang_group'),
 	);
 
 	show_settings_fields(array('area' => $options_area, 'settings' => $arr_settings));
@@ -203,6 +204,22 @@ function settings_group_callback()
 	$setting_key = get_setting_key(__FUNCTION__);
 
 	echo settings_header($setting_key, __("Group", 'lang_group'));
+}
+
+function setting_emails_per_hour_callback()
+{
+	$setting_key = get_setting_key(__FUNCTION__);
+	$option = get_option($setting_key);
+
+	echo show_textfield(array('name' => $setting_key, 'value' => $option, 'type' => 'number', 'suffix' => __("0 or empty means infinte", 'lang_group')));
+}
+
+function setting_group_see_other_roles_callback()
+{
+	$setting_key = get_setting_key(__FUNCTION__);
+	$option = get_option($setting_key, 'yes');
+
+	echo show_select(array('data' => get_yes_no_for_select(), 'name' => $setting_key, 'value' => $option));
 }
 
 function setting_group_import_callback()
@@ -224,20 +241,12 @@ function setting_group_import_callback()
 	echo show_select(array('data' => $arr_data, 'name' => $setting_key, 'value' => $option, 'suffix' => "<a href='".admin_url("admin.php?page=mf_group/create/index.php")."'><i class='fa fa-lg fa-plus'></i></a>"));
 }
 
-function setting_group_see_other_roles_callback()
+function setting_group_acceptance_email_callback()
 {
 	$setting_key = get_setting_key(__FUNCTION__);
-	$option = get_option($setting_key, 'yes');
+	$option = get_option($setting_key, 'no');
 
 	echo show_select(array('data' => get_yes_no_for_select(), 'name' => $setting_key, 'value' => $option));
-}
-
-function setting_emails_per_hour_callback()
-{
-	$setting_key = get_setting_key(__FUNCTION__);
-	$option = get_option($setting_key);
-
-	echo show_textfield(array('name' => $setting_key, 'value' => $option, 'type' => 'number'));
 }
 
 function count_unsent_group($id = 0)
@@ -284,13 +293,6 @@ function menu_group()
 	$menu_title = __("Import", 'lang_group');
 	add_submenu_page($menu_root, $menu_title, $menu_title, $menu_capability, $menu_root."import/index.php");
 }
-
-/*function get_group_name($id)
-{
-	global $wpdb;
-
-	return $wpdb->get_var($wpdb->prepare("SELECT post_title FROM ".$wpdb->posts." WHERE post_type = 'mf_group' AND ID = '%d'", $id));
-}*/
 
 function get_email_link($data)
 {
@@ -483,7 +485,7 @@ function show_group_registration_form($post_id)
 
 		$query_where = $query_set = "";
 
-		if(is_array($arrGroupRegistrationFields))
+		if(is_array($arrGroupRegistrationFields) && count($arrGroupRegistrationFields) > 0)
 		{
 			if(in_array("name", $arrGroupRegistrationFields))
 			{
@@ -597,7 +599,7 @@ function show_group_registration_form($post_id)
 	{
 		$out .= "<form action='' method='post' class='mf_form'>";
 
-			if(is_array($arrGroupRegistrationFields))
+			if(is_array($arrGroupRegistrationFields) && count($arrGroupRegistrationFields) > 0)
 			{
 				if(in_array("name", $arrGroupRegistrationFields))
 				{

@@ -119,7 +119,26 @@ class mf_group
 
 			if($wpdb->num_rows == 0)
 			{
-				$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->base_prefix."address2group SET addressID = '%d', groupID = '%d'", $data['address_id'], $data['group_id']));
+				$setting_group_acceptance_email = get_option('setting_group_acceptance_email');
+
+				$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->base_prefix."address2group SET addressID = '%d', groupID = '%d', groupAccepted = '%d'", $data['address_id'], $data['group_id'], ($setting_group_acceptance_email == 'yes' ? 0 : 1)));
+
+				if($setting_group_acceptance_email == 'yes')
+				{
+					$obj_address = new mf_address();
+
+					$strAddressEmail = $obj_address->get_address($data['address_id']);
+					$strGroupName = $this->get_name($data['group_id']);
+
+					$mail_to = $strAddressEmail;
+					$mail_subject = sprintf(__("Accept subscription to %s", 'lang_group'), $strGroupName);
+					$mail_content = sprintf(__("You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below.", 'lang_group'), $strGroupName)."<p>&nbsp;</p><p><a href='[subscribe_link]'>".__("By accepting this subscription you will from now on get messages that are sent to this group", 'lang_group')."</a></p>";
+
+					$subscribe_link = get_email_link(array('type' => "subscribe", 'group_id' => $data['group_id'], 'email' => $strAddressEmail));
+					$mail_content = str_replace("[subscribe_link]", $subscribe_link, $mail_content);
+
+					$sent = send_email(array('to' => $mail_to, 'subject' => $mail_subject, 'content' => $mail_content));
+				}
 			}
 		}
 	}
@@ -273,6 +292,8 @@ class mf_group_table extends mf_list_table
 {
 	function set_default()
 	{
+		global $wpdb;
+
 		$this->post_type = "mf_group";
 
 		$this->arr_settings['query_select_id'] = "ID";
@@ -326,15 +347,25 @@ class mf_group_table extends mf_list_table
 			),
 		));
 
-		$this->set_columns(array(
+		$rowsAddressesNotAccepted = $wpdb->get_var("SELECT COUNT(addressID) FROM ".$wpdb->base_prefix."address INNER JOIN ".$wpdb->base_prefix."address2group USING (addressID) WHERE addressDeleted = '0' AND groupAccepted = '0'");
+
+		$arr_columns = array(
 			'cb' => '<input type="checkbox">',
 			'post_title' => __("Name", 'lang_group'),
 			'post_status' => "",
 			'amount' => __("Amount", 'lang_group'),
-			'unsubscribed' => __("Unsubscribed", 'lang_group'),
-			'post_author' => __("User", 'lang_group'),
-			'sent' => __("Sent", 'lang_group'),
-		));
+		);
+
+		if($rowsAddressesNotAccepted > 0)
+		{
+			$arr_columns['not_accepted'] = __("Not Accepted", 'lang_group');
+		}
+
+		$arr_columns['unsubscribed'] = __("Unsubscribed", 'lang_group');
+		$arr_columns['post_author'] = shorten_text(array('text' => __("User", 'lang_group'), 'limit' => 4));
+		$arr_columns['sent'] = __("Sent", 'lang_group');
+
+		$this->set_columns($arr_columns);
 
 		$this->set_sortable_columns(array(
 			'post_title',
@@ -410,7 +441,7 @@ class mf_group_table extends mf_list_table
 			break;
 
 			case 'post_author':
-				$out .= get_user_info(array('id' => $item[$column_name]));
+				$out .= get_user_info(array('id' => $item[$column_name], 'type' => 'short_name'));
 			break;
 
 			case 'amount':
@@ -433,8 +464,13 @@ class mf_group_table extends mf_list_table
 				}
 
 				$out .= "<a href='?page=mf_address/list/index.php&intGroupID=".$post_id."&no_ses&is_part_of_group=1'>".$amount."</a>"
-				//.count_unsent_group($post_id)
 				.$this->row_actions($actions);
+			break;
+
+			case 'not_accepted':
+				$rowsAddressesNotAccepted = $wpdb->get_var($wpdb->prepare("SELECT COUNT(addressID) FROM ".$wpdb->base_prefix."address INNER JOIN ".$wpdb->base_prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' AND groupAccepted = '0'", $post_id));
+
+				$out .= $rowsAddressesNotAccepted;
 			break;
 
 			case 'unsubscribed':
@@ -450,7 +486,7 @@ class mf_group_table extends mf_list_table
 					$user_email = $current_user->user_email;
 
 					$out .= "<div class='row-actions'>
-						<a href='".get_email_link(array('type' => "unsubscribe", 'group_id' => $post_id, 'email' => $user_email))."'>".__("Test Unregistration", 'lang_group')."</a>
+						<a href='".get_email_link(array('type' => "unsubscribe", 'group_id' => $post_id, 'email' => $user_email))."'>".__("Test", 'lang_group')."</a>
 					</div>";
 				}
 			break;

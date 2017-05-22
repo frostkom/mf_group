@@ -67,7 +67,7 @@ if(isset($_POST['btnGroupSend']) && count($arrGroupID) > 0 && wp_verify_nonce($_
 
 					if($intMessageID > 0)
 					{
-						$result = $wpdb->get_results($wpdb->prepare("SELECT addressID, addressEmail, addressCellNo FROM ".$wpdb->base_prefix."address INNER JOIN ".$wpdb->base_prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' AND groupUnsubscribed = '0'", $intGroupID));
+						$result = $wpdb->get_results($wpdb->prepare("SELECT addressID, addressEmail, addressCellNo FROM ".$wpdb->base_prefix."address INNER JOIN ".$wpdb->base_prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' AND groupAccepted = '1' AND groupUnsubscribed = '0'", $intGroupID));
 
 						foreach($result as $r)
 						{
