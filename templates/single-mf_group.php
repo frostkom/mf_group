@@ -63,76 +63,73 @@ get_header();
 
 					if($post_status == 'publish' || $intGroupSentAmount > 0)
 					{
-						/*if($intGroupSentAmount > 0)
-						{*/
-							$strUnsubscribeHash = check_var('unsubscribe', 'char');
-							$strVerifyHash = check_var('verify', 'char');
+						$strUnsubscribeHash = check_var('unsubscribe', 'char');
+						$strVerifyHash = check_var('verify', 'char');
 
-							$intGroupID = check_var('gid', 'int');
-							$strAddressEmail = check_var('aem', 'char');
-							$intQueueID = check_var('qid', 'int');
+						$intGroupID = check_var('gid', 'int');
+						$strAddressEmail = check_var('aem', 'char');
+						$intQueueID = check_var('qid', 'int');
 
-							$hash_temp = md5(NONCE_SALT.$intGroupID.$strAddressEmail);
+						$hash_temp = md5(NONCE_SALT.$intGroupID.$strAddressEmail);
 
-							if($strUnsubscribeHash != '')
+						if($strUnsubscribeHash != '')
+						{
+							if($strUnsubscribeHash == $hash_temp)
 							{
-								if($strUnsubscribeHash == $hash_temp)
+								$intAddressID = $wpdb->get_var($wpdb->prepare("SELECT addressID FROM ".$wpdb->base_prefix."address INNER JOIN ".$wpdb->base_prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressEmail = %s AND addressDeleted = '0' AND groupUnsubscribed = '0' LIMIT 0, 1", $intGroupID, $strAddressEmail));
+
+								if($intAddressID > 0)
 								{
-									$intAddressID = $wpdb->get_var($wpdb->prepare("SELECT addressID FROM ".$wpdb->base_prefix."address INNER JOIN ".$wpdb->base_prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressEmail = %s AND addressDeleted = '0' AND groupUnsubscribed = '0' LIMIT 0, 1", $intGroupID, $strAddressEmail));
-
-									if($intAddressID > 0)
+									if(isset($_POST['btnUnsubscribe']))
 									{
-										if(isset($_POST['btnUnsubscribe']))
-										{
-											$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->base_prefix."address2group SET groupUnsubscribed = '1' WHERE groupID = '%d' AND addressID = '%d'", $intGroupID, $intAddressID));
+										$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->base_prefix."address2group SET groupUnsubscribed = '1' WHERE groupID = '%d' AND addressID = '%d'", $intGroupID, $intAddressID));
 
-											$out .= __("You have been successfully unsubscribed", 'lang_group');
-										}
-
-										else
-										{
-											$out .= "<form method='post' action='' class='mf_form'>
-												<p>".__("Are you sure that you want to unsubscribe?", 'lang_group')."</p>
-												<div class='form_button'>"
-													.show_button(array('name' => "btnUnsubscribe", 'text' => __("Unsubscribe", 'lang_group')))
-												."</div>"
-												.input_hidden(array('name' => 'unsubscribe', 'value' => $strUnsubscribeHash))
-												.input_hidden(array('name' => 'gid', 'value' => $intGroupID))
-												.input_hidden(array('name' => 'aem', 'value' => $strAddressEmail))
-											."</form>";
-										}
+										$out .= __("You have been successfully unsubscribed", 'lang_group');
 									}
 
 									else
 									{
-										$out .= __("Either you're not part of the group or you've already unsubscribed from it", 'lang_group');
+										$out .= "<form method='post' action='' class='mf_form'>
+											<p>".__("Are you sure that you want to unsubscribe?", 'lang_group')."</p>
+											<div class='form_button'>"
+												.show_button(array('name' => "btnUnsubscribe", 'text' => __("Unsubscribe", 'lang_group')))
+											."</div>"
+											.input_hidden(array('name' => 'unsubscribe', 'value' => $strUnsubscribeHash))
+											.input_hidden(array('name' => 'gid', 'value' => $intGroupID))
+											.input_hidden(array('name' => 'aem', 'value' => $strAddressEmail))
+										."</form>";
 									}
 								}
 
 								else
 								{
-									$out .= __("Something went wrong. Please contact an admin if the problem persists", 'lang_group');
+									$out .= __("Either you're not part of the group or you've already unsubscribed from it", 'lang_group');
 								}
 							}
 
-							if($strUnsubscribeHash != '' && $strUnsubscribeHash == $hash_temp || $strVerifyHash != '' && $strVerifyHash == $hash_temp)
+							else
 							{
-								if($intQueueID > 0)
+								$out .= __("Something went wrong. Please contact an admin if the problem persists", 'lang_group');
+							}
+						}
+
+						if($strUnsubscribeHash != '' && $strUnsubscribeHash == $hash_temp || $strVerifyHash != '' && $strVerifyHash == $hash_temp)
+						{
+							if($intQueueID > 0)
+							{
+								$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->base_prefix."address INNER JOIN ".$wpdb->base_prefix."group_queue USING (addressID) WHERE addressEmail = %s AND queueID = '%d'", $strAddressEmail, $intQueueID));
+
+								foreach($result as $r)
 								{
-									$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->base_prefix."address INNER JOIN ".$wpdb->base_prefix."group_queue USING (addressID) WHERE addressEmail = %s AND queueID = '%d'", $strAddressEmail, $intQueueID));
+									$intAddressID = $r->addressID;
 
-									foreach($result as $r)
-									{
-										$intAddressID = $r->addressID;
+									$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->base_prefix."group_queue SET queueReceived = '1' WHERE queueID = '%d' AND addressID = '%d'", $intQueueID, $intAddressID));
 
-										$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->base_prefix."group_queue SET queueReceived = '1' WHERE queueID = '%d' AND addressID = '%d'", $intQueueID, $intAddressID));
-
-										$obj_address = new mf_address($intAddressID);
-										$obj_address->update_errors(array('action' => 'reset'));
-									}
+									$obj_address = new mf_address($intAddressID);
+									$obj_address->update_errors(array('action' => 'reset'));
 								}
 							}
-						//}
+						}
 					}
 				}
 
@@ -158,7 +155,7 @@ get_header();
 				{
 					if(is_user_logged_in() && IS_ADMIN)
 					{
-						echo $post_status.", ".$intGroupSentAmount;
+						do_log("Group 404: ".var_export($_REQUEST, true).", ".var_export($post, true));
 					}
 
 					else
