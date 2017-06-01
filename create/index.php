@@ -11,6 +11,7 @@ if(!IS_EDITOR)
 
 $intGroupID = check_var('intGroupID');
 $strGroupPublic = check_var('strGroupPublic', 'char', true, 'draft');
+$strGroupAcceptanceEmail = check_var('strGroupAcceptanceEmail');
 $strGroupVerifyAddress = check_var('strGroupVerifyAddress');
 $intGroupContactPage = check_var('intGroupContactPage');
 $strGroupName = check_var('strGroupName');
@@ -35,6 +36,7 @@ if(isset($_POST['btnGroupCreate']))
 		if(wp_update_post($post_data) > 0)
 		{
 			update_post_meta($intGroupID, 'group_registration_fields', $arrGroupRegistrationFields);
+			update_post_meta($intGroupID, 'group_acceptance_email', $strGroupAcceptanceEmail);
 			update_post_meta($intGroupID, 'group_verify_address', $strGroupVerifyAddress);
 			update_post_meta($intGroupID, 'group_contact_page', $intGroupContactPage);
 
@@ -89,9 +91,15 @@ echo "<div class='wrap'>
 			$strGroupName = $r->post_title;
 
 			$arrGroupRegistrationFields = get_post_meta($intGroupID, 'group_registration_fields', true);
+			$strGroupAcceptanceEmail = get_post_meta($intGroupID, 'group_acceptance_email', true);
 			$strGroupVerifyAddress = get_post_meta($intGroupID, 'group_verify_address', true);
 			$intGroupContactPage = get_post_meta($intGroupID, 'group_contact_page', true);
 
+			if($strGroupAcceptanceEmail == "")
+			{
+				$strGroupAcceptanceEmail = "no";
+			}
+			
 			if($strGroupVerifyAddress == "")
 			{
 				$strGroupVerifyAddress = "no";
@@ -111,19 +119,21 @@ echo "<div class='wrap'>
 
 				if($intGroupID > 0)
 				{
-					echo "<div class='flex_flow'>";
+					$arr_data = array(
+						'publish' => __("Public", 'lang_group'),
+						'draft' => __("Not Public", 'lang_group'),
+						'ignore' => __("Inactive", 'lang_group'),
+					);
 
-						$arr_data = array(
-							'publish' => __("Public", 'lang_group'),
-							'draft' => __("Not Public", 'lang_group'),
-							'ignore' => __("Inactive", 'lang_group'),
-						);
+					echo "<div class='flex_flow'>"
+						.show_select(array('data' => $arr_data, 'name' => 'strGroupPublic', 'text' => __("Status", 'lang_group'), 'value' => $strGroupPublic))
+						.show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupAcceptanceEmail', 'text' => __("Send acceptance e-mail before adding to a group", 'lang_group'), 'value' => $strGroupAcceptanceEmail))
+					."</div>";
 
-						echo show_select(array('data' => $arr_data, 'name' => 'strGroupPublic', 'text' => __("Status", 'lang_group'), 'value' => $strGroupPublic));
-
-						if($strGroupPublic == "publish")
-						{
-							echo show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupVerifyAddress', 'text' => __("Verify that address is in Address book", 'lang_group'), 'value' => $strGroupVerifyAddress));
+					if($strGroupPublic == "publish")
+					{
+						echo "<div class='flex_flow'>"
+							.show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupVerifyAddress', 'text' => __("Verify that address is in Address book", 'lang_group'), 'value' => $strGroupVerifyAddress));
 
 							if($strGroupVerifyAddress == "yes")
 							{
@@ -132,9 +142,9 @@ echo "<div class='wrap'>
 
 								echo show_select(array('data' => $arr_data, 'name' => 'intGroupContactPage', 'text' => __("Contact Page", 'lang_group'), 'value' => $intGroupContactPage));
 							}
-						}
 
-					echo "</div>";
+						echo "</div>";
+					}
 				}
 
 				echo show_textfield(array('name' => "strGroupName", 'text' => __("Name", 'lang_group'), 'value' => $strGroupName, 'xtra' => "autofocus"));

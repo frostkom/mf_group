@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: 
-Version: 4.0.5
+Version: 4.1.1
 Author: Martin Fors
 Author URI: http://frostkom.se
 Text Domain: lang_group
@@ -98,11 +98,9 @@ function activate_group()
 
 function uninstall_group()
 {
-	do_log("Uninstalled group");
-
 	mf_uninstall_plugin(array(
 		'uploads' => 'mf_group',
-		'options' => array('setting_emails_per_hour', 'setting_group_see_other_roles', 'setting_group_import'),
+		'options' => array('setting_emails_per_hour', 'setting_group_see_other_roles', 'setting_group_import', 'setting_group_acceptance_email'),
 		'tables' => array('group_message', 'group_queue', 'address2group'),
 	));
 }

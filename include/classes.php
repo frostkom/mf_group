@@ -119,7 +119,8 @@ class mf_group
 
 			if($wpdb->num_rows == 0)
 			{
-				$setting_group_acceptance_email = get_option('setting_group_acceptance_email');
+				//$setting_group_acceptance_email = get_option('setting_group_acceptance_email');
+				$setting_group_acceptance_email = get_post_meta($data['group_id'], 'group_acceptance_email', true);
 
 				$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->base_prefix."address2group SET addressID = '%d', groupID = '%d', groupAccepted = '%d'", $data['address_id'], $data['group_id'], ($setting_group_acceptance_email == 'yes' ? 0 : 1)));
 
