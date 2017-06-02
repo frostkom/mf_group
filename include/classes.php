@@ -119,24 +119,26 @@ class mf_group
 
 			if($wpdb->num_rows == 0)
 			{
-				//$setting_group_acceptance_email = get_option('setting_group_acceptance_email');
 				$setting_group_acceptance_email = get_post_meta($data['group_id'], 'group_acceptance_email', true);
 
 				$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->base_prefix."address2group SET addressID = '%d', groupID = '%d', groupAccepted = '%d'", $data['address_id'], $data['group_id'], ($setting_group_acceptance_email == 'yes' ? 0 : 1)));
 
 				if($setting_group_acceptance_email == 'yes')
 				{
+					$strGroupAcceptanceSubject = get_post_meta_or_default($data['group_id'], 'group_acceptance_subject', true, __("Accept subscription to %s", 'lang_group'));
+					$strGroupAcceptanceText = get_post_meta_or_default($data['group_id'], 'group_acceptance_text', true, __("You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below.", 'lang_group'));
+
 					$obj_address = new mf_address();
 
 					$strAddressEmail = $obj_address->get_address($data['address_id']);
 					$strGroupName = $this->get_name($data['group_id']);
 
 					$mail_to = $strAddressEmail;
-					$mail_subject = sprintf(__("Accept subscription to %s", 'lang_group'), $strGroupName);
-					$mail_content = sprintf(__("You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below.", 'lang_group'), $strGroupName)."<p>&nbsp;</p><p><a href='[subscribe_link]'>".__("By accepting this subscription you will from now on get messages that are sent to this group", 'lang_group')."</a></p>";
+					$mail_subject = sprintf($strGroupAcceptanceSubject, $strGroupName);
+					$mail_content = sprintf($strGroupAcceptanceText, $strGroupName);
 
 					$subscribe_link = get_email_link(array('type' => "subscribe", 'group_id' => $data['group_id'], 'email' => $strAddressEmail));
-					$mail_content = str_replace("[subscribe_link]", $subscribe_link, $mail_content);
+					$mail_content .= "<p>&nbsp;</p><p><a href='".$subscribe_link."'>".__("Accept Link", 'lang_group')."</a></p>";
 
 					$sent = send_email(array('to' => $mail_to, 'subject' => $mail_subject, 'content' => $mail_content));
 				}

@@ -12,6 +12,8 @@ if(!IS_EDITOR)
 $intGroupID = check_var('intGroupID');
 $strGroupPublic = check_var('strGroupPublic', 'char', true, 'draft');
 $strGroupAcceptanceEmail = check_var('strGroupAcceptanceEmail');
+$strGroupAcceptanceSubject = check_var('strGroupAcceptanceSubject');
+$strGroupAcceptanceText = check_var('strGroupAcceptanceText');
 $strGroupVerifyAddress = check_var('strGroupVerifyAddress');
 $intGroupContactPage = check_var('intGroupContactPage');
 $strGroupName = check_var('strGroupName');
@@ -37,6 +39,8 @@ if(isset($_POST['btnGroupCreate']))
 		{
 			update_post_meta($intGroupID, 'group_registration_fields', $arrGroupRegistrationFields);
 			update_post_meta($intGroupID, 'group_acceptance_email', $strGroupAcceptanceEmail);
+			update_post_meta($intGroupID, 'group_acceptance_subject', $strGroupAcceptanceSubject);
+			update_post_meta($intGroupID, 'group_acceptance_text', $strGroupAcceptanceText);
 			update_post_meta($intGroupID, 'group_verify_address', $strGroupVerifyAddress);
 			update_post_meta($intGroupID, 'group_contact_page', $intGroupContactPage);
 
@@ -77,115 +81,126 @@ if(isset($_POST['btnGroupCreate']))
 	}
 }
 
-echo "<div class='wrap'>
-	<h2>".__("Group", 'lang_group')."</h2>"
-	.get_notification();
+if($intGroupID > 0)
+{
+	$result = $wpdb->get_results($wpdb->prepare("SELECT post_status, post_title FROM ".$wpdb->posts." WHERE post_type = 'mf_group' AND ID = '%d'".$query_xtra, $intGroupID));
 
-	if($intGroupID > 0)
+	foreach($result as $r)
 	{
-		$result = $wpdb->get_results($wpdb->prepare("SELECT post_status, post_title FROM ".$wpdb->posts." WHERE post_type = 'mf_group' AND ID = '%d'".$query_xtra, $intGroupID));
+		$strGroupPublic = $r->post_status;
+		$strGroupName = $r->post_title;
 
-		foreach($result as $r)
+		$arrGroupRegistrationFields = get_post_meta($intGroupID, 'group_registration_fields', true);
+		$strGroupAcceptanceEmail = get_post_meta_or_default($intGroupID, 'group_acceptance_email', true, 'no');
+		$strGroupAcceptanceSubject = get_post_meta($intGroupID, 'group_acceptance_subject', true);
+		$strGroupAcceptanceText = get_post_meta($intGroupID, 'group_acceptance_text', true);
+		$strGroupVerifyAddress = get_post_meta_or_default($intGroupID, 'group_verify_address', true, 'no');
+		$intGroupContactPage = get_post_meta($intGroupID, 'group_contact_page', true);
+
+		if($strGroupPublic == "trash")
 		{
-			$strGroupPublic = $r->post_status;
-			$strGroupName = $r->post_title;
-
-			$arrGroupRegistrationFields = get_post_meta($intGroupID, 'group_registration_fields', true);
-			$strGroupAcceptanceEmail = get_post_meta($intGroupID, 'group_acceptance_email', true);
-			$strGroupVerifyAddress = get_post_meta($intGroupID, 'group_verify_address', true);
-			$intGroupContactPage = get_post_meta($intGroupID, 'group_contact_page', true);
-
-			if($strGroupAcceptanceEmail == "")
-			{
-				$strGroupAcceptanceEmail = "no";
-			}
-			
-			if($strGroupVerifyAddress == "")
-			{
-				$strGroupVerifyAddress = "no";
-			}
-
-			if($strGroupPublic == "trash")
-			{
-				$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->posts." SET post_status = 'publish' WHERE ID = '%d' AND post_type = 'mf_group'".$query_xtra, $intGroupID));
-			}
+			$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->posts." SET post_status = 'publish' WHERE ID = '%d' AND post_type = 'mf_group'".$query_xtra, $intGroupID));
 		}
 	}
+}
 
-	echo "<div id='poststuff' class='postbox'>
-		<h3 class='hndle'>".($intGroupID > 0 ? __("Update", 'lang_group') : __("Add", 'lang_group'))."</h3>
-		<div class='inside'>
-			<form action='#' method='post' class='mf_form mf_settings'>";
+$arr_data_public = array(
+	'publish' => __("Public", 'lang_group'),
+	'draft' => __("Not Public", 'lang_group'),
+	'ignore' => __("Inactive", 'lang_group'),
+);
 
-				if($intGroupID > 0)
-				{
-					$arr_data = array(
-						'publish' => __("Public", 'lang_group'),
-						'draft' => __("Not Public", 'lang_group'),
-						'ignore' => __("Inactive", 'lang_group'),
-					);
+echo "<div class='wrap'>
+	<h2>".__("Group", 'lang_group')."</h2>"
+	.get_notification()
+	."<div id='poststuff'>
+		<form action='#' method='post' class='mf_form mf_settings'>
+			<div id='post-body' class='columns-2'>
+				<div id='post-body-content'>
+					<div class='postbox'>
+						<h3 class='hndle'><span>".($intGroupID > 0 ? __("Update", 'lang_group') : __("Add", 'lang_group'))."</span></h3>
+						<div class='inside'>"
+							.show_textfield(array('name' => "strGroupName", 'text' => __("Name", 'lang_group'), 'value' => $strGroupName, 'xtra' => "autofocus"));
 
-					echo "<div class='flex_flow'>"
-						.show_select(array('data' => $arr_data, 'name' => 'strGroupPublic', 'text' => __("Status", 'lang_group'), 'value' => $strGroupPublic))
-						.show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupAcceptanceEmail', 'text' => __("Send acceptance e-mail before adding to a group", 'lang_group'), 'value' => $strGroupAcceptanceEmail))
-					."</div>";
-
-					if($strGroupPublic == "publish")
-					{
-						echo "<div class='flex_flow'>"
-							.show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupVerifyAddress', 'text' => __("Verify that address is in Address book", 'lang_group'), 'value' => $strGroupVerifyAddress));
-
-							if($strGroupVerifyAddress == "yes")
+							if(!($intGroupID > 0))
 							{
-								$arr_data = array();
-								get_post_children(array('add_choose_here' => true), $arr_data);
+								$result = $wpdb->get_results("SELECT ID, post_title FROM ".$wpdb->posts." WHERE post_type = 'mf_group' AND post_status = 'publish'".$query_xtra." ORDER BY post_title ASC");
 
-								echo show_select(array('data' => $arr_data, 'name' => 'intGroupContactPage', 'text' => __("Contact Page", 'lang_group'), 'value' => $intGroupContactPage));
+								if($wpdb->num_rows > 0)
+								{
+									$arr_data = array();
+
+									$arr_data[''] = "-- ".__("Choose here", 'lang_group')." --";
+
+									foreach($result as $r)
+									{
+										$arr_data[$r->ID] = $r->post_title;
+									}
+
+									echo show_select(array('data' => $arr_data, 'name' => 'intGroupID_copy', 'text' => __("Copy addresses from", 'lang_group')));
+								}
 							}
 
-						echo "</div>";
-					}
-				}
+						echo "</div>
+					</div>
+					<div class='postbox'>
+						<h3 class='hndle'><span>".__("Acceptance e-mail", 'lang_group')."</span></h3>
+						<div class='inside'>"
+							.show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupAcceptanceEmail', 'text' => __("Send before adding to a group", 'lang_group'), 'value' => $strGroupAcceptanceEmail));
 
-				echo show_textfield(array('name' => "strGroupName", 'text' => __("Name", 'lang_group'), 'value' => $strGroupName, 'xtra' => "autofocus"));
+							if($strGroupAcceptanceEmail == 'yes')
+							{
+								echo show_textfield(array('name' => 'strGroupAcceptanceSubject', 'text' => __("Subject", 'lang_group'), 'value' => $strGroupAcceptanceSubject, 'placeholder' => sprintf(__("Accept subscription to %s", 'lang_group'), $strGroupName)))
+								.show_textarea(array('name' => 'strGroupAcceptanceText', 'text' => __("Message", 'lang_group'), 'value' => $strGroupAcceptanceText, 'placeholder' => sprintf(__("You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below.", 'lang_group'), $strGroupName)));
+							}
 
-				if($strGroupPublic == "publish")
-				{
-					$arr_data = array(
-						'name' => __("Name", 'lang_group'),
-						'address' => __("Address", 'lang_group'),
-						'zip' => __("Zip Code", 'lang_group'),
-						'city' => __("City", 'lang_group'),
-						'phone' => __("Phone Number", 'lang_group'),
-						'email' => __("E-mail", 'lang_group'),
-						'extra' => get_option_or_default('setting_address_extra', __("Extra", 'lang_group')),
-					);
+						echo "</div>
+					</div>
+				</div>
+				<div id='postbox-container-1'>
+					<div class='postbox'>
+						<div class='inside'>"
+							.show_button(array('name' => "btnGroupCreate", 'text' => __("Save", 'lang_group')))
+							.input_hidden(array('name' => "intGroupID", 'value' => $intGroupID))
+						."</div>
+					</div>
+					<div class='postbox'>
+						<h3 class='hndle'><span>".__("Settings", 'lang_group')."</span></h3>
+						<div class='inside'>"
+							.show_select(array('data' => $arr_data_public, 'name' => 'strGroupPublic', 'text' => __("Status", 'lang_group'), 'value' => $strGroupPublic, 'description' => ($intGroupID > 0 ? get_permalink($intGroupID) : "")));
 
-					echo show_select(array('data' => $arr_data, 'name' => 'arrGroupRegistrationFields[]', 'text' => __("Registration Fields", 'lang_group'), 'value' => $arrGroupRegistrationFields));
-				}
+							if($strGroupPublic == "publish")
+							{
+								echo show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupVerifyAddress', 'text' => __("Verify that address is in Address book", 'lang_group'), 'value' => $strGroupVerifyAddress));
 
-				if(!($intGroupID > 0))
-				{
-					$result = $wpdb->get_results("SELECT ID, post_title FROM ".$wpdb->posts." WHERE post_type = 'mf_group' AND post_status = 'publish'".$query_xtra." ORDER BY post_title ASC");
+								if($strGroupVerifyAddress == "yes")
+								{
+									$arr_data = array();
+									get_post_children(array('add_choose_here' => true), $arr_data);
 
-					if($wpdb->num_rows > 0)
-					{
-						$arr_data = array();
+									echo show_select(array('data' => $arr_data, 'name' => 'intGroupContactPage', 'text' => __("Contact Page", 'lang_group'), 'value' => $intGroupContactPage));
+								}
+							}
 
-						$arr_data[''] = "-- ".__("Choose here", 'lang_group')." --";
+							if($strGroupPublic == "publish")
+							{
+								$arr_data = array(
+									'name' => __("Name", 'lang_group'),
+									'address' => __("Address", 'lang_group'),
+									'zip' => __("Zip Code", 'lang_group'),
+									'city' => __("City", 'lang_group'),
+									'phone' => __("Phone Number", 'lang_group'),
+									'email' => __("E-mail", 'lang_group'),
+									'extra' => get_option_or_default('setting_address_extra', __("Extra", 'lang_group')),
+								);
 
-						foreach($result as $r)
-						{
-							$arr_data[$r->ID] = $r->post_title;
-						}
+								echo show_select(array('data' => $arr_data, 'name' => 'arrGroupRegistrationFields[]', 'text' => __("Registration Fields", 'lang_group'), 'value' => $arrGroupRegistrationFields));
+							}
 
-						echo show_select(array('data' => $arr_data, 'name' => 'intGroupID_copy', 'text' => __("Copy addresses from", 'lang_group')));
-					}
-				}
-
-				echo show_button(array('name' => "btnGroupCreate", 'text' => __("Save", 'lang_group')))
-				.input_hidden(array('name' => "intGroupID", 'value' => $intGroupID))
-			."</form>
-		</div>
+						echo "</div>
+					</div>
+				</div>
+			</div>
+		</form>
 	</div>
 </div>";

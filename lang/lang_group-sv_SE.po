@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-06-01 20:50+0100\n"
+"POT-Creation-Date: 2017-06-02 13:24+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -16,119 +16,151 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 "X-Poedit-SearchPath-1: ..\n"
 
-#: ../create/index.php:48
-#: ../create/index.php:75
+#: ../create/index.php:52
+#: ../create/index.php:79
 msgid "The information was not submitted, contact an admin if this persists"
 msgstr "Informationen las inte in, kontakta en administratör om problemet kvarstår"
 
-#: ../create/index.php:81
-#: ../include/classes.php:222
-#: ../include/classes.php:287
-#: ../include/functions.php:163
-#: ../include/functions.php:164
-#: ../include/functions.php:165
-#: ../include/functions.php:206
+#: ../create/index.php:108
+#: ../include/classes.php:346
+msgid "Public"
+msgstr "Publik"
+
+#: ../create/index.php:109
+#: ../include/classes.php:347
+msgid "Not Public"
+msgstr "Inte publik"
+
+#: ../create/index.php:110
+#: ../include/classes.php:348
+msgid "Inactive"
+msgstr "Inaktiv"
+
+#: ../create/index.php:114
+#: ../include/classes.php:224
+#: ../include/classes.php:289
+#: ../include/functions.php:159
+#: ../include/functions.php:160
+#: ../include/functions.php:161
+#: ../include/functions.php:201
 #: ../list/index.php:9
 msgid "Group"
 msgstr "Grupp"
 
-#: ../create/index.php:116
+#: ../create/index.php:121
 msgid "Update"
 msgstr "Uppdatera"
 
-#: ../create/index.php:116
+#: ../create/index.php:121
 #: ../import/index.php:111
 msgid "Add"
 msgstr "Lägg till"
 
 #: ../create/index.php:123
-#: ../include/classes.php:344
-msgid "Public"
-msgstr "Publik"
-
-#: ../create/index.php:124
-#: ../include/classes.php:345
-msgid "Not Public"
-msgstr "Inte publik"
-
-#: ../create/index.php:125
-#: ../include/classes.php:346
-msgid "Inactive"
-msgstr "Inaktiv"
-
-#: ../create/index.php:129
-msgid "Status"
-msgstr "Status"
-
-#: ../create/index.php:130
-msgid "Send acceptance e-mail before adding to a group"
-msgstr "Skicka bekräftelsemeddelande före man läggs till i en grupp"
-
-#: ../create/index.php:136
-msgid "Verify that address is in Address book"
-msgstr "Verifiera att adress finns i Adressboken"
-
-#: ../create/index.php:143
-msgid "Contact Page"
-msgstr "Kontaktsida"
-
-#: ../create/index.php:150
-#: ../create/index.php:155
-#: ../include/classes.php:355
-#: ../include/functions.php:606
+#: ../create/index.php:188
+#: ../include/classes.php:357
+#: ../include/functions.php:593
 msgid "Name"
 msgstr "Namn"
 
-#: ../create/index.php:156
-#: ../include/functions.php:611
-msgid "Address"
-msgstr "Adress"
-
-#: ../create/index.php:157
-#: ../include/functions.php:616
-msgid "Zip Code"
-msgstr "Postnummer"
-
-#: ../create/index.php:158
-#: ../include/functions.php:621
-msgid "City"
-msgstr "Stad"
-
-#: ../create/index.php:159
-#: ../include/functions.php:626
-msgid "Phone Number"
-msgstr "Telefonnummer"
-
-#: ../create/index.php:160
-#: ../include/functions.php:631
-msgid "E-mail"
-msgstr "E-post"
-
-#: ../create/index.php:161
-#: ../include/functions.php:636
-msgid "Extra"
-msgstr "Extra"
-
-#: ../create/index.php:164
-msgid "Registration Fields"
-msgstr "Fält för registrering"
-
-#: ../create/index.php:175
-#: ../include/classes.php:278
+#: ../create/index.php:133
+#: ../include/classes.php:280
 #: ../include/functions.php:52
-#: ../include/functions.php:231
+#: ../include/functions.php:226
 #: ../send/index.php:172
 #: ../send/index.php:202
 msgid "Choose here"
 msgstr "Välj här"
 
-#: ../create/index.php:182
+#: ../create/index.php:140
 msgid "Copy addresses from"
 msgstr "Kopiera adresser från"
 
-#: ../create/index.php:186
+#: ../create/index.php:147
+msgid "Acceptance e-mail"
+msgstr "Bekräftelsemeddelande"
+
+#: ../create/index.php:149
+msgid "Send before adding to a group"
+msgstr "Skicka före man läggs till i en grupp"
+
+#: ../create/index.php:153
+#: ../send/index.php:188
+#: ../sent/index.php:30
+msgid "Subject"
+msgstr "Ämne"
+
+#: ../create/index.php:153
+#: ../include/classes.php:128
+#, php-format
+msgid "Accept subscription to %s"
+msgstr "Bekräfta prenumeration till %s"
+
+#: ../create/index.php:154
+#: ../send/index.php:135
+#: ../send/index.php:219
+msgid "Message"
+msgstr "Meddelande"
+
+#: ../create/index.php:154
+#: ../include/classes.php:129
+#, php-format
+msgid "You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below."
+msgstr "Du har blivit tillagd i gruppen %s men kommer inte att få några meddelanden förrän du har bekräftat prenumerationen genom att klicka på länken nedan."
+
+#: ../create/index.php:163
 msgid "Save"
 msgstr "Spara"
+
+#: ../create/index.php:168
+msgid "Settings"
+msgstr "Inställningar"
+
+#: ../create/index.php:170
+msgid "Status"
+msgstr "Status"
+
+#: ../create/index.php:174
+msgid "Verify that address is in Address book"
+msgstr "Verifiera att adress finns i Adressboken"
+
+#: ../create/index.php:181
+msgid "Contact Page"
+msgstr "Kontaktsida"
+
+#: ../create/index.php:189
+#: ../include/functions.php:598
+msgid "Address"
+msgstr "Adress"
+
+#: ../create/index.php:190
+#: ../include/functions.php:603
+msgid "Zip Code"
+msgstr "Postnummer"
+
+#: ../create/index.php:191
+#: ../include/functions.php:608
+msgid "City"
+msgstr "Stad"
+
+#: ../create/index.php:192
+#: ../include/functions.php:613
+msgid "Phone Number"
+msgstr "Telefonnummer"
+
+#: ../create/index.php:193
+#: ../include/functions.php:618
+msgid "E-mail"
+msgstr "E-post"
+
+#: ../create/index.php:194
+#: ../include/functions.php:623
+msgid "Extra"
+msgstr "Extra"
+
+#: ../create/index.php:197
+msgid "Registration Fields"
+msgstr "Fält för registrering"
 
 #: ../import/index.php:77
 msgid "An address with that information did not exist"
@@ -148,8 +180,8 @@ msgstr "Gruppen uppdaterades inte med någon adress"
 
 #: ../import/index.php:108
 #: ../import/index.php:115
-#: ../include/classes.php:419
-#: ../include/functions.php:293
+#: ../include/classes.php:421
+#: ../include/functions.php:280
 msgid "Import"
 msgstr "Importera"
 
@@ -177,89 +209,79 @@ msgstr "Gruppen skapades"
 msgid "The group was updated"
 msgstr "Gruppen uppdaterades"
 
-#: ../include/classes.php:135
-#, php-format
-msgid "Accept subscription to %s"
-msgstr "Bekräfta prenumeration till %s"
+#: ../include/classes.php:141
+msgid "Accept Link"
+msgstr "Bekräftelselänk"
 
-#: ../include/classes.php:136
-#, php-format
-msgid "You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below."
-msgstr "Du har blivit tillagd i gruppen %s men kommer inte att få några meddelanden förrän du har bekräftat prenumerationen genom att klicka på länken nedan."
-
-#: ../include/classes.php:136
-msgid "By accepting this subscription you will from now on get messages that are sent to this group"
-msgstr "Genom att acceptera denna prenumeration kommer du from. nu att få meddelanden som skickas till denna grupp"
-
-#: ../include/classes.php:217
+#: ../include/classes.php:219
 msgid "Display a group registration form"
 msgstr "Visa ett registreringsformulär till en grupp"
 
-#: ../include/classes.php:222
+#: ../include/classes.php:224
 msgid "Newsletter"
 msgstr "Nyhetsbrev"
 
-#: ../include/classes.php:286
+#: ../include/classes.php:288
 msgid "Heading"
 msgstr "Rubrik"
 
-#: ../include/classes.php:343
+#: ../include/classes.php:345
 msgid "All"
 msgstr "Alla"
 
-#: ../include/classes.php:347
+#: ../include/classes.php:349
 msgid "Trash"
 msgstr "Papperskorg"
 
-#: ../include/classes.php:357
+#: ../include/classes.php:359
 msgid "Amount"
 msgstr "Antal"
 
-#: ../include/classes.php:362
+#: ../include/classes.php:364
 msgid "Not Accepted"
 msgstr "Inte bekräftad"
 
-#: ../include/classes.php:365
+#: ../include/classes.php:367
 msgid "Unsubscribed"
 msgstr "Avregistrerade"
 
-#: ../include/classes.php:366
+#: ../include/classes.php:368
 msgid "User"
 msgstr "Användare"
 
-#: ../include/classes.php:367
-#: ../include/classes.php:505
-#: ../include/functions.php:290
+#: ../include/classes.php:369
+#: ../include/classes.php:507
+#: ../include/functions.php:277
 #: ../sent/index.php:21
 #: ../sent/index.php:31
 msgid "Sent"
 msgstr "Skickat"
 
-#: ../include/classes.php:411
+#: ../include/classes.php:413
 msgid "Edit"
 msgstr "Redigera"
 
-#: ../include/classes.php:415
+#: ../include/classes.php:417
 msgid "Delete"
 msgstr "Radera"
 
-#: ../include/classes.php:418
+#: ../include/classes.php:420
 msgid "Add or remove"
 msgstr "Lägg till/ta bort"
 
-#: ../include/classes.php:426
+#: ../include/classes.php:428
 msgid "CSV"
 msgstr "CSV"
 
-#: ../include/classes.php:430
+#: ../include/classes.php:432
 msgid "XLS"
 msgstr "XLS"
 
-#: ../include/classes.php:437
+#: ../include/classes.php:439
 msgid "Recover"
 msgstr "Återställ"
 
-#: ../include/classes.php:490
+#: ../include/classes.php:492
 msgid "Test"
 msgstr "Testa"
 
@@ -267,65 +289,65 @@ msgstr "Testa"
 msgid "Choose a Group"
 msgstr "Välj en grupp"
 
-#: ../include/functions.php:153
+#: ../include/functions.php:149
 msgid "There were unsent messages"
 msgstr "Det finns oskickade meddelanden"
 
-#: ../include/functions.php:174
+#: ../include/functions.php:170
 msgid "group"
 msgstr "grupp"
 
-#: ../include/functions.php:193
+#: ../include/functions.php:189
 msgid "Outgoing e-mails per hour"
 msgstr "Utgående e-post per timme"
 
-#: ../include/functions.php:194
+#: ../include/functions.php:190
 msgid "See groups created by other roles"
 msgstr "Se grupper skapade av andra roller"
 
-#: ../include/functions.php:195
+#: ../include/functions.php:191
 msgid "Add all imported to this group"
 msgstr "Lägg till alla importerade i denna grupp"
 
-#: ../include/functions.php:214
+#: ../include/functions.php:209
 msgid "0 or empty means infinte"
 msgstr "0 eller tomt betyder oändligt"
 
-#: ../include/functions.php:278
+#: ../include/functions.php:265
 msgid "Groups"
 msgstr "Grupper"
 
-#: ../include/functions.php:281
+#: ../include/functions.php:268
 msgid "List"
 msgstr "Lista"
 
-#: ../include/functions.php:284
+#: ../include/functions.php:271
 #: ../list/index.php:10
 msgid "Add New"
 msgstr "Skapa ny"
 
-#: ../include/functions.php:287
+#: ../include/functions.php:274
 msgid "Send New"
 msgstr "Skicka nytt"
 
-#: ../include/functions.php:417
+#: ../include/functions.php:404
 #, php-format
 msgid "The message from %s in the group %s could not be sent"
 msgstr "Meddelandet från %s i gruppen %s kunde inte skickas"
 
-#: ../include/functions.php:545
+#: ../include/functions.php:532
 msgid "The information that you entered is not in our register. Please contact the admin of this page to get your information submitted."
 msgstr "Informationen som du angav finns inte med i vårt register. Var vänlig kontakta oss så lägger vi in det."
 
-#: ../include/functions.php:588
+#: ../include/functions.php:575
 msgid "Thank you for showing your interest. You have been added to the group"
 msgstr "Tack för visat intresse. Du har lagts till i gruppen"
 
-#: ../include/functions.php:642
+#: ../include/functions.php:629
 msgid "Your Email Address"
 msgstr "Din epost"
 
-#: ../include/functions.php:646
+#: ../include/functions.php:633
 msgid "Join"
 msgstr "Gå med"
 
@@ -350,11 +372,6 @@ msgstr "Meddelandet skickades inte till någon"
 msgid "Send message"
 msgstr "Skicka meddelande"
 
-#: ../send/index.php:135
-#: ../send/index.php:219
-msgid "Message"
-msgstr "Meddelande"
-
 #: ../send/index.php:152
 msgid "If you don't want to get these messages in the future click this link to unsubscribe"
 msgstr "Om du inte vill ha dessa meddelanden i framtiden, klicka på länken för att avregistrera dig"
@@ -364,11 +381,6 @@ msgstr "Om du inte vill ha dessa meddelanden i framtiden, klicka på länken fö
 #: ../sent/index.php:29
 msgid "From"
 msgstr "Från"
-
-#: ../send/index.php:188
-#: ../sent/index.php:30
-msgid "Subject"
-msgstr "Ämne"
 
 #: ../send/index.php:190
 #: ../send/index.php:218
@@ -454,3 +466,9 @@ msgstr "Avregistrera"
 msgid "Either you're not part of the group or you've already unsubscribed from it"
 msgstr "Antingen var du inte med i gruppen eller så har du redan avregistrerat dig"
 
+#~ msgid ""
+#~ "By accepting this subscription you will from now on get messages that are "
+#~ "sent to this group"
+#~ msgstr ""
+#~ "Genom att acceptera denna prenumeration kommer du from. nu att få "
+#~ "meddelanden som skickas till denna grupp"

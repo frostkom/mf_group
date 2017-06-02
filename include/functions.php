@@ -189,7 +189,6 @@ function settings_group()
 		'setting_emails_per_hour' => __("Outgoing e-mails per hour", 'lang_group'),
 		'setting_group_see_other_roles' => __("See groups created by other roles", 'lang_group'),
 		'setting_group_import' => __("Add all imported to this group", 'lang_group'),
-		//'setting_group_acceptance_email' => __("Send acceptance e-mail before adding to a group", 'lang_group'),
 	);
 
 	show_settings_fields(array('area' => $options_area, 'settings' => $arr_settings));
@@ -236,14 +235,6 @@ function setting_group_import_callback()
 
 	echo show_select(array('data' => $arr_data, 'name' => $setting_key, 'value' => $option, 'suffix' => "<a href='".admin_url("admin.php?page=mf_group/create/index.php")."'><i class='fa fa-lg fa-plus'></i></a>"));
 }
-
-/*function setting_group_acceptance_email_callback()
-{
-	$setting_key = get_setting_key(__FUNCTION__);
-	$option = get_option($setting_key, 'no');
-
-	echo show_select(array('data' => get_yes_no_for_select(), 'name' => $setting_key, 'value' => $option));
-}*/
 
 function count_unsent_group($id = 0)
 {
