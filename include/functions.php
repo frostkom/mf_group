@@ -246,7 +246,7 @@ function count_unsent_group($id = 0)
 
 	if($rows > 0)
 	{
-		$count_message = "&nbsp;<i class='fa fa-spin fa-spinner'></i>";
+		$count_message = "&nbsp;<i class='fa fa-spinner fa-spin'></i>";
 	}
 
 	return $count_message;
