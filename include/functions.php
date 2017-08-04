@@ -358,22 +358,22 @@ function cron_group()
 
 			if($strMessageType == "email")
 			{
-				$strMessageFromName = "";
-
-				if(preg_match("/\|/", $strMessageFrom))
-				{
-					list($strMessageFromName, $strMessageFrom) = explode("|", $strMessageFrom);
-				}
-
-				else
-				{
-					$strMessageFromName = $strMessageFrom;
-				}
-
-				$mail_headers = "From: ".$strMessageFromName." <".$strMessageFrom.">\r\n";
-
 				if($strAddressEmail != '' && is_domain_valid($strAddressEmail))
 				{
+					$strMessageFromName = "";
+
+					if(preg_match("/\|/", $strMessageFrom))
+					{
+						list($strMessageFromName, $strMessageFrom) = explode("|", $strMessageFrom);
+					}
+
+					else
+					{
+						$strMessageFromName = $strMessageFrom;
+					}
+
+					$mail_headers = "From: ".$strMessageFromName." <".$strMessageFrom.">\r\n";
+
 					$mail_to = $strAddressEmail;
 					$mail_subject = $strMessageName;
 					$mail_content = stripslashes(apply_filters('the_content', $strMessageText));

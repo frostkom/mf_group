@@ -519,7 +519,7 @@ class mf_group_table extends mf_list_table
 
 							else
 							{
-								$out .= "<i class='fa fa-spinner fa-spin fa-lg'></i>"
+								$out .= "<i class='fa fa-spinner fa-spin fa-lg'></i> ".sprintf(__("Will be sent %s", 'lang_group'), get_next_cron())
 								."<i class='set_tr_color' rel='yellow'></i>";
 							}
 						}
