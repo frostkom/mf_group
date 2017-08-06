@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: 
-Version: 4.2.3
+Version: 4.2.4
 Author: Martin Fors
 Author URI: http://frostkom.se
 Text Domain: lang_group
@@ -52,6 +52,8 @@ function activate_group()
 
 	$default_charset = DB_CHARSET != '' ? DB_CHARSET : "utf8";
 
+	$arr_add_column = array();
+
 	$wpdb->query("CREATE TABLE IF NOT EXISTS ".$wpdb->base_prefix."group_message (
 		messageID INT unsigned NOT NULL AUTO_INCREMENT,
 		groupID INT unsigned NOT NULL DEFAULT '0',
@@ -65,6 +67,8 @@ function activate_group()
 		PRIMARY KEY (messageID)
 	) DEFAULT CHARSET=".$default_charset);
 
+	$arr_add_column[$wpdb->base_prefix."group_message"]['messageAttachment'] = "ALTER TABLE [table] ADD [column] TEXT AFTER messageText";
+
 	$wpdb->query("CREATE TABLE IF NOT EXISTS ".$wpdb->base_prefix."group_queue (
 		queueID INT unsigned NOT NULL AUTO_INCREMENT,
 		addressID INT unsigned NOT NULL DEFAULT '0',
@@ -76,23 +80,19 @@ function activate_group()
 		PRIMARY KEY (queueID)
 	) DEFAULT CHARSET=".$default_charset);
 
+	$arr_add_column[$wpdb->base_prefix."group_queue"]['queueReceived'] = "ALTER TABLE [table] ADD [column] ENUM('-1', '0','1') NOT NULL DEFAULT '0' AFTER queueSent";
+
 	$wpdb->query("CREATE TABLE IF NOT EXISTS ".$wpdb->base_prefix."address2group (
 		addressID INT unsigned NOT NULL,
 		groupID INT unsigned NOT NULL,
 		groupAccepted ENUM('0', '1') NOT NULL DEFAULT '1',
 		groupUnsubscribed ENUM('0', '1') NOT NULL DEFAULT '0'
 	) DEFAULT CHARSET=".$default_charset);
-
-	$arr_add_column = array();
-
-	$arr_add_column[$wpdb->base_prefix."group_message"]['messageAttachment'] = "ALTER TABLE [table] ADD [column] TEXT AFTER messageText";
 	
 	$arr_add_column[$wpdb->base_prefix."address2group"] = array(
 		'groupUnsubscribed' => "ALTER TABLE [table] ADD [column] ENUM('0', '1') NOT NULL DEFAULT '0' AFTER groupID",
 		'groupAccepted' => "ALTER TABLE [table] ADD [column] ENUM('0', '1') NOT NULL DEFAULT '1' AFTER groupUnsubscribed",
 	);
-
-	$arr_add_column[$wpdb->base_prefix."group_queue"]['queueReceived'] = "ALTER TABLE [table] ADD [column] ENUM('-1', '0','1') NOT NULL DEFAULT '0' AFTER queueSent";
 
 	add_columns($arr_add_column);
 }
