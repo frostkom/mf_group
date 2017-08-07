@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: 
-Version: 4.2.4
+Version: 4.2.5
 Author: Martin Fors
 Author URI: http://frostkom.se
 Text Domain: lang_group
@@ -52,7 +52,7 @@ function activate_group()
 
 	$default_charset = DB_CHARSET != '' ? DB_CHARSET : "utf8";
 
-	$arr_add_column = array();
+	$arr_add_column = $arr_add_index = array();
 
 	$wpdb->query("CREATE TABLE IF NOT EXISTS ".$wpdb->base_prefix."group_message (
 		messageID INT unsigned NOT NULL AUTO_INCREMENT,
@@ -64,10 +64,15 @@ function activate_group()
 		messageAttachment TEXT,
 		messageCreated DATETIME,
 		userID INT unsigned NOT NULL DEFAULT '0',
-		PRIMARY KEY (messageID)
+		PRIMARY KEY (messageID),
+		KEY groupID (groupID)
 	) DEFAULT CHARSET=".$default_charset);
 
 	$arr_add_column[$wpdb->base_prefix."group_message"]['messageAttachment'] = "ALTER TABLE [table] ADD [column] TEXT AFTER messageText";
+
+	$arr_add_index[$wpdb->base_prefix."group_message"] = array(
+		'groupID' => "ALTER TABLE [table] ADD INDEX [column] ([column])",
+	);
 
 	$wpdb->query("CREATE TABLE IF NOT EXISTS ".$wpdb->base_prefix."group_queue (
 		queueID INT unsigned NOT NULL AUTO_INCREMENT,
@@ -77,16 +82,25 @@ function activate_group()
 		queueReceived ENUM('-1', '0','1') NOT NULL DEFAULT '0',
 		queueCreated DATETIME NOT NULL,
 		queueSentTime DATETIME NOT NULL,
-		PRIMARY KEY (queueID)
+		PRIMARY KEY (queueID),
+		KEY messageID (messageID),
+		KEY queueSent (queueSent)
 	) DEFAULT CHARSET=".$default_charset);
 
 	$arr_add_column[$wpdb->base_prefix."group_queue"]['queueReceived'] = "ALTER TABLE [table] ADD [column] ENUM('-1', '0','1') NOT NULL DEFAULT '0' AFTER queueSent";
+
+	$arr_add_index[$wpdb->base_prefix."group_queue"] = array(
+		'messageID' => "ALTER TABLE [table] ADD INDEX [column] ([column])",
+		'queueSent' => "ALTER TABLE [table] ADD INDEX [column] ([column])",
+	);
 
 	$wpdb->query("CREATE TABLE IF NOT EXISTS ".$wpdb->base_prefix."address2group (
 		addressID INT unsigned NOT NULL,
 		groupID INT unsigned NOT NULL,
 		groupAccepted ENUM('0', '1') NOT NULL DEFAULT '1',
-		groupUnsubscribed ENUM('0', '1') NOT NULL DEFAULT '0'
+		groupUnsubscribed ENUM('0', '1') NOT NULL DEFAULT '0',
+		KEY addressID (addressID),
+		KEY groupID (groupID)
 	) DEFAULT CHARSET=".$default_charset);
 	
 	$arr_add_column[$wpdb->base_prefix."address2group"] = array(
@@ -94,7 +108,13 @@ function activate_group()
 		'groupAccepted' => "ALTER TABLE [table] ADD [column] ENUM('0', '1') NOT NULL DEFAULT '1' AFTER groupUnsubscribed",
 	);
 
+	$arr_add_index[$wpdb->base_prefix."address2group"] = array(
+		'addressID' => "ALTER TABLE [table] ADD INDEX [column] ([column])",
+		'groupID' => "ALTER TABLE [table] ADD INDEX [column] ([column])",
+	);
+
 	add_columns($arr_add_column);
+	add_index($arr_add_index);
 }
 
 function deactivate_group()

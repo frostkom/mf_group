@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-08-04 10:03+0100\n"
+"POT-Creation-Date: 2017-08-07 10:08+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -59,7 +59,7 @@ msgstr "Lägg till"
 #: ../create/index.php:123
 #: ../create/index.php:188
 #: ../include/classes.php:357
-#: ../include/functions.php:595
+#: ../include/functions.php:593
 msgid "Name"
 msgstr "Namn"
 
@@ -129,32 +129,32 @@ msgid "Contact Page"
 msgstr "Kontaktsida"
 
 #: ../create/index.php:189
-#: ../include/functions.php:600
+#: ../include/functions.php:598
 msgid "Address"
 msgstr "Adress"
 
 #: ../create/index.php:190
-#: ../include/functions.php:605
+#: ../include/functions.php:603
 msgid "Zip Code"
 msgstr "Postnummer"
 
 #: ../create/index.php:191
-#: ../include/functions.php:610
+#: ../include/functions.php:608
 msgid "City"
 msgstr "Stad"
 
 #: ../create/index.php:192
-#: ../include/functions.php:615
+#: ../include/functions.php:613
 msgid "Phone Number"
 msgstr "Telefonnummer"
 
 #: ../create/index.php:193
-#: ../include/functions.php:620
+#: ../include/functions.php:618
 msgid "E-mail"
 msgstr "E-post"
 
 #: ../create/index.php:194
-#: ../include/functions.php:625
+#: ../include/functions.php:623
 msgid "Extra"
 msgstr "Extra"
 
@@ -335,24 +335,24 @@ msgstr "Skapa ny"
 msgid "Send New"
 msgstr "Skicka nytt"
 
-#: ../include/functions.php:406
+#: ../include/functions.php:404
 #, php-format
 msgid "The message from %s in the group %s could not be sent"
 msgstr "Meddelandet från %s i gruppen %s kunde inte skickas"
 
-#: ../include/functions.php:534
+#: ../include/functions.php:532
 msgid "The information that you entered is not in our register. Please contact the admin of this page to get your information submitted."
 msgstr "Informationen som du angav finns inte med i vårt register. Var vänlig kontakta oss så lägger vi in det."
 
-#: ../include/functions.php:577
+#: ../include/functions.php:575
 msgid "Thank you for showing your interest. You have been added to the group"
 msgstr "Tack för visat intresse. Du har lagts till i gruppen"
 
-#: ../include/functions.php:631
+#: ../include/functions.php:629
 msgid "Your Email Address"
 msgstr "Din epost"
 
-#: ../include/functions.php:635
+#: ../include/functions.php:633
 msgid "Join"
 msgstr "Gå med"
 
