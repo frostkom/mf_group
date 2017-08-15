@@ -158,10 +158,7 @@ get_header();
 						do_log("Group 404: ".var_export($_REQUEST, true).", ".var_export($post, true));
 					}
 
-					else
-					{
-						wp_redirect("/404/");
-					}
+					wp_redirect("/404/");
 				}
 			}
 
