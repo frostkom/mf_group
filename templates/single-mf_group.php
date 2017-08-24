@@ -13,7 +13,7 @@ get_header();
 				$post_id = $post->ID;
 				$post_status = $post->post_status;
 				$post_title = $post->post_title;
-				
+
 				$out = "";
 
 				if(isset($_REQUEST['subscribe']))

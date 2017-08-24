@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: 
-Version: 4.2.6
+Version: 4.2.7
 Author: Martin Fors
 Author URI: http://frostkom.se
 Text Domain: lang_group
@@ -102,7 +102,7 @@ function activate_group()
 		KEY addressID (addressID),
 		KEY groupID (groupID)
 	) DEFAULT CHARSET=".$default_charset);
-	
+
 	$arr_add_column[$wpdb->base_prefix."address2group"] = array(
 		'groupUnsubscribed' => "ALTER TABLE [table] ADD [column] ENUM('0', '1') NOT NULL DEFAULT '0' AFTER groupID",
 		'groupAccepted' => "ALTER TABLE [table] ADD [column] ENUM('0', '1') NOT NULL DEFAULT '1' AFTER groupUnsubscribed",
@@ -129,6 +129,7 @@ function uninstall_group()
 	mf_uninstall_plugin(array(
 		'uploads' => 'mf_group',
 		'options' => array('setting_emails_per_hour', 'setting_group_see_other_roles', 'setting_group_import'),
+		'post_types' => array('mf_group'),
 		'tables' => array('group_message', 'group_queue', 'address2group'),
 	));
 }
