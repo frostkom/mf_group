@@ -53,7 +53,7 @@ if(isset($_POST['btnGroupSend']) && count($arrGroupID) > 0 && wp_verify_nonce($_
 
 		else
 		{
-			$message_recepients = 0;
+			$arr_recepients = array();
 
 			foreach($arrGroupID as $intGroupID)
 			{
@@ -75,13 +75,13 @@ if(isset($_POST['btnGroupSend']) && count($arrGroupID) > 0 && wp_verify_nonce($_
 							$strAddressEmail = $r->addressEmail;
 							$strAddressCellNo = $r->addressCellNo;
 
-							if($type == "email" && $strAddressEmail != "" || $type == "sms" && $strAddressCellNo != "")
+							if(!in_array($intAddressID, $arr_recepients) && ($type == "email" && $strAddressEmail != "" || $type == "sms" && $strAddressCellNo != ""))
 							{
 								$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->base_prefix."group_queue SET addressID = '%d', messageID = '%d', queueCreated = NOW()", $intAddressID, $intMessageID));
 
 								if($wpdb->rows_affected > 0)
 								{
-									$message_recepients++;
+									$arr_recepients[] = $intAddressID;
 								}
 							}
 						}
@@ -94,7 +94,7 @@ if(isset($_POST['btnGroupSend']) && count($arrGroupID) > 0 && wp_verify_nonce($_
 				}
 			}
 
-			if($message_recepients > 0)
+			if(count($arr_recepients) > 0)
 			{
 				mf_redirect("/wp-admin/admin.php?page=mf_group/list/index.php&sent");
 			}
