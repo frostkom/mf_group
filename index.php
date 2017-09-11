@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: 
-Version: 4.2.8
+Version: 4.2.9
 Author: Martin Fors
 Author URI: http://frostkom.se
 Text Domain: lang_group

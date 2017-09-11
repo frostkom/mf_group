@@ -219,16 +219,19 @@ class widget_group extends WP_Widget
 			'description' => __("Display a group registration form", 'lang_group')
 		);
 
-		$control_ops = array('id_base' => 'group-widget');
+		$this->arr_default = array(
+			'group_heading' => "",
+			'group_id' => "",
+		);
 
-		parent::__construct('group-widget', __("Group", 'lang_group')." / ".__("Newsletter", 'lang_group'), $widget_ops, $control_ops);
+		parent::__construct('group-widget', __("Group", 'lang_group')." / ".__("Newsletter", 'lang_group'), $widget_ops);
 	}
 
 	function widget($args, $instance)
 	{
-		global $wpdb;
-
 		extract($args);
+
+		$instance = wp_parse_args((array)$instance, $this->arr_default);
 
 		if($instance['group_id'] > 0)
 		{
@@ -250,6 +253,8 @@ class widget_group extends WP_Widget
 	{
 		$instance = $old_instance;
 
+		$new_instance = wp_parse_args((array)$new_instance, $this->arr_default);
+
 		$instance['group_heading'] = strip_tags($new_instance['group_heading']);
 		$instance['group_id'] = strip_tags($new_instance['group_id']);
 
@@ -260,12 +265,7 @@ class widget_group extends WP_Widget
 	{
 		global $wpdb;
 
-		$defaults = array(
-			'group_heading' => "",
-			'group_id' => "",
-		);
-
-		$instance = wp_parse_args((array)$instance, $defaults);
+		$instance = wp_parse_args((array)$instance, $this->arr_default);
 
 		$query_xtra = "";
 
