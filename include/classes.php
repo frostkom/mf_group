@@ -159,7 +159,9 @@ class mf_group
 	{
 		global $wpdb;
 
-		do_log("Deleted all (GID: ".$group_id.")");
+		$user_data = get_userdata(get_current_user_id());
+
+		do_log("Deleted all (GID: ".$group_id.", User: ".$user_data->display_name.")");
 
 		$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->base_prefix."address2group WHERE groupID = '%d'", $group_id));
 	}
@@ -181,9 +183,8 @@ class mf_group_export extends mf_export
 
 	function get_export_data()
 	{
-		global $wpdb, $error_text;
+		global $wpdb;
 
-		//$this->name = $wpdb->get_var($wpdb->prepare("SELECT post_title FROM ".$wpdb->posts." WHERE ID = '%d' AND post_type = 'mf_group'", $this->type));
 		$obj_group = new mf_group();
 		$this->name = $obj_group->get_name($this->type);
 
