@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-08-29 10:05+0100\n"
+"POT-Creation-Date: 2017-10-10 09:47+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -22,23 +22,23 @@ msgid "The information was not submitted, contact an admin if this persists"
 msgstr "Informationen las inte in, kontakta en administratör om problemet kvarstår"
 
 #: ../create/index.php:108
-#: ../include/classes.php:346
+#: ../include/classes.php:347
 msgid "Public"
 msgstr "Publik"
 
 #: ../create/index.php:109
-#: ../include/classes.php:347
+#: ../include/classes.php:348
 msgid "Not Public"
 msgstr "Inte publik"
 
 #: ../create/index.php:110
-#: ../include/classes.php:348
+#: ../include/classes.php:349
 msgid "Inactive"
 msgstr "Inaktiv"
 
 #: ../create/index.php:114
-#: ../include/classes.php:224
-#: ../include/classes.php:289
+#: ../include/classes.php:228
+#: ../include/classes.php:290
 #: ../include/functions.php:159
 #: ../include/functions.php:160
 #: ../include/functions.php:161
@@ -58,13 +58,13 @@ msgstr "Lägg till"
 
 #: ../create/index.php:123
 #: ../create/index.php:188
-#: ../include/classes.php:357
+#: ../include/classes.php:358
 #: ../include/functions.php:593
 msgid "Name"
 msgstr "Namn"
 
 #: ../create/index.php:133
-#: ../include/classes.php:280
+#: ../include/classes.php:281
 #: ../include/functions.php:52
 #: ../include/functions.php:226
 #: ../send/index.php:172
@@ -180,7 +180,7 @@ msgstr "Gruppen uppdaterades inte med någon adress"
 
 #: ../import/index.php:108
 #: ../import/index.php:115
-#: ../include/classes.php:421
+#: ../include/classes.php:422
 #: ../include/functions.php:280
 msgid "Import"
 msgstr "Importera"
@@ -213,79 +213,79 @@ msgstr "Gruppen uppdaterades"
 msgid "Accept Link"
 msgstr "Bekräftelselänk"
 
-#: ../include/classes.php:219
+#: ../include/classes.php:220
 msgid "Display a group registration form"
 msgstr "Visa ett registreringsformulär till en grupp"
 
-#: ../include/classes.php:224
+#: ../include/classes.php:228
 msgid "Newsletter"
 msgstr "Nyhetsbrev"
 
-#: ../include/classes.php:288
+#: ../include/classes.php:289
 msgid "Heading"
 msgstr "Rubrik"
 
-#: ../include/classes.php:345
+#: ../include/classes.php:346
 msgid "All"
 msgstr "Alla"
 
-#: ../include/classes.php:349
+#: ../include/classes.php:350
 msgid "Trash"
 msgstr "Papperskorg"
 
-#: ../include/classes.php:359
+#: ../include/classes.php:360
 msgid "Amount"
 msgstr "Antal"
 
-#: ../include/classes.php:364
+#: ../include/classes.php:365
 msgid "Not Accepted"
 msgstr "Inte bekräftad"
 
-#: ../include/classes.php:367
+#: ../include/classes.php:368
 msgid "Unsubscribed"
 msgstr "Avregistrerade"
 
-#: ../include/classes.php:368
+#: ../include/classes.php:369
 msgid "User"
 msgstr "Användare"
 
-#: ../include/classes.php:369
-#: ../include/classes.php:507
+#: ../include/classes.php:370
+#: ../include/classes.php:508
 #: ../include/functions.php:277
 #: ../sent/index.php:21
 #: ../sent/index.php:31
 msgid "Sent"
 msgstr "Skickat"
 
-#: ../include/classes.php:413
+#: ../include/classes.php:414
 msgid "Edit"
 msgstr "Redigera"
 
-#: ../include/classes.php:417
+#: ../include/classes.php:418
 msgid "Delete"
 msgstr "Radera"
 
-#: ../include/classes.php:420
+#: ../include/classes.php:421
 msgid "Add or remove"
 msgstr "Lägg till/ta bort"
 
-#: ../include/classes.php:428
+#: ../include/classes.php:429
 msgid "CSV"
 msgstr "CSV"
 
-#: ../include/classes.php:432
+#: ../include/classes.php:433
 msgid "XLS"
 msgstr "XLS"
 
-#: ../include/classes.php:439
+#: ../include/classes.php:440
 msgid "Recover"
 msgstr "Återställ"
 
-#: ../include/classes.php:492
+#: ../include/classes.php:493
 msgid "Test"
 msgstr "Testa"
 
-#: ../include/classes.php:522
+#: ../include/classes.php:523
 #, php-format
 msgid "Will be sent %s"
 msgstr "Kommer att skickas %s"

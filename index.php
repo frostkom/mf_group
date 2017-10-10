@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: 
-Version: 4.2.10
+Version: 4.2.11
 Author: Martin Fors
 Author URI: http://frostkom.se
 Text Domain: lang_group
@@ -30,7 +30,7 @@ if(is_admin())
 	add_action('admin_init', 'settings_group');
 	add_action('admin_menu', 'menu_group');
 	add_action('admin_notices', 'notices_group');
-	add_action('before_delete_post', 'delete_group');
+	add_action('delete_post', 'delete_group');
 	add_action('deleted_user', 'deleted_user_group');
 
 	add_filter('count_shortcode_button', 'count_shortcode_button_group');
