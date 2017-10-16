@@ -466,7 +466,7 @@ function show_group_registration_form($post_id)
 	$strAddressEmail = check_var('strAddressEmail');
 	$strAddressExtra = check_var('strAddressExtra');
 
-	if(isset($_POST['btnGroupJoin']) && wp_verify_nonce($_POST['_wpnonce'], 'group_join'))
+	if(isset($_POST['btnGroupJoin'])) // && wp_verify_nonce($_POST['_wpnonce'], 'group_join')
 	{
 		$strGroupVerifyAddress = get_post_meta($post_id, 'group_verify_address', true);
 
@@ -632,7 +632,7 @@ function show_group_registration_form($post_id)
 			$out .= "<div class='form_button'>"
 				.show_button(array('name' => "btnGroupJoin", 'text' => __("Join", 'lang_group')))
 			."</div>"
-			.wp_nonce_field('group_join', '_wpnonce', true, false)
+			//.wp_nonce_field('group_join', '_wpnonce', true, false)
 		."</form>";
 	}
 
