@@ -170,7 +170,7 @@ class mf_group
 	{
 		global $wpdb;
 
-		return $wpdb->get_var($wpdb->prepare("SELECT COUNT(addressID) FROM ".$wpdb->base_prefix."address INNER JOIN ".$wpdb->base_prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0'", $this->id));
+		return $wpdb->get_var($wpdb->prepare("SELECT COUNT(addressID) FROM ".$wpdb->base_prefix."address INNER JOIN ".$wpdb->base_prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' AND groupAccepted = '1' AND groupUnsubscribed = '0'", $this->id));
 	}
 }
 
@@ -389,18 +389,6 @@ class mf_group_table extends mf_list_table
 
 		switch($column_name)
 		{
-			case 'post_status':
-				if($item[$column_name] == "publish")
-				{
-					$post_url = get_permalink($post_id);
-
-					$out .= "<i class='fa fa-globe green'></i>
-					<div class='row-actions'>
-						<a href='".$post_url."'><i class='fa fa-link'></i></a>
-					</div>";
-				}
-			break;
-
 			case 'post_title':
 				$post_edit_url = "#";
 				$post_author = $item['post_author'];
@@ -444,8 +432,16 @@ class mf_group_table extends mf_list_table
 				.$this->row_actions($actions);
 			break;
 
-			case 'post_author':
-				$out .= get_user_info(array('id' => $item[$column_name], 'type' => 'short_name'));
+			case 'post_status':
+				if($item[$column_name] == "publish")
+				{
+					$post_url = get_permalink($post_id);
+
+					$out .= "<i class='fa fa-globe green'></i>
+					<div class='row-actions'>
+						<a href='".$post_url."'><i class='fa fa-link'></i></a>
+					</div>";
+				}
 			break;
 
 			case 'amount':
@@ -493,6 +489,10 @@ class mf_group_table extends mf_list_table
 						<a href='".get_email_link(array('type' => "unsubscribe", 'group_id' => $post_id, 'email' => $user_email))."'>".__("Test", 'lang_group')."</a>
 					</div>";
 				}
+			break;
+
+			case 'post_author':
+				$out .= get_user_info(array('id' => $item[$column_name], 'type' => 'short_name'));
 			break;
 
 			case 'sent':

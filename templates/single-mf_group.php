@@ -16,6 +16,8 @@ get_header();
 
 				$out = "";
 
+				$done_text = $error_text = "";
+
 				if(isset($_REQUEST['subscribe']))
 				{
 					$strSubscribeHash = check_var('subscribe', 'char');
@@ -36,24 +38,24 @@ get_header();
 
 							if($wpdb->rows_affected > 0)
 							{
-								$out .= __("You have successfully subscribed", 'lang_group');
+								$done_text = __("You have successfully subscribed", 'lang_group');
 							}
 
 							else
 							{
-								$out .= __("Either you're not part of the group or you've already accepted to be a part of the group", 'lang_group');
+								$error_text = __("Either you're not part of the group or you've already accepted to be a part of the group", 'lang_group');
 							}
 						}
 
 						else
 						{
-							$out .= __("Either you're not part of the group or you've already accepted to be a part of the group", 'lang_group');
+							$error_text = __("Either you're not part of the group or you've already accepted to be a part of the group", 'lang_group');
 						}
 					}
 
 					else
 					{
-						$out .= __("Something went wrong. Please contact an admin if the problem persists", 'lang_group');
+						$error_text = __("Something went wrong. Please contact an admin if the problem persists", 'lang_group');
 					}
 				}
 
@@ -84,7 +86,7 @@ get_header();
 									{
 										$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->base_prefix."address2group SET groupUnsubscribed = '1' WHERE groupID = '%d' AND addressID = '%d'", $intGroupID, $intAddressID));
 
-										$out .= __("You have been successfully unsubscribed", 'lang_group');
+										$done_text = __("You have been successfully unsubscribed", 'lang_group');
 									}
 
 									else
@@ -103,13 +105,13 @@ get_header();
 
 								else
 								{
-									$out .= __("Either you're not part of the group or you've already unsubscribed from it", 'lang_group');
+									$error_text = __("Either you're not part of the group or you've already unsubscribed from it", 'lang_group');
 								}
 							}
 
 							else
 							{
-								$out .= __("Something went wrong. Please contact an admin if the problem persists", 'lang_group');
+								$error_text = __("Something went wrong. Please contact an admin if the problem persists", 'lang_group');
 							}
 						}
 
@@ -132,6 +134,8 @@ get_header();
 						}
 					}
 				}
+
+				$out .= get_notification();
 
 				if($out != '' || $post_status == 'publish')
 				{
