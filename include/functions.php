@@ -393,8 +393,6 @@ function cron_group()
 						$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->base_prefix."group_queue SET queueSent = '1', queueSentTime = NOW() WHERE queueID = '%d'", $intQueueID));
 
 						$mail_sent++;
-
-						//do_log("Not sent to ".$mail_to, 'trash');
 					}
 
 					else
