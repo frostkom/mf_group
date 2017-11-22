@@ -18,7 +18,7 @@ if(isset($_POST['btnGroupImport']) && $strGroupImport != '' && wp_verify_nonce($
 
 	$arr_import = explode("\n", $strGroupImport);
 
-	$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE post_type = 'mf_group' AND ID = '%d'".$query_xtra." LIMIT 0, 1", $intGroupID));
+	$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE post_type = 'mf_group' AND ID = '%d'".$query_xtra." LIMIT 0, 1", $intGroupID));
 
 	if($wpdb->num_rows > 0)
 	{
@@ -44,7 +44,7 @@ if(isset($_POST['btnGroupImport']) && $strGroupImport != '' && wp_verify_nonce($
 
 				if($intAddressID > 0)
 				{
-					$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->base_prefix."address2group WHERE addressID = '%d' AND groupID = '%d'", $intAddressID, $intGroupID));
+					$wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->base_prefix."address2group WHERE addressID = '%d' AND groupID = '%d' LIMIT 0, 1", $intAddressID, $intGroupID));
 
 					if($wpdb->num_rows == 0)
 					{

@@ -115,7 +115,7 @@ class mf_group
 
 		if($data['address_id'] > 0 && $data['group_id'] > 0)
 		{
-			$wpdb->get_var($wpdb->prepare("SELECT addressID FROM ".$wpdb->base_prefix."address2group WHERE addressID = '%d' AND groupID = '%d'", $data['address_id'], $data['group_id']));
+			$wpdb->get_var($wpdb->prepare("SELECT addressID FROM ".$wpdb->base_prefix."address2group WHERE addressID = '%d' AND groupID = '%d' LIMIT 0, 1", $data['address_id'], $data['group_id']));
 
 			if($wpdb->num_rows == 0)
 			{

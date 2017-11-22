@@ -418,11 +418,11 @@ function cron_group()
 			{
 				//Must be here to make sure that send_sms() is loaded
 				##################
-				include_once(ABSPATH."wp-admin/includes/plugin.php");
+				require_once(ABSPATH."wp-admin/includes/plugin.php");
 
 				if(is_plugin_active("mf_sms/index.php"))
 				{
-					include_once(ABSPATH."wp-content/plugins/mf_sms/include/functions.php");
+					require_once(ABSPATH."wp-content/plugins/mf_sms/include/functions.php");
 				}
 				##################
 
