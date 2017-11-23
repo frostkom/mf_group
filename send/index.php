@@ -96,7 +96,7 @@ if(isset($_POST['btnGroupSend']) && count($arrGroupID) > 0 && wp_verify_nonce($_
 
 			if(count($arr_recepients) > 0)
 			{
-				mf_redirect("/wp-admin/admin.php?page=mf_group/list/index.php&sent");
+				mf_redirect(admin_url("admin.php?page=mf_group/list/index.php&sent"));
 			}
 
 			else

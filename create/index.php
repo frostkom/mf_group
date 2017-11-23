@@ -44,7 +44,7 @@ if(isset($_POST['btnGroupCreate']))
 			update_post_meta($intGroupID, 'group_verify_address', $strGroupVerifyAddress);
 			update_post_meta($intGroupID, 'group_contact_page', $intGroupContactPage);
 
-			mf_redirect("/wp-admin/admin.php?page=mf_group/list/index.php&updated");
+			mf_redirect(admin_url("admin.php?page=mf_group/list/index.php&updated"));
 		}
 
 		else
@@ -71,7 +71,7 @@ if(isset($_POST['btnGroupCreate']))
 				}
 			}
 
-			mf_redirect("/wp-admin/admin.php?page=mf_group/list/index.php&created");
+			mf_redirect(admin_url("admin.php?page=mf_group/list/index.php&created"));
 		}
 
 		else

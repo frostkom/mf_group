@@ -221,8 +221,9 @@ class widget_group extends WP_Widget
 		);
 
 		$this->arr_default = array(
-			'group_heading' => "",
-			'group_id' => "",
+			'group_heading' => '',
+			'group_text' => '',
+			'group_id' => '',
 		);
 
 		parent::__construct('group-widget', __("Group", 'lang_group')." / ".__("Newsletter", 'lang_group'), $widget_ops);
@@ -245,7 +246,15 @@ class widget_group extends WP_Widget
 					.$after_title;
 				}
 
-				echo show_group_registration_form($instance['group_id'])
+				echo "<div class='section'>";
+
+					if($instance['group_text'] != '')
+					{
+						echo apply_filters('the_content', $instance['group_text']);
+					}
+
+					echo show_group_registration_form($instance['group_id'])
+				."</div>"
 			.$after_widget;
 		}
 	}
@@ -256,8 +265,9 @@ class widget_group extends WP_Widget
 
 		$new_instance = wp_parse_args((array)$new_instance, $this->arr_default);
 
-		$instance['group_heading'] = strip_tags($new_instance['group_heading']);
-		$instance['group_id'] = strip_tags($new_instance['group_id']);
+		$instance['group_heading'] = sanitize_text_field($new_instance['group_heading']);
+		$instance['group_text'] = sanitize_text_field($new_instance['group_text']);
+		$instance['group_id'] = sanitize_text_field($new_instance['group_id']);
 
 		return $instance;
 	}
@@ -275,18 +285,23 @@ class widget_group extends WP_Widget
 			$query_xtra .= " AND post_author = '".get_current_user_id()."'";
 		}
 
-		$result = $wpdb->get_results("SELECT ID, post_title FROM ".$wpdb->posts." WHERE post_type = 'mf_group' AND post_status != 'trash'".$query_xtra." ORDER BY post_status ASC, post_title ASC");
+		/*$result = $wpdb->get_results("SELECT ID, post_title FROM ".$wpdb->posts." WHERE post_type = 'mf_group' AND post_status != 'trash'".$query_xtra." ORDER BY post_status ASC, post_title ASC");
 
-		$arr_data = array();
-		$arr_data[''] = "-- ".__("Choose here", 'lang_group')." --";
+		$arr_data = array(
+			'' => "-- ".__("Choose here", 'lang_group')." --",
+		);
 
 		foreach($result as $r)
 		{
 			$arr_data[$r->ID] = $r->post_title;
-		}
+		}*/
+
+		$arr_data = array();
+		get_post_children(array('add_choose_here' => true, 'post_type' => 'mf_group', 'post_status' => '', 'where' => "post_status != 'trash'".$query_xtra), $arr_data);
 
 		echo "<div class='mf_form'>"
 			.show_textfield(array('name' => $this->get_field_name('group_heading'), 'text' => __("Heading", 'lang_group'), 'value' => $instance['group_heading']))
+			.show_textarea(array('name' => $this->get_field_name('group_text'), 'text' => __("Text", 'lang_group'), 'value' => $instance['group_text']))
 			.show_select(array('data' => $arr_data, 'name' => $this->get_field_name('group_id'), 'text' => __("Group", 'lang_group'), 'value' => $instance['group_id']))
 		."</div>";
 	}

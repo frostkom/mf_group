@@ -46,17 +46,17 @@ function get_shortcode_output_group($out)
 
 	if(count($tbl_group->data) > 0)
 	{
-		$out .= "<h3>".__("Choose a Group", 'lang_group')."</h3>";
-
-		$arr_data = array();
-		$arr_data[''] = "-- ".__("Choose here", 'lang_group')." --";
+		$arr_data = array(
+			'' => "-- ".__("Choose here", 'lang_group')." --",
+		);
 
 		foreach($tbl_group->data as $template)
 		{
 			$arr_data[$template['ID']] = $template['post_title'];
 		}
 
-		$out .= show_select(array('data' => $arr_data, 'xtra' => "rel='mf_group'"));
+		$out .= "<h3>".__("Choose a Group", 'lang_group')."</h3>"
+		.show_select(array('data' => $arr_data, 'xtra' => "rel='mf_group'"));
 	}
 
 	return $out;
@@ -464,7 +464,7 @@ function show_group_registration_form($post_id)
 	$strAddressEmail = check_var('strAddressEmail');
 	$strAddressExtra = check_var('strAddressExtra');
 
-	if(isset($_POST['btnGroupJoin'])) // && wp_verify_nonce($_POST['_wpnonce'], 'group_join')
+	if(isset($_POST['btnGroupJoin']))
 	{
 		$strGroupVerifyAddress = get_post_meta($post_id, 'group_verify_address', true);
 
@@ -620,18 +620,23 @@ function show_group_registration_form($post_id)
 				{
 					$out .= show_textfield(array('name' => "strAddressExtra", 'text' => get_option_or_default('setting_address_extra', __("Extra", 'lang_group')), 'value' => $strAddressExtra, 'required' => true));
 				}
+
+				$out .= "<div class='form_button'>"
+					.show_button(array('name' => "btnGroupJoin", 'text' => __("Join", 'lang_group')))
+				."</div>";
 			}
 
 			else
 			{
-				$out .= show_textfield(array('name' => "strAddressEmail", 'placeholder' => __("Your Email Address", 'lang_group'), 'value' => $strAddressEmail, 'required' => true));
+				$out .= "<div class='flex_flow'>"
+					.show_textfield(array('name' => "strAddressEmail", 'placeholder' => __("Your Email Address", 'lang_group'), 'value' => $strAddressEmail, 'required' => true))
+					."<div class='form_button'>"
+						.show_button(array('name' => "btnGroupJoin", 'text' => __("Join", 'lang_group')))
+					."</div>
+				</div>";
 			}
 
-			$out .= "<div class='form_button'>"
-				.show_button(array('name' => "btnGroupJoin", 'text' => __("Join", 'lang_group')))
-			."</div>"
-			//.wp_nonce_field('group_join', '_wpnonce', true, false)
-		."</form>";
+		$out .= "</form>";
 	}
 
 	return $out;
