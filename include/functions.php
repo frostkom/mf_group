@@ -172,6 +172,14 @@ function init_group()
 	);
 
 	register_post_type('mf_group', $args);
+
+	if(!is_admin())
+	{
+		$plugin_include_url = plugin_dir_url(__FILE__);
+		$plugin_version = get_plugin_version(__FILE__);
+
+		mf_enqueue_style('style_group', $plugin_include_url."style.css", $plugin_version);
+	}
 }
 
 function widgets_group()
@@ -446,15 +454,18 @@ function cron_group()
 	}
 }
 
-function show_group_registration_form($post_id)
+function show_group_registration_form($data) //$post_id
 {
 	global $wpdb, $done_text, $error_text;
+
+	if(!isset($data['text'])){				$data['text'] = '';}
+	if(!isset($data['button_text'])){		$data['button_text'] = __("Join", 'lang_group');}
 
 	$out = "";
 
 	$obj_group = new mf_group();
 
-	$arrGroupRegistrationFields = get_post_meta($post_id, 'group_registration_fields', true);
+	$arrGroupRegistrationFields = get_post_meta($data['id'], 'group_registration_fields', true);
 
 	$strAddressName = check_var('strAddressName');
 	$intAddressZipCode = check_var('intAddressZipCode');
@@ -466,7 +477,7 @@ function show_group_registration_form($post_id)
 
 	if(isset($_POST['btnGroupJoin']))
 	{
-		$strGroupVerifyAddress = get_post_meta($post_id, 'group_verify_address', true);
+		$strGroupVerifyAddress = get_post_meta($data['id'], 'group_verify_address', true);
 
 		$query_where = $query_set = "";
 
@@ -529,7 +540,7 @@ function show_group_registration_form($post_id)
 		{
 			$out .= "<p>".__("The information that you entered is not in our register. Please contact the admin of this page to get your information submitted.", 'lang_group')."</p>";
 
-			$intGroupContactPage = get_post_meta($post_id, 'group_contact_page', true);
+			$intGroupContactPage = get_post_meta($data['id'], 'group_contact_page', true);
 
 			if($intGroupContactPage > 0)
 			{
@@ -568,7 +579,7 @@ function show_group_registration_form($post_id)
 
 			if($intAddressID > 0)
 			{
-				$obj_group->add_address(array('address_id' => $intAddressID, 'group_id' => $post_id));
+				$obj_group->add_address(array('address_id' => $intAddressID, 'group_id' => $data['id']));
 
 				$done_text = __("Thank you for showing your interest. You have been added to the group", 'lang_group');
 			}
@@ -583,6 +594,11 @@ function show_group_registration_form($post_id)
 	else
 	{
 		$out .= "<form action='' method='post' class='mf_form'>";
+
+			if($data['text'] != '')
+			{
+				$out .= apply_filters('the_content', $data['text']);
+			}
 
 			if(is_array($arrGroupRegistrationFields) && count($arrGroupRegistrationFields) > 0)
 			{
@@ -622,7 +638,7 @@ function show_group_registration_form($post_id)
 				}
 
 				$out .= "<div class='form_button'>"
-					.show_button(array('name' => "btnGroupJoin", 'text' => __("Join", 'lang_group')))
+					.show_button(array('name' => "btnGroupJoin", 'text' => $data['button_text']))
 				."</div>";
 			}
 
@@ -631,7 +647,7 @@ function show_group_registration_form($post_id)
 				$out .= "<div class='flex_flow'>"
 					.show_textfield(array('name' => "strAddressEmail", 'placeholder' => __("Your Email Address", 'lang_group'), 'value' => $strAddressEmail, 'required' => true))
 					."<div class='form_button'>"
-						.show_button(array('name' => "btnGroupJoin", 'text' => __("Join", 'lang_group')))
+						.show_button(array('name' => "btnGroupJoin", 'text' => $data['button_text']))
 					."</div>
 				</div>";
 			}
@@ -640,4 +656,25 @@ function show_group_registration_form($post_id)
 	}
 
 	return $out;
+}
+
+function shortcode_group($atts)
+{
+	extract(shortcode_atts(array(
+		'id' => ''
+	), $atts));
+
+	return show_group_registration_form(array('id' => $id));
+}
+
+function custom_templates_group($single_template)
+{
+	global $post;
+
+	if(in_array($post->post_type, array("mf_group")))
+	{
+		$single_template = plugin_dir_path(__FILE__)."templates/single-".$post->post_type.".php";
+	}
+
+	return $single_template;
 }

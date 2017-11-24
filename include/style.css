@@ -1,0 +1,44 @@
+@media all
+{
+	.widget.group
+	{
+		
+	}
+
+		.widget.group .mf_form
+		{
+			font-size: 1.6em;
+			margin: 0 auto;
+			max-width: 80%;
+			width: 500px;
+		}
+
+			.widget.group .mf_form > p
+			{
+				margin-bottom: .5em;
+			}
+		
+			.widget.group .flex_flow
+			{
+				
+			}
+
+				.widget.group .flex_flow .form_textfield input, .widget.group .flex_flow button
+				{
+					border: 0;
+					font-size: inherit;
+					font-weight: normal;
+					height: 3em;
+					padding: .8em 1em;
+				}
+
+					.widget.group .flex_flow .form_textfield input
+					{
+						border-radius: .2em;
+					}
+
+					.widget.group .flex_flow button
+					{
+						width: 100%;
+					}
+}

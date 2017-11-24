@@ -149,7 +149,7 @@ get_header();
 
 						else if($post_status == 'publish')
 						{
-							echo show_group_registration_form($post_id);
+							echo show_group_registration_form(array('id' => $post_id));
 						}
 
 					echo "</section>";

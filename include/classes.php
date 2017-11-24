@@ -224,6 +224,7 @@ class widget_group extends WP_Widget
 			'group_heading' => '',
 			'group_text' => '',
 			'group_id' => '',
+			'group_button_text' => '',
 		);
 
 		parent::__construct('group-widget', __("Group", 'lang_group')." / ".__("Newsletter", 'lang_group'), $widget_ops);
@@ -246,14 +247,8 @@ class widget_group extends WP_Widget
 					.$after_title;
 				}
 
-				echo "<div class='section'>";
-
-					if($instance['group_text'] != '')
-					{
-						echo apply_filters('the_content', $instance['group_text']);
-					}
-
-					echo show_group_registration_form($instance['group_id'])
+				echo "<div class='section'>"
+					.show_group_registration_form(array('id' => $instance['group_id'], 'text' => $instance['group_text'], 'button_text' => $instance['group_button_text']))
 				."</div>"
 			.$after_widget;
 		}
@@ -268,6 +263,7 @@ class widget_group extends WP_Widget
 		$instance['group_heading'] = sanitize_text_field($new_instance['group_heading']);
 		$instance['group_text'] = sanitize_text_field($new_instance['group_text']);
 		$instance['group_id'] = sanitize_text_field($new_instance['group_id']);
+		$instance['group_button_text'] = sanitize_text_field($new_instance['group_button_text']);
 
 		return $instance;
 	}
@@ -278,31 +274,14 @@ class widget_group extends WP_Widget
 
 		$instance = wp_parse_args((array)$instance, $this->arr_default);
 
-		$query_xtra = "";
-
-		if(!IS_EDITOR)
-		{
-			$query_xtra .= " AND post_author = '".get_current_user_id()."'";
-		}
-
-		/*$result = $wpdb->get_results("SELECT ID, post_title FROM ".$wpdb->posts." WHERE post_type = 'mf_group' AND post_status != 'trash'".$query_xtra." ORDER BY post_status ASC, post_title ASC");
-
-		$arr_data = array(
-			'' => "-- ".__("Choose here", 'lang_group')." --",
-		);
-
-		foreach($result as $r)
-		{
-			$arr_data[$r->ID] = $r->post_title;
-		}*/
-
 		$arr_data = array();
-		get_post_children(array('add_choose_here' => true, 'post_type' => 'mf_group', 'post_status' => '', 'where' => "post_status != 'trash'".$query_xtra), $arr_data);
+		get_post_children(array('add_choose_here' => true, 'post_type' => 'mf_group', 'post_status' => '', 'where' => "post_status != 'trash'".(IS_EDITOR ? "" : " AND post_author = '".get_current_user_id()."'")), $arr_data);
 
 		echo "<div class='mf_form'>"
 			.show_textfield(array('name' => $this->get_field_name('group_heading'), 'text' => __("Heading", 'lang_group'), 'value' => $instance['group_heading']))
 			.show_textarea(array('name' => $this->get_field_name('group_text'), 'text' => __("Text", 'lang_group'), 'value' => $instance['group_text']))
 			.show_select(array('data' => $arr_data, 'name' => $this->get_field_name('group_id'), 'text' => __("Group", 'lang_group'), 'value' => $instance['group_id']))
+			.show_textfield(array('name' => $this->get_field_name('group_button_text'), 'text' => __("Button Text", 'lang_group'), 'value' => $instance['group_button_text'], 'placeholder' => __("Join", 'lang_group')))
 		."</div>";
 	}
 }
