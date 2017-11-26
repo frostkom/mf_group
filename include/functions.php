@@ -644,7 +644,7 @@ function show_group_registration_form($data) //$post_id
 
 			else
 			{
-				$out .= "<div class='flex_flow'>"
+				$out .= "<div class='flex_form'>"
 					.show_textfield(array('name' => "strAddressEmail", 'placeholder' => __("Your Email Address", 'lang_group'), 'value' => $strAddressEmail, 'required' => true))
 					."<div class='form_button'>"
 						.show_button(array('name' => "btnGroupJoin", 'text' => $data['button_text']))
