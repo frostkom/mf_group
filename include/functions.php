@@ -458,8 +458,8 @@ function show_group_registration_form($data) //$post_id
 {
 	global $wpdb, $done_text, $error_text;
 
-	if(!isset($data['text'])){				$data['text'] = '';}
-	if(!isset($data['button_text'])){		$data['button_text'] = __("Join", 'lang_group');}
+	if(!isset($data['text'])){											$data['text'] = '';}
+	if(!isset($data['button_text']) || $data['button_text'] == ''){		$data['button_text'] = __("Join", 'lang_group');}
 
 	$out = "";
 
