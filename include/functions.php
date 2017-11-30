@@ -345,6 +345,8 @@ function cron_group()
 	{
 		$intGroupID = $r->groupID;
 
+		$intGroupVerifyLink = get_post_meta($intGroupID, $obj_group->meta_prefix.'verify_link', true);
+
 		$resultMessages = $wpdb->get_results($wpdb->prepare("SELECT addressEmail, addressCellNo, queueID, messageType, messageFrom, messageName, messageText, messageAttachment, ".$wpdb->base_prefix."group_message.userID FROM ".$wpdb->base_prefix."address INNER JOIN ".$wpdb->base_prefix."group_queue USING (addressID) INNER JOIN ".$wpdb->base_prefix."group_message USING (messageID) WHERE groupID = '%d' AND queueSent = '0' ORDER BY messageType ASC, queueCreated ASC".$query_limit, $intGroupID));
 
 		foreach($resultMessages as $r)
@@ -387,10 +389,13 @@ function cron_group()
 					$mail_content = stripslashes(apply_filters('the_content', $strMessageText));
 
 					$unsubscribe_link = get_email_link(array('type' => "unsubscribe", 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
-					$verify_link = get_email_link(array('type' => "verify", 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
-
 					$mail_content = str_replace("[unsubscribe_link]", $unsubscribe_link, $mail_content);
-					$mail_content .= "<img src='".$verify_link."' style='height: 0; visibility: hidden; width: 0'>";
+					
+					if('yes' == $intGroupVerifyLink)
+					{
+						$verify_link = get_email_link(array('type' => "verify", 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
+						$mail_content .= "<img src='".$verify_link."' style='height: 0; visibility: hidden; width: 0'>";
+					}
 
 					list($mail_attachment, $rest) = get_attachment_to_send($strMessageAttachment);
 

@@ -13,6 +13,8 @@ class mf_group
 		{
 			$this->id = check_var('intGroupID');
 		}
+
+		$this->meta_prefix = "mf_group_";
 	}
 
 	function fetch_request()

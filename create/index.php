@@ -1,5 +1,7 @@
 <?php
 
+$obj_group = new mf_group();
+
 $intGroupID = check_var('intGroupID');
 
 $query_xtra = "";
@@ -16,6 +18,7 @@ $strGroupAcceptanceSubject = check_var('strGroupAcceptanceSubject');
 $strGroupAcceptanceText = check_var('strGroupAcceptanceText');
 $strGroupVerifyAddress = check_var('strGroupVerifyAddress');
 $intGroupContactPage = check_var('intGroupContactPage');
+$intGroupVerifyLink = check_var('intGroupVerifyLink', 'char', true, 'no');
 $strGroupName = check_var('strGroupName');
 $arrGroupRegistrationFields = check_var('arrGroupRegistrationFields');
 $intGroupID_copy = check_var('intGroupID_copy');
@@ -43,6 +46,7 @@ if(isset($_POST['btnGroupCreate']))
 			update_post_meta($intGroupID, 'group_acceptance_text', $strGroupAcceptanceText);
 			update_post_meta($intGroupID, 'group_verify_address', $strGroupVerifyAddress);
 			update_post_meta($intGroupID, 'group_contact_page', $intGroupContactPage);
+			update_post_meta($intGroupID, $obj_group->meta_prefix.'verify_link', $intGroupVerifyLink);
 
 			mf_redirect(admin_url("admin.php?page=mf_group/list/index.php&updated"));
 		}
@@ -197,7 +201,8 @@ echo "<div class='wrap'>
 								echo show_select(array('data' => $arr_data, 'name' => 'arrGroupRegistrationFields[]', 'text' => __("Registration Fields", 'lang_group'), 'value' => $arrGroupRegistrationFields));
 							}
 
-						echo "</div>
+							echo show_select(array('data' => get_yes_no_for_select(), 'name' => 'intGroupVerifyLink', 'text' => __("Add Verify Link", 'lang_group'), 'value' => $intGroupVerifyLink, 'description' => __("In every message a hidden image/link is placed to see if the recepient has opened the message. This increases the risk of being classified as spam", 'lang_group')))
+						."</div>
 					</div>
 				</div>
 			</div>
