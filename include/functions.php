@@ -666,15 +666,3 @@ function shortcode_group($atts)
 
 	return show_group_registration_form(array('id' => $id));
 }
-
-function custom_templates_group($single_template)
-{
-	global $post;
-
-	if(in_array($post->post_type, array("mf_group")))
-	{
-		$single_template = plugin_dir_path(__FILE__)."templates/single-".$post->post_type.".php";
-	}
-
-	return $single_template;
-}

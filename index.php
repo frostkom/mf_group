@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: 
-Version: 4.2.22
+Version: 4.2.24
 Author: Martin Fors
 Author URI: http://frostkom.se
 Text Domain: lang_group
@@ -132,4 +132,16 @@ function uninstall_group()
 		'post_types' => array('mf_group'),
 		'tables' => array('group_message', 'group_queue', 'address2group'),
 	));
+}
+
+function custom_templates_group($single_template)
+{
+	global $post;
+
+	if(in_array($post->post_type, array("mf_group")))
+	{
+		$single_template = plugin_dir_path(__FILE__)."templates/single-".$post->post_type.".php";
+	}
+
+	return $single_template;
 }
