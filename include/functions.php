@@ -391,7 +391,7 @@ function cron_group()
 					$unsubscribe_link = get_email_link(array('type' => "unsubscribe", 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
 					$mail_content = str_replace("[unsubscribe_link]", $unsubscribe_link, $mail_content);
 					
-					if('yes' == $intGroupVerifyLink)
+					if($intGroupVerifyLink == 'yes')
 					{
 						$verify_link = get_email_link(array('type' => "verify", 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
 						$mail_content .= "<img src='".$verify_link."' style='height: 0; visibility: hidden; width: 0'>";

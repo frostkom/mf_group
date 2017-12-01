@@ -22,11 +22,16 @@
 
 	.full_width .widget.group .mf_form
 	{
-		font-size: 1.6em;
+		/*font-size: 1.6em;*/
 		margin: 0 auto;
 		max-width: 80%;
 		width: 500px;
 	}
+
+		.full_width .widget.group .mf_form p
+		{
+			text-align: center;
+		}
 	
 		.full_width .widget.group .flex_form
 		{
