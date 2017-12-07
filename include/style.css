@@ -1,9 +1,6 @@
 @media all
 {
-	.widget.group
-	{
-		
-	}
+	.widget.group{}
 
 		.widget.group .mf_form > p
 		{
@@ -12,7 +9,7 @@
 
 		.widget.group .flex_form .form_textfield input, .widget.group .flex_form button
 		{
-			border-radius: .2em;
+			/*border-radius: .2em;*/
 			font-size: inherit;
 			font-weight: normal;
 			height: 3em;
@@ -32,7 +29,7 @@
 		{
 			text-align: center;
 		}
-	
+
 		.full_width .widget.group .flex_form
 		{
 			display: -webkit-box;

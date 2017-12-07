@@ -390,7 +390,7 @@ function cron_group()
 
 					$unsubscribe_link = get_email_link(array('type' => "unsubscribe", 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
 					$mail_content = str_replace("[unsubscribe_link]", $unsubscribe_link, $mail_content);
-					
+
 					if($intGroupVerifyLink == 'yes')
 					{
 						$verify_link = get_email_link(array('type' => "verify", 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
@@ -399,7 +399,7 @@ function cron_group()
 
 					list($mail_attachment, $rest) = get_attachment_to_send($strMessageAttachment);
 
-					$sent = send_email(array('to' => $mail_to, 'subject' => $mail_subject, 'content' => $mail_content, 'headers' => $mail_headers, 'attachment' => $mail_attachment));
+					$sent = send_email(array('to' => $mail_to, 'subject' => $mail_subject, 'content' => $mail_content, 'headers' => $mail_headers, 'attachment' => $mail_attachment, 'save_log' => false));
 
 					if($sent)
 					{
