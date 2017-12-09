@@ -88,7 +88,7 @@ function delete_group($post_id)
 
 	if($post_type == 'mf_group')
 	{
-		do_log("Delete postID (#".$post_id.") from ".$wpdb->base_prefix."group_message etc.");
+		error_log("Delete postID (#".$post_id.") from ".$wpdb->base_prefix."group_message etc.");
 
 		/*$result = $wpdb->get_results($wpdb->prepare("SELECT messageID FROM ".$wpdb->base_prefix."group_message WHERE groupID = '%d'", $post_id));
 
@@ -415,7 +415,7 @@ function cron_group()
 							$error_text = sprintf(__("The message from %s in the group %s could not be sent", 'lang_group'), $strMessageFrom, $obj_group->get_name($intGroupID));
 						}
 
-						do_log($error_text);
+						error_log($error_text);
 					}
 				}
 
