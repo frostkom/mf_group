@@ -4,13 +4,13 @@ if(!defined('ABSPATH'))
 {
 	header('Content-Type: application/json');
 
-	$folder = str_replace("/wp-content/plugins/mf_group/include", "/", dirname(__FILE__));
+	$folder = str_replace("/wp-content/plugins/mf_group/include/api", "/", dirname(__FILE__));
 
 	require_once($folder."wp-load.php");
 }
 
-require_once("classes.php");
-require_once("functions.php");
+/*require_once("classes.php");
+require_once("functions.php");*/
 
 $json_output = array();
 
