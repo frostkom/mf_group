@@ -212,7 +212,7 @@ function settings_group_callback()
 function setting_emails_per_hour_callback()
 {
 	$setting_key = get_setting_key(__FUNCTION__);
-	$option = get_option($setting_key);
+	$option = get_option($setting_key, 200);
 
 	echo show_textfield(array('name' => $setting_key, 'value' => $option, 'type' => 'number', 'suffix' => __("0 or empty means infinte", 'lang_group')));
 }
