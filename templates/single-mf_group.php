@@ -157,11 +157,6 @@ get_header();
 
 				else
 				{
-					/*if(is_user_logged_in() && IS_ADMIN)
-					{
-						error_log("Group 404: ".var_export($_REQUEST, true).", ".var_export($post, true));
-					}*/
-
 					wp_redirect("/404/");
 				}
 			}

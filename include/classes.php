@@ -111,6 +111,26 @@ class mf_group
 		}
 	}
 
+	function send_acceptance_message($data)
+	{
+		$strGroupAcceptanceSubject = get_post_meta_or_default($data['group_id'], 'group_acceptance_subject', true, __("Accept subscription to %s", 'lang_group'));
+		$strGroupAcceptanceText = get_post_meta_or_default($data['group_id'], 'group_acceptance_text', true, __("You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below.", 'lang_group'));
+
+		$obj_address = new mf_address();
+
+		$strAddressEmail = $obj_address->get_address($data['address_id']);
+		$strGroupName = $this->get_name($data['group_id']);
+
+		$mail_to = $strAddressEmail;
+		$mail_subject = sprintf($strGroupAcceptanceSubject, $strGroupName);
+		$mail_content = sprintf($strGroupAcceptanceText, $strGroupName);
+
+		$subscribe_link = get_email_link(array('type' => "subscribe", 'group_id' => $data['group_id'], 'email' => $strAddressEmail));
+		$mail_content .= "<p>&nbsp;</p><p><a href='".$subscribe_link."'>".__("Accept Link", 'lang_group')."</a></p>";
+
+		return send_email(array('to' => $mail_to, 'subject' => $mail_subject, 'content' => $mail_content));
+	}
+
 	function add_address($data)
 	{
 		global $wpdb;
@@ -127,22 +147,7 @@ class mf_group
 
 				if($setting_group_acceptance_email == 'yes')
 				{
-					$strGroupAcceptanceSubject = get_post_meta_or_default($data['group_id'], 'group_acceptance_subject', true, __("Accept subscription to %s", 'lang_group'));
-					$strGroupAcceptanceText = get_post_meta_or_default($data['group_id'], 'group_acceptance_text', true, __("You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below.", 'lang_group'));
-
-					$obj_address = new mf_address();
-
-					$strAddressEmail = $obj_address->get_address($data['address_id']);
-					$strGroupName = $this->get_name($data['group_id']);
-
-					$mail_to = $strAddressEmail;
-					$mail_subject = sprintf($strGroupAcceptanceSubject, $strGroupName);
-					$mail_content = sprintf($strGroupAcceptanceText, $strGroupName);
-
-					$subscribe_link = get_email_link(array('type' => "subscribe", 'group_id' => $data['group_id'], 'email' => $strAddressEmail));
-					$mail_content .= "<p>&nbsp;</p><p><a href='".$subscribe_link."'>".__("Accept Link", 'lang_group')."</a></p>";
-
-					$sent = send_email(array('to' => $mail_to, 'subject' => $mail_subject, 'content' => $mail_content));
+					$this->send_acceptance_message($data);
 				}
 			}
 		}
@@ -168,11 +173,22 @@ class mf_group
 		$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->base_prefix."address2group WHERE groupID = '%d'", $group_id));
 	}
 
-	function amount_in_group()
+	function amount_in_group($data = array())
 	{
 		global $wpdb;
 
-		return $wpdb->get_var($wpdb->prepare("SELECT COUNT(addressID) FROM ".$wpdb->base_prefix."address INNER JOIN ".$wpdb->base_prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' AND groupAccepted = '1' AND groupUnsubscribed = '0'", $this->id));
+		if(!isset($data['id'])){				$data['id'] = $this->id;}
+		if(!isset($data['accepted'])){			$data['accepted'] = 1;}
+		if(!isset($data['unsubscribed'])){		$data['unsubscribed'] = 0;}
+
+		$query_where = "";
+
+		if($data['id'] > 0)
+		{
+			$query_where .= " AND groupID = '".esc_sql($data['id'])."'";
+		}
+
+		return $wpdb->get_var($wpdb->prepare("SELECT COUNT(addressID) FROM ".$wpdb->base_prefix."address INNER JOIN ".$wpdb->base_prefix."address2group USING (addressID) WHERE addressDeleted = '0' AND groupAccepted = '%d' AND groupUnsubscribed = '%d'".$query_where, $data['accepted'], $data['unsubscribed']));
 	}
 }
 
@@ -347,7 +363,8 @@ class mf_group_table extends mf_list_table
 			),
 		));
 
-		$rowsAddressesNotAccepted = $wpdb->get_var("SELECT COUNT(addressID) FROM ".$wpdb->base_prefix."address INNER JOIN ".$wpdb->base_prefix."address2group USING (addressID) WHERE addressDeleted = '0' AND groupAccepted = '0'");
+		$obj_group = new mf_group();
+		$rowsAddressesNotAccepted = $obj_group->amount_in_group(array('id' => 0, 'accepted' => 0));
 
 		$arr_columns = array(
 			'cb' => '<input type="checkbox">',
@@ -382,6 +399,8 @@ class mf_group_table extends mf_list_table
 
 		$post_id = $item['ID'];
 		$post_status = $item['post_status'];
+		
+		$obj_group = new mf_group($post_id);
 
 		switch($column_name)
 		{
@@ -405,7 +424,6 @@ class mf_group_table extends mf_list_table
 					$actions['addnremove'] = "<a href='?page=mf_address/list/index.php&intGroupID=".$post_id."'>".__("Add or remove", 'lang_group')."</a>";
 					$actions['import'] = "<a href='?page=mf_group/import/index.php&intGroupID=".$post_id."'>".__("Import", 'lang_group')."</a>";
 
-					$obj_group = new mf_group($post_id);
 					$amount = $obj_group->amount_in_group();
 
 					if($amount > 0)
@@ -441,7 +459,6 @@ class mf_group_table extends mf_list_table
 			break;
 
 			case 'amount':
-				$obj_group = new mf_group($post_id);
 				$amount = $obj_group->amount_in_group();
 
 				$actions = array();
@@ -464,7 +481,7 @@ class mf_group_table extends mf_list_table
 			break;
 
 			case 'not_accepted':
-				$rowsAddressesNotAccepted = $wpdb->get_var($wpdb->prepare("SELECT COUNT(addressID) FROM ".$wpdb->base_prefix."address INNER JOIN ".$wpdb->base_prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' AND groupAccepted = '0'", $post_id));
+				$rowsAddressesNotAccepted = $obj_group->amount_in_group(array('accepted' => 0));
 
 				$out .= $rowsAddressesNotAccepted;
 			break;
