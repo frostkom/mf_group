@@ -110,6 +110,10 @@ if(isset($_POST['btnGroupSend']) && count($arrGroupID) > 0 && wp_verify_nonce($_
 else if($intEmailTextSource > 0)
 {
 	$strMessageText = $wpdb->get_var($wpdb->prepare("SELECT post_content FROM ".$wpdb->posts." WHERE post_type = 'page' AND post_status = 'publish' AND ID = '%d'", $intEmailTextSource));
+
+	$user_data = get_userdata(get_current_user_id());
+
+	$strMessageText = str_replace("[name]", $user_data->display_name, $strMessageText);
 }
 
 else if($intMessageID > 0)
@@ -225,18 +229,8 @@ echo "<div class='wrap'>
 				<div id='postbox-container-1'>
 					<div class='postbox'>
 						<h3 class='hndle'>".__("Send", 'lang_group')."</h3>
-						<div class='inside'>";
-
-							if($type == "email")
-							{
-								$arr_data_source = array();
-								get_post_children(array('add_choose_here' => true), $arr_data_source);
-
-								echo show_select(array('data' => $arr_data_source, 'name' => 'intEmailTextSource', 'text' => __("Text Source", 'lang_group'), 'xtra' => "rel='submit_change' disabled"))
-								.get_media_button(array('name' => "strMessageAttachment", 'value' => $strMessageAttachment));
-							}
-
-							echo show_button(array('name' => "btnGroupSend", 'text' => __("Send", 'lang_group')))
+						<div class='inside'>"
+							.show_button(array('name' => "btnGroupSend", 'text' => __("Send", 'lang_group')))
 							.wp_nonce_field('group_send_'.$type, '_wpnonce', true, false);
 
 							if($type == "sms")
@@ -246,8 +240,23 @@ echo "<div class='wrap'>
 
 							echo input_hidden(array('name' => "type", 'value' => $type))
 						."</div>
-					</div>
-				</div>
+					</div>";
+
+					if($type == "email")
+					{
+						$arr_data_source = array();
+						get_post_children(array('add_choose_here' => true), $arr_data_source);
+
+						echo "<div class='postbox'>
+							<h3 class='hndle'>".__("Advanced", 'lang_group')."</h3>
+							<div class='inside'>"
+								.show_select(array('data' => $arr_data_source, 'name' => 'intEmailTextSource', 'text' => __("Text Source", 'lang_group'), 'xtra' => "rel='submit_change' disabled"))
+								.get_media_button(array('name' => "strMessageAttachment", 'value' => $strMessageAttachment))
+							."</div>
+						</div>";
+					}
+
+				echo "</div>
 			<div>
 		</form>
 	</div>

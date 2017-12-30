@@ -399,7 +399,7 @@ class mf_group_table extends mf_list_table
 
 		$post_id = $item['ID'];
 		$post_status = $item['post_status'];
-		
+
 		$obj_group = new mf_group($post_id);
 
 		switch($column_name)

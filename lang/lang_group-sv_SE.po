@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-11-30 15:49+0100\n"
+"POT-Creation-Date: 2017-12-30 10:32+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -22,23 +22,23 @@ msgid "The information was not submitted, contact an admin if this persists"
 msgstr "Informationen las inte in, kontakta en administratör om problemet kvarstår"
 
 #: ../create/index.php:112
-#: ../include/classes.php:343
+#: ../include/classes.php:359
 msgid "Public"
 msgstr "Publik"
 
 #: ../create/index.php:113
-#: ../include/classes.php:344
+#: ../include/classes.php:360
 msgid "Not Public"
 msgstr "Inte publik"
 
 #: ../create/index.php:114
-#: ../include/classes.php:345
+#: ../include/classes.php:361
 msgid "Inactive"
 msgstr "Inaktiv"
 
 #: ../create/index.php:118
-#: ../include/classes.php:232
-#: ../include/classes.php:285
+#: ../include/classes.php:248
+#: ../include/classes.php:301
 #: ../include/functions.php:159
 #: ../include/functions.php:160
 #: ../include/functions.php:161
@@ -58,7 +58,7 @@ msgstr "Lägg till"
 
 #: ../create/index.php:127
 #: ../create/index.php:192
-#: ../include/classes.php:354
+#: ../include/classes.php:371
 #: ../include/functions.php:612
 msgid "Name"
 msgstr "Namn"
@@ -66,8 +66,8 @@ msgstr "Namn"
 #: ../create/index.php:137
 #: ../include/functions.php:50
 #: ../include/functions.php:234
-#: ../send/index.php:172
-#: ../send/index.php:202
+#: ../send/index.php:176
+#: ../send/index.php:206
 msgid "Choose here"
 msgstr "Välj här"
 
@@ -84,25 +84,25 @@ msgid "Send before adding to a group"
 msgstr "Skicka före man läggs till i en grupp"
 
 #: ../create/index.php:157
-#: ../send/index.php:188
+#: ../send/index.php:192
 #: ../sent/index.php:30
 msgid "Subject"
 msgstr "Ämne"
 
 #: ../create/index.php:157
-#: ../include/classes.php:130
+#: ../include/classes.php:116
 #, php-format
 msgid "Accept subscription to %s"
 msgstr "Bekräfta prenumeration till %s"
 
 #: ../create/index.php:158
-#: ../send/index.php:135
-#: ../send/index.php:219
+#: ../send/index.php:139
+#: ../send/index.php:223
 msgid "Message"
 msgstr "Meddelande"
 
 #: ../create/index.php:158
-#: ../include/classes.php:131
+#: ../include/classes.php:117
 #, php-format
 msgid "You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below."
 msgstr "Du har blivit tillagd i gruppen %s men kommer inte att få några meddelanden förrän du har bekräftat prenumerationen genom att klicka på länken nedan."
@@ -187,13 +187,13 @@ msgstr "Gruppen uppdaterades inte med någon adress"
 
 #: ../import/index.php:108
 #: ../import/index.php:115
-#: ../include/classes.php:406
+#: ../include/classes.php:425
 #: ../include/functions.php:288
 msgid "Import"
 msgstr "Importera"
 
 #: ../import/index.php:114
-#: ../include/classes.php:284
+#: ../include/classes.php:300
 msgid "Text"
 msgstr "Text"
 
@@ -217,92 +217,92 @@ msgstr "Gruppen skapades"
 msgid "The group was updated"
 msgstr "Gruppen uppdaterades"
 
-#: ../include/classes.php:143
+#: ../include/classes.php:129
 msgid "Accept Link"
 msgstr "Bekräftelselänk"
 
-#: ../include/classes.php:222
+#: ../include/classes.php:238
 msgid "Display a group registration form"
 msgstr "Visa ett registreringsformulär till en grupp"
 
-#: ../include/classes.php:232
+#: ../include/classes.php:248
 msgid "Newsletter"
 msgstr "Nyhetsbrev"
 
-#: ../include/classes.php:283
+#: ../include/classes.php:299
 msgid "Heading"
 msgstr "Rubrik"
 
-#: ../include/classes.php:286
+#: ../include/classes.php:302
 msgid "Button Text"
 msgstr "Knapptext"
 
-#: ../include/classes.php:286
+#: ../include/classes.php:302
 #: ../include/functions.php:467
 msgid "Join"
 msgstr "Gå med"
 
-#: ../include/classes.php:342
+#: ../include/classes.php:358
 msgid "All"
 msgstr "Alla"
 
-#: ../include/classes.php:346
+#: ../include/classes.php:362
 msgid "Trash"
 msgstr "Papperskorg"
 
-#: ../include/classes.php:356
+#: ../include/classes.php:373
 msgid "Amount"
 msgstr "Antal"
 
-#: ../include/classes.php:361
+#: ../include/classes.php:378
 msgid "Not Accepted"
 msgstr "Inte bekräftad"
 
-#: ../include/classes.php:364
+#: ../include/classes.php:381
 msgid "Unsubscribed"
 msgstr "Avregistrerade"
 
-#: ../include/classes.php:365
+#: ../include/classes.php:382
 msgid "User"
 msgstr "Användare"
 
-#: ../include/classes.php:366
-#: ../include/classes.php:504
+#: ../include/classes.php:383
+#: ../include/classes.php:521
 #: ../include/functions.php:285
 #: ../sent/index.php:21
 #: ../sent/index.php:31
 msgid "Sent"
 msgstr "Skickat"
 
-#: ../include/classes.php:398
+#: ../include/classes.php:417
 msgid "Edit"
 msgstr "Redigera"
 
-#: ../include/classes.php:402
+#: ../include/classes.php:421
 msgid "Delete"
 msgstr "Radera"
 
-#: ../include/classes.php:405
+#: ../include/classes.php:424
 msgid "Add or remove"
 msgstr "Lägg till/ta bort"
 
-#: ../include/classes.php:413
+#: ../include/classes.php:431
 msgid "CSV"
 msgstr "CSV"
 
-#: ../include/classes.php:417
+#: ../include/classes.php:435
 msgid "XLS"
 msgstr "XLS"
 
-#: ../include/classes.php:424
+#: ../include/classes.php:442
 msgid "Recover"
 msgstr "Återställ"
 
-#: ../include/classes.php:485
+#: ../include/classes.php:502
 msgid "Test"
 msgstr "Testa"
 
-#: ../include/classes.php:519
+#: ../include/classes.php:536
 #, php-format
 msgid "Will be sent %s"
 msgstr "Kommer att skickas %s"
@@ -386,31 +386,35 @@ msgstr "Det blev ett fel när meddelandet skulle sparas"
 msgid "The message was not sent to anybody"
 msgstr "Meddelandet skickades inte till någon"
 
-#: ../send/index.php:128
+#: ../send/index.php:132
 msgid "Send message"
 msgstr "Skicka meddelande"
 
-#: ../send/index.php:152
+#: ../send/index.php:156
 msgid "If you don't want to get these messages in the future click this link to unsubscribe"
 msgstr "Om du inte vill ha dessa meddelanden i framtiden, klicka på länken för att avregistrera dig"
 
-#: ../send/index.php:187
-#: ../send/index.php:217
+#: ../send/index.php:191
+#: ../send/index.php:221
 #: ../sent/index.php:29
 msgid "From"
 msgstr "Från"
 
-#: ../send/index.php:190
-#: ../send/index.php:218
+#: ../send/index.php:194
+#: ../send/index.php:222
 msgid "To"
 msgstr "Till"
 
-#: ../send/index.php:227
-#: ../send/index.php:239
+#: ../send/index.php:231
+#: ../send/index.php:233
 msgid "Send"
 msgstr "Skicka"
 
-#: ../send/index.php:235
+#: ../send/index.php:251
+msgid "Advanced"
+msgstr "Avancerat"
+
+#: ../send/index.php:253
 msgid "Text Source"
 msgstr "Textkälla"
 
