@@ -139,7 +139,7 @@ echo "<div class='wrap'>
 
 						if($strMessageAttachment != '')
 						{
-							echo "<tr><td colspan='".count($arr_header)."'>".get_media_button(array('name' => "strMessageAttachment", 'value' => $strMessageAttachment, 'show_add_button' => false))."</td></tr>";
+							echo "<tr><td colspan='".count($arr_header)."'>".get_media_button(array('name' => 'strMessageAttachment', 'value' => $strMessageAttachment, 'show_add_button' => false))."</td></tr>";
 						}
 					}
 				}

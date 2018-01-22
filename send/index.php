@@ -251,7 +251,7 @@ echo "<div class='wrap'>
 							<h3 class='hndle'>".__("Advanced", 'lang_group')."</h3>
 							<div class='inside'>"
 								.show_select(array('data' => $arr_data_source, 'name' => 'intEmailTextSource', 'text' => __("Text Source", 'lang_group'), 'xtra' => "rel='submit_change' disabled"))
-								.get_media_button(array('name' => "strMessageAttachment", 'value' => $strMessageAttachment))
+								.get_media_button(array('name' => 'strMessageAttachment', 'value' => $strMessageAttachment))
 							."</div>
 						</div>";
 					}
