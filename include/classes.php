@@ -170,7 +170,7 @@ class mf_group
 
 		$user_data = get_userdata(get_current_user_id());
 
-		error_log("Deleted all (GID: ".$group_id.", User: ".$user_data->display_name.")");
+		error_log("Deleted all (GID: ".$group_id." (".$this->get_name($group_id)."), User: ".$user_data->display_name.")");
 
 		$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->base_prefix."address2group WHERE groupID = '%d'", $group_id));
 	}
@@ -538,6 +538,12 @@ class mf_group_table extends mf_list_table
 								$out .= "<i class='fa fa-spinner fa-spin fa-lg'></i> ".sprintf(__("Will be sent %s", 'lang_group'), get_next_cron())
 								."<i class='set_tr_color' rel='yellow'></i>";
 							}
+						}
+
+						else if($intMessageSent < ($intMessageSent + $intMessageNotSent))
+						{
+							$out .= "<i class='fa fa-spinner fa-spin fa-lg'></i> ".__("Is sending", 'lang_group')
+							."<i class='set_tr_color' rel='yellow'></i>";
 						}
 
 						else

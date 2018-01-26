@@ -328,18 +328,24 @@ function cron_group()
 	{
 		$emails_left_to_send = $setting_emails_per_hour;
 
-		$wpdb->get_results("SELECT messageID FROM ".$wpdb->base_prefix."email_message WHERE messageFrom = '' AND messageCreated > DATE_SUB(NOW(), INTERVAL 1 HOUR)");
-		$emails_left_to_send -= $wpdb->num_rows;
+		if($emails_left_to_send > 0)
+		{
+			$wpdb->get_results("SELECT messageID FROM ".$wpdb->base_prefix."email_message WHERE messageFrom = '' AND messageCreated > DATE_SUB(NOW(), INTERVAL 1 HOUR)");
+			$emails_left_to_send -= $wpdb->num_rows;
+		}
 
-		$wpdb->get_results("SELECT queueID FROM ".$wpdb->base_prefix."group_queue WHERE queueSent = '1' AND queueSentTime > DATE_SUB(NOW(), INTERVAL 1 HOUR)");
-		$emails_left_to_send -= $wpdb->num_rows;
+		if($emails_left_to_send > 0)
+		{
+			$wpdb->get_results("SELECT queueID FROM ".$wpdb->base_prefix."group_queue WHERE queueSent = '1' AND queueSentTime > DATE_SUB(NOW(), INTERVAL 1 HOUR)");
+			$emails_left_to_send -= $wpdb->num_rows;
+		}
 
 		$query_limit = " LIMIT 0, ".$emails_left_to_send;
 	}
 
 	$i = 0;
 
-	$result = $wpdb->get_results("SELECT groupID FROM ".$wpdb->base_prefix."group_queue INNER JOIN ".$wpdb->base_prefix."group_message USING (messageID) WHERE queueSent = '0' GROUP BY groupID ORDER BY RAND()");
+	$result = $wpdb->get_results("SELECT groupID FROM ".$wpdb->base_prefix."group_queue INNER JOIN ".$wpdb->base_prefix."group_message USING (messageID) WHERE queueSent = '0' AND (messageSchedule IS NULL OR messageSchedule < NOW()) GROUP BY groupID ORDER BY RAND()");
 
 	foreach($result as $r)
 	{

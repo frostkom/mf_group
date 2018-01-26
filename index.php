@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: 
-Version: 4.3.9
+Version: 4.3.10
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: http://frostkom.se
@@ -63,13 +63,17 @@ function activate_group()
 		messageName VARCHAR(60),
 		messageText TEXT,
 		messageAttachment TEXT,
+		messageSchedule DATETIME DEFAULT NULL,
 		messageCreated DATETIME,
 		userID INT unsigned NOT NULL DEFAULT '0',
 		PRIMARY KEY (messageID),
 		KEY groupID (groupID)
 	) DEFAULT CHARSET=".$default_charset);
 
-	$arr_add_column[$wpdb->base_prefix."group_message"]['messageAttachment'] = "ALTER TABLE [table] ADD [column] TEXT AFTER messageText";
+	$arr_add_column[$wpdb->base_prefix."group_message"] = array(
+		'messageAttachment' => "ALTER TABLE [table] ADD [column] TEXT AFTER messageText",
+		'messageSchedule' => "ALTER TABLE [table] ADD [column] DATETIME DEFAULT NULL AFTER messageAttachment",
+	);
 
 	$arr_add_index[$wpdb->base_prefix."group_message"] = array(
 		'groupID' => "ALTER TABLE [table] ADD INDEX [column] ([column])",

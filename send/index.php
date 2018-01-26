@@ -16,6 +16,8 @@ $intMessageID = check_var('intMessageID');
 $strMessageFrom = check_var('strMessageFrom', 'char', true, $obj_group->get_from_last());
 $strMessageName = check_var('strMessageName');
 $strMessageText_orig = $strMessageText = check_var('strMessageText', 'raw');
+$dteMessageScheduleDate = check_var('dteMessageScheduleDate');
+$dteMessageScheduleTime = check_var('dteMessageScheduleTime');
 $strMessageAttachment = check_var('strMessageAttachment');
 $intEmailTextSource = check_var('intEmailTextSource');
 
@@ -61,7 +63,9 @@ if(isset($_POST['btnGroupSend']) && count($arrGroupID) > 0 && wp_verify_nonce($_
 
 				if($wpdb->num_rows > 0)
 				{
-					$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->base_prefix."group_message SET groupID = '%d', messageType = %s, messageFrom = %s, messageName = %s, messageText = %s, messageAttachment = %s, messageCreated = NOW(), userID = '%d'", $intGroupID, $type, $strMessageFrom, $strMessageName, $strMessageText, $strMessageAttachment, get_current_user_id()));
+					$dteMessageSchedule = $dteMessageScheduleDate != '' && $dteMessageScheduleTime != '' ? $dteMessageScheduleDate." ".$dteMessageScheduleTime : '';
+
+					$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->base_prefix."group_message SET groupID = '%d', messageType = %s, messageFrom = %s, messageName = %s, messageText = %s, messageAttachment = %s, messageSchedule = %s, messageCreated = NOW(), userID = '%d'", $intGroupID, $type, $strMessageFrom, $strMessageName, $strMessageText, $strMessageAttachment, $dteMessageSchedule, get_current_user_id()));
 
 					$intMessageID = $wpdb->insert_id;
 
@@ -149,78 +153,79 @@ echo "<div class='wrap'>
 								$arr_data_to[$r->ID] = $r->post_title;
 							}
 
-							if($type == "email")
+							switch($type)
 							{
-								if($strMessageText_orig == '')
-								{
-									$strMessageText .= "<p>&nbsp;</p><p><a href='[unsubscribe_link]'>".__("If you don't want to get these messages in the future click this link to unsubscribe", 'lang_group')."</a></p>";
-								}
+								case 'email':
+									if($strMessageText_orig == '')
+									{
+										$strMessageText .= "<p>&nbsp;</p><p><a href='[unsubscribe_link]'>".__("If you don't want to get these messages in the future click this link to unsubscribe", 'lang_group')."</a></p>";
+									}
 
-								if(is_plugin_active("mf_email/index.php"))
-								{
-									$obj_email = new mf_email();
-									$arr_data_from = $obj_email->get_from_for_select(array('index' => 'address'));
-								}
+									if(is_plugin_active("mf_email/index.php"))
+									{
+										$obj_email = new mf_email();
+										$arr_data_from = $obj_email->get_from_for_select(array('index' => 'address'));
+									}
 
-								else
-								{
-									$current_user = wp_get_current_user();
+									else
+									{
+										$current_user = wp_get_current_user();
 
-									$user_name = $current_user->display_name;
-									$user_email = $current_user->user_email;
-									$admin_name = get_bloginfo('name');
-									$admin_email = get_bloginfo('admin_email');
+										$user_name = $current_user->display_name;
+										$user_email = $current_user->user_email;
+										$admin_name = get_bloginfo('name');
+										$admin_email = get_bloginfo('admin_email');
+
+										$arr_data_from = array();
+
+										$arr_data_from[''] = "-- ".__("Choose here", 'lang_group')." --";
+
+										if($user_email != '')
+										{
+											$arr_data_from[$user_name."|".$user_email] = $user_name." (".$user_email.")";
+										}
+
+										if($admin_email != '' && $admin_email != $user_email)
+										{
+											$arr_data_from[$admin_name."|".$admin_email] = $admin_name." (".$admin_email.")";
+										}
+									}
+
+									echo "<div class='flex_flow'>
+										<div>"
+											.show_select(array('data' => $arr_data_from, 'name' => 'strMessageFrom', 'text' => __("From", 'lang_group'), 'value' => $strMessageFrom, 'required' => true))
+											.show_textfield(array('name' => "strMessageName", 'text' => __("Subject", 'lang_group'), 'value' => $strMessageName, 'required' => true))
+										."</div>"
+										.show_select(array('data' => $arr_data_to, 'name' => 'arrGroupID[]', 'text' => __("To", 'lang_group'), 'value' => $arrGroupID, 'maxsize' => 5))
+									."</div>"
+									.show_wp_editor(array('name' => 'strMessageText', 'value' => $strMessageText));
+								break;
+
+								case 'sms':
+									$sms_senders = get_option('setting_sms_senders');
+									$sms_phone = get_user_meta(get_current_user_id(), 'mf_sms_phone', true);
 
 									$arr_data_from = array();
 
 									$arr_data_from[''] = "-- ".__("Choose here", 'lang_group')." --";
 
-									if($user_email != '')
+									foreach(explode(",", $sms_senders) as $sender)
 									{
-										$arr_data_from[$user_name."|".$user_email] = $user_name." (".$user_email.")";
+										if($sender != '')
+										{
+											$arr_data_from[$sender] = $sender;
+										}
 									}
 
-									if($admin_email != '' && $admin_email != $user_email)
+									if($sms_phone != '')
 									{
-										$arr_data_from[$admin_name."|".$admin_email] = $admin_name." (".$admin_email.")";
+										$arr_data_from[$sms_phone] = $sms_phone;
 									}
-								}
 
-								echo "<div class='flex_flow'>
-									<div>"
-										.show_select(array('data' => $arr_data_from, 'name' => 'strMessageFrom', 'text' => __("From", 'lang_group'), 'value' => $strMessageFrom, 'required' => true))
-										.show_textfield(array('name' => "strMessageName", 'text' => __("Subject", 'lang_group'), 'value' => $strMessageName, 'required' => true))
-									."</div>"
+									echo show_select(array('data' => $arr_data_from, 'name' => 'strMessageFrom', 'text' => __("From", 'lang_group'), 'value' => $strMessageFrom, 'required' => true))
 									.show_select(array('data' => $arr_data_to, 'name' => 'arrGroupID[]', 'text' => __("To", 'lang_group'), 'value' => $arrGroupID, 'maxsize' => 5))
-								."</div>"
-								.show_wp_editor(array('name' => 'strMessageText', 'value' => $strMessageText));
-							}
-
-							else if($type == "sms")
-							{
-								$sms_senders = get_option('setting_sms_senders');
-								$sms_phone = get_user_meta(get_current_user_id(), 'mf_sms_phone', true);
-
-								$arr_data_from = array();
-
-								$arr_data_from[''] = "-- ".__("Choose here", 'lang_group')." --";
-
-								foreach(explode(",", $sms_senders) as $sender)
-								{
-									if($sender != '')
-									{
-										$arr_data_from[$sender] = $sender;
-									}
-								}
-
-								if($sms_phone != '')
-								{
-									$arr_data_from[$sms_phone] = $sms_phone;
-								}
-
-								echo show_select(array('data' => $arr_data_from, 'name' => 'strMessageFrom', 'text' => __("From", 'lang_group'), 'value' => $strMessageFrom, 'required' => true))
-								.show_select(array('data' => $arr_data_to, 'name' => 'arrGroupID[]', 'text' => __("To", 'lang_group'), 'value' => $arrGroupID, 'maxsize' => 5))
-								.show_textarea(array('name' => "strMessageText", 'text' => __("Message", 'lang_group'), 'value' => $strMessageText, 'required' => true));
+									.show_textarea(array('name' => "strMessageText", 'text' => __("Message", 'lang_group'), 'value' => $strMessageText, 'required' => true));
+								break;
 							}
 
 						echo "</div>
@@ -231,11 +236,18 @@ echo "<div class='wrap'>
 						<h3 class='hndle'>".__("Send", 'lang_group')."</h3>
 						<div class='inside'>"
 							.show_button(array('name' => "btnGroupSend", 'text' => __("Send", 'lang_group')))
+							."<div class='flex_flow'>"
+								.show_textfield(array('type' => 'date', 'name' => 'dteMessageScheduleDate', 'text' => __("Schedule", 'lang_group'), 'value' => $dteMessageScheduleDate, 'placeholder' => date("Y-m-d")))
+								.show_textfield(array('type' => 'time', 'name' => 'dteMessageScheduleTime', 'text' => "&nbsp;", 'value' => $dteMessageScheduleTime, 'placeholder' => date("H:i")))
+							."</div>
+							<p class='description'>".__("Choose date and time to send the message", 'lang_group')."</p>"
 							.wp_nonce_field('group_send_'.$type, '_wpnonce', true, false);
 
-							if($type == "sms")
+							switch($type)
 							{
-								echo " <span id='chars_left'></span> (<span id='sms_amount'>1</span>)";
+								case 'sms':
+									echo " <span id='chars_left'></span> (<span id='sms_amount'>1</span>)";
+								break;
 							}
 
 							echo input_hidden(array('name' => "type", 'value' => $type))

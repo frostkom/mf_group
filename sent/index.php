@@ -21,13 +21,14 @@ echo "<div class='wrap'>
 	<h2>".__("Sent", 'lang_group')."</h2>"
 	.get_notification();
 
-	$result = $wpdb->get_results($wpdb->prepare("SELECT messageID, messageType, messageFrom, messageName, messageText, messageAttachment, messageCreated FROM ".$wpdb->base_prefix."group_message WHERE groupID = '%d' ORDER BY messageCreated DESC", $intGroupID));
+	$result = $wpdb->get_results($wpdb->prepare("SELECT messageID, messageType, messageFrom, messageName, messageText, messageAttachment, messageSchedule, messageCreated FROM ".$wpdb->base_prefix."group_message WHERE groupID = '%d' ORDER BY messageCreated DESC", $intGroupID));
 
 	echo "<table class='widefat striped'>";
 
 		$arr_header[] = __("Type", 'lang_group');
 		$arr_header[] = __("From", 'lang_group');
 		$arr_header[] = __("Subject", 'lang_group');
+		$arr_header[] = __("Scheduled", 'lang_group');
 		$arr_header[] = __("Sent", 'lang_group');
 		$arr_header[] = __("Created", 'lang_group');
 
@@ -49,6 +50,7 @@ echo "<div class='wrap'>
 					$strMessageName = $r->messageName;
 					$strMessageText = $r->messageText;
 					$strMessageAttachment = $r->messageAttachment;
+					$dteMessageSchedule = $r->messageSchedule;
 					$dteMessageCreated = $r->messageCreated;
 
 					$strMessageFromName = "";
@@ -79,6 +81,11 @@ echo "<div class='wrap'>
 						}
 					}
 
+					else if($intMessageSent < ($intMessageSent + $intMessageNotSent))
+					{
+						$class = "yellow";
+					}
+
 					echo "<tr id='message_".$intMessageID2."'".($class != '' ? " class='".$class."'" : "").">
 						<td>"
 							.$strMessageType
@@ -100,6 +107,14 @@ echo "<div class='wrap'>
 
 						echo "</td>
 						<td>".$strMessageName."</td>
+						<td>";
+						
+							if($dteMessageSchedule > DEFAULT_DATE)
+							{
+								echo format_date($dteMessageSchedule);
+							}
+							
+						echo "</td>
 						<td>"
 							.$intMessageSent." / ".($intMessageSent + $intMessageNotSent);
 
