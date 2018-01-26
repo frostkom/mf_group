@@ -125,8 +125,10 @@ class mf_group
 		$mail_subject = sprintf($strGroupAcceptanceSubject, $strGroupName);
 		$mail_content = sprintf($strGroupAcceptanceText, $strGroupName);
 
-		$subscribe_link = get_email_link(array('type' => "subscribe", 'group_id' => $data['group_id'], 'email' => $strAddressEmail));
-		$mail_content .= "<p>&nbsp;</p><p><a href='".$subscribe_link."'>".__("Accept Link", 'lang_group')."</a></p>";
+		$mail_content .= "<p>&nbsp;</p>
+		<p>
+			<a href='".get_group_url(array('type' => 'subscribe', 'group_id' => $data['group_id'], 'email' => $strAddressEmail))."'>".__("Accept Link", 'lang_group')."</a>
+		</p>";
 
 		return send_email(array('to' => $mail_to, 'subject' => $mail_subject, 'content' => $mail_content));
 	}
@@ -499,7 +501,7 @@ class mf_group_table extends mf_list_table
 					$user_email = $current_user->user_email;
 
 					$out .= "<div class='row-actions'>
-						<a href='".get_email_link(array('type' => "unsubscribe", 'group_id' => $post_id, 'email' => $user_email))."'>".__("Test", 'lang_group')."</a>
+						<a href='".get_group_url(array('type' => 'unsubscribe', 'group_id' => $post_id, 'email' => $user_email))."'>".__("Test", 'lang_group')."</a>
 					</div>";
 				}
 			break;

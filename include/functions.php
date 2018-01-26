@@ -289,7 +289,7 @@ function menu_group()
 	add_submenu_page($menu_root, $menu_title, $menu_title, $menu_capability, $menu_root."import/index.php");
 }
 
-function get_email_link($data)
+function get_group_url($data)
 {
 	global $wpdb;
 
@@ -344,8 +344,20 @@ function cron_group()
 	foreach($result as $r)
 	{
 		$intGroupID = $r->groupID;
+		$strGroupPublic = get_post_status($intGroupID);
+		
+		if($strGroupPublic == 'public')
+		{
+			$group_url = get_permalink($intGroupID);
+		}
 
 		$intGroupVerifyLink = get_post_meta($intGroupID, $obj_group->meta_prefix.'verify_link', true);
+
+		$intGroupUnsubscribeEmail = get_post_meta($intGroupID, $obj_group->meta_prefix.'unsubscribe_email', true);
+		$intGroupSubscribeEmail = get_post_meta($intGroupID, $obj_group->meta_prefix.'subscribe_email', true);
+		$intGroupOwnerEmail = get_post_meta($intGroupID, $obj_group->meta_prefix.'owner_email', true);
+		$intGroupHelpPage = get_post_meta($intGroupID, $obj_group->meta_prefix.'help_page', true);
+		$intGroupArchivePage = get_post_meta($intGroupID, $obj_group->meta_prefix.'archive_page', true);
 
 		$resultMessages = $wpdb->get_results($wpdb->prepare("SELECT addressEmail, addressCellNo, queueID, messageType, messageFrom, messageName, messageText, messageAttachment, ".$wpdb->base_prefix."group_message.userID FROM ".$wpdb->base_prefix."address INNER JOIN ".$wpdb->base_prefix."group_queue USING (addressID) INNER JOIN ".$wpdb->base_prefix."group_message USING (messageID) WHERE groupID = '%d' AND queueSent = '0' ORDER BY messageType ASC, queueCreated ASC".$query_limit, $intGroupID));
 
@@ -382,19 +394,72 @@ function cron_group()
 						$strMessageFromName = $strMessageFrom;
 					}
 
+					$unsubscribe_url = get_group_url(array('type' => "unsubscribe", 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
+
 					$mail_headers = "From: ".$strMessageFromName." <".$strMessageFrom.">\r\n";
+
+					/*if($intGroupUnsubscribeEmail > 0)
+					{
+						$mail_headers .= "List-Unsubscribe: <mailto:".$."?subject=Unsubscribe>";
+
+							if($strGroupPublic == 'public')
+							{
+								$mail_headers .= ", <".$unsubscribe_url.">";
+							}
+
+						$mail_headers .= "\r\n";
+					}
+
+					else
+					{*/
+						$mail_headers .= "List-Unsubscribe: <".$unsubscribe_url.">\r\n";
+					//}
+
+					/*if($intGroupSubscribeEmail > 0)
+					{
+						$mail_headers .= "List-Subscribe: <mailto:".$."?subject=Subscribe>";
+
+							if($strGroupPublic == 'public')
+							{
+								$mail_headers .= ", <".$group_url.">";
+							}
+
+						$mail_headers .= "\r\n";
+					}
+
+					else */if($strGroupPublic == 'public')
+					{
+						$mail_headers .= "List-Subscribe: <".$group_url.">\r\n";
+					}
+
+					if($intGroupOwnerEmail > 0)
+					{
+						$mail_headers .= "List-Owner: <mailto:".get_email_address_from_id($intGroupOwnerEmail).">\r\n";
+					}
+
+					if($intGroupHelpPage > 0)
+					{
+						$mail_headers .= "List-Help: <".get_permalink($intGroupHelpPage).">\r\n";
+					}
+
+					else if($strGroupPublic == 'public')
+					{
+						$mail_headers .= "List-Help: <".$group_url.">\r\n";
+					}
+
+					if($intGroupArchivePage > 0)
+					{
+						$mail_headers .= "List-Archive: <".get_permalink($intGroupArchivePage).">\r\n";
+					}
 
 					$mail_to = $strAddressEmail;
 					$mail_subject = $strMessageName;
 					$mail_content = stripslashes(apply_filters('the_content', $strMessageText));
-
-					$unsubscribe_link = get_email_link(array('type' => "unsubscribe", 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
-					$mail_content = str_replace("[unsubscribe_link]", $unsubscribe_link, $mail_content);
+					$mail_content = str_replace("[unsubscribe_link]", $unsubscribe_url, $mail_content);
 
 					if($intGroupVerifyLink == 'yes')
 					{
-						$verify_link = get_email_link(array('type' => "verify", 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
-						$mail_content .= "<img src='".$verify_link."' style='height: 0; visibility: hidden; width: 0'>";
+						$mail_content .= "<img src='".get_group_url(array('type' => "verify", 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID))."' style='height: 0; visibility: hidden; width: 0'>";
 					}
 
 					list($mail_attachment, $rest) = get_attachment_to_send($strMessageAttachment);
@@ -408,15 +473,15 @@ function cron_group()
 						$mail_sent++;
 					}
 
-					else
+					/*else
 					{
 						if($error_text == '')
 						{
 							$error_text = sprintf(__("The message from %s in the group %s could not be sent", 'lang_group'), $strMessageFrom, $obj_group->get_name($intGroupID));
 						}
 
-						error_log($error_text);
-					}
+						do_log($error_text);
+					}*/
 				}
 
 				else

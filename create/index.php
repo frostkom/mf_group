@@ -12,14 +12,22 @@ if(!IS_EDITOR)
 }
 
 $intGroupID = check_var('intGroupID');
-$strGroupPublic = check_var('strGroupPublic', 'char', true, 'draft');
+$strGroupName = check_var('strGroupName');
+
 $strGroupAcceptanceEmail = check_var('strGroupAcceptanceEmail');
 $strGroupAcceptanceSubject = check_var('strGroupAcceptanceSubject');
 $strGroupAcceptanceText = check_var('strGroupAcceptanceText');
+
+/*$intGroupUnsubscribeEmail = check_var('intGroupUnsubscribeEmail');
+$intGroupSubscribeEmail = check_var('intGroupSubscribeEmail');*/
+$intGroupOwnerEmail = check_var('intGroupOwnerEmail');
+$intGroupHelpPage = check_var('intGroupHelpPage');
+$intGroupArchivePage = check_var('intGroupArchivePage');
+
+$strGroupPublic = check_var('strGroupPublic', 'char', true, 'draft');
 $strGroupVerifyAddress = check_var('strGroupVerifyAddress');
 $intGroupContactPage = check_var('intGroupContactPage');
 $intGroupVerifyLink = check_var('intGroupVerifyLink', 'char', true, 'no');
-$strGroupName = check_var('strGroupName');
 $arrGroupRegistrationFields = check_var('arrGroupRegistrationFields');
 $intGroupID_copy = check_var('intGroupID_copy');
 
@@ -40,13 +48,20 @@ if(isset($_POST['btnGroupCreate']))
 
 		if(wp_update_post($post_data) > 0)
 		{
-			update_post_meta($intGroupID, 'group_registration_fields', $arrGroupRegistrationFields);
 			update_post_meta($intGroupID, 'group_acceptance_email', $strGroupAcceptanceEmail);
 			update_post_meta($intGroupID, 'group_acceptance_subject', $strGroupAcceptanceSubject);
 			update_post_meta($intGroupID, 'group_acceptance_text', $strGroupAcceptanceText);
+
 			update_post_meta($intGroupID, 'group_verify_address', $strGroupVerifyAddress);
 			update_post_meta($intGroupID, 'group_contact_page', $intGroupContactPage);
+			update_post_meta($intGroupID, 'group_registration_fields', $arrGroupRegistrationFields);
 			update_post_meta($intGroupID, $obj_group->meta_prefix.'verify_link', $intGroupVerifyLink);
+
+			/*update_post_meta($intGroupID, $obj_group->meta_prefix.'unsubscribe_email', $intGroupUnsubscribeEmail);
+			update_post_meta($intGroupID, $obj_group->meta_prefix.'subscribe_email', $intGroupSubscribeEmail);*/
+			update_post_meta($intGroupID, $obj_group->meta_prefix.'owner_email', $intGroupOwnerEmail);
+			update_post_meta($intGroupID, $obj_group->meta_prefix.'help_page', $intGroupHelpPage);
+			update_post_meta($intGroupID, $obj_group->meta_prefix.'archive_page', $intGroupArchivePage);
 
 			mf_redirect(admin_url("admin.php?page=mf_group/list/index.php&updated"));
 		}
@@ -94,12 +109,20 @@ if($intGroupID > 0)
 		$strGroupPublic = $r->post_status;
 		$strGroupName = $r->post_title;
 
-		$arrGroupRegistrationFields = get_post_meta($intGroupID, 'group_registration_fields', true);
 		$strGroupAcceptanceEmail = get_post_meta_or_default($intGroupID, 'group_acceptance_email', true, 'no');
 		$strGroupAcceptanceSubject = get_post_meta($intGroupID, 'group_acceptance_subject', true);
 		$strGroupAcceptanceText = get_post_meta($intGroupID, 'group_acceptance_text', true);
+
 		$strGroupVerifyAddress = get_post_meta_or_default($intGroupID, 'group_verify_address', true, 'no');
 		$intGroupContactPage = get_post_meta($intGroupID, 'group_contact_page', true);
+		$arrGroupRegistrationFields = get_post_meta($intGroupID, 'group_registration_fields', true);
+		$intGroupVerifyLink = get_post_meta($intGroupID, $obj_group->meta_prefix.'verify_link', true);
+
+		/*$intGroupUnsubscribeEmail = get_post_meta($intGroupID, $obj_group->meta_prefix.'unsubscribe_email', true);
+		$intGroupSubscribeEmail = get_post_meta($intGroupID, $obj_group->meta_prefix.'subscribe_email', true);*/
+		$intGroupOwnerEmail = get_post_meta($intGroupID, $obj_group->meta_prefix.'owner_email', true);
+		$intGroupHelpPage = get_post_meta($intGroupID, $obj_group->meta_prefix.'help_page', true);
+		$intGroupArchivePage = get_post_meta($intGroupID, $obj_group->meta_prefix.'archive_page', true);
 
 		if($strGroupPublic == "trash")
 		{
@@ -132,9 +155,9 @@ echo "<div class='wrap'>
 
 								if($wpdb->num_rows > 0)
 								{
-									$arr_data = array();
-
-									$arr_data[''] = "-- ".__("Choose here", 'lang_group')." --";
+									$arr_data = array(
+										'' => "-- ".__("Choose here", 'lang_group')." --"
+									);
 
 									foreach($result as $r)
 									{
@@ -156,6 +179,28 @@ echo "<div class='wrap'>
 							{
 								echo show_textfield(array('name' => 'strGroupAcceptanceSubject', 'text' => __("Subject", 'lang_group'), 'value' => $strGroupAcceptanceSubject, 'placeholder' => sprintf(__("Accept subscription to %s", 'lang_group'), $strGroupName)))
 								.show_textarea(array('name' => 'strGroupAcceptanceText', 'text' => __("Message", 'lang_group'), 'value' => $strGroupAcceptanceText, 'placeholder' => sprintf(__("You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below.", 'lang_group'), $strGroupName)));
+							}
+
+						echo "</div>
+					</div>
+					<div class='postbox'>
+						<h3 class='hndle'><span>".__("About the Group", 'lang_group')."</span></h3>
+						<div class='inside'>";
+
+							if(is_plugin_active("mf_email/index.php"))
+							{
+								$obj_email = new mf_email();
+								//$arr_data_incoming = $obj_email->get_from_for_select(array('type' => 'incoming'));
+								$arr_data_email = $obj_email->get_from_for_select();
+								
+								$arr_data_page = array();
+								get_post_children(array('add_choose_here' => true), $arr_data_page);
+
+								/*echo show_select(array('data' => $arr_data_incoming, 'name' => 'intGroupUnsubscribeEmail', 'text' => __("E-mail to Unsubscribe to", 'lang_group'), 'value' => $intGroupUnsubscribeEmail))
+								.show_select(array('data' => $arr_data_incoming, 'name' => 'intGroupSubscribeEmail', 'text' => __("E-mail to Subscribe to", 'lang_group'), 'value' => $intGroupSubscribeEmail));*/
+								echo show_select(array('data' => $arr_data_email, 'name' => 'intGroupOwnerEmail', 'text' => __("E-mail Owner", 'lang_group'), 'value' => $intGroupOwnerEmail))
+								.show_select(array('data' => $arr_data_page, 'name' => 'intGroupHelpPage', 'text' => __("Help Page", 'lang_group'), 'value' => $intGroupHelpPage))
+								.show_select(array('data' => $arr_data_page, 'name' => 'intGroupArchivePage', 'text' => __("Archive Page", 'lang_group'), 'value' => $intGroupArchivePage));
 							}
 
 						echo "</div>
