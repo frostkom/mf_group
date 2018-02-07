@@ -16,7 +16,7 @@ if(isset($_POST['btnGroupImport']) && $strGroupImport != '' && wp_verify_nonce($
 {
 	$rows = 0;
 
-	$arr_import = explode("\n", $strGroupImport);
+	$arr_import = array_map('trim', explode("\n", $strGroupImport));
 
 	$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE post_type = 'mf_group' AND ID = '%d'".$query_xtra." LIMIT 0, 1", $intGroupID));
 
@@ -26,7 +26,7 @@ if(isset($_POST['btnGroupImport']) && $strGroupImport != '' && wp_verify_nonce($
 		{
 			$is_email = preg_match("/\@/", $address_row);
 
-			$address_row = trim($address_row);
+			//$address_row = trim($address_row);
 
 			if($is_email)
 			{
