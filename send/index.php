@@ -1,136 +1,8 @@
 <?php
 
 $obj_group = new mf_group();
-
-$query_xtra = "";
-
-if(!IS_EDITOR)
-{
-	$query_xtra .= " AND post_author = '".get_current_user_id()."'";
-}
-
-$type = check_var('type', 'char', true, 'email');
-$intGroupID = check_var('intGroupID');
-$arrGroupID = check_var('arrGroupID');
-$intMessageID = check_var('intMessageID');
-$strMessageFrom = check_var('strMessageFrom', 'char', true, $obj_group->get_from_last());
-$strMessageName = check_var('strMessageName');
-$strMessageText_orig = $strMessageText = check_var('strMessageText', 'raw');
-$dteMessageScheduleDate = check_var('dteMessageScheduleDate');
-$dteMessageScheduleTime = check_var('dteMessageScheduleTime');
-$strMessageAttachment = check_var('strMessageAttachment');
-$intEmailTextSource = check_var('intEmailTextSource');
-
-if($intGroupID > 0 && !in_array($intGroupID, $arrGroupID))
-{
-	$arrGroupID[] = $intGroupID;
-}
-
-if(isset($_POST['btnGroupSend']) && count($arrGroupID) > 0 && wp_verify_nonce($_POST['_wpnonce'], 'group_send_'.$type))
-{
-	if($strMessageText == '')
-	{
-		$error_text = __("You have to enter a text to send", 'lang_group');
-	}
-
-	else if($type == "email" || $type == "sms")
-	{
-		$attachments_size = 0;
-		$attachments_size_limit = 5 * pow(1024, 2);
-
-		if($strMessageAttachment != '')
-		{
-			list($mail_attachment, $rest) = get_attachment_to_send($strMessageAttachment);
-
-			foreach($mail_attachment as $file)
-			{
-				$attachments_size += filesize($file);
-			}
-		}
-
-		if($attachments_size > $attachments_size_limit)
-		{
-			$error_text = sprintf(__("You are trying to send attachments of a total of %s. I suggest that you send the attachments as inline links instead of attachments. This way I don't have to send too much data which might slow down the server or make it timeout due to memory limits and it also makes the recipients not have to recieve that much in their inboxes.", 'lang_group'), show_final_size($attachments_size));
-		}
-
-		else
-		{
-			$arr_recepients = array();
-
-			foreach($arrGroupID as $intGroupID)
-			{
-				$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE post_type = 'mf_group' AND ID = '%d'".$query_xtra." LIMIT 0, 1", $intGroupID));
-
-				if($wpdb->num_rows > 0)
-				{
-					$dteMessageSchedule = $dteMessageScheduleDate != '' && $dteMessageScheduleTime != '' ? $dteMessageScheduleDate." ".$dteMessageScheduleTime : '';
-
-					$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->base_prefix."group_message SET groupID = '%d', messageType = %s, messageFrom = %s, messageName = %s, messageText = %s, messageAttachment = %s, messageSchedule = %s, messageCreated = NOW(), userID = '%d'", $intGroupID, $type, $strMessageFrom, $strMessageName, $strMessageText, $strMessageAttachment, $dteMessageSchedule, get_current_user_id()));
-
-					$intMessageID = $wpdb->insert_id;
-
-					if($intMessageID > 0)
-					{
-						$result = $wpdb->get_results($wpdb->prepare("SELECT addressID, addressEmail, addressCellNo FROM ".$wpdb->base_prefix."address INNER JOIN ".$wpdb->base_prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' AND groupAccepted = '1' AND groupUnsubscribed = '0'", $intGroupID));
-
-						foreach($result as $r)
-						{
-							$intAddressID = $r->addressID;
-							$strAddressEmail = $r->addressEmail;
-							$strAddressCellNo = $r->addressCellNo;
-
-							if(!in_array($intAddressID, $arr_recepients) && ($type == "email" && $strAddressEmail != "" || $type == "sms" && $strAddressCellNo != ""))
-							{
-								$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->base_prefix."group_queue SET addressID = '%d', messageID = '%d', queueCreated = NOW()", $intAddressID, $intMessageID));
-
-								if($wpdb->rows_affected > 0)
-								{
-									$arr_recepients[] = $intAddressID;
-								}
-							}
-						}
-					}
-
-					else
-					{
-						$error_text = __("There was an error when saving the message", 'lang_group');
-					}
-				}
-			}
-
-			if(count($arr_recepients) > 0)
-			{
-				mf_redirect(admin_url("admin.php?page=mf_group/list/index.php&sent"));
-			}
-
-			else
-			{
-				$error_text = __("The message was not sent to anybody", 'lang_group');
-			}
-		}
-	}
-}
-
-else if($intEmailTextSource > 0)
-{
-	$strMessageText = $wpdb->get_var($wpdb->prepare("SELECT post_content FROM ".$wpdb->posts." WHERE post_type = 'page' AND post_status = 'publish' AND ID = '%d'", $intEmailTextSource));
-
-	$user_data = get_userdata(get_current_user_id());
-
-	$strMessageText = str_replace("[name]", $user_data->display_name, $strMessageText);
-}
-
-else if($intMessageID > 0)
-{
-	$result = $wpdb->get_results($wpdb->prepare("SELECT messageFrom, messageName, messageText FROM ".$wpdb->base_prefix."group_message WHERE messageID = '%d'", $intMessageID));
-
-	foreach($result as $r)
-	{
-		$strMessageFrom = $r->messageFrom;
-		$strMessageName = $r->messageName;
-		$strMessageText = stripslashes($r->messageText);
-	}
-}
+$obj_group->fetch_request('form');
+echo $obj_group->save_data('form');
 
 echo "<div class='wrap'>
 	<h2>".__("Send message", 'lang_group')."</h2>"
@@ -145,7 +17,6 @@ echo "<div class='wrap'>
 
 							$arr_data_to = array();
 
-							$obj_group = new mf_group();
 							$result = $obj_group->get_groups();
 
 							foreach($result as $r)
@@ -153,14 +24,9 @@ echo "<div class='wrap'>
 								$arr_data_to[$r->ID] = $r->post_title;
 							}
 
-							switch($type)
+							switch($obj_group->message_type)
 							{
 								case 'email':
-									if($strMessageText_orig == '')
-									{
-										$strMessageText .= "<p>&nbsp;</p><p><a href='[unsubscribe_link]'>".__("If you don't want to get these messages in the future click this link to unsubscribe", 'lang_group')."</a></p>";
-									}
-
 									if(is_plugin_active("mf_email/index.php"))
 									{
 										$obj_email = new mf_email();
@@ -193,12 +59,12 @@ echo "<div class='wrap'>
 
 									echo "<div class='flex_flow'>
 										<div>"
-											.show_select(array('data' => $arr_data_from, 'name' => 'strMessageFrom', 'text' => __("From", 'lang_group'), 'value' => $strMessageFrom, 'required' => true))
-											.show_textfield(array('name' => "strMessageName", 'text' => __("Subject", 'lang_group'), 'value' => $strMessageName, 'required' => true))
+											.show_select(array('data' => $arr_data_from, 'name' => 'strMessageFrom', 'text' => __("From", 'lang_group'), 'value' => $obj_group->message_from, 'required' => true))
+											.show_textfield(array('name' => "strMessageName", 'text' => __("Subject", 'lang_group'), 'value' => $obj_group->message_name, 'required' => true))
 										."</div>"
-										.show_select(array('data' => $arr_data_to, 'name' => 'arrGroupID[]', 'text' => __("To", 'lang_group'), 'value' => $arrGroupID, 'maxsize' => 5))
+										.show_select(array('data' => $arr_data_to, 'name' => 'arrGroupID[]', 'text' => __("To", 'lang_group'), 'value' => $obj_group->arr_group_id, 'maxsize' => 5))
 									."</div>"
-									.show_wp_editor(array('name' => 'strMessageText', 'value' => $strMessageText));
+									.show_wp_editor(array('name' => 'strMessageText', 'value' => $obj_group->message_text));
 								break;
 
 								case 'sms':
@@ -222,9 +88,9 @@ echo "<div class='wrap'>
 										$arr_data_from[$sms_phone] = $sms_phone;
 									}
 
-									echo show_select(array('data' => $arr_data_from, 'name' => 'strMessageFrom', 'text' => __("From", 'lang_group'), 'value' => $strMessageFrom, 'required' => true))
-									.show_select(array('data' => $arr_data_to, 'name' => 'arrGroupID[]', 'text' => __("To", 'lang_group'), 'value' => $arrGroupID, 'maxsize' => 5))
-									.show_textarea(array('name' => "strMessageText", 'text' => __("Message", 'lang_group'), 'value' => $strMessageText, 'required' => true));
+									echo show_select(array('data' => $arr_data_from, 'name' => 'strMessageFrom', 'text' => __("From", 'lang_group'), 'value' => $obj_group->message_from, 'required' => true))
+									.show_select(array('data' => $arr_data_to, 'name' => 'arrGroupID[]', 'text' => __("To", 'lang_group'), 'value' => $obj_group->arr_group_id, 'maxsize' => 5))
+									.show_textarea(array('name' => "strMessageText", 'text' => __("Message", 'lang_group'), 'value' => $obj_group->message_text, 'required' => true));
 								break;
 							}
 
@@ -237,24 +103,24 @@ echo "<div class='wrap'>
 						<div class='inside'>"
 							.show_button(array('name' => "btnGroupSend", 'text' => __("Send", 'lang_group')))
 							."<div class='flex_flow'>"
-								.show_textfield(array('type' => 'date', 'name' => 'dteMessageScheduleDate', 'text' => __("Schedule", 'lang_group'), 'value' => $dteMessageScheduleDate, 'placeholder' => date("Y-m-d")))
-								.show_textfield(array('type' => 'time', 'name' => 'dteMessageScheduleTime', 'text' => "&nbsp;", 'value' => $dteMessageScheduleTime, 'placeholder' => date("H:i")))
+								.show_textfield(array('type' => 'date', 'name' => 'dteMessageScheduleDate', 'text' => __("Schedule", 'lang_group'), 'value' => $obj_group->message_schedule_date, 'placeholder' => date("Y-m-d")))
+								.show_textfield(array('type' => 'time', 'name' => 'dteMessageScheduleTime', 'text' => "&nbsp;", 'value' => $obj_group->message_schedule_time, 'placeholder' => date("H:i")))
 							."</div>
 							<p class='description'>".__("Choose date and time to send the message", 'lang_group')."</p>"
-							.wp_nonce_field('group_send_'.$type, '_wpnonce', true, false);
+							.wp_nonce_field('group_send_'.$obj_group->message_type, '_wpnonce', true, false);
 
-							switch($type)
+							switch($obj_group->message_type)
 							{
 								case 'sms':
 									echo " <span id='chars_left'></span> (<span id='sms_amount'>1</span>)";
 								break;
 							}
 
-							echo input_hidden(array('name' => "type", 'value' => $type))
+							echo input_hidden(array('name' => "type", 'value' => $obj_group->message_type))
 						."</div>
 					</div>";
 
-					if($type == "email")
+					if($obj_group->message_type == "email")
 					{
 						$arr_data_source = array();
 						get_post_children(array('add_choose_here' => true), $arr_data_source);
@@ -263,7 +129,8 @@ echo "<div class='wrap'>
 							<h3 class='hndle'>".__("Advanced", 'lang_group')."</h3>
 							<div class='inside'>"
 								.show_select(array('data' => $arr_data_source, 'name' => 'intEmailTextSource', 'text' => __("Text Source", 'lang_group'), 'xtra' => "rel='submit_change' disabled"))
-								.get_media_button(array('name' => 'strMessageAttachment', 'value' => $strMessageAttachment))
+								.get_media_button(array('name' => 'strMessageAttachment', 'value' => $obj_group->message_attachment))
+								.show_select(array('data' => get_yes_no_for_select(), 'name' => 'strMessageUnsubscribeLink', 'text' => __("Add Unsubscribe Link", 'lang_group'), 'value' => $obj_group->message_unsubscribe_link))
 							."</div>
 						</div>";
 					}

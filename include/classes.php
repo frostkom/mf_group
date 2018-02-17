@@ -17,45 +17,195 @@ class mf_group
 		$this->meta_prefix = "mf_group_";
 	}
 
-	function fetch_request()
+	function fetch_request($type)
 	{
-		if(isset($_SESSION['intGroupID'])){			unset($_SESSION['intGroupID']);}
-		if(isset($_SESSION['is_part_of_group'])){	unset($_SESSION['is_part_of_group']);}
+		switch($type)
+		{
+			case 'table':
+				if(isset($_SESSION['intGroupID'])){			unset($_SESSION['intGroupID']);}
+				if(isset($_SESSION['is_part_of_group'])){	unset($_SESSION['is_part_of_group']);}
+			break;
+
+			case 'form':
+				$this->message_type = check_var('type', 'char', true, 'email');
+				$this->group_id = check_var('intGroupID');
+				$this->arr_group_id = check_var('arrGroupID');
+				$this->message_id = check_var('intMessageID');
+				$this->message_from = check_var('strMessageFrom', 'char', true, $this->get_from_last());
+				$this->message_name = check_var('strMessageName');
+				$this->message_text = check_var('strMessageText', 'raw'); //$this->message_text_orig = 
+				$this->message_schedule_date = check_var('dteMessageScheduleDate');
+				$this->message_schedule_time = check_var('dteMessageScheduleTime');
+				$this->message_text_source = check_var('intEmailTextSource');
+				$this->message_attachment = check_var('strMessageAttachment');
+				$this->message_unsubscribe_link = check_var('strMessageUnsubscribeLink', 'char', true, 'yes');
+
+				if($this->group_id > 0 && !in_array($this->group_id, $this->arr_group_id))
+				{
+					$this->arr_group_id[] = $this->group_id;
+				}
+			break;
+		}
 	}
 
-	function save_data()
+	function save_data($type)
 	{
 		global $wpdb, $error_text, $done_text;
 
 		$out = "";
 
-		if(isset($_REQUEST['btnGroupDelete']) && $this->id > 0 && wp_verify_nonce($_REQUEST['_wpnonce'], 'group_delete_'.$this->id))
+		switch($type)
 		{
-			if(wp_trash_post($this->id))
-			{
-				$obj_group = new mf_group();
-				$obj_group->remove_all_address($this->id);
+			case 'table':
+				if(isset($_REQUEST['btnGroupDelete']) && $this->id > 0 && wp_verify_nonce($_REQUEST['_wpnonce'], 'group_delete_'.$this->id))
+				{
+					if(wp_trash_post($this->id))
+					{
+						//$obj_group = new mf_group();
+						$this->remove_all_address($this->id);
 
-				$done_text = __("The information was deleted", 'lang_group');
-			}
+						$done_text = __("The information was deleted", 'lang_group');
+					}
+				}
+
+				else if(isset($_GET['sent']))
+				{
+					$done_text = __("The information was sent", 'lang_group');
+				}
+
+				else if(isset($_GET['created']))
+				{
+					$done_text = __("The group was created", 'lang_group');
+				}
+
+				else if(isset($_GET['updated']))
+				{
+					$done_text = __("The group was updated", 'lang_group');
+				}
+
+				$obj_export = new mf_group_export();
+			break;
+
+			case 'form':
+				if(isset($_POST['btnGroupSend']) && count($this->arr_group_id) > 0 && wp_verify_nonce($_POST['_wpnonce'], 'group_send_'.$this->message_type))
+				{
+					if($this->message_text == '')
+					{
+						$error_text = __("You have to enter a text to send", 'lang_group');
+					}
+
+					else if($this->message_type == "email" || $this->message_type == "sms")
+					{
+						$attachments_size = 0;
+						$attachments_size_limit = 5 * pow(1024, 2);
+
+						if($this->message_attachment != '')
+						{
+							list($mail_attachment, $rest) = get_attachment_to_send($this->message_attachment);
+
+							foreach($mail_attachment as $file)
+							{
+								$attachments_size += filesize($file);
+							}
+						}
+
+						if($attachments_size > $attachments_size_limit)
+						{
+							$error_text = sprintf(__("You are trying to send attachments of a total of %s. I suggest that you send the attachments as inline links instead of attachments. This way I don't have to send too much data which might slow down the server or make it timeout due to memory limits and it also makes the recipients not have to recieve that much in their inboxes.", 'lang_group'), show_final_size($attachments_size));
+						}
+
+						else
+						{
+							$query_where = "";
+
+							if(!IS_EDITOR)
+							{
+								$query_where .= " AND post_author = '".get_current_user_id()."'";
+							}
+
+							$arr_recepients = array();
+
+							foreach($this->arr_group_id as $this->group_id)
+							{
+								$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE post_type = 'mf_group' AND ID = '%d'".$query_where." LIMIT 0, 1", $this->group_id));
+
+								if($wpdb->num_rows > 0)
+								{
+									if($this->message_unsubscribe_link == 'yes')
+									{
+										$this->message_text .= "<p>&nbsp;</p><p><a href='[unsubscribe_link]'>".__("If you don't want to get these messages in the future click this link to unsubscribe", 'lang_group')."</a></p>";
+									}
+
+									$dteMessageSchedule = $this->message_schedule_date != '' && $this->message_schedule_time != '' ? $this->message_schedule_date." ".$this->message_schedule_time : '';
+
+									$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->base_prefix."group_message SET groupID = '%d', messageType = %s, messageFrom = %s, messageName = %s, messageText = %s, messageAttachment = %s, messageSchedule = %s, messageCreated = NOW(), userID = '%d'", $this->group_id, $this->message_type, $this->message_from, $this->message_name, $this->message_text, $this->message_attachment, $dteMessageSchedule, get_current_user_id()));
+
+									$this->message_id = $wpdb->insert_id;
+
+									if($this->message_id > 0)
+									{
+										$result = $wpdb->get_results($wpdb->prepare("SELECT addressID, addressEmail, addressCellNo FROM ".$wpdb->base_prefix."address INNER JOIN ".$wpdb->base_prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' AND groupAccepted = '1' AND groupUnsubscribed = '0'", $this->group_id));
+
+										foreach($result as $r)
+										{
+											$intAddressID = $r->addressID;
+											$strAddressEmail = $r->addressEmail;
+											$strAddressCellNo = $r->addressCellNo;
+
+											if(!in_array($intAddressID, $arr_recepients) && ($this->message_type == "email" && $strAddressEmail != "" || $this->message_type == "sms" && $strAddressCellNo != ""))
+											{
+												$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->base_prefix."group_queue SET addressID = '%d', messageID = '%d', queueCreated = NOW()", $intAddressID, $this->message_id));
+
+												if($wpdb->rows_affected > 0)
+												{
+													$arr_recepients[] = $intAddressID;
+												}
+											}
+										}
+									}
+
+									else
+									{
+										$error_text = __("There was an error when saving the message", 'lang_group');
+									}
+								}
+							}
+
+							if(count($arr_recepients) > 0)
+							{
+								mf_redirect(admin_url("admin.php?page=mf_group/list/index.php&sent"));
+							}
+
+							else
+							{
+								$error_text = __("The message was not sent to anybody", 'lang_group');
+							}
+						}
+					}
+				}
+
+				else if($this->message_text_source > 0)
+				{
+					$this->message_text = $wpdb->get_var($wpdb->prepare("SELECT post_content FROM ".$wpdb->posts." WHERE post_type = 'page' AND post_status = 'publish' AND ID = '%d'", $this->message_text_source));
+
+					$user_data = get_userdata(get_current_user_id());
+
+					$this->message_text = str_replace("[name]", $user_data->display_name, $this->message_text);
+				}
+
+				else if($this->message_id > 0)
+				{
+					$result = $wpdb->get_results($wpdb->prepare("SELECT messageFrom, messageName, messageText FROM ".$wpdb->base_prefix."group_message WHERE messageID = '%d'", $this->message_id));
+
+					foreach($result as $r)
+					{
+						$this->message_from = $r->messageFrom;
+						$this->message_name = $r->messageName;
+						$this->message_text = stripslashes($r->messageText);
+					}
+				}
+			break;
 		}
-
-		else if(isset($_GET['sent']))
-		{
-			$done_text = __("The information was sent", 'lang_group');
-		}
-
-		else if(isset($_GET['created']))
-		{
-			$done_text = __("The group was created", 'lang_group');
-		}
-
-		else if(isset($_GET['updated']))
-		{
-			$done_text = __("The group was updated", 'lang_group');
-		}
-
-		$obj_export = new mf_group_export();
 
 		return $out;
 	}

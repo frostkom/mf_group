@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-01-26 13:47+0100\n"
+"POT-Creation-Date: 2018-02-17 14:06+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -22,23 +22,23 @@ msgid "The information was not submitted, contact an admin if this persists"
 msgstr "Informationen las inte in, kontakta en administratör om problemet kvarstår"
 
 #: ../create/index.php:135
-#: ../include/classes.php:361
+#: ../include/classes.php:511
 msgid "Public"
 msgstr "Publik"
 
 #: ../create/index.php:136
-#: ../include/classes.php:362
+#: ../include/classes.php:512
 msgid "Not Public"
 msgstr "Inte publik"
 
 #: ../create/index.php:137
-#: ../include/classes.php:363
+#: ../include/classes.php:513
 msgid "Inactive"
 msgstr "Inaktiv"
 
 #: ../create/index.php:141
-#: ../include/classes.php:250
-#: ../include/classes.php:303
+#: ../include/classes.php:400
+#: ../include/classes.php:453
 #: ../include/functions.php:159
 #: ../include/functions.php:160
 #: ../include/functions.php:161
@@ -58,7 +58,7 @@ msgstr "Lägg till"
 
 #: ../create/index.php:150
 #: ../create/index.php:237
-#: ../include/classes.php:373
+#: ../include/classes.php:523
 #: ../include/functions.php:683
 msgid "Name"
 msgstr "Namn"
@@ -66,8 +66,8 @@ msgstr "Namn"
 #: ../create/index.php:159
 #: ../include/functions.php:50
 #: ../include/functions.php:234
-#: ../send/index.php:181
-#: ../send/index.php:210
+#: ../send/index.php:47
+#: ../send/index.php:76
 msgid "Choose here"
 msgstr "Välj här"
 
@@ -84,25 +84,25 @@ msgid "Send before adding to a group"
 msgstr "Skicka före man läggs till i en grupp"
 
 #: ../create/index.php:180
-#: ../send/index.php:197
+#: ../send/index.php:63
 #: ../sent/index.php:30
 msgid "Subject"
 msgstr "Ämne"
 
 #: ../create/index.php:180
-#: ../include/classes.php:116
+#: ../include/classes.php:266
 #, php-format
 msgid "Accept subscription to %s"
 msgstr "Bekräfta prenumeration till %s"
 
 #: ../create/index.php:181
-#: ../send/index.php:143
-#: ../send/index.php:227
+#: ../send/index.php:15
+#: ../send/index.php:93
 msgid "Message"
 msgstr "Meddelande"
 
 #: ../create/index.php:181
-#: ../include/classes.php:117
+#: ../include/classes.php:267
 #, php-format
 msgid "You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below."
 msgstr "Du har blivit tillagd i gruppen %s men kommer inte att få några meddelanden förrän du har bekräftat prenumerationen genom att klicka på länken nedan."
@@ -203,13 +203,13 @@ msgstr "Gruppen uppdaterades inte med någon adress"
 
 #: ../import/index.php:108
 #: ../import/index.php:115
-#: ../include/classes.php:427
+#: ../include/classes.php:577
 #: ../include/functions.php:288
 msgid "Import"
 msgstr "Importera"
 
 #: ../import/index.php:114
-#: ../include/classes.php:302
+#: ../include/classes.php:452
 msgid "Text"
 msgstr "Text"
 
@@ -217,113 +217,134 @@ msgstr "Text"
 msgid "Enter social security numbers or e-mail addresses on separate rows for import"
 msgstr "Lägg in personnummer eller e-postaddresser på separata rader för att importera"
 
-#: ../include/classes.php:39
+#: ../include/classes.php:67
 msgid "The information was deleted"
 msgstr "Informationen raderades"
 
-#: ../include/classes.php:45
+#: ../include/classes.php:73
 msgid "The information was sent"
 msgstr "Informationen skickades"
 
-#: ../include/classes.php:50
+#: ../include/classes.php:78
 msgid "The group was created"
 msgstr "Gruppen skapades"
 
-#: ../include/classes.php:55
+#: ../include/classes.php:83
 msgid "The group was updated"
 msgstr "Gruppen uppdaterades"
 
-#: ../include/classes.php:130
+#: ../include/classes.php:94
+msgid "You have to enter a text to send"
+msgstr "Du måste fylla i en text att skicka"
+
+#: ../include/classes.php:114
+#, php-format
+msgid "You are trying to send attachments of a total of %s. I suggest that you send the attachments as inline links instead of attachments. This way I don't have to send too much data which might slow down the server or make it timeout due to memory limits and it also makes the recipients not have to recieve that much in their inboxes."
+msgstr "Du försöker skicka bifogade filer som totalt är på %s. Jag föreslår att du skickar bifogade filer som länkar i texten istället. På det sättet behöver inte jag skicka för mycket data som kan slöa ner servern eller tom. göra så att jag slår i serverns tak för minne och det gör också att mottagarna inte behöver ta emot så mycket i deras inkorg."
+
+#: ../include/classes.php:136
+msgid "If you don't want to get these messages in the future click this link to unsubscribe"
+msgstr "Om du inte vill ha dessa meddelanden i framtiden, klicka på länken för att avregistrera dig"
+
+#: ../include/classes.php:169
+msgid "There was an error when saving the message"
+msgstr "Det blev ett fel när meddelandet skulle sparas"
+
+#: ../include/classes.php:181
+msgid "The message was not sent to anybody"
+msgstr "Meddelandet skickades inte till någon"
+
+#: ../include/classes.php:280
 msgid "Accept Link"
 msgstr "Bekräftelselänk"
 
-#: ../include/classes.php:240
+#: ../include/classes.php:390
 msgid "Display a group registration form"
 msgstr "Visa ett registreringsformulär till en grupp"
 
-#: ../include/classes.php:250
+#: ../include/classes.php:400
 msgid "Newsletter"
 msgstr "Nyhetsbrev"
 
-#: ../include/classes.php:301
+#: ../include/classes.php:451
 msgid "Heading"
 msgstr "Rubrik"
 
-#: ../include/classes.php:304
+#: ../include/classes.php:454
 msgid "Button Text"
 msgstr "Knapptext"
 
-#: ../include/classes.php:304
+#: ../include/classes.php:454
 #: ../include/functions.php:538
 msgid "Join"
 msgstr "Gå med"
 
-#: ../include/classes.php:360
+#: ../include/classes.php:510
 msgid "All"
 msgstr "Alla"
 
-#: ../include/classes.php:364
+#: ../include/classes.php:514
 msgid "Trash"
 msgstr "Papperskorg"
 
-#: ../include/classes.php:375
+#: ../include/classes.php:525
 msgid "Amount"
 msgstr "Antal"
 
-#: ../include/classes.php:380
+#: ../include/classes.php:530
 msgid "Not Accepted"
 msgstr "Inte bekräftad"
 
-#: ../include/classes.php:383
+#: ../include/classes.php:533
 msgid "Unsubscribed"
 msgstr "Avregistrerade"
 
-#: ../include/classes.php:384
+#: ../include/classes.php:534
 msgid "User"
 msgstr "Användare"
 
-#: ../include/classes.php:385
-#: ../include/classes.php:523
+#: ../include/classes.php:535
+#: ../include/classes.php:673
 #: ../include/functions.php:285
 #: ../sent/index.php:21
 #: ../sent/index.php:32
 msgid "Sent"
 msgstr "Skickat"
 
-#: ../include/classes.php:419
+#: ../include/classes.php:569
 msgid "Edit"
 msgstr "Redigera"
 
-#: ../include/classes.php:423
+#: ../include/classes.php:573
 msgid "Delete"
 msgstr "Radera"
 
-#: ../include/classes.php:426
+#: ../include/classes.php:576
 msgid "Add or remove"
 msgstr "Lägg till/ta bort"
 
-#: ../include/classes.php:433
+#: ../include/classes.php:583
 msgid "CSV"
 msgstr "CSV"
 
-#: ../include/classes.php:437
+#: ../include/classes.php:587
 msgid "XLS"
 msgstr "XLS"
 
-#: ../include/classes.php:444
+#: ../include/classes.php:594
 msgid "Recover"
 msgstr "Återställ"
 
-#: ../include/classes.php:504
+#: ../include/classes.php:654
 msgid "Test"
 msgstr "Testa"
 
-#: ../include/classes.php:538
+#: ../include/classes.php:688
 #, php-format
 msgid "Will be sent %s"
 msgstr "Kommer att skickas %s"
 
-#: ../include/classes.php:545
+#: ../include/classes.php:695
 msgid "Is sending"
 msgstr "Skickar"
 
@@ -384,62 +405,45 @@ msgstr "Tack för visat intresse. Du har lagts till i gruppen"
 msgid "Your Email Address"
 msgstr "Din epost"
 
-#: ../send/index.php:33
-msgid "You have to enter a text to send"
-msgstr "Du måste fylla i en text att skicka"
-
-#: ../send/index.php:53
-#, php-format
-msgid "You are trying to send attachments of a total of %s. I suggest that you send the attachments as inline links instead of attachments. This way I don't have to send too much data which might slow down the server or make it timeout due to memory limits and it also makes the recipients not have to recieve that much in their inboxes."
-msgstr "Du försöker skicka bifogade filer som totalt är på %s. Jag föreslår att du skickar bifogade filer som länkar i texten istället. På det sättet behöver inte jag skicka för mycket data som kan slöa ner servern eller tom. göra så att jag slår i serverns tak för minne och det gör också att mottagarna inte behöver ta emot så mycket i deras inkorg."
-
-#: ../send/index.php:96
-msgid "There was an error when saving the message"
-msgstr "Det blev ett fel när meddelandet skulle sparas"
-
-#: ../send/index.php:108
-msgid "The message was not sent to anybody"
-msgstr "Meddelandet skickades inte till någon"
-
-#: ../send/index.php:136
+#: ../send/index.php:8
 msgid "Send message"
 msgstr "Skicka meddelande"
 
-#: ../send/index.php:161
-msgid "If you don't want to get these messages in the future click this link to unsubscribe"
-msgstr "Om du inte vill ha dessa meddelanden i framtiden, klicka på länken för att avregistrera dig"
-
-#: ../send/index.php:196
-#: ../send/index.php:225
+#: ../send/index.php:62
+#: ../send/index.php:91
 #: ../sent/index.php:29
 msgid "From"
 msgstr "Från"
 
-#: ../send/index.php:199
-#: ../send/index.php:226
+#: ../send/index.php:65
+#: ../send/index.php:92
 msgid "To"
 msgstr "Till"
 
-#: ../send/index.php:236
-#: ../send/index.php:238
+#: ../send/index.php:102
+#: ../send/index.php:104
 msgid "Send"
 msgstr "Skicka"
 
-#: ../send/index.php:240
+#: ../send/index.php:106
 msgid "Schedule"
 msgstr "Schemalägg"
 
-#: ../send/index.php:243
+#: ../send/index.php:109
 msgid "Choose date and time to send the message"
 msgstr "Välj datum och tid när meddelandet ska skickas"
 
-#: ../send/index.php:263
+#: ../send/index.php:129
 msgid "Advanced"
 msgstr "Avancerat"
 
-#: ../send/index.php:265
+#: ../send/index.php:131
 msgid "Text Source"
 msgstr "Textkälla"
+
+#: ../send/index.php:133
+msgid "Add Unsubscribe Link"
+msgstr "Lägg till avregistreringslänk"
 
 #: ../sent/index.php:17
 msgid "The message was aborted"
