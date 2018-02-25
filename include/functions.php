@@ -88,16 +88,16 @@ function delete_group($post_id)
 
 	if($post_type == 'mf_group')
 	{
-		error_log("Delete postID (#".$post_id.") from ".$wpdb->base_prefix."group_message etc.");
+		error_log("Delete postID (#".$post_id.") from ".$wpdb->prefix."group_message etc.");
 
-		/*$result = $wpdb->get_results($wpdb->prepare("SELECT messageID FROM ".$wpdb->base_prefix."group_message WHERE groupID = '%d'", $post_id));
+		/*$result = $wpdb->get_results($wpdb->prepare("SELECT messageID FROM ".$wpdb->prefix."group_message WHERE groupID = '%d'", $post_id));
 
 		foreach($result as $r)
 		{
-			$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->base_prefix."group_queue WHERE messageID = '%d'", $r->messageID));
+			$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d'", $r->messageID));
 		}
 
-		$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->base_prefix."group_message WHERE groupID = '%d'", $post_id));
+		$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->prefix."group_message WHERE groupID = '%d'", $post_id));
 
 		$obj_group = new mf_group();
 		$obj_group->remove_all_address($post_id);*/
@@ -108,7 +108,7 @@ function deleted_user_group($user_id)
 {
 	global $wpdb;
 
-	$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->base_prefix."group_message SET userID = '%d' WHERE userID = '%d'", get_current_user_id(), $user_id));
+	$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_message SET userID = '%d' WHERE userID = '%d'", get_current_user_id(), $user_id));
 }
 
 function notices_group()
@@ -117,7 +117,7 @@ function notices_group()
 
 	if(IS_ADMIN)
 	{
-		$result = $wpdb->get_results("SELECT messageType, addressID, addressFirstName, addressSurName, addressEmail, addressCellNo FROM ".$wpdb->base_prefix."group_message INNER JOIN ".$wpdb->base_prefix."group_queue USING (messageID) INNER JOIN ".$wpdb->base_prefix."address USING (addressID) WHERE queueSent = '0' AND queueCreated < DATE_SUB(NOW(), INTERVAL 3 HOUR) LIMIT 0, 6");
+		$result = $wpdb->get_results("SELECT messageType, addressID, addressFirstName, addressSurName, addressEmail, addressCellNo FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) INNER JOIN ".$wpdb->prefix."address USING (addressID) WHERE queueSent = '0' AND queueCreated < DATE_SUB(NOW(), INTERVAL 3 HOUR) LIMIT 0, 6");
 
 		$rows = $wpdb->num_rows;
 
@@ -250,7 +250,7 @@ function count_unsent_group($id = 0)
 
 	$count_message = "";
 
-	$rows = $wpdb->get_var("SELECT COUNT(queueID) FROM ".$wpdb->base_prefix."group_message INNER JOIN ".$wpdb->base_prefix."group_queue USING (messageID) WHERE queueSent = '0'".($id > 0 ? " AND groupID = '".esc_sql($id)."'" : ""));
+	$rows = $wpdb->get_var("SELECT COUNT(queueID) FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) WHERE queueSent = '0'".($id > 0 ? " AND groupID = '".esc_sql($id)."'" : ""));
 
 	if($rows > 0)
 	{
@@ -318,34 +318,9 @@ function cron_group()
 	$obj_cron = new mf_cron();
 	$obj_group = new mf_group();
 
-	$mail_sent = $sms_sent = 0;
+	//$i = 0;
 
-	$query_limit = "";
-
-	$setting_emails_per_hour = get_option_or_default('setting_emails_per_hour');
-
-	if($setting_emails_per_hour > 0)
-	{
-		$emails_left_to_send = $setting_emails_per_hour;
-
-		if($emails_left_to_send > 0)
-		{
-			$wpdb->get_results("SELECT messageID FROM ".$wpdb->base_prefix."email_message WHERE messageFrom = '' AND messageCreated > DATE_SUB(NOW(), INTERVAL 1 HOUR)");
-			$emails_left_to_send -= $wpdb->num_rows;
-		}
-
-		if($emails_left_to_send > 0)
-		{
-			$wpdb->get_results("SELECT queueID FROM ".$wpdb->base_prefix."group_queue WHERE queueSent = '1' AND queueSentTime > DATE_SUB(NOW(), INTERVAL 1 HOUR)");
-			$emails_left_to_send -= $wpdb->num_rows;
-		}
-
-		$query_limit = " LIMIT 0, ".$emails_left_to_send;
-	}
-
-	$i = 0;
-
-	$result = $wpdb->get_results("SELECT groupID FROM ".$wpdb->base_prefix."group_queue INNER JOIN ".$wpdb->base_prefix."group_message USING (messageID) WHERE queueSent = '0' AND (messageSchedule IS NULL OR messageSchedule < NOW()) GROUP BY groupID ORDER BY RAND()");
+	$result = $wpdb->get_results("SELECT groupID FROM ".$wpdb->prefix."group_queue INNER JOIN ".$wpdb->prefix."group_message USING (messageID) WHERE queueSent = '0' AND (messageSchedule IS NULL OR messageSchedule < NOW()) GROUP BY groupID ORDER BY RAND()");
 
 	foreach($result as $r)
 	{
@@ -365,7 +340,7 @@ function cron_group()
 		$intGroupHelpPage = get_post_meta($intGroupID, $obj_group->meta_prefix.'help_page', true);
 		$intGroupArchivePage = get_post_meta($intGroupID, $obj_group->meta_prefix.'archive_page', true);
 
-		$resultMessages = $wpdb->get_results($wpdb->prepare("SELECT addressEmail, addressCellNo, queueID, messageType, messageFrom, messageName, messageText, messageAttachment, ".$wpdb->base_prefix."group_message.userID FROM ".$wpdb->base_prefix."address INNER JOIN ".$wpdb->base_prefix."group_queue USING (addressID) INNER JOIN ".$wpdb->base_prefix."group_message USING (messageID) WHERE groupID = '%d' AND queueSent = '0' ORDER BY messageType ASC, queueCreated ASC".$query_limit, $intGroupID));
+		$resultMessages = $wpdb->get_results($wpdb->prepare("SELECT addressEmail, addressCellNo, queueID, messageType, messageFrom, messageName, messageText, messageAttachment, ".$wpdb->prefix."group_message.userID FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."group_queue USING (addressID) INNER JOIN ".$wpdb->prefix."group_message USING (messageID) WHERE groupID = '%d' AND queueSent = '0' ORDER BY messageType ASC, queueCreated ASC".$obj_group->get_emails_left_to_send(), $intGroupID));
 
 		foreach($resultMessages as $r)
 		{
@@ -470,29 +445,22 @@ function cron_group()
 
 					list($mail_attachment, $rest) = get_attachment_to_send($strMessageAttachment);
 
-					$sent = send_email(array('to' => $mail_to, 'subject' => $mail_subject, 'content' => $mail_content, 'headers' => $mail_headers, 'attachment' => $mail_attachment, 'save_log' => false));
+					$wpdb->get_results($wpdb->prepare("SELECT queueID FROM ".$wpdb->prefix."group_queue WHERE queueSent = '1' AND queueID = '%d'", $intQueueID));
 
-					if($sent)
+					if($wpdb->num_rows == 0)
 					{
-						$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->base_prefix."group_queue SET queueSent = '1', queueSentTime = NOW() WHERE queueID = '%d'", $intQueueID));
+						$sent = send_email(array('to' => $mail_to, 'subject' => $mail_subject, 'content' => $mail_content, 'headers' => $mail_headers, 'attachment' => $mail_attachment, 'save_log' => false));
 
-						$mail_sent++;
-					}
-
-					/*else
-					{
-						if($error_text == '')
+						if($sent)
 						{
-							$error_text = sprintf(__("The message from %s in the group %s could not be sent", 'lang_group'), $strMessageFrom, $obj_group->get_name($intGroupID));
+							$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_queue SET queueSent = '1', queueSentTime = NOW() WHERE queueID = '%d'", $intQueueID));
 						}
-
-						do_log($error_text);
-					}*/
+					}
 				}
 
 				else
 				{
-					$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->base_prefix."group_queue WHERE queueID = '%d'", $intQueueID));
+					$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->prefix."group_queue WHERE queueID = '%d'", $intQueueID));
 				}
 			}
 
@@ -512,9 +480,7 @@ function cron_group()
 
 				if($sent == "OK")
 				{
-					$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->base_prefix."group_queue SET queueSent = '1', queueSentTime = NOW() WHERE queueID = '%d'", $intQueueID));
-
-					$sms_sent++;
+					$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_queue SET queueSent = '1', queueSentTime = NOW() WHERE queueID = '%d'", $intQueueID));
 
 					do_log("Not sent to ".$strAddressCellNo, 'trash');
 				}
@@ -525,7 +491,7 @@ function cron_group()
 				}
 			}
 
-			$i++;
+			//$i++;
 		}
 	}
 }
@@ -648,7 +614,7 @@ function show_group_registration_form($data) //$post_id
 		{
 			if(!($intAddressID > 0))
 			{
-				$wpdb->query("INSERT INTO ".$wpdb->base_prefix."address SET addressPublic = '1'".$query_set.", addressCreated = NOW()");
+				$wpdb->query("INSERT INTO ".$wpdb->prefix."address SET addressPublic = '1'".$query_set.", addressCreated = NOW()");
 
 				$intAddressID = $wpdb->insert_id;
 			}

@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: 
-Version: 4.4.0
+Version: 4.4.2
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: http://frostkom.se
@@ -59,7 +59,7 @@ function activate_group()
 
 	$arr_add_column = $arr_add_index = array();
 
-	$wpdb->query("CREATE TABLE IF NOT EXISTS ".$wpdb->base_prefix."group_message (
+	$wpdb->query("CREATE TABLE IF NOT EXISTS ".$wpdb->prefix."group_message (
 		messageID INT unsigned NOT NULL AUTO_INCREMENT,
 		groupID INT unsigned NOT NULL DEFAULT '0',
 		messageType VARCHAR(10),
@@ -74,16 +74,16 @@ function activate_group()
 		KEY groupID (groupID)
 	) DEFAULT CHARSET=".$default_charset);
 
-	$arr_add_column[$wpdb->base_prefix."group_message"] = array(
+	$arr_add_column[$wpdb->prefix."group_message"] = array(
 		'messageAttachment' => "ALTER TABLE [table] ADD [column] TEXT AFTER messageText",
 		'messageSchedule' => "ALTER TABLE [table] ADD [column] DATETIME DEFAULT NULL AFTER messageAttachment",
 	);
 
-	$arr_add_index[$wpdb->base_prefix."group_message"] = array(
+	$arr_add_index[$wpdb->prefix."group_message"] = array(
 		'groupID' => "ALTER TABLE [table] ADD INDEX [column] ([column])",
 	);
 
-	$wpdb->query("CREATE TABLE IF NOT EXISTS ".$wpdb->base_prefix."group_queue (
+	$wpdb->query("CREATE TABLE IF NOT EXISTS ".$wpdb->prefix."group_queue (
 		queueID INT unsigned NOT NULL AUTO_INCREMENT,
 		addressID INT unsigned NOT NULL DEFAULT '0',
 		messageID INT unsigned NOT NULL DEFAULT '0',
@@ -96,14 +96,14 @@ function activate_group()
 		KEY queueSent (queueSent)
 	) DEFAULT CHARSET=".$default_charset);
 
-	$arr_add_column[$wpdb->base_prefix."group_queue"]['queueReceived'] = "ALTER TABLE [table] ADD [column] ENUM('-1', '0','1') NOT NULL DEFAULT '0' AFTER queueSent";
+	$arr_add_column[$wpdb->prefix."group_queue"]['queueReceived'] = "ALTER TABLE [table] ADD [column] ENUM('-1', '0','1') NOT NULL DEFAULT '0' AFTER queueSent";
 
-	$arr_add_index[$wpdb->base_prefix."group_queue"] = array(
+	$arr_add_index[$wpdb->prefix."group_queue"] = array(
 		'messageID' => "ALTER TABLE [table] ADD INDEX [column] ([column])",
 		'queueSent' => "ALTER TABLE [table] ADD INDEX [column] ([column])",
 	);
 
-	$wpdb->query("CREATE TABLE IF NOT EXISTS ".$wpdb->base_prefix."address2group (
+	$wpdb->query("CREATE TABLE IF NOT EXISTS ".$wpdb->prefix."address2group (
 		addressID INT unsigned NOT NULL,
 		groupID INT unsigned NOT NULL,
 		groupAccepted ENUM('0', '1') NOT NULL DEFAULT '1',
@@ -112,12 +112,12 @@ function activate_group()
 		KEY groupID (groupID)
 	) DEFAULT CHARSET=".$default_charset);
 
-	$arr_add_column[$wpdb->base_prefix."address2group"] = array(
+	$arr_add_column[$wpdb->prefix."address2group"] = array(
 		'groupUnsubscribed' => "ALTER TABLE [table] ADD [column] ENUM('0', '1') NOT NULL DEFAULT '0' AFTER groupID",
 		'groupAccepted' => "ALTER TABLE [table] ADD [column] ENUM('0', '1') NOT NULL DEFAULT '1' AFTER groupUnsubscribed",
 	);
 
-	$arr_add_index[$wpdb->base_prefix."address2group"] = array(
+	$arr_add_index[$wpdb->prefix."address2group"] = array(
 		'addressID' => "ALTER TABLE [table] ADD INDEX [column] ([column])",
 		'groupID' => "ALTER TABLE [table] ADD INDEX [column] ([column])",
 	);

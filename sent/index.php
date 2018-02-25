@@ -12,7 +12,7 @@ $intMessageID = check_var('intMessageID');
 
 if(isset($_REQUEST['btnMessageAbort']) && $intMessageID > 0 && wp_verify_nonce($_REQUEST['_wpnonce'], 'message_abort_'.$intMessageID))
 {
-	$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->base_prefix."group_queue WHERE messageID = '%d' AND queueSent = '0'", $intMessageID));
+	$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueSent = '0'", $intMessageID));
 
 	$done_text = __("The message was aborted", 'lang_group');
 }
@@ -21,7 +21,7 @@ echo "<div class='wrap'>
 	<h2>".__("Sent", 'lang_group')."</h2>"
 	.get_notification();
 
-	$result = $wpdb->get_results($wpdb->prepare("SELECT messageID, messageType, messageFrom, messageName, messageText, messageAttachment, messageSchedule, messageCreated FROM ".$wpdb->base_prefix."group_message WHERE groupID = '%d' ORDER BY messageCreated DESC", $intGroupID));
+	$result = $wpdb->get_results($wpdb->prepare("SELECT messageID, messageType, messageFrom, messageName, messageText, messageAttachment, messageSchedule, messageCreated FROM ".$wpdb->prefix."group_message WHERE groupID = '%d' ORDER BY messageCreated DESC", $intGroupID));
 
 	echo "<table class='widefat striped'>";
 
@@ -60,11 +60,11 @@ echo "<div class='wrap'>
 						list($strMessageFromName, $strMessageFrom) = explode("|", $strMessageFrom);
 					}
 
-					$intMessageSent = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->base_prefix."group_queue WHERE messageID = '%d' AND queueSent = '1'", $intMessageID2));
-					$intMessageNotSent = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->base_prefix."group_queue WHERE messageID = '%d' AND queueSent = '0'", $intMessageID2));
+					$intMessageSent = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueSent = '1'", $intMessageID2));
+					$intMessageNotSent = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueSent = '0'", $intMessageID2));
 
-					$intMessageErrors = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->base_prefix."group_queue WHERE messageID = '%d' AND queueReceived = '-1'", $intMessageID2));
-					$intMessageReceived = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->base_prefix."group_queue WHERE messageID = '%d' AND queueReceived = '1'", $intMessageID2));
+					$intMessageErrors = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueReceived = '-1'", $intMessageID2));
+					$intMessageReceived = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueReceived = '1'", $intMessageID2));
 
 					$class = "";
 

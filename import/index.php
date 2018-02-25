@@ -40,11 +40,11 @@ if(isset($_POST['btnGroupImport']) && $strGroupImport != '' && wp_verify_nonce($
 
 			if($address_row != '')
 			{
-				$intAddressID = $wpdb->get_var("SELECT addressID FROM ".$wpdb->base_prefix."address WHERE ".($is_email ? "addressEmail = '".esc_sql($address_row)."'" : "addressBirthDate LIKE '%".esc_sql($address_row)."%'")." LIMIT 0, 1");
+				$intAddressID = $wpdb->get_var("SELECT addressID FROM ".$wpdb->prefix."address WHERE ".($is_email ? "addressEmail = '".esc_sql($address_row)."'" : "addressBirthDate LIKE '%".esc_sql($address_row)."%'")." LIMIT 0, 1");
 
 				if($intAddressID > 0)
 				{
-					$wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->base_prefix."address2group WHERE addressID = '%d' AND groupID = '%d' LIMIT 0, 1", $intAddressID, $intGroupID));
+					$wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address2group WHERE addressID = '%d' AND groupID = '%d' LIMIT 0, 1", $intAddressID, $intGroupID));
 
 					if($wpdb->num_rows == 0)
 					{

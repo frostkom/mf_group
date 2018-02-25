@@ -30,11 +30,11 @@ get_header();
 
 					if($strSubscribeHash == $hash_temp)
 					{
-						$intAddressID = $wpdb->get_var($wpdb->prepare("SELECT addressID FROM ".$wpdb->base_prefix."address INNER JOIN ".$wpdb->base_prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressEmail = %s AND addressDeleted = '0' AND groupAccepted = '0' LIMIT 0, 1", $intGroupID, $strAddressEmail));
+						$intAddressID = $wpdb->get_var($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressEmail = %s AND addressDeleted = '0' AND groupAccepted = '0' LIMIT 0, 1", $intGroupID, $strAddressEmail));
 
 						if($intAddressID > 0)
 						{
-							$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->base_prefix."address2group SET groupAccepted = '1' WHERE groupID = '%d' AND addressID = '%d'", $intGroupID, $intAddressID));
+							$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."address2group SET groupAccepted = '1' WHERE groupID = '%d' AND addressID = '%d'", $intGroupID, $intAddressID));
 
 							if($wpdb->rows_affected > 0)
 							{
@@ -61,7 +61,7 @@ get_header();
 
 				else if(isset($_REQUEST['unsubscribe']))
 				{
-					$intGroupSentAmount = $wpdb->get_var($wpdb->prepare("SELECT COUNT(groupID) FROM ".$wpdb->base_prefix."group_message WHERE groupID = '%d'", $post_id));
+					$intGroupSentAmount = $wpdb->get_var($wpdb->prepare("SELECT COUNT(groupID) FROM ".$wpdb->prefix."group_message WHERE groupID = '%d'", $post_id));
 
 					if($post_status == 'publish' || $intGroupSentAmount > 0)
 					{
@@ -78,13 +78,13 @@ get_header();
 						{
 							if($strUnsubscribeHash == $hash_temp)
 							{
-								$intAddressID = $wpdb->get_var($wpdb->prepare("SELECT addressID FROM ".$wpdb->base_prefix."address INNER JOIN ".$wpdb->base_prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressEmail = %s AND addressDeleted = '0' AND groupUnsubscribed = '0' LIMIT 0, 1", $intGroupID, $strAddressEmail));
+								$intAddressID = $wpdb->get_var($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressEmail = %s AND addressDeleted = '0' AND groupUnsubscribed = '0' LIMIT 0, 1", $intGroupID, $strAddressEmail));
 
 								if($intAddressID > 0)
 								{
 									if(isset($_POST['btnUnsubscribe']))
 									{
-										$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->base_prefix."address2group SET groupUnsubscribed = '1' WHERE groupID = '%d' AND addressID = '%d'", $intGroupID, $intAddressID));
+										$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."address2group SET groupUnsubscribed = '1' WHERE groupID = '%d' AND addressID = '%d'", $intGroupID, $intAddressID));
 
 										$done_text = __("You have been successfully unsubscribed", 'lang_group');
 									}
@@ -119,13 +119,13 @@ get_header();
 						{
 							if($intQueueID > 0)
 							{
-								$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->base_prefix."address INNER JOIN ".$wpdb->base_prefix."group_queue USING (addressID) WHERE addressEmail = %s AND queueID = '%d'", $strAddressEmail, $intQueueID));
+								$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."group_queue USING (addressID) WHERE addressEmail = %s AND queueID = '%d'", $strAddressEmail, $intQueueID));
 
 								foreach($result as $r)
 								{
 									$intAddressID = $r->addressID;
 
-									$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->base_prefix."group_queue SET queueReceived = '1' WHERE queueID = '%d' AND addressID = '%d'", $intQueueID, $intAddressID));
+									$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_queue SET queueReceived = '1' WHERE queueID = '%d' AND addressID = '%d'", $intQueueID, $intAddressID));
 
 									$obj_address = new mf_address($intAddressID);
 									$obj_address->update_errors(array('action' => 'reset'));
