@@ -178,7 +178,7 @@ echo "<div class='wrap'>
 							if($strGroupAcceptanceEmail == 'yes')
 							{
 								echo show_textfield(array('name' => 'strGroupAcceptanceSubject', 'text' => __("Subject", 'lang_group'), 'value' => $strGroupAcceptanceSubject, 'placeholder' => sprintf(__("Accept subscription to %s", 'lang_group'), $strGroupName)))
-								.show_textarea(array('name' => 'strGroupAcceptanceText', 'text' => __("Message", 'lang_group'), 'value' => $strGroupAcceptanceText, 'placeholder' => sprintf(__("You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below.", 'lang_group'), $strGroupName)));
+								.show_wp_editor(array('name' => 'strGroupAcceptanceText', 'value' => $strGroupAcceptanceText, 'description' => __("Example", 'lang_group').": ".sprintf(__("You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below.", 'lang_group'), $strGroupName))); //, 'text' => __("Message", 'lang_group')
 							}
 
 						echo "</div>

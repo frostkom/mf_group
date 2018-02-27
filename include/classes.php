@@ -303,12 +303,9 @@ class mf_group
 
 		$mail_to = $strAddressEmail;
 		$mail_subject = sprintf($strGroupAcceptanceSubject, $strGroupName);
-		$mail_content = sprintf($strGroupAcceptanceText, $strGroupName);
+		$mail_content = apply_filters('the_content', sprintf($strGroupAcceptanceText, $strGroupName));
 
-		$mail_content .= "<p>&nbsp;</p>
-		<p>
-			<a href='".get_group_url(array('type' => 'subscribe', 'group_id' => $data['group_id'], 'email' => $strAddressEmail))."'>".__("Accept Link", 'lang_group')."</a>
-		</p>";
+		$mail_content .= "<p><a href='".get_group_url(array('type' => 'subscribe', 'group_id' => $data['group_id'], 'email' => $strAddressEmail))."'>".__("Accept Link", 'lang_group')."</a></p>";
 
 		return send_email(array('to' => $mail_to, 'subject' => $mail_subject, 'content' => $mail_content));
 	}
