@@ -318,7 +318,7 @@ function cron_group()
 	$obj_cron = new mf_cron();
 	$obj_cron->start(__FUNCTION__);
 
-	if($obj_cron->is_running() == false)
+	if($obj_cron->is_running == false)
 	{
 		$obj_group = new mf_group();
 
