@@ -117,7 +117,7 @@ function notices_group()
 
 	if(IS_ADMIN)
 	{
-		$result = $wpdb->get_results("SELECT messageType, addressID, addressFirstName, addressSurName, addressEmail, addressCellNo FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) INNER JOIN ".$wpdb->prefix."address USING (addressID) WHERE queueSent = '0' AND queueCreated < DATE_SUB(NOW(), INTERVAL 3 HOUR) LIMIT 0, 6");
+		$result = $wpdb->get_results("SELECT messageType, addressID, addressFirstName, addressSurName, addressEmail, addressCellNo FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) INNER JOIN ".get_address_table_prefix()."address USING (addressID) WHERE queueSent = '0' AND queueCreated < DATE_SUB(NOW(), INTERVAL 3 HOUR) LIMIT 0, 6");
 
 		$rows = $wpdb->num_rows;
 
@@ -316,184 +316,191 @@ function cron_group()
 	global $wpdb, $error_text;
 
 	$obj_cron = new mf_cron();
-	$obj_group = new mf_group();
+	$obj_cron->start(__FUNCTION__);
 
-	//$i = 0;
-
-	$result = $wpdb->get_results("SELECT groupID FROM ".$wpdb->prefix."group_queue INNER JOIN ".$wpdb->prefix."group_message USING (messageID) WHERE queueSent = '0' AND (messageSchedule IS NULL OR messageSchedule < NOW()) GROUP BY groupID ORDER BY RAND()");
-
-	foreach($result as $r)
+	if($obj_cron->is_running() == false)
 	{
-		$intGroupID = $r->groupID;
-		$strGroupPublic = get_post_status($intGroupID);
-		
-		if($strGroupPublic == 'public')
+		$obj_group = new mf_group();
+
+		//$i = 0;
+
+		$result = $wpdb->get_results("SELECT groupID FROM ".$wpdb->prefix."group_queue INNER JOIN ".$wpdb->prefix."group_message USING (messageID) WHERE queueSent = '0' AND (messageSchedule IS NULL OR messageSchedule < NOW()) GROUP BY groupID ORDER BY RAND()");
+
+		foreach($result as $r)
 		{
-			$group_url = get_permalink($intGroupID);
-		}
-
-		$intGroupVerifyLink = get_post_meta($intGroupID, $obj_group->meta_prefix.'verify_link', true);
-
-		$intGroupUnsubscribeEmail = get_post_meta($intGroupID, $obj_group->meta_prefix.'unsubscribe_email', true);
-		$intGroupSubscribeEmail = get_post_meta($intGroupID, $obj_group->meta_prefix.'subscribe_email', true);
-		$intGroupOwnerEmail = get_post_meta($intGroupID, $obj_group->meta_prefix.'owner_email', true);
-		$intGroupHelpPage = get_post_meta($intGroupID, $obj_group->meta_prefix.'help_page', true);
-		$intGroupArchivePage = get_post_meta($intGroupID, $obj_group->meta_prefix.'archive_page', true);
-
-		$resultMessages = $wpdb->get_results($wpdb->prepare("SELECT addressEmail, addressCellNo, queueID, messageType, messageFrom, messageName, messageText, messageAttachment, ".$wpdb->prefix."group_message.userID FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."group_queue USING (addressID) INNER JOIN ".$wpdb->prefix."group_message USING (messageID) WHERE groupID = '%d' AND queueSent = '0' ORDER BY messageType ASC, queueCreated ASC".$obj_group->get_emails_left_to_send(), $intGroupID));
-
-		foreach($resultMessages as $r)
-		{
-			if($obj_cron->has_expired(array('margin' => .9)))
+			$intGroupID = $r->groupID;
+			$strGroupPublic = get_post_status($intGroupID);
+			
+			if($strGroupPublic == 'public')
 			{
-				break;
+				$group_url = get_permalink($intGroupID);
 			}
 
-			$intQueueID = $r->queueID;
-			$strAddressEmail = trim($r->addressEmail);
-			$strAddressCellNo = $r->addressCellNo;
-			$strMessageType = $r->messageType;
-			$strMessageFrom = $r->messageFrom;
-			$strMessageName = $r->messageName;
-			$strMessageText = $r->messageText;
-			$strMessageAttachment = $r->messageAttachment;
-			$intUserID = $r->userID;
+			$intGroupVerifyLink = get_post_meta($intGroupID, $obj_group->meta_prefix.'verify_link', true);
 
-			if($strMessageType == "email")
+			$intGroupUnsubscribeEmail = get_post_meta($intGroupID, $obj_group->meta_prefix.'unsubscribe_email', true);
+			$intGroupSubscribeEmail = get_post_meta($intGroupID, $obj_group->meta_prefix.'subscribe_email', true);
+			$intGroupOwnerEmail = get_post_meta($intGroupID, $obj_group->meta_prefix.'owner_email', true);
+			$intGroupHelpPage = get_post_meta($intGroupID, $obj_group->meta_prefix.'help_page', true);
+			$intGroupArchivePage = get_post_meta($intGroupID, $obj_group->meta_prefix.'archive_page', true);
+
+			$resultMessages = $wpdb->get_results($wpdb->prepare("SELECT addressEmail, addressCellNo, queueID, messageType, messageFrom, messageName, messageText, messageAttachment, ".$wpdb->prefix."group_message.userID FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."group_queue USING (addressID) INNER JOIN ".$wpdb->prefix."group_message USING (messageID) WHERE groupID = '%d' AND queueSent = '0' ORDER BY messageType ASC, queueCreated ASC".$obj_group->get_emails_left_to_send(), $intGroupID));
+
+			foreach($resultMessages as $r)
 			{
-				if($strAddressEmail != '' && is_domain_valid($strAddressEmail))
+				if($obj_cron->has_expired(array('margin' => .9)))
 				{
-					$strMessageFromName = "";
+					break;
+				}
 
-					if(preg_match("/\|/", $strMessageFrom))
+				$intQueueID = $r->queueID;
+				$strAddressEmail = trim($r->addressEmail);
+				$strAddressCellNo = $r->addressCellNo;
+				$strMessageType = $r->messageType;
+				$strMessageFrom = $r->messageFrom;
+				$strMessageName = $r->messageName;
+				$strMessageText = $r->messageText;
+				$strMessageAttachment = $r->messageAttachment;
+				$intUserID = $r->userID;
+
+				if($strMessageType == "email")
+				{
+					if($strAddressEmail != '' && is_domain_valid($strAddressEmail))
 					{
-						list($strMessageFromName, $strMessageFrom) = explode("|", $strMessageFrom);
-					}
+						$strMessageFromName = "";
 
-					else
-					{
-						$strMessageFromName = $strMessageFrom;
-					}
-
-					$unsubscribe_url = get_group_url(array('type' => "unsubscribe", 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
-
-					$mail_headers = "From: ".$strMessageFromName." <".$strMessageFrom.">\r\n";
-
-					/*if($intGroupUnsubscribeEmail > 0)
-					{
-						$mail_headers .= "List-Unsubscribe: <mailto:".$."?subject=Unsubscribe>";
-
-							if($strGroupPublic == 'public')
-							{
-								$mail_headers .= ", <".$unsubscribe_url.">";
-							}
-
-						$mail_headers .= "\r\n";
-					}
-
-					else
-					{*/
-						$mail_headers .= "List-Unsubscribe: <".$unsubscribe_url.">\r\n";
-					//}
-
-					/*if($intGroupSubscribeEmail > 0)
-					{
-						$mail_headers .= "List-Subscribe: <mailto:".$."?subject=Subscribe>";
-
-							if($strGroupPublic == 'public')
-							{
-								$mail_headers .= ", <".$group_url.">";
-							}
-
-						$mail_headers .= "\r\n";
-					}
-
-					else */if($strGroupPublic == 'public')
-					{
-						$mail_headers .= "List-Subscribe: <".$group_url.">\r\n";
-					}
-
-					if($intGroupOwnerEmail > 0)
-					{
-						$mail_headers .= "List-Owner: <mailto:".get_email_address_from_id($intGroupOwnerEmail).">\r\n";
-					}
-
-					if($intGroupHelpPage > 0)
-					{
-						$mail_headers .= "List-Help: <".get_permalink($intGroupHelpPage).">\r\n";
-					}
-
-					else if($strGroupPublic == 'public')
-					{
-						$mail_headers .= "List-Help: <".$group_url.">\r\n";
-					}
-
-					if($intGroupArchivePage > 0)
-					{
-						$mail_headers .= "List-Archive: <".get_permalink($intGroupArchivePage).">\r\n";
-					}
-
-					$mail_to = $strAddressEmail;
-					$mail_subject = $strMessageName;
-					$mail_content = stripslashes(apply_filters('the_content', $strMessageText));
-					$mail_content = str_replace("[unsubscribe_link]", $unsubscribe_url, $mail_content);
-
-					if($intGroupVerifyLink == 'yes')
-					{
-						$mail_content .= "<img src='".get_group_url(array('type' => "verify", 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID))."' style='height: 0; visibility: hidden; width: 0'>";
-					}
-
-					list($mail_attachment, $rest) = get_attachment_to_send($strMessageAttachment);
-
-					$wpdb->get_results($wpdb->prepare("SELECT queueID FROM ".$wpdb->prefix."group_queue WHERE queueSent = '1' AND queueID = '%d'", $intQueueID));
-
-					if($wpdb->num_rows == 0)
-					{
-						$sent = send_email(array('to' => $mail_to, 'subject' => $mail_subject, 'content' => $mail_content, 'headers' => $mail_headers, 'attachment' => $mail_attachment, 'save_log' => false));
-
-						if($sent)
+						if(preg_match("/\|/", $strMessageFrom))
 						{
-							$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_queue SET queueSent = '1', queueSentTime = NOW() WHERE queueID = '%d'", $intQueueID));
+							list($strMessageFromName, $strMessageFrom) = explode("|", $strMessageFrom);
+						}
+
+						else
+						{
+							$strMessageFromName = $strMessageFrom;
+						}
+
+						$unsubscribe_url = get_group_url(array('type' => "unsubscribe", 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
+
+						$mail_headers = "From: ".$strMessageFromName." <".$strMessageFrom.">\r\n";
+
+						/*if($intGroupUnsubscribeEmail > 0)
+						{
+							$mail_headers .= "List-Unsubscribe: <mailto:".$."?subject=Unsubscribe>";
+
+								if($strGroupPublic == 'public')
+								{
+									$mail_headers .= ", <".$unsubscribe_url.">";
+								}
+
+							$mail_headers .= "\r\n";
+						}
+
+						else
+						{*/
+							$mail_headers .= "List-Unsubscribe: <".$unsubscribe_url.">\r\n";
+						//}
+
+						/*if($intGroupSubscribeEmail > 0)
+						{
+							$mail_headers .= "List-Subscribe: <mailto:".$."?subject=Subscribe>";
+
+								if($strGroupPublic == 'public')
+								{
+									$mail_headers .= ", <".$group_url.">";
+								}
+
+							$mail_headers .= "\r\n";
+						}
+
+						else */if($strGroupPublic == 'public')
+						{
+							$mail_headers .= "List-Subscribe: <".$group_url.">\r\n";
+						}
+
+						if($intGroupOwnerEmail > 0)
+						{
+							$mail_headers .= "List-Owner: <mailto:".get_email_address_from_id($intGroupOwnerEmail).">\r\n";
+						}
+
+						if($intGroupHelpPage > 0)
+						{
+							$mail_headers .= "List-Help: <".get_permalink($intGroupHelpPage).">\r\n";
+						}
+
+						else if($strGroupPublic == 'public')
+						{
+							$mail_headers .= "List-Help: <".$group_url.">\r\n";
+						}
+
+						if($intGroupArchivePage > 0)
+						{
+							$mail_headers .= "List-Archive: <".get_permalink($intGroupArchivePage).">\r\n";
+						}
+
+						$mail_to = $strAddressEmail;
+						$mail_subject = $strMessageName;
+						$mail_content = stripslashes(apply_filters('the_content', $strMessageText));
+						$mail_content = str_replace("[unsubscribe_link]", $unsubscribe_url, $mail_content);
+
+						if($intGroupVerifyLink == 'yes')
+						{
+							$mail_content .= "<img src='".get_group_url(array('type' => "verify", 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID))."' style='height: 0; visibility: hidden; width: 0'>";
+						}
+
+						list($mail_attachment, $rest) = get_attachment_to_send($strMessageAttachment);
+
+						$wpdb->get_results($wpdb->prepare("SELECT queueID FROM ".$wpdb->prefix."group_queue WHERE queueSent = '1' AND queueID = '%d'", $intQueueID));
+
+						if($wpdb->num_rows == 0)
+						{
+							$sent = send_email(array('to' => $mail_to, 'subject' => $mail_subject, 'content' => $mail_content, 'headers' => $mail_headers, 'attachment' => $mail_attachment, 'save_log' => false));
+
+							if($sent)
+							{
+								$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_queue SET queueSent = '1', queueSentTime = NOW() WHERE queueID = '%d'", $intQueueID));
+							}
 						}
 					}
+
+					else
+					{
+						$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->prefix."group_queue WHERE queueID = '%d'", $intQueueID));
+					}
 				}
 
-				else
+				else if($strMessageType == "sms")
 				{
-					$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->prefix."group_queue WHERE queueID = '%d'", $intQueueID));
+					//Must be here to make sure that send_sms() is loaded
+					##################
+					require_once(ABSPATH."wp-admin/includes/plugin.php");
+
+					if(is_plugin_active("mf_sms/index.php"))
+					{
+						require_once(ABSPATH."wp-content/plugins/mf_sms/include/functions.php");
+					}
+					##################
+
+					$sent = send_sms(array('from' => $strMessageFrom, 'to' => $strAddressCellNo, 'text' => $strMessageText, 'user_id' => $intUserID));
+
+					if($sent == "OK")
+					{
+						$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_queue SET queueSent = '1', queueSentTime = NOW() WHERE queueID = '%d'", $intQueueID));
+
+						do_log("Not sent to ".$strAddressCellNo, 'trash');
+					}
+
+					else
+					{
+						do_log("Not sent to ".$strAddressCellNo.", ".shorten_text(array('string' => htmlspecialchars($strMessageText), 'limit' => 10)));
+					}
 				}
+
+				//$i++;
 			}
-
-			else if($strMessageType == "sms")
-			{
-				//Must be here to make sure that send_sms() is loaded
-				##################
-				require_once(ABSPATH."wp-admin/includes/plugin.php");
-
-				if(is_plugin_active("mf_sms/index.php"))
-				{
-					require_once(ABSPATH."wp-content/plugins/mf_sms/include/functions.php");
-				}
-				##################
-
-				$sent = send_sms(array('from' => $strMessageFrom, 'to' => $strAddressCellNo, 'text' => $strMessageText, 'user_id' => $intUserID));
-
-				if($sent == "OK")
-				{
-					$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_queue SET queueSent = '1', queueSentTime = NOW() WHERE queueID = '%d'", $intQueueID));
-
-					do_log("Not sent to ".$strAddressCellNo, 'trash');
-				}
-
-				else
-				{
-					do_log("Not sent to ".$strAddressCellNo.", ".shorten_text(array('string' => htmlspecialchars($strMessageText), 'limit' => 10)));
-				}
-			}
-
-			//$i++;
 		}
 	}
+
+	$obj_cron->end();
 }
 
 function show_group_registration_form($data) //$post_id
@@ -614,7 +621,7 @@ function show_group_registration_form($data) //$post_id
 		{
 			if(!($intAddressID > 0))
 			{
-				$wpdb->query("INSERT INTO ".$wpdb->prefix."address SET addressPublic = '1'".$query_set.", addressCreated = NOW()");
+				$wpdb->query("INSERT INTO ".get_address_table_prefix()."address SET addressPublic = '1'".$query_set.", addressCreated = NOW()");
 
 				$intAddressID = $wpdb->insert_id;
 			}

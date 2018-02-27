@@ -144,7 +144,7 @@ class mf_group
 
 									if($this->message_id > 0)
 									{
-										$result = $wpdb->get_results($wpdb->prepare("SELECT addressID, addressEmail, addressCellNo FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' AND groupAccepted = '1' AND groupUnsubscribed = '0'", $this->group_id));
+										$result = $wpdb->get_results($wpdb->prepare("SELECT addressID, addressEmail, addressCellNo FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' AND groupAccepted = '1' AND groupUnsubscribed = '0'", $this->group_id));
 
 										foreach($result as $r)
 										{
@@ -255,7 +255,7 @@ class mf_group
 
 		if($query_where != '')
 		{
-			$intAddressID = $wpdb->get_var("SELECT addressID FROM ".$wpdb->prefix."address WHERE addressDeleted = '0' AND ".$query_where);
+			$intAddressID = $wpdb->get_var("SELECT addressID FROM ".get_address_table_prefix()."address WHERE addressDeleted = '0' AND ".$query_where);
 
 			return $intAddressID;
 		}
@@ -367,7 +367,7 @@ class mf_group
 			$query_where .= " AND groupID = '".esc_sql($data['id'])."'";
 		}
 
-		return $wpdb->get_var($wpdb->prepare("SELECT COUNT(addressID) FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE addressDeleted = '0' AND groupAccepted = '%d' AND groupUnsubscribed = '%d'".$query_where, $data['accepted'], $data['unsubscribed']));
+		return $wpdb->get_var($wpdb->prepare("SELECT COUNT(addressID) FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE addressDeleted = '0' AND groupAccepted = '%d' AND groupUnsubscribed = '%d'".$query_where, $data['accepted'], $data['unsubscribed']));
 	}
 }
 
@@ -385,7 +385,7 @@ class mf_group_export extends mf_export
 		$obj_group = new mf_group();
 		$this->name = $obj_group->get_name($this->type);
 
-		$result = $wpdb->get_results($wpdb->prepare("SELECT * FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' GROUP BY addressID ORDER BY addressPublic ASC, addressSurName ASC, addressFirstName ASC", $this->type));
+		$result = $wpdb->get_results($wpdb->prepare("SELECT * FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' GROUP BY addressID ORDER BY addressPublic ASC, addressSurName ASC, addressFirstName ASC", $this->type));
 
 		foreach($result as $r)
 		{
@@ -666,7 +666,7 @@ class mf_group_table extends mf_list_table
 			break;
 
 			case 'unsubscribed':
-				$rowsAddressesUnsubscribed = $wpdb->get_var($wpdb->prepare("SELECT COUNT(addressID) FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' AND groupUnsubscribed = '1'", $post_id));
+				$rowsAddressesUnsubscribed = $wpdb->get_var($wpdb->prepare("SELECT COUNT(addressID) FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' AND groupUnsubscribed = '1'", $post_id));
 
 				$dteMessageCreated = $wpdb->get_var($wpdb->prepare("SELECT messageCreated FROM ".$wpdb->prefix."group_message WHERE groupID = '%d' ORDER BY messageCreated DESC", $post_id));
 

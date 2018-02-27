@@ -80,7 +80,7 @@ if(isset($_POST['btnGroupCreate']))
 		{
 			if($intGroupID_copy > 0)
 			{
-				$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0'", $intGroupID_copy));
+				$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0'", $intGroupID_copy));
 
 				foreach($result as $r)
 				{
