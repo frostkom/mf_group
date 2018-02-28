@@ -138,7 +138,9 @@ function notices_group()
 					$emlAddressEmail = $r->addressEmail;
 					$strAddressCellNo = $r->addressCellNo;
 
-					$strAddressName = $strAddressFirstName." ".$strAddressSurName." &lt;".($strMessageType == "email" ? $emlAddressEmail : $strAddressCellNo)."&gt;";
+					$strAddressName = ($strAddressFirstName != '' ? $strAddressFirstName." " : "")
+						.($strAddressSurName != '' ? $strAddressSurName." " : "")
+						."&lt;".($strMessageType == "email" ? $emlAddressEmail : $strAddressCellNo)."&gt;";
 
 					$unsent_links .= ($unsent_links != '' ? ", " : "")."<a href='".admin_url("admin.php?page=mf_address/create/index.php&intAddressID=".$intAddressID)."'>".$strAddressName."</a>";
 
