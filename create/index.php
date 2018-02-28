@@ -192,13 +192,15 @@ echo "<div class='wrap'>
 								$obj_email = new mf_email();
 								//$arr_data_incoming = $obj_email->get_from_for_select(array('type' => 'incoming'));
 								$arr_data_email = $obj_email->get_from_for_select();
+								$arr_data_abuse = $obj_email->get_from_for_select(array('type' => 'abuse'));
 								
 								$arr_data_page = array();
 								get_post_children(array('add_choose_here' => true), $arr_data_page);
 
 								/*echo show_select(array('data' => $arr_data_incoming, 'name' => 'intGroupUnsubscribeEmail', 'text' => __("E-mail to Unsubscribe to", 'lang_group'), 'value' => $intGroupUnsubscribeEmail))
 								.show_select(array('data' => $arr_data_incoming, 'name' => 'intGroupSubscribeEmail', 'text' => __("E-mail to Subscribe to", 'lang_group'), 'value' => $intGroupSubscribeEmail));*/
-								echo show_select(array('data' => $arr_data_email, 'name' => 'intGroupOwnerEmail', 'text' => __("E-mail Owner", 'lang_group'), 'value' => $intGroupOwnerEmail))
+								echo show_select(array('data' => $arr_data_email, 'name' => 'intGroupOwnerEmail', 'text' => __("Owner", 'lang_group'), 'value' => $intGroupOwnerEmail))
+								.show_select(array('data' => $arr_data_abuse, 'name' => 'intGroupAbuseEmail', 'text' => __("Abuse", 'lang_group'), 'description' => sprintf(__("You should have setup both %s and %s because these addresses are usually used for other servers when sending notices about spam. This is a great way of receiving and handling possible issues within your own domain", 'lang_group'), "abuse@domain.com", "postmaster@domain.com")))
 								.show_select(array('data' => $arr_data_page, 'name' => 'intGroupHelpPage', 'text' => __("Help Page", 'lang_group'), 'value' => $intGroupHelpPage))
 								.show_select(array('data' => $arr_data_page, 'name' => 'intGroupArchivePage', 'text' => __("Archive Page", 'lang_group'), 'value' => $intGroupArchivePage));
 							}
