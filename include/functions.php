@@ -324,8 +324,6 @@ function cron_group()
 	{
 		$obj_group = new mf_group();
 
-		//$i = 0;
-
 		$result = $wpdb->get_results("SELECT groupID FROM ".$wpdb->prefix."group_queue INNER JOIN ".$wpdb->prefix."group_message USING (messageID) WHERE queueSent = '0' AND (messageSchedule IS NULL OR messageSchedule < NOW()) GROUP BY groupID ORDER BY RAND()");
 
 		foreach($result as $r)
@@ -496,8 +494,6 @@ function cron_group()
 						do_log("Not sent to ".$strAddressCellNo.", ".shorten_text(array('string' => htmlspecialchars($strMessageText), 'limit' => 10)));
 					}
 				}
-
-				//$i++;
 			}
 		}
 	}
@@ -505,7 +501,7 @@ function cron_group()
 	$obj_cron->end();
 }
 
-function show_group_registration_form($data) //$post_id
+function show_group_registration_form($data)
 {
 	global $wpdb, $done_text, $error_text;
 
