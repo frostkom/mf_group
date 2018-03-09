@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: 
-Version: 4.4.9
+Version: 4.4.10
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: http://frostkom.se
@@ -50,10 +50,7 @@ function activate_group()
 {
 	global $wpdb;
 
-	if(is_admin())
-	{
-		require_plugin("mf_address/index.php", "MF Address");
-	}
+	require_plugin("mf_address/index.php", "MF Address");
 
 	$default_charset = DB_CHARSET != '' ? DB_CHARSET : "utf8";
 
