@@ -1,141 +1,17 @@
 <?php
 
-$obj_group = new mf_group();
+$obj_group = new mf_group(array('type' => 'create'));
 
-$intGroupID = check_var('intGroupID');
-
-$query_xtra = "";
+$obj_group->query_where = "";
 
 if(!IS_EDITOR)
 {
-	$query_xtra .= " AND post_author = '".get_current_user_id()."'";
+	$obj_group->query_where .= " AND post_author = '".get_current_user_id()."'";
 }
 
-$intGroupID = check_var('intGroupID');
-$strGroupName = check_var('strGroupName');
-
-$strGroupAcceptanceEmail = check_var('strGroupAcceptanceEmail');
-$strGroupAcceptanceSubject = check_var('strGroupAcceptanceSubject');
-$strGroupAcceptanceText = check_var('strGroupAcceptanceText');
-
-/*$intGroupUnsubscribeEmail = check_var('intGroupUnsubscribeEmail');
-$intGroupSubscribeEmail = check_var('intGroupSubscribeEmail');*/
-$intGroupOwnerEmail = check_var('intGroupOwnerEmail');
-$intGroupHelpPage = check_var('intGroupHelpPage');
-$intGroupArchivePage = check_var('intGroupArchivePage');
-
-$strGroupPublic = check_var('strGroupPublic', 'char', true, 'draft');
-$strGroupVerifyAddress = check_var('strGroupVerifyAddress');
-$intGroupContactPage = check_var('intGroupContactPage');
-$intGroupVerifyLink = check_var('intGroupVerifyLink', 'char', true, 'no');
-$arrGroupRegistrationFields = check_var('arrGroupRegistrationFields');
-$intGroupID_copy = check_var('intGroupID_copy');
-
-$obj_group = new mf_group();
-
-if(isset($_POST['btnGroupCreate']))
-{
-	$post_data = array(
-		'post_type' => 'mf_group',
-		'post_status' => $strGroupPublic,
-		'post_title' => $strGroupName,
-	);
-
-	if($intGroupID > 0)
-	{
-		$post_data['ID'] = $intGroupID;
-		$post_data['post_modified'] = date("Y-m-d H:i:s");
-
-		if(wp_update_post($post_data) > 0)
-		{
-			update_post_meta($intGroupID, 'group_acceptance_email', $strGroupAcceptanceEmail);
-			update_post_meta($intGroupID, 'group_acceptance_subject', $strGroupAcceptanceSubject);
-			update_post_meta($intGroupID, 'group_acceptance_text', $strGroupAcceptanceText);
-
-			update_post_meta($intGroupID, 'group_verify_address', $strGroupVerifyAddress);
-			update_post_meta($intGroupID, 'group_contact_page', $intGroupContactPage);
-			update_post_meta($intGroupID, 'group_registration_fields', $arrGroupRegistrationFields);
-			update_post_meta($intGroupID, $obj_group->meta_prefix.'verify_link', $intGroupVerifyLink);
-
-			/*update_post_meta($intGroupID, $obj_group->meta_prefix.'unsubscribe_email', $intGroupUnsubscribeEmail);
-			update_post_meta($intGroupID, $obj_group->meta_prefix.'subscribe_email', $intGroupSubscribeEmail);*/
-			update_post_meta($intGroupID, $obj_group->meta_prefix.'owner_email', $intGroupOwnerEmail);
-			update_post_meta($intGroupID, $obj_group->meta_prefix.'help_page', $intGroupHelpPage);
-			update_post_meta($intGroupID, $obj_group->meta_prefix.'archive_page', $intGroupArchivePage);
-
-			mf_redirect(admin_url("admin.php?page=mf_group/list/index.php&updated"));
-		}
-
-		else
-		{
-			$error_text = __("The information was not submitted, contact an admin if this persists", 'lang_group');
-		}
-	}
-
-	else
-	{
-		$intGroupID = wp_insert_post($post_data);
-
-		if($intGroupID > 0)
-		{
-			if($intGroupID_copy > 0)
-			{
-				$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0'", $intGroupID_copy));
-
-				foreach($result as $r)
-				{
-					$intAddressID = $r->addressID;
-
-					$obj_group->add_address(array('address_id' => $intAddressID, 'group_id' => $intGroupID));
-				}
-			}
-
-			mf_redirect(admin_url("admin.php?page=mf_group/list/index.php&created"));
-		}
-
-		else
-		{
-			$error_text = __("The information was not submitted, contact an admin if this persists", 'lang_group');
-		}
-	}
-}
-
-if($intGroupID > 0)
-{
-	$result = $wpdb->get_results($wpdb->prepare("SELECT post_status, post_title FROM ".$wpdb->posts." WHERE post_type = 'mf_group' AND ID = '%d'".$query_xtra, $intGroupID));
-
-	foreach($result as $r)
-	{
-		$strGroupPublic = $r->post_status;
-		$strGroupName = $r->post_title;
-
-		$strGroupAcceptanceEmail = get_post_meta_or_default($intGroupID, 'group_acceptance_email', true, 'no');
-		$strGroupAcceptanceSubject = get_post_meta($intGroupID, 'group_acceptance_subject', true);
-		$strGroupAcceptanceText = get_post_meta($intGroupID, 'group_acceptance_text', true);
-
-		$strGroupVerifyAddress = get_post_meta_or_default($intGroupID, 'group_verify_address', true, 'no');
-		$intGroupContactPage = get_post_meta($intGroupID, 'group_contact_page', true);
-		$arrGroupRegistrationFields = get_post_meta($intGroupID, 'group_registration_fields', true);
-		$intGroupVerifyLink = get_post_meta($intGroupID, $obj_group->meta_prefix.'verify_link', true);
-
-		/*$intGroupUnsubscribeEmail = get_post_meta($intGroupID, $obj_group->meta_prefix.'unsubscribe_email', true);
-		$intGroupSubscribeEmail = get_post_meta($intGroupID, $obj_group->meta_prefix.'subscribe_email', true);*/
-		$intGroupOwnerEmail = get_post_meta($intGroupID, $obj_group->meta_prefix.'owner_email', true);
-		$intGroupHelpPage = get_post_meta($intGroupID, $obj_group->meta_prefix.'help_page', true);
-		$intGroupArchivePage = get_post_meta($intGroupID, $obj_group->meta_prefix.'archive_page', true);
-
-		if($strGroupPublic == "trash")
-		{
-			$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->posts." SET post_status = 'publish' WHERE ID = '%d' AND post_type = 'mf_group'".$query_xtra, $intGroupID));
-		}
-	}
-}
-
-$arr_data_public = array(
-	'publish' => __("Public", 'lang_group'),
-	'draft' => __("Not Public", 'lang_group'),
-	'ignore' => __("Inactive", 'lang_group'),
-);
+$obj_group->fetch_request();
+echo $obj_group->save_data();
+$obj_group->get_from_db();
 
 echo "<div class='wrap'>
 	<h2>".__("Group", 'lang_group')."</h2>"
@@ -145,13 +21,13 @@ echo "<div class='wrap'>
 			<div id='post-body' class='columns-2'>
 				<div id='post-body-content'>
 					<div class='postbox'>
-						<h3 class='hndle'><span>".($intGroupID > 0 ? __("Update", 'lang_group') : __("Add", 'lang_group'))."</span></h3>
+						<h3 class='hndle'><span>".($obj_group->id > 0 ? __("Update", 'lang_group') : __("Add", 'lang_group'))."</span></h3>
 						<div class='inside'>"
-							.show_textfield(array('name' => "strGroupName", 'text' => __("Name", 'lang_group'), 'value' => $strGroupName, 'xtra' => "autofocus"));
+							.show_textfield(array('name' => "strGroupName", 'text' => __("Name", 'lang_group'), 'value' => $obj_group->name, 'xtra' => "autofocus"));
 
-							if(!($intGroupID > 0))
+							if(!($obj_group->id > 0))
 							{
-								$result = $wpdb->get_results("SELECT ID, post_title FROM ".$wpdb->posts." WHERE post_type = 'mf_group' AND post_status = 'publish'".$query_xtra." ORDER BY post_title ASC");
+								$result = $wpdb->get_results("SELECT ID, post_title FROM ".$wpdb->posts." WHERE post_type = 'mf_group' AND post_status = 'publish'".$obj_group->query_where." ORDER BY post_title ASC");
 
 								if($wpdb->num_rows > 0)
 								{
@@ -173,12 +49,12 @@ echo "<div class='wrap'>
 					<div class='postbox'>
 						<h3 class='hndle'><span>".__("Acceptance e-mail", 'lang_group')."</span></h3>
 						<div class='inside'>"
-							.show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupAcceptanceEmail', 'text' => __("Send before adding to a group", 'lang_group'), 'value' => $strGroupAcceptanceEmail));
+							.show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupAcceptanceEmail', 'text' => __("Send before adding to a group", 'lang_group'), 'value' => $obj_group->acceptance_email));
 
-							if($strGroupAcceptanceEmail == 'yes')
+							if($obj_group->acceptance_email == 'yes')
 							{
-								echo show_textfield(array('name' => 'strGroupAcceptanceSubject', 'text' => __("Subject", 'lang_group'), 'value' => $strGroupAcceptanceSubject, 'placeholder' => sprintf(__("Accept subscription to %s", 'lang_group'), $strGroupName)))
-								.show_wp_editor(array('name' => 'strGroupAcceptanceText', 'value' => $strGroupAcceptanceText, 'description' => __("Example", 'lang_group').": ".sprintf(__("You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below.", 'lang_group'), $strGroupName))); //, 'text' => __("Message", 'lang_group')
+								echo show_textfield(array('name' => 'strGroupAcceptanceSubject', 'text' => __("Subject", 'lang_group'), 'value' => $obj_group->acceptance_subject, 'placeholder' => sprintf(__("Accept subscription to %s", 'lang_group'), $obj_group->name)))
+								.show_wp_editor(array('name' => 'strGroupAcceptanceText', 'value' => $obj_group->acceptance_text, 'description' => __("Example", 'lang_group').": ".sprintf(__("You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below.", 'lang_group'), $obj_group->name))); //, 'text' => __("Message", 'lang_group')
 							}
 
 						echo "</div>
@@ -198,12 +74,12 @@ echo "<div class='wrap'>
 								$arr_data_page = array();
 								get_post_children(array('add_choose_here' => true), $arr_data_page);
 
-								/*echo show_select(array('data' => $arr_data_incoming, 'name' => 'intGroupUnsubscribeEmail', 'text' => __("E-mail to Unsubscribe to", 'lang_group'), 'value' => $intGroupUnsubscribeEmail))
-								.show_select(array('data' => $arr_data_incoming, 'name' => 'intGroupSubscribeEmail', 'text' => __("E-mail to Subscribe to", 'lang_group'), 'value' => $intGroupSubscribeEmail));*/
-								echo show_select(array('data' => $arr_data_email, 'name' => 'intGroupOwnerEmail', 'text' => __("Owner", 'lang_group'), 'value' => $intGroupOwnerEmail))
+								/*echo show_select(array('data' => $arr_data_incoming, 'name' => 'intGroupUnsubscribeEmail', 'text' => __("E-mail to Unsubscribe to", 'lang_group'), 'value' => $obj_group->unsubscribe_email))
+								.show_select(array('data' => $arr_data_incoming, 'name' => 'intGroupSubscribeEmail', 'text' => __("E-mail to Subscribe to", 'lang_group'), 'value' => $obj_group->subscribe_email));*/
+								echo show_select(array('data' => $arr_data_email, 'name' => 'intGroupOwnerEmail', 'text' => __("Owner", 'lang_group'), 'value' => $obj_group->owner_email))
 								.show_select(array('data' => $arr_data_abuse, 'name' => 'intGroupAbuseEmail', 'text' => __("Abuse", 'lang_group'), 'description' => sprintf(__("You should have setup both %s and %s because these addresses are usually used for other servers when sending notices about spam. This is a great way of receiving and handling possible issues within your own domain", 'lang_group'), "abuse@domain.com", "postmaster@domain.com")))
-								.show_select(array('data' => $arr_data_page, 'name' => 'intGroupHelpPage', 'text' => __("Help Page", 'lang_group'), 'value' => $intGroupHelpPage))
-								.show_select(array('data' => $arr_data_page, 'name' => 'intGroupArchivePage', 'text' => __("Archive Page", 'lang_group'), 'value' => $intGroupArchivePage));
+								.show_select(array('data' => $arr_data_page, 'name' => 'intGroupHelpPage', 'text' => __("Help Page", 'lang_group'), 'value' => $obj_group->help_page))
+								.show_select(array('data' => $arr_data_page, 'name' => 'intGroupArchivePage', 'text' => __("Archive Page", 'lang_group'), 'value' => $obj_group->archive_page));
 
 							echo "</div>
 						</div>
@@ -213,30 +89,28 @@ echo "<div class='wrap'>
 				echo "<div id='postbox-container-1'>
 					<div class='postbox'>
 						<div class='inside'>"
-							.show_button(array('name' => "btnGroupCreate", 'text' => __("Save", 'lang_group')))
-							.input_hidden(array('name' => "intGroupID", 'value' => $intGroupID))
+							.show_button(array('name' => 'btnGroupSave', 'text' => __("Save", 'lang_group')))
+							.input_hidden(array('name' => 'intGroupID', 'value' => $obj_group->id))
+							.wp_nonce_field('group_save_'.$obj_group->id, '_wpnonce', true, false)
 						."</div>
 					</div>
 					<div class='postbox'>
 						<h3 class='hndle'><span>".__("Settings", 'lang_group')."</span></h3>
 						<div class='inside'>"
-							.show_select(array('data' => $arr_data_public, 'name' => 'strGroupPublic', 'text' => __("Status", 'lang_group'), 'value' => $strGroupPublic, 'description' => ($intGroupID > 0 ? get_permalink($intGroupID) : "")));
+							.show_select(array('data' => $obj_group->get_post_status_for_select(), 'name' => 'strGroupPublic', 'text' => __("Status", 'lang_group'), 'value' => $obj_group->public, 'description' => ($obj_group->id > 0 ? get_permalink($obj_group->id) : "")));
 
-							if($strGroupPublic == "publish")
+							if($obj_group->public == "publish")
 							{
-								echo show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupVerifyAddress', 'text' => __("Verify that address is in Address book", 'lang_group'), 'value' => $strGroupVerifyAddress));
+								echo show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupVerifyAddress', 'text' => __("Verify that address is in Address book", 'lang_group'), 'value' => $obj_group->verify_address));
 
-								if($strGroupVerifyAddress == "yes")
+								if($obj_group->verify_address == "yes")
 								{
 									$arr_data = array();
 									get_post_children(array('add_choose_here' => true), $arr_data);
 
-									echo show_select(array('data' => $arr_data, 'name' => 'intGroupContactPage', 'text' => __("Contact Page", 'lang_group'), 'value' => $intGroupContactPage));
+									echo show_select(array('data' => $arr_data, 'name' => 'intGroupContactPage', 'text' => __("Contact Page", 'lang_group'), 'value' => $obj_group->contact_page));
 								}
-							}
 
-							if($strGroupPublic == "publish")
-							{
 								$arr_data = array(
 									'name' => __("Name", 'lang_group'),
 									'address' => __("Address", 'lang_group'),
@@ -247,10 +121,11 @@ echo "<div class='wrap'>
 									'extra' => get_option_or_default('setting_address_extra', __("Extra", 'lang_group')),
 								);
 
-								echo show_select(array('data' => $arr_data, 'name' => 'arrGroupRegistrationFields[]', 'text' => __("Registration Fields", 'lang_group'), 'value' => $arrGroupRegistrationFields));
+								echo show_select(array('data' => $arr_data, 'name' => 'arrGroupRegistrationFields[]', 'text' => __("Registration Fields", 'lang_group'), 'value' => $obj_group->registration_fields));
 							}
 
-							echo show_select(array('data' => get_yes_no_for_select(), 'name' => 'intGroupVerifyLink', 'text' => __("Add Verify Link", 'lang_group'), 'value' => $intGroupVerifyLink, 'description' => __("In every message a hidden image/link is placed to see if the recepient has opened the message. This increases the risk of being classified as spam", 'lang_group')))
+							echo show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupVerifyLink', 'text' => __("Add Verify Link", 'lang_group'), 'value' => $obj_group->verify_link, 'description' => __("In every message a hidden image/link is placed to see if the recepient has opened the message. This increases the risk of being classified as spam", 'lang_group')))
+							.show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupSyncUsers', 'text' => __("Synchronize Users", 'lang_group'), 'value' => $obj_group->sync_users, 'description' => __("This will automatically add/remove users and their information to this group", 'lang_group')))
 						."</div>
 					</div>
 				</div>

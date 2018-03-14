@@ -1,8 +1,8 @@
 <?php
 
-$obj_group = new mf_group();
-$obj_group->fetch_request('table');
-echo $obj_group->save_data('table');
+$obj_group = new mf_group(array('type' => 'table'));
+$obj_group->fetch_request();
+echo $obj_group->save_data();
 
 echo "<div class='wrap'>
 	<h2>"

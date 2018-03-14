@@ -1,8 +1,8 @@
 <?php
 
-$obj_group = new mf_group();
-$obj_group->fetch_request('form');
-echo $obj_group->save_data('form');
+$obj_group = new mf_group(array('type' => 'form'));
+$obj_group->fetch_request();
+echo $obj_group->save_data();
 
 echo "<div class='wrap'>
 	<h2>".__("Send message", 'lang_group')."</h2>"

@@ -324,6 +324,7 @@ function cron_group()
 	{
 		$obj_group = new mf_group();
 
+		/* Send group messages */
 		$result = $wpdb->get_results("SELECT groupID FROM ".$wpdb->prefix."group_queue INNER JOIN ".$wpdb->prefix."group_message USING (messageID) WHERE queueSent = '0' AND (messageSchedule IS NULL OR messageSchedule < NOW()) GROUP BY groupID ORDER BY RAND()");
 
 		foreach($result as $r)
@@ -336,7 +337,7 @@ function cron_group()
 				$group_url = get_permalink($intGroupID);
 			}
 
-			$intGroupVerifyLink = get_post_meta($intGroupID, $obj_group->meta_prefix.'verify_link', true);
+			$strGroupVerifyLink = get_post_meta($intGroupID, $obj_group->meta_prefix.'verify_link', true);
 
 			$intGroupUnsubscribeEmail = get_post_meta($intGroupID, $obj_group->meta_prefix.'unsubscribe_email', true);
 			$intGroupSubscribeEmail = get_post_meta($intGroupID, $obj_group->meta_prefix.'subscribe_email', true);
@@ -442,7 +443,7 @@ function cron_group()
 						$mail_content = stripslashes(apply_filters('the_content', $strMessageText));
 						$mail_content = str_replace("[unsubscribe_link]", $unsubscribe_url, $mail_content);
 
-						if($intGroupVerifyLink == 'yes')
+						if($strGroupVerifyLink == 'yes')
 						{
 							$mail_content .= "<img src='".get_group_url(array('type' => "verify", 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID))."' style='height: 0; visibility: hidden; width: 0'>";
 						}
@@ -493,6 +494,50 @@ function cron_group()
 					{
 						do_log("Not sent to ".$strAddressCellNo.", ".shorten_text(array('string' => htmlspecialchars($strMessageText), 'limit' => 10)));
 					}
+				}
+			}
+		}
+
+		/* Add users to groups that are set to synchronize */
+		$result = $wpdb->get_results("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = 'mf_group' AND meta_key = '".$obj_group->meta_prefix."sync_users' AND meta_value = 'yes'");
+
+		foreach($result as $r)
+		{
+			$intGroupID = $r->ID;
+
+			$obj_group->remove_all_address($intGroupID);
+
+			$users = get_users(array('fields' => 'all'));
+
+			foreach($users as $user)
+			{
+				$strUserLogin = $user->user_login;
+				$strUserFirstName = $user->first_name;
+				$strUserSurName = $user->last_name;
+				$strUserEmail = $user->user_email;
+
+				if($strUserFirstName == '' || $strUserSurName == '')
+				{
+					@list($strUserFirstName, $strUserSurName) = explode(" ", $user->display_name, 2);
+				}
+
+				$intAddressID = $wpdb->get_var($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address WHERE addressExtra = %s", $strUserLogin));
+
+				if($intAddressID > 0)
+				{
+					$wpdb->query($wpdb->prepare("UPDATE ".get_address_table_prefix()."address SET addressFirstName = %s, addressSurName = %s, addressEmail = %s, addressExtra = %s WHERE addressID = '%d'", $strUserFirstName, $strUserSurName, $strUserEmail, $strUserLogin, $intAddressID));
+				}
+
+				else
+				{
+					$wpdb->query($wpdb->prepare("INSERT INTO ".get_address_table_prefix()."address SET addressFirstName = %s, addressSurName = %s, addressEmail = %s, addressExtra = %s, addressCreated = NOW()", $strUserFirstName, $strUserSurName, $strUserEmail, $strUserLogin));
+
+					$intAddressID = $wpdb->insert_id;
+				}
+
+				if($intAddressID > 0)
+				{
+					$obj_group->add_address(array('address_id' => $intAddressID, 'group_id' => $intGroupID));
 				}
 			}
 		}
