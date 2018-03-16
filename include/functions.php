@@ -516,6 +516,8 @@ function cron_group()
 				$strUserSurName = $user->last_name;
 				$strUserEmail = $user->user_email;
 
+				$intAddressCountry = get_the_author_meta('profile_country', $user->ID);
+
 				if($strUserFirstName == '' || $strUserSurName == '')
 				{
 					@list($strUserFirstName, $strUserSurName) = explode(" ", $user->display_name, 2);
@@ -525,7 +527,7 @@ function cron_group()
 
 				if($intAddressID > 0)
 				{
-					$wpdb->query($wpdb->prepare("UPDATE ".get_address_table_prefix()."address SET addressFirstName = %s, addressSurName = %s, addressEmail = %s, addressExtra = %s WHERE addressID = '%d'", $strUserFirstName, $strUserSurName, $strUserEmail, $strUserLogin, $intAddressID));
+					$wpdb->query($wpdb->prepare("UPDATE ".get_address_table_prefix()."address SET addressFirstName = %s, addressSurName = %s, addressEmail = %s, addressCountry = '%d', addressExtra = %s WHERE addressID = '%d'", $strUserFirstName, $strUserSurName, $strUserEmail, $intAddressCountry, $strUserLogin, $intAddressID));
 				}
 
 				else
@@ -562,6 +564,7 @@ function show_group_registration_form($data)
 	$strAddressName = check_var('strAddressName');
 	$intAddressZipCode = check_var('intAddressZipCode');
 	$strAddressCity = check_var('strAddressCity');
+	$intAddressCountry = check_var('intAddressCountry');
 	$strAddressAddress = check_var('strAddressAddress');
 	$strAddressTelNo = check_var('strAddressTelNo');
 	$strAddressEmail = check_var('strAddressEmail');
@@ -599,6 +602,12 @@ function show_group_registration_form($data)
 			{
 				$query_where .= ($query_where != '' ? " AND " : "")."addressCity = '".$strAddressCity."'";
 				$query_set .= ", addressCity = '".esc_sql($strAddressCity)."'";
+			}
+
+			if(in_array("country", $arrGroupRegistrationFields))
+			{
+				$query_where .= ($query_where != '' ? " AND " : "")."addressCountry = '".$intAddressCountry."'";
+				$query_set .= ", addressCountry = '".esc_sql($intAddressCountry)."'";
 			}
 
 			if(in_array("phone", $arrGroupRegistrationFields))
@@ -712,6 +721,13 @@ function show_group_registration_form($data)
 				if(in_array("city", $arrGroupRegistrationFields))
 				{
 					$out .= show_textfield(array('name' => "strAddressCity", 'text' => __("City", 'lang_group'), 'value' => $strAddressCity, 'required' => true));
+				}
+
+				if(in_array("country", $arrGroupRegistrationFields))
+				{
+					$obj_address = new mf_address();
+
+					$out .= show_select(array('data' => $obj_address->get_countries_for_select(), 'name' => "intAddressCountry", 'text' => __("Country", 'lang_group'), 'value' => $intAddressCountry, 'required' => true));
 				}
 
 				if(in_array("phone", $arrGroupRegistrationFields))

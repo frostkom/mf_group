@@ -533,6 +533,9 @@ class mf_group_export extends mf_export
 		$obj_group = new mf_group();
 		$this->name = $obj_group->get_name($this->type);
 
+		$obj_address = new mf_address();
+		$arr_countries = $obj_address->get_countries_for_select();
+
 		$result = $wpdb->get_results($wpdb->prepare("SELECT * FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' GROUP BY addressID ORDER BY addressPublic ASC, addressSurName ASC, addressFirstName ASC", $this->type));
 
 		foreach($result as $r)
@@ -546,6 +549,7 @@ class mf_group_export extends mf_export
 				$r->addressCo,
 				$r->addressZipCode,
 				$r->addressCity,
+				($r->addressCountry > 0 && isset($arr_countries[$r->addressCountry]) ? $arr_countries[$r->addressCountry] : ''),
 				$r->addressTelNo,
 				$r->addressCellNo,
 				$r->addressWorkNo,
