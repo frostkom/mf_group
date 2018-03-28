@@ -331,7 +331,7 @@ function cron_group()
 		{
 			$intGroupID = $r->groupID;
 			$strGroupPublic = get_post_status($intGroupID);
-			
+
 			if($strGroupPublic == 'public')
 			{
 				$group_url = get_permalink($intGroupID);

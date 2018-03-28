@@ -70,7 +70,7 @@ echo "<div class='wrap'>
 								//$arr_data_incoming = $obj_email->get_from_for_select(array('type' => 'incoming'));
 								$arr_data_email = $obj_email->get_from_for_select();
 								$arr_data_abuse = $obj_email->get_from_for_select(array('type' => 'abuse'));
-								
+
 								$arr_data_page = array();
 								get_post_children(array('add_choose_here' => true), $arr_data_page);
 

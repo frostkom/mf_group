@@ -108,12 +108,12 @@ echo "<div class='wrap'>
 						echo "</td>
 						<td>".$strMessageName."</td>
 						<td>";
-						
+
 							if($dteMessageSchedule > DEFAULT_DATE)
 							{
 								echo format_date($dteMessageSchedule);
 							}
-							
+
 						echo "</td>
 						<td>"
 							.$intMessageSent." / ".($intMessageSent + $intMessageNotSent);
