@@ -519,122 +519,6 @@ class mf_group
 	}
 }
 
-class mf_group_export extends mf_export
-{
-	function get_defaults()
-	{
-		$this->plugin = "mf_group";
-	}
-
-	function get_export_data()
-	{
-		global $wpdb;
-
-		$obj_group = new mf_group();
-		$this->name = $obj_group->get_name($this->type);
-
-		$obj_address = new mf_address();
-		$arr_countries = $obj_address->get_countries_for_select();
-
-		$result = $wpdb->get_results($wpdb->prepare("SELECT * FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' GROUP BY addressID ORDER BY addressPublic ASC, addressSurName ASC, addressFirstName ASC", $this->type));
-
-		foreach($result as $r)
-		{
-			$this->data[] = array(
-				$r->addressMemberID,
-				$r->addressBirthDate,
-				$r->addressFirstName,
-				$r->addressSurName,
-				$r->addressAddress,
-				$r->addressCo,
-				$r->addressZipCode,
-				$r->addressCity,
-				($r->addressCountry > 0 && isset($arr_countries[$r->addressCountry]) ? $arr_countries[$r->addressCountry] : ''),
-				$r->addressTelNo,
-				$r->addressCellNo,
-				$r->addressWorkNo,
-				$r->addressEmail,
-				$r->addressExtra,
-			);
-		}
-	}
-}
-
-class widget_group extends WP_Widget
-{
-	function __construct()
-	{
-		$widget_ops = array(
-			'classname' => 'group',
-			'description' => __("Display a group registration form", 'lang_group')
-		);
-
-		$this->arr_default = array(
-			'group_heading' => '',
-			'group_text' => '',
-			'group_id' => '',
-			'group_button_text' => '',
-		);
-
-		parent::__construct('group-widget', __("Group", 'lang_group')." / ".__("Newsletter", 'lang_group'), $widget_ops);
-	}
-
-	function widget($args, $instance)
-	{
-		extract($args);
-
-		$instance = wp_parse_args((array)$instance, $this->arr_default);
-
-		if($instance['group_id'] > 0)
-		{
-			echo $before_widget;
-
-				if($instance['group_heading'] != '')
-				{
-					echo $before_title
-						.$instance['group_heading']
-					.$after_title;
-				}
-
-				echo "<div class='section'>"
-					.show_group_registration_form(array('id' => $instance['group_id'], 'text' => $instance['group_text'], 'button_text' => $instance['group_button_text']))
-				."</div>"
-			.$after_widget;
-		}
-	}
-
-	function update($new_instance, $old_instance)
-	{
-		$instance = $old_instance;
-
-		$new_instance = wp_parse_args((array)$new_instance, $this->arr_default);
-
-		$instance['group_heading'] = sanitize_text_field($new_instance['group_heading']);
-		$instance['group_text'] = sanitize_text_field($new_instance['group_text']);
-		$instance['group_id'] = sanitize_text_field($new_instance['group_id']);
-		$instance['group_button_text'] = sanitize_text_field($new_instance['group_button_text']);
-
-		return $instance;
-	}
-
-	function form($instance)
-	{
-		global $wpdb;
-
-		$instance = wp_parse_args((array)$instance, $this->arr_default);
-
-		$arr_data = array();
-		get_post_children(array('add_choose_here' => true, 'post_type' => 'mf_group', 'post_status' => '', 'where' => "post_status != 'trash'".(IS_EDITOR ? "" : " AND post_author = '".get_current_user_id()."'")), $arr_data);
-
-		echo "<div class='mf_form'>"
-			.show_textfield(array('name' => $this->get_field_name('group_heading'), 'text' => __("Heading", 'lang_group'), 'value' => $instance['group_heading']))
-			.show_textarea(array('name' => $this->get_field_name('group_text'), 'text' => __("Text", 'lang_group'), 'value' => $instance['group_text']))
-			.show_select(array('data' => $arr_data, 'name' => $this->get_field_name('group_id'), 'text' => __("Group", 'lang_group'), 'value' => $instance['group_id']))
-			.show_textfield(array('name' => $this->get_field_name('group_button_text'), 'text' => __("Button Text", 'lang_group'), 'value' => $instance['group_button_text'], 'placeholder' => __("Join", 'lang_group')))
-		."</div>";
-	}
-}
-
 class mf_group_table extends mf_list_table
 {
 	function set_default()
@@ -894,5 +778,319 @@ class mf_group_table extends mf_list_table
 		}
 
 		return $out;
+	}
+}
+
+class mf_group_sent_table extends mf_list_table
+{
+	function set_default()
+	{
+		global $wpdb;
+
+		$this->arr_settings['query_from'] = $wpdb->prefix."group_message";
+		$this->post_type = "";
+
+		$this->arr_settings['query_select_id'] = "messageID";
+		//$this->arr_settings['query_all_id'] = "0";
+		//$this->arr_settings['query_trash_id'] = "1";
+		$this->orderby_default = "messageCreated";
+		$this->orderby_default_order = "DESC";
+
+		$this->arr_settings['intGroupID'] = check_var('intGroupID');
+
+		$this->query_where .= "groupID = '".esc_sql($this->arr_settings['intGroupID'])."'";
+
+		if($this->search != '')
+		{
+			$this->query_where .= ($this->query_where != '' ? " AND " : "")."(messageFrom LIKE '%".$this->search."%' OR messageName LIKE '%".$this->search."%' OR messageText LIKE '%".$this->search."%' OR messageCreated LIKE '%".$this->search."%')";
+		}
+
+		/*$this->set_views(array(
+			'db_field' => 'proposalDeleted',
+			'types' => array(
+				'0' => __("All", 'lang_company'),
+				'1' => __("Trash", 'lang_company')
+			),
+		));*/
+
+		$arr_columns = array(
+			//'cb' => '<input type="checkbox">',
+			'messageType' => __("Type", 'lang_group'),
+			'messageFrom' => __("From", 'lang_group'),
+			'messageName' => __("Subject", 'lang_group'),
+			'messageSchedule' => __("Scheduled", 'lang_group'),
+			'sent' => __("Sent", 'lang_group'),
+			'messageCreated' => __("Created", 'lang_group'),
+		);
+
+		$this->set_columns($arr_columns);
+
+		$this->set_sortable_columns(array(
+			'messageType',
+			'messageFrom',
+			'messageName',
+			'messageSchedule',
+			'messageCreated',
+		));
+	}
+
+	function column_default($item, $column_name)
+	{
+		global $wpdb;
+
+		$out = "";
+
+		$intMessageID2 = $item['messageID'];
+
+		switch($column_name)
+		{
+			case 'messageType':
+				$actions = array();
+				$actions['view_data'] = "<i class='fa fa-lg fa-eye' title='".__("View Content", 'lang_group')."'></i>";
+				//$actions['view'] = "<a href='".admin_url("admin.php?page=mf_group/sent/index.php&intGroupID=".$this->arr_settings['intGroupID']."&intMessageID=".$intMessageID2."#message_".$intMessageID2)."'><i class='fa fa-lg fa-eye' title='".__("View Content", 'lang_group')."'></i></a>";
+				$actions['send_to_group'] = "<a href='".admin_url("admin.php?page=mf_group/send/index.php&intGroupID=".$this->arr_settings['intGroupID']."&intMessageID=".$intMessageID2)."'><i class='fa fa-lg fa-users' title='".__("Send to group again", 'lang_group')."'></i></a>";
+				$actions['send_email'] = "<a href='".admin_url("admin.php?page=mf_email/send/index.php&intGroupMessageID=".$intMessageID2)."'><i class='fa fa-lg fa-envelope-o' title='".__("Send to e-mail", 'lang_group')."'></i></a>";
+
+				$out .= $item[$column_name]
+				.$this->row_actions($actions);
+			break;
+
+			case 'messageFrom':
+				$strMessageFrom = $item[$column_name];
+			
+				$actions = array();
+
+				$strMessageFromName = "";
+
+				if(preg_match("/\|/", $strMessageFrom))
+				{
+					list($strMessageFromName, $strMessageFrom) = explode("|", $strMessageFrom);
+
+					$actions['from'] = $strMessageFromName;
+				}
+
+				$out .= $strMessageFrom
+				.$this->row_actions($actions);
+			break;
+
+			case 'messageSchedule':
+				if($item[$column_name] > DEFAULT_DATE)
+				{
+					$out .= format_date($item[$column_name]);
+				}
+			break;
+
+			case 'sent':
+				$intMessageSent = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueSent = '1'", $intMessageID2));
+				$intMessageNotSent = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueSent = '0'", $intMessageID2));
+
+				$intMessageTotal = $intMessageSent + $intMessageNotSent;
+
+				$class = '';
+
+				if($intMessageSent == 0)
+				{
+					if($intMessageNotSent == 0)
+					{
+						$class = "red";
+					}
+
+					else
+					{
+						$class = "yellow";
+					}
+				}
+
+				else if($intMessageSent < $intMessageTotal)
+				{
+					$class = "yellow";
+				}
+
+				$actions = array();
+
+				if($intMessageNotSent > 0)
+				{
+					$actions['abort'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/sent/index.php&btnMessageAbort&intGroupID=".$this->arr_settings['intGroupID']."&intMessageID=".$intMessageID2), 'message_abort_'.$intMessageID2)."'>".__("Abort", 'lang_group')."</a>";
+				}
+
+				else
+				{
+					if($item['messageCreated'] > date('Y-m-d H:i:s', strtotime("-1 week")))
+					{
+						$dteQueueSentTime_first = $wpdb->get_var($wpdb->prepare("SELECT MIN(queueSentTime) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueSent = '1'", $intMessageID2));
+
+						if($dteQueueSentTime_first > DEFAULT_DATE)
+						{
+							$actions['sent'] = format_date($dteQueueSentTime_first);
+
+							$dteQueueSentTime_last = $wpdb->get_var($wpdb->prepare("SELECT MAX(queueSentTime) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueSent = '1'", $intMessageID2));
+
+							if($dteQueueSentTime_last > $dteQueueSentTime_first && format_date($dteQueueSentTime_last) != format_date($dteQueueSentTime_first))
+							{
+								$actions['sent'] .= " - ".format_date($dteQueueSentTime_last);
+							}
+						}
+					}
+
+					$intMessageErrors = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueReceived = '-1'", $intMessageID2));
+					$intMessageReceived = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueReceived = '1'", $intMessageID2));
+
+					if($intMessageErrors > 0)
+					{
+						$actions['errors'] = mf_format_number($intMessageErrors / $intMessageSent * 100, 1)."% ".__("Errors", 'lang_group');
+					}
+
+					if($intMessageReceived > 0)
+					{
+						$actions['read'] = "<i class='fa fa-check green'></i> ".$intMessageReceived." ".__("Read", 'lang_group');
+					}
+				}
+
+				$out .= $intMessageSent." / ".$intMessageTotal
+				.$this->row_actions($actions);
+
+				if($class != '')
+				{
+					$out .= "<i class='set_tr_color' rel='".$class."'></i>";
+				}
+			break;
+
+			case 'messageCreated':
+				$out .= format_date($item[$column_name])
+				."</td></tr><tr class='hide'><td colspan='".count($this->columns)."'>";
+
+				$out .= "<p>".stripslashes(apply_filters('the_content', $item['messageText']))."</p>";
+
+				if($item['messageAttachment'] != '')
+				{
+					$out .= "<p>".get_media_button(array('name' => 'strMessageAttachment', 'value' => $item['messageAttachment'], 'show_add_button' => false))."</p>";
+				}
+			break;
+
+			default:
+				if(isset($item[$column_name]))
+				{
+					$out .= $item[$column_name];
+				}
+			break;
+		}
+
+		return $out;
+	}
+}
+
+class mf_group_export extends mf_export
+{
+	function get_defaults()
+	{
+		$this->plugin = "mf_group";
+	}
+
+	function get_export_data()
+	{
+		global $wpdb;
+
+		$obj_group = new mf_group();
+		$this->name = $obj_group->get_name($this->type);
+
+		$obj_address = new mf_address();
+		$arr_countries = $obj_address->get_countries_for_select();
+
+		$result = $wpdb->get_results($wpdb->prepare("SELECT * FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' GROUP BY addressID ORDER BY addressPublic ASC, addressSurName ASC, addressFirstName ASC", $this->type));
+
+		foreach($result as $r)
+		{
+			$this->data[] = array(
+				$r->addressMemberID,
+				$r->addressBirthDate,
+				$r->addressFirstName,
+				$r->addressSurName,
+				$r->addressAddress,
+				$r->addressCo,
+				$r->addressZipCode,
+				$r->addressCity,
+				($r->addressCountry > 0 && isset($arr_countries[$r->addressCountry]) ? $arr_countries[$r->addressCountry] : ''),
+				$r->addressTelNo,
+				$r->addressCellNo,
+				$r->addressWorkNo,
+				$r->addressEmail,
+				$r->addressExtra,
+			);
+		}
+	}
+}
+
+class widget_group extends WP_Widget
+{
+	function __construct()
+	{
+		$widget_ops = array(
+			'classname' => 'group',
+			'description' => __("Display a group registration form", 'lang_group')
+		);
+
+		$this->arr_default = array(
+			'group_heading' => '',
+			'group_text' => '',
+			'group_id' => '',
+			'group_button_text' => '',
+		);
+
+		parent::__construct('group-widget', __("Group", 'lang_group')." / ".__("Newsletter", 'lang_group'), $widget_ops);
+	}
+
+	function widget($args, $instance)
+	{
+		extract($args);
+
+		$instance = wp_parse_args((array)$instance, $this->arr_default);
+
+		if($instance['group_id'] > 0)
+		{
+			echo $before_widget;
+
+				if($instance['group_heading'] != '')
+				{
+					echo $before_title
+						.$instance['group_heading']
+					.$after_title;
+				}
+
+				echo "<div class='section'>"
+					.show_group_registration_form(array('id' => $instance['group_id'], 'text' => $instance['group_text'], 'button_text' => $instance['group_button_text']))
+				."</div>"
+			.$after_widget;
+		}
+	}
+
+	function update($new_instance, $old_instance)
+	{
+		$instance = $old_instance;
+
+		$new_instance = wp_parse_args((array)$new_instance, $this->arr_default);
+
+		$instance['group_heading'] = sanitize_text_field($new_instance['group_heading']);
+		$instance['group_text'] = sanitize_text_field($new_instance['group_text']);
+		$instance['group_id'] = sanitize_text_field($new_instance['group_id']);
+		$instance['group_button_text'] = sanitize_text_field($new_instance['group_button_text']);
+
+		return $instance;
+	}
+
+	function form($instance)
+	{
+		global $wpdb;
+
+		$instance = wp_parse_args((array)$instance, $this->arr_default);
+
+		$arr_data = array();
+		get_post_children(array('add_choose_here' => true, 'post_type' => 'mf_group', 'post_status' => '', 'where' => "post_status != 'trash'".(IS_EDITOR ? "" : " AND post_author = '".get_current_user_id()."'")), $arr_data);
+
+		echo "<div class='mf_form'>"
+			.show_textfield(array('name' => $this->get_field_name('group_heading'), 'text' => __("Heading", 'lang_group'), 'value' => $instance['group_heading']))
+			.show_textarea(array('name' => $this->get_field_name('group_text'), 'text' => __("Text", 'lang_group'), 'value' => $instance['group_text']))
+			.show_select(array('data' => $arr_data, 'name' => $this->get_field_name('group_id'), 'text' => __("Group", 'lang_group'), 'value' => $instance['group_id']))
+			.show_textfield(array('name' => $this->get_field_name('group_button_text'), 'text' => __("Button Text", 'lang_group'), 'value' => $instance['group_button_text'], 'placeholder' => __("Join", 'lang_group')))
+		."</div>";
 	}
 }

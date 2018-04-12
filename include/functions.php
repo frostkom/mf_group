@@ -273,7 +273,7 @@ function menu_group()
 	$count_message = count_unsent_group();
 
 	$menu_title = __("Groups", 'lang_group');
-	add_menu_page("", $menu_title.$count_message, $menu_capability, $menu_start, '', 'dashicons-groups');
+	add_menu_page("", $menu_title.$count_message, $menu_capability, $menu_start, '', 'dashicons-groups', 99);
 
 	$menu_title = __("List", 'lang_group');
 	add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, $menu_start);
