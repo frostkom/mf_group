@@ -22,6 +22,14 @@ class mf_group
 		$this->meta_prefix = "mf_group_";
 	}
 
+	function wp_head()
+	{
+		$plugin_include_url = plugin_dir_url(__FILE__);
+		$plugin_version = get_plugin_version(__FILE__);
+
+		mf_enqueue_style('style_group', $plugin_include_url."style.css", $plugin_version);
+	}
+
 	function fetch_request()
 	{
 		switch($this->type)

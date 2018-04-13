@@ -174,14 +174,6 @@ function init_group()
 	);
 
 	register_post_type('mf_group', $args);
-
-	if(!is_admin())
-	{
-		$plugin_include_url = plugin_dir_url(__FILE__);
-		$plugin_version = get_plugin_version(__FILE__);
-
-		mf_enqueue_style('style_group', $plugin_include_url."style.css", $plugin_version);
-	}
 }
 
 function widgets_group()
