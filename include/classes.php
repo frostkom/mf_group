@@ -722,7 +722,7 @@ class mf_group_table extends mf_list_table
 					$user_email = $current_user->user_email;
 
 					$out .= "<div class='row-actions'>
-						<a href='".get_group_url(array('type' => 'unsubscribe', 'group_id' => $post_id, 'email' => $user_email))."'>".__("Test", 'lang_group')."</a>
+						<a href='".get_group_url(array('type' => 'unsubscribe', 'group_id' => $post_id, 'email' => $user_email))."' rel='confirm'>".__("Test", 'lang_group')."</a>
 					</div>";
 				}
 			break;
