@@ -1,21 +1,5 @@
 <?php
 
-function show_final_size($in)
-{
-	$arr_suffix = array("B", "kB", "MB", "GB", "TB");
-
-	$count_temp = count($arr_suffix);
-
-	for($i = 0; ($in > 1024 || $i < 1) && $i < $count_temp; $i++) //Forces at least kB
-	{
-		$in /= 1024;
-	}
-
-	$out = strlen(round($in)) < 3 ? round($in, 1) : round($in); //If less than 3 digits, show one decimal aswell
-
-	return $out."&nbsp;".$arr_suffix[$i];
-}
-
 function count_shortcode_button_group($count)
 {
 	if($count == 0)
@@ -88,7 +72,7 @@ function delete_group($post_id)
 
 	if($post_type == 'mf_group')
 	{
-		error_log("Delete postID (#".$post_id.") from ".$wpdb->prefix."group_message etc.");
+		do_log("Delete postID (#".$post_id.") from ".$wpdb->prefix."group_message etc.");
 
 		/*$result = $wpdb->get_results($wpdb->prepare("SELECT messageID FROM ".$wpdb->prefix."group_message WHERE groupID = '%d'", $post_id));
 
