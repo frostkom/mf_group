@@ -71,9 +71,9 @@ echo "<div class='wrap'>
 									$sms_senders = get_option('setting_sms_senders');
 									$sms_phone = get_user_meta(get_current_user_id(), 'mf_sms_phone', true);
 
-									$arr_data_from = array();
-
-									$arr_data_from[''] = "-- ".__("Choose here", 'lang_group')." --";
+									$arr_data_from = array(
+										'' => "-- ".__("Choose here", 'lang_group')." --"
+									);
 
 									foreach(explode(",", $sms_senders) as $sender)
 									{
@@ -90,7 +90,7 @@ echo "<div class='wrap'>
 
 									echo show_select(array('data' => $arr_data_from, 'name' => 'strMessageFrom', 'text' => __("From", 'lang_group'), 'value' => $obj_group->message_from, 'required' => true))
 									.show_select(array('data' => $arr_data_to, 'name' => 'arrGroupID[]', 'text' => __("To", 'lang_group'), 'value' => $obj_group->arr_group_id, 'maxsize' => 5))
-									.show_textarea(array('name' => "strMessageText", 'text' => __("Message", 'lang_group'), 'value' => $obj_group->message_text, 'required' => true));
+									.show_textarea(array('name' => 'strMessageText', 'text' => __("Message", 'lang_group'), 'value' => $obj_group->message_text, 'required' => true));
 								break;
 							}
 

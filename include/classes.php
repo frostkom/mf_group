@@ -46,7 +46,7 @@ class mf_group
 				$this->message_id = check_var('intMessageID');
 				$this->message_from = check_var('strMessageFrom', 'char', true, $this->get_from_last());
 				$this->message_name = check_var('strMessageName');
-				$this->message_text = check_var('strMessageText', 'raw'); //$this->message_text_orig = 
+				$this->message_text = check_var('strMessageText', 'raw');
 				$this->message_schedule_date = check_var('dteMessageScheduleDate');
 				$this->message_schedule_time = check_var('dteMessageScheduleTime');
 				$this->message_text_source = check_var('intEmailTextSource');
@@ -129,7 +129,7 @@ class mf_group
 						$error_text = __("You have to enter a text to send", 'lang_group');
 					}
 
-					else if($this->message_type == "email" || $this->message_type == "sms")
+					else if($this->message_type == 'email' || $this->message_type == 'sms')
 					{
 						$attachments_size = 0;
 						$attachments_size_limit = 5 * pow(1024, 2);
@@ -166,7 +166,7 @@ class mf_group
 
 								if($wpdb->num_rows > 0)
 								{
-									if($this->message_unsubscribe_link == 'yes')
+									if($this->message_type == 'email' && $this->message_unsubscribe_link == 'yes')
 									{
 										$this->message_text .= "<p>&nbsp;</p><p><a href='[unsubscribe_link]'>".__("If you don't want to get these messages in the future click this link to unsubscribe", 'lang_group')."</a></p>";
 									}
