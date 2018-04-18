@@ -124,9 +124,14 @@ echo "<div class='wrap'>
 								echo show_select(array('data' => $arr_data, 'name' => 'arrGroupRegistrationFields[]', 'text' => __("Registration Fields", 'lang_group'), 'value' => $obj_group->registration_fields));
 							}
 
-							echo show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupVerifyLink', 'text' => __("Add Verify Link", 'lang_group'), 'value' => $obj_group->verify_link, 'description' => __("In every message a hidden image/link is placed to see if the recepient has opened the message. This increases the risk of being classified as spam", 'lang_group')))
-							.show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupSyncUsers', 'text' => __("Synchronize Users", 'lang_group'), 'value' => $obj_group->sync_users, 'description' => __("This will automatically add/remove users and their information to this group", 'lang_group')))
-						."</div>
+							echo show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupVerifyLink', 'text' => __("Add Verify Link", 'lang_group'), 'value' => $obj_group->verify_link, 'description' => __("In every message a hidden image/link is placed to see if the recepient has opened the message. This increases the risk of being classified as spam", 'lang_group')));
+
+							if(!($obj_group->id > 0) || $obj_group->sync_users == 'yes')
+							{
+								echo show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupSyncUsers', 'text' => __("Synchronize Users", 'lang_group'), 'value' => $obj_group->sync_users, 'description' => __("This will automatically add/remove users and their information to this group", 'lang_group')));
+							}
+
+						echo "</div>
 					</div>
 				</div>
 			</div>
