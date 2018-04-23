@@ -43,7 +43,7 @@ get_header();
 
 							else
 							{
-								$error_text = __("Either you're not part of the group or you've already accepted to be a part of the group", 'lang_group');
+								$error_text = __("You've already accepted to be a part of the group", 'lang_group');
 							}
 						}
 

@@ -853,13 +853,26 @@ class mf_group_sent_table extends mf_list_table
 		switch($column_name)
 		{
 			case 'messageType':
-				$actions = array();
-				$actions['view_data'] = "<i class='fa fa-lg fa-eye' title='".__("View Content", 'lang_group')."'></i>";
-				//$actions['view'] = "<a href='".admin_url("admin.php?page=mf_group/sent/index.php&intGroupID=".$this->arr_settings['intGroupID']."&intMessageID=".$intMessageID2."#message_".$intMessageID2)."'><i class='fa fa-lg fa-eye' title='".__("View Content", 'lang_group')."'></i></a>";
-				$actions['send_to_group'] = "<a href='".admin_url("admin.php?page=mf_group/send/index.php&intGroupID=".$this->arr_settings['intGroupID']."&intMessageID=".$intMessageID2)."'><i class='fa fa-lg fa-users' title='".__("Send to group again", 'lang_group')."'></i></a>";
-				$actions['send_email'] = "<a href='".admin_url("admin.php?page=mf_email/send/index.php&intGroupMessageID=".$intMessageID2)."'><i class='fa fa-lg fa-envelope-o' title='".__("Send to e-mail", 'lang_group')."'></i></a>";
+				$actions = array(
+					'view_data' => "<i class='fa fa-lg fa-eye' title='".__("View Content", 'lang_group')."'></i>",
+					//'view' => "<a href='".admin_url("admin.php?page=mf_group/sent/index.php&intGroupID=".$this->arr_settings['intGroupID']."&intMessageID=".$intMessageID2."#message_".$intMessageID2)."'><i class='fa fa-lg fa-eye' title='".__("View Content", 'lang_group')."'></i></a>",
+					'send_to_group' => "<a href='".admin_url("admin.php?page=mf_group/send/index.php&intGroupID=".$this->arr_settings['intGroupID']."&intMessageID=".$intMessageID2)."'><i class='fa fa-lg fa-users' title='".__("Send to group again", 'lang_group')."'></i></a>",
+					'send_email' => "<a href='".admin_url("admin.php?page=mf_email/send/index.php&intGroupMessageID=".$intMessageID2)."'><i class='fa fa-lg fa-envelope-o' title='".__("Send to e-mail", 'lang_group')."'></i></a>",
+				);
 
-				$out .= $item[$column_name]
+				switch($item[$column_name])
+				{
+					default:
+					case 'email':
+						$strMessageType = __("E-mail", 'lang_group');
+					break;
+
+					case 'sms':
+						$strMessageType = __("SMS", 'lang_group');
+					break;
+				}
+
+				$out .= $strMessageType
 				.$this->row_actions($actions);
 			break;
 
