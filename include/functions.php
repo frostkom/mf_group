@@ -306,12 +306,7 @@ function cron_group()
 		foreach($result as $r)
 		{
 			$intGroupID = $r->groupID;
-			$strGroupPublic = get_post_status($intGroupID);
-
-			if($strGroupPublic == 'public')
-			{
-				$group_url = get_permalink($intGroupID);
-			}
+			//$strGroupPublic = get_post_status($intGroupID);
 
 			$strGroupVerifyLink = get_post_meta($intGroupID, $obj_group->meta_prefix.'verify_link', true);
 
@@ -320,6 +315,8 @@ function cron_group()
 			$intGroupOwnerEmail = get_post_meta($intGroupID, $obj_group->meta_prefix.'owner_email', true);
 			$intGroupHelpPage = get_post_meta($intGroupID, $obj_group->meta_prefix.'help_page', true);
 			$intGroupArchivePage = get_post_meta($intGroupID, $obj_group->meta_prefix.'archive_page', true);
+
+			$group_url = get_permalink($intGroupID);
 
 			$resultMessages = $wpdb->get_results($wpdb->prepare("SELECT addressEmail, addressCellNo, queueID, messageType, messageFrom, messageName, messageText, messageAttachment, ".$wpdb->prefix."group_message.userID FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."group_queue USING (addressID) INNER JOIN ".$wpdb->prefix."group_message USING (messageID) WHERE groupID = '%d' AND queueSent = '0' ORDER BY messageType ASC, queueCreated ASC".$obj_group->get_emails_left_to_send(), $intGroupID));
 
@@ -360,39 +357,21 @@ function cron_group()
 
 						$mail_headers = "From: ".$strMessageFromName." <".$strMessageFrom.">\r\n";
 
+						$unsubscribe_email = $subscribe_email = "";
+
 						/*if($intGroupUnsubscribeEmail > 0)
 						{
-							$mail_headers .= "List-Unsubscribe: <mailto:".$."?subject=Unsubscribe>";
+							$unsubscribe_email .= "<mailto:".$."?subject=Unsubscribe>, ";
+						}*/
 
-								if($strGroupPublic == 'public')
-								{
-									$mail_headers .= ", <".$unsubscribe_url.">";
-								}
-
-							$mail_headers .= "\r\n";
-						}
-
-						else
-						{*/
-							$mail_headers .= "List-Unsubscribe: <".$unsubscribe_url.">\r\n";
-						//}
+						$mail_headers .= "List-Unsubscribe: <".$unsubscribe_url.">\r\n";
 
 						/*if($intGroupSubscribeEmail > 0)
 						{
-							$mail_headers .= "List-Subscribe: <mailto:".$."?subject=Subscribe>";
+							$subscribe_email = "<mailto:".$."?subject=Subscribe>, ";
+						}*/
 
-								if($strGroupPublic == 'public')
-								{
-									$mail_headers .= ", <".$group_url.">";
-								}
-
-							$mail_headers .= "\r\n";
-						}
-
-						else */if($strGroupPublic == 'public')
-						{
-							$mail_headers .= "List-Subscribe: <".$group_url.">\r\n";
-						}
+						$mail_headers .= "List-Subscribe: ".$subscribe_email."<".$group_url.">\r\n";
 
 						if($intGroupOwnerEmail > 0)
 						{
@@ -404,7 +383,7 @@ function cron_group()
 							$mail_headers .= "List-Help: <".get_permalink($intGroupHelpPage).">\r\n";
 						}
 
-						else if($strGroupPublic == 'public')
+						else
 						{
 							$mail_headers .= "List-Help: <".$group_url.">\r\n";
 						}

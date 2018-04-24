@@ -4,6 +4,8 @@ get_header();
 
 	if(have_posts())
 	{
+		$obj_group = new mf_group();
+
 		echo "<article>";
 
 			while(have_posts())
@@ -11,8 +13,10 @@ get_header();
 				the_post();
 
 				$post_id = $post->ID;
-				$post_status = $post->post_status;
+				//$post_status = $post->post_status;
 				$post_title = $post->post_title;
+
+				$post_allow_registration = get_post_meta_or_default($post_id, $obj_group->meta_prefix.'allow_registration', true, 'no');
 
 				$out = "";
 
@@ -63,7 +67,7 @@ get_header();
 				{
 					$intGroupSentAmount = $wpdb->get_var($wpdb->prepare("SELECT COUNT(groupID) FROM ".$wpdb->prefix."group_message WHERE groupID = '%d'", $post_id));
 
-					if($post_status == 'publish' || $intGroupSentAmount > 0)
+					if($post_allow_registration == 'yes' || $intGroupSentAmount > 0)
 					{
 						$strUnsubscribeHash = check_var('unsubscribe', 'char');
 						$strVerifyHash = check_var('verify', 'char');
@@ -137,8 +141,8 @@ get_header();
 
 				$out .= get_notification();
 
-				if($out != '' || $post_status == 'publish')
-				{
+				/*if($out != '' || $post_allow_registration == 'yes')
+				{*/
 					echo "<h1>".$post_title."</h1>
 					<section>";
 
@@ -147,18 +151,23 @@ get_header();
 							echo $out;
 						}
 
-						else if($post_status == 'publish')
+						else if($post_allow_registration == 'yes')
 						{
 							echo show_group_registration_form(array('id' => $post_id));
 						}
 
+						else
+						{
+							echo apply_filters('the_content', __("This group is closed for registration", 'lang_group'));
+						}
+
 					echo "</section>";
-				}
+				/*}
 
 				else
 				{
 					wp_redirect("/404/");
-				}
+				}*/
 			}
 
 		echo "</article>";

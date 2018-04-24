@@ -72,7 +72,9 @@ class mf_group
 				$this->help_page = check_var('intGroupHelpPage');
 				$this->archive_page = check_var('intGroupArchivePage');
 
-				$this->public = check_var('strGroupPublic', 'char', true, 'draft');
+				$this->allow_registration = check_var('strGroupAllowRegistration', 'char', true, 'no');
+
+				//$this->public = check_var('strGroupPublic', 'char', true, 'draft');
 				$this->verify_address = check_var('strGroupVerifyAddress');
 				$this->contact_page = check_var('intGroupContactPage');
 				$this->registration_fields = check_var('arrGroupRegistrationFields');
@@ -246,7 +248,8 @@ class mf_group
 				{
 					$post_data = array(
 						'post_type' => 'mf_group',
-						'post_status' => $this->public,
+						//'post_status' => $this->public,
+						'post_status' => 'publish',
 						'post_title' => $this->name,
 					);
 
@@ -260,6 +263,8 @@ class mf_group
 							update_post_meta($this->id, 'group_acceptance_email', $this->acceptance_email);
 							update_post_meta($this->id, 'group_acceptance_subject', $this->acceptance_subject);
 							update_post_meta($this->id, 'group_acceptance_text', $this->acceptance_text);
+
+							update_post_meta($this->id, $this->meta_prefix.'allow_registration', $this->allow_registration);
 
 							update_post_meta($this->id, 'group_verify_address', $this->verify_address);
 							update_post_meta($this->id, 'group_contact_page', $this->contact_page);
@@ -309,6 +314,24 @@ class mf_group
 						}
 					}
 				}
+				
+				else if(isset($_POST['btnGroupRemoveRecepients']) && $this->id > 0 && wp_verify_nonce($_POST['_wpnonce'], 'group_remove_recepients_'.$this->id))
+				{
+					if(isset($_POST['intGroupRemoveRecepientsConfirm']) && $_POST['intGroupRemoveRecepientsConfirm'] == 1)
+					{
+						$this->remove_all_address($this->id);
+
+						if($wpdb->rows_affected > 0)
+						{
+							$done_text = __("I removed all the recepients from this group", 'lang_group');
+						}
+
+						else
+						{
+							$error_text = __("I could not remove the recepients from this group", 'lang_group');
+						}
+					}
+				}
 			break;
 		}
 
@@ -335,6 +358,8 @@ class mf_group
 						$this->acceptance_subject = get_post_meta($this->id, 'group_acceptance_subject', true);
 						$this->acceptance_text = get_post_meta($this->id, 'group_acceptance_text', true);
 
+						$this->allow_registration = get_post_meta_or_default($this->id, $this->meta_prefix.'allow_registration', true, 'no');
+
 						$this->verify_address = get_post_meta_or_default($this->id, 'group_verify_address', true, 'no');
 						$this->contact_page = get_post_meta($this->id, 'group_contact_page', true);
 						$this->registration_fields = get_post_meta($this->id, 'group_registration_fields', true);
@@ -347,7 +372,7 @@ class mf_group
 						$this->help_page = get_post_meta($this->id, $this->meta_prefix.'help_page', true);
 						$this->archive_page = get_post_meta($this->id, $this->meta_prefix.'archive_page', true);
 
-						if($this->public == "trash")
+						if($this->public == 'trash')
 						{
 							$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->posts." SET post_status = 'publish' WHERE ID = '%d' AND post_type = 'mf_group'".$this->query_where, $this->id));
 						}
@@ -357,14 +382,14 @@ class mf_group
 		}
 	}
 
-	function get_post_status_for_select()
+	/*function get_post_status_for_select()
 	{
 		return array(
 			'publish' => __("Public", 'lang_group'),
 			'draft' => __("Not Public", 'lang_group'),
 			'ignore' => __("Inactive", 'lang_group'),
 		);
-	}
+	}*/
 
 	function get_groups($data = array())
 	{
@@ -501,9 +526,8 @@ class mf_group
 	{
 		global $wpdb;
 
-		$user_data = get_userdata(get_current_user_id());
-
-		//do_log("Deleted all (GID: ".$group_id." (".$this->get_name($group_id)."), User: ".$user_data->display_name.")");
+		/*$user_data = get_userdata(get_current_user_id());
+		do_log("Deleted all (GID: ".$group_id." (".$this->get_name($group_id)."), User: ".$user_data->display_name.")");*/
 
 		$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->prefix."address2group WHERE groupID = '%d'", $group_id));
 	}
@@ -644,25 +668,27 @@ class mf_group_table extends mf_list_table
 						$actions['delete'] = "<a href='".wp_nonce_url("?page=mf_group/list/index.php&btnGroupDelete&intGroupID=".$post_id, 'group_delete_'.$post_id)."'>".__("Delete", 'lang_group')."</a>";
 					}
 
-					$actions['addnremove'] = "<a href='?page=mf_address/list/index.php&intGroupID=".$post_id."'>".__("Add or remove", 'lang_group')."</a>";
-					$actions['import'] = "<a href='?page=mf_group/import/index.php&intGroupID=".$post_id."'>".__("Import", 'lang_group')."</a>";
+					$actions['view'] = "<a href='".get_permalink($post_id)."'>".__("View", 'lang_group')."</a>";
+
+					$actions['addnremove'] = "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id)."'>".__("Add or remove", 'lang_group')."</a>";
+					$actions['import'] = "<a href='".admin_url("admin.php?page=mf_group/import/index.php&intGroupID=".$post_id)."'>".__("Import", 'lang_group')."</a>";
 
 					$amount = $obj_group->amount_in_group();
 
 					if($amount > 0)
 					{
-						$actions['export_csv'] = "<a href='".wp_nonce_url("?page=mf_group/list/index.php&btnExportRun&intExportType=".$post_id."&strExportFormat=csv", 'export_run')."'>".__("CSV", 'lang_group')."</a>";
+						$actions['export_csv'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnExportRun&intExportType=".$post_id."&strExportFormat=csv"), 'export_run')."'>".__("CSV", 'lang_group')."</a>";
 
 						if(is_plugin_active("mf_phpexcel/index.php"))
 						{
-							$actions['export_xls'] = "<a href='".wp_nonce_url("?page=mf_group/list/index.php&btnExportRun&intExportType=".$post_id."&strExportFormat=xls", 'export_run')."'>".__("XLS", 'lang_group')."</a>";
+							$actions['export_xls'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnExportRun&intExportType=".$post_id."&strExportFormat=xls"), 'export_run')."'>".__("XLS", 'lang_group')."</a>";
 						}
 					}
 				}
 
 				else
 				{
-					$actions['recover'] = "<a href='?page=mf_group/create/index.php&intGroupID=".$post_id."&recover'>".__("Recover", 'lang_group')."</a>";
+					$actions['recover'] = "<a href='".admin_url("admin.php?page=mf_group/create/index.php&intGroupID=".$post_id."&recover")."'>".__("Recover", 'lang_group')."</a>";
 				}
 
 				$out .= "<a href='".$post_edit_url."'>".$item[$column_name]."</a>"
@@ -670,7 +696,14 @@ class mf_group_table extends mf_list_table
 			break;
 
 			case 'post_status':
-				if($item[$column_name] == "publish")
+				$post_allow_registration = get_post_meta($post_id, $obj_group->meta_prefix.'allow_registration', true);
+
+				if($post_allow_registration == 'yes')
+				{
+					$out .= "<i class='fa fa-globe green' title='".__("This group is open for registration", 'lang_group')."'></i>";
+				}
+
+				/*if($item[$column_name] == "publish")
 				{
 					$post_url = get_permalink($post_id);
 
@@ -678,7 +711,7 @@ class mf_group_table extends mf_list_table
 					<div class='row-actions'>
 						<a href='".$post_url."'><i class='fa fa-link'></i></a>
 					</div>";
-				}
+				}*/
 			break;
 
 			case 'amount':
@@ -690,16 +723,16 @@ class mf_group_table extends mf_list_table
 				{
 					if($amount > 0)
 					{
-						$actions['send_email'] = "<a href='?page=mf_group/send/index.php&intGroupID=".$post_id."&type=email'><i class='fa fa-lg fa-envelope-o'></i></a>";
+						$actions['send_email'] = "<a href='".admin_url("admin.php?page=mf_group/send/index.php&intGroupID=".$post_id."&type=email")."'><i class='fa fa-lg fa-envelope-o'></i></a>";
 
 						if(is_plugin_active("mf_sms/index.php") && sms_is_active())
 						{
-							$actions['send_sms'] = "<a href='?page=mf_group/send/index.php&intGroupID=".$post_id."&type=sms'><i class='fa fa-lg fa-mobile'></i></a>";
+							$actions['send_sms'] = "<a href='".admin_url("admin.php?page=mf_group/send/index.php&intGroupID=".$post_id."&type=sms")."'><i class='fa fa-lg fa-mobile'></i></a>";
 						}
 					}
 				}
 
-				$out .= "<a href='?page=mf_address/list/index.php&intGroupID=".$post_id."&no_ses&is_part_of_group=1'>".$amount."</a>"
+				$out .= "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id."&no_ses&is_part_of_group=1")."'>".$amount."</a>"
 				.$this->row_actions($actions);
 			break;
 
@@ -741,7 +774,7 @@ class mf_group_table extends mf_list_table
 
 					if($dteMessageCreated != '')
 					{
-						$actions['sent'] = "<a href='?page=mf_group/sent/index.php&intGroupID=".$post_id."'>".__("Sent", 'lang_group')."</a>";
+						$actions['sent'] = "<a href='".admin_url("admin.php?page=mf_group/sent/index.php&intGroupID=".$post_id)."'>".__("Sent", 'lang_group')."</a>";
 
 						$intMessageSent = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueSent = '1'", $intMessageID));
 						$intMessageNotSent = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueSent = '0'", $intMessageID));
