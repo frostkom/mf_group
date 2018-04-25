@@ -491,6 +491,15 @@ class mf_group
 		return send_email(array('to' => $mail_to, 'subject' => $mail_subject, 'content' => $mail_content));
 	}
 
+	function accept_address($data)
+	{
+		global $wpdb;
+
+		$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."address2group SET groupAccepted = '1' WHERE addressID = '%d' AND groupID = '%d'", $data['address_id'], $data['group_id']));
+
+		return ($wpdb->rows_affected > 0);
+	}
+
 	function add_address($data)
 	{
 		global $wpdb;
@@ -659,13 +668,13 @@ class mf_group_table extends mf_list_table
 
 				if($post_status != "trash")
 				{
-					$post_edit_url = "?page=mf_group/create/index.php&intGroupID=".$post_id;
+					$post_edit_url = admin_url("admin.php?page=mf_group/create/index.php&intGroupID=".$post_id);
 
 					$actions['edit'] = "<a href='".$post_edit_url."'>".__("Edit", 'lang_group')."</a>";
 
 					if($post_author == get_current_user_id() || IS_ADMIN)
 					{
-						$actions['delete'] = "<a href='".wp_nonce_url("?page=mf_group/list/index.php&btnGroupDelete&intGroupID=".$post_id, 'group_delete_'.$post_id)."'>".__("Delete", 'lang_group')."</a>";
+						$actions['delete'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnGroupDelete&intGroupID=".$post_id), 'group_delete_'.$post_id)."'>".__("Delete", 'lang_group')."</a>";
 					}
 
 					$actions['view'] = "<a href='".get_permalink($post_id)."'>".__("View", 'lang_group')."</a>";

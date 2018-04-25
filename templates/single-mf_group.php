@@ -38,9 +38,7 @@ get_header();
 
 						if($intAddressID > 0)
 						{
-							$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."address2group SET groupAccepted = '1' WHERE groupID = '%d' AND addressID = '%d'", $intGroupID, $intAddressID));
-
-							if($wpdb->rows_affected > 0)
+							if($obj_group->accept_address(array('address_id' => $intAddressID, 'group_id' => $intGroupID)))
 							{
 								$done_text = __("You have successfully subscribed", 'lang_group');
 							}
