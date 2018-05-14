@@ -11,7 +11,9 @@ echo "<div class='wrap'>
 	."</h2>"
 	.get_notification();
 
-	$tbl_group = new mf_group_table();
+	$tbl_group = new mf_group_table(array(
+		'remember_search' => true,
+	));
 
 	$tbl_group->select_data(array(
 		'select' => "ID, post_status, post_name, post_title, post_modified, post_author",

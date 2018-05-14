@@ -564,8 +564,6 @@ class mf_group_table extends mf_list_table
 {
 	function set_default()
 	{
-		global $wpdb;
-
 		$this->post_type = "mf_group";
 
 		$this->arr_settings['query_select_id'] = "ID";
@@ -573,7 +571,12 @@ class mf_group_table extends mf_list_table
 		$this->arr_settings['has_autocomplete'] = true;
 		$this->arr_settings['plugin_name'] = 'mf_group';
 		$this->orderby_default = "post_title";
+	}
 
+	function init_fetch()
+	{
+		global $wpdb;
+		
 		if($this->search != '')
 		{
 			$this->query_where .= ($this->query_where != '' ? " AND " : "")."(post_title LIKE '%".$this->search."%')";
