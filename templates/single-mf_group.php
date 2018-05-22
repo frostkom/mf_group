@@ -30,7 +30,7 @@ get_header();
 					$intGroupID = check_var('gid', 'int');
 					$strAddressEmail = check_var('aem', 'char');
 
-					$hash_temp = md5(NONCE_SALT.$intGroupID.$strAddressEmail);
+					$hash_temp = md5((defined('NONCE_SALT') ? NONCE_SALT : '').$intGroupID.$strAddressEmail);
 
 					if($strSubscribeHash == $hash_temp)
 					{
@@ -74,7 +74,7 @@ get_header();
 						$strAddressEmail = check_var('aem', 'char');
 						$intQueueID = check_var('qid', 'int');
 
-						$hash_temp = md5(NONCE_SALT.$intGroupID.$strAddressEmail);
+						$hash_temp = md5((defined('NONCE_SALT') ? NONCE_SALT : '').$intGroupID.$strAddressEmail);
 
 						if($strUnsubscribeHash != '')
 						{

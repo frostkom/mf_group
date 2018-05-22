@@ -277,7 +277,7 @@ function get_group_url($data)
 
 	$out .= $base_url
 		.(preg_match("/\?/", $base_url) ? "&" : "?")
-		.$data['type']."=".md5(NONCE_SALT.$data['group_id'].$data['email'])
+		.$data['type']."=".md5((defined('NONCE_SALT') ? NONCE_SALT : '').$data['group_id'].$data['email'])
 		."&gid=".$data['group_id']
 		."&aem=".$data['email'];
 

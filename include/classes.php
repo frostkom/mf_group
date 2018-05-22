@@ -314,7 +314,7 @@ class mf_group
 						}
 					}
 				}
-				
+
 				else if(isset($_POST['btnGroupRemoveRecepients']) && $this->id > 0 && wp_verify_nonce($_POST['_wpnonce'], 'group_remove_recepients_'.$this->id))
 				{
 					if(isset($_POST['intGroupRemoveRecepientsConfirm']) && $_POST['intGroupRemoveRecepientsConfirm'] == 1)
@@ -576,7 +576,7 @@ class mf_group_table extends mf_list_table
 	function init_fetch()
 	{
 		global $wpdb;
-		
+
 		if($this->search != '')
 		{
 			$this->query_where .= ($this->query_where != '' ? " AND " : "")."(post_title LIKE '%".$this->search."%')";
@@ -923,7 +923,7 @@ class mf_group_sent_table extends mf_list_table
 
 			case 'messageFrom':
 				$strMessageFrom = $item[$column_name];
-			
+
 				$actions = array();
 
 				$strMessageFromName = "";
