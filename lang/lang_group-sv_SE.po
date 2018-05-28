@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-04-25 15:42+0100\n"
+"POT-Creation-Date: 2018-05-28 11:16+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -17,8 +17,8 @@ msgstr ""
 "X-Poedit-SearchPath-1: ..\n"
 
 #: ../create/index.php:17
-#: ../include/classes.php:1102
-#: ../include/classes.php:1155
+#: ../include/classes.php:1105
+#: ../include/classes.php:1158
 #: ../include/functions.php:145
 #: ../include/functions.php:146
 #: ../include/functions.php:147
@@ -38,7 +38,7 @@ msgstr "Lägg till"
 
 #: ../create/index.php:26
 #: ../create/index.php:116
-#: ../include/classes.php:627
+#: ../include/classes.php:630
 #: ../include/functions.php:663
 msgid "Name"
 msgstr "Namn"
@@ -64,7 +64,7 @@ msgid "Send before adding to a group"
 msgstr "Skicka före man läggs till i en grupp"
 
 #: ../create/index.php:56
-#: ../include/classes.php:870
+#: ../include/classes.php:873
 #: ../send/index.php:63
 msgid "Subject"
 msgstr "Ämne"
@@ -151,7 +151,7 @@ msgid "Phone Number"
 msgstr "Telefonnummer"
 
 #: ../create/index.php:121
-#: ../include/classes.php:909
+#: ../include/classes.php:912
 #: ../include/functions.php:695
 msgid "E-mail"
 msgstr "E-post"
@@ -211,13 +211,13 @@ msgstr "Gruppen uppdaterades inte med någon adress"
 
 #: ../import/index.php:108
 #: ../import/index.php:115
-#: ../include/classes.php:683
+#: ../include/classes.php:686
 #: ../include/functions.php:266
 msgid "Import"
 msgstr "Importera"
 
 #: ../import/index.php:114
-#: ../include/classes.php:1154
+#: ../include/classes.php:1157
 msgid "Text"
 msgstr "Text"
 
@@ -279,158 +279,158 @@ msgstr "Jag kunde inte radera alla mottagare från denna grupp"
 msgid "Accept Link"
 msgstr "Bekräftelselänk"
 
-#: ../include/classes.php:614
+#: ../include/classes.php:617
 msgid "All"
 msgstr "Alla"
 
-#: ../include/classes.php:615
+#: ../include/classes.php:618
 msgid "Public"
 msgstr "Publik"
 
-#: ../include/classes.php:616
+#: ../include/classes.php:619
 msgid "Not Public"
 msgstr "Inte publik"
 
-#: ../include/classes.php:617
+#: ../include/classes.php:620
 msgid "Inactive"
 msgstr "Inaktiv"
 
-#: ../include/classes.php:618
+#: ../include/classes.php:621
 msgid "Trash"
 msgstr "Papperskorg"
 
-#: ../include/classes.php:629
+#: ../include/classes.php:632
 msgid "Amount"
 msgstr "Antal"
 
-#: ../include/classes.php:634
+#: ../include/classes.php:637
 msgid "Not Accepted"
 msgstr "Inte bekräftad"
 
-#: ../include/classes.php:637
+#: ../include/classes.php:640
 msgid "Unsubscribed"
 msgstr "Avregistrerade"
 
-#: ../include/classes.php:638
+#: ../include/classes.php:641
 msgid "User"
 msgstr "Användare"
 
-#: ../include/classes.php:639
-#: ../include/classes.php:786
-#: ../include/classes.php:872
+#: ../include/classes.php:642
+#: ../include/classes.php:789
+#: ../include/classes.php:875
 #: ../include/functions.php:263
 #: ../sent/index.php:21
 msgid "Sent"
 msgstr "Skickat"
 
-#: ../include/classes.php:673
+#: ../include/classes.php:676
 msgid "Edit"
 msgstr "Redigera"
 
-#: ../include/classes.php:677
+#: ../include/classes.php:680
 msgid "Delete"
 msgstr "Radera"
 
-#: ../include/classes.php:680
+#: ../include/classes.php:683
 msgid "View"
 msgstr "Visa"
 
-#: ../include/classes.php:682
+#: ../include/classes.php:685
 msgid "Add or remove"
 msgstr "Lägg till/ta bort"
 
-#: ../include/classes.php:689
+#: ../include/classes.php:692
 msgid "CSV"
 msgstr "CSV"
 
-#: ../include/classes.php:693
+#: ../include/classes.php:696
 msgid "XLS"
 msgstr "XLS"
 
-#: ../include/classes.php:700
+#: ../include/classes.php:703
 msgid "Recover"
 msgstr "Återställ"
 
-#: ../include/classes.php:712
+#: ../include/classes.php:715
 msgid "This group is open for registration"
 msgstr "Denna grupp är öppen för registrering"
 
-#: ../include/classes.php:767
+#: ../include/classes.php:770
 msgid "Test"
 msgstr "Testa"
 
-#: ../include/classes.php:801
+#: ../include/classes.php:804
 #, php-format
 msgid "Will be sent %s"
 msgstr "Kommer att skickas %s"
 
-#: ../include/classes.php:808
+#: ../include/classes.php:811
 msgid "Is sending"
 msgstr "Skickar"
 
-#: ../include/classes.php:868
+#: ../include/classes.php:871
 msgid "Type"
 msgstr "Typ"
 
-#: ../include/classes.php:869
+#: ../include/classes.php:872
 #: ../send/index.php:62
 #: ../send/index.php:91
 msgid "From"
 msgstr "Från"
 
-#: ../include/classes.php:871
+#: ../include/classes.php:874
 msgid "Scheduled"
 msgstr "Schemalagd"
 
-#: ../include/classes.php:873
+#: ../include/classes.php:876
 msgid "Created"
 msgstr "Skapad"
 
-#: ../include/classes.php:899
+#: ../include/classes.php:902
 msgid "View Content"
 msgstr "Visa innehåll"
 
-#: ../include/classes.php:901
+#: ../include/classes.php:904
 msgid "Send to group again"
 msgstr "Skicka till grupp igen"
 
-#: ../include/classes.php:902
+#: ../include/classes.php:905
 msgid "Send to e-mail"
 msgstr "Skicka till e-post"
 
-#: ../include/classes.php:913
+#: ../include/classes.php:916
 msgid "SMS"
 msgstr "SMS"
 
-#: ../include/classes.php:976
+#: ../include/classes.php:979
 msgid "Abort"
 msgstr "Avbryt"
 
-#: ../include/classes.php:1003
+#: ../include/classes.php:1006
 msgid "Errors"
 msgstr "Fel"
 
-#: ../include/classes.php:1008
+#: ../include/classes.php:1011
 msgid "Read"
 msgstr "Lästa"
 
-#: ../include/classes.php:1092
+#: ../include/classes.php:1095
 msgid "Display a group registration form"
 msgstr "Visa ett registreringsformulär till en grupp"
 
-#: ../include/classes.php:1102
+#: ../include/classes.php:1105
 msgid "Newsletter"
 msgstr "Nyhetsbrev"
 
-#: ../include/classes.php:1153
+#: ../include/classes.php:1156
 msgid "Heading"
 msgstr "Rubrik"
 
-#: ../include/classes.php:1156
+#: ../include/classes.php:1159
 msgid "Button Text"
 msgstr "Knapptext"
 
-#: ../include/classes.php:1156
+#: ../include/classes.php:1159
 #: ../include/functions.php:511
 msgid "Join"
 msgstr "Gå med"
@@ -492,7 +492,12 @@ msgstr "Tack för visat intresse. Du har lagts till i gruppen"
 msgid "Country"
 msgstr "Land"
 
-#: ../include/functions.php:711
+#: ../include/functions.php:704
+#: ../include/functions.php:717
+msgid "I consent to having this website store my submitted information, so that they can contact me as part of this newsletter"
+msgstr "Jag godkänner att denna webbsida sparar min ifyllda information, så att de kan kontakta mig inom ramen för detta nyhetsbrev"
+
+#: ../include/functions.php:712
 msgid "Your Email Address"
 msgstr "Din epost"
 

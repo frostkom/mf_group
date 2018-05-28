@@ -701,6 +701,7 @@ function show_group_registration_form($data)
 				}
 
 				$out .= "<div class='form_button'>"
+					.show_checkbox(array('text' => __("I consent to having this website store my submitted information, so that they can contact me as part of this newsletter", 'lang_group'), 'value' => 1, 'required' => true))
 					.show_button(array('name' => "btnGroupJoin", 'text' => $data['button_text']))
 				."</div>";
 			}
@@ -712,7 +713,8 @@ function show_group_registration_form($data)
 					."<div class='form_button'>"
 						.show_button(array('name' => "btnGroupJoin", 'text' => $data['button_text']))
 					."</div>
-				</div>";
+				</div>"
+				.show_checkbox(array('text' => __("I consent to having this website store my submitted information, so that they can contact me as part of this newsletter", 'lang_group'), 'value' => 1, 'required' => true));
 			}
 
 		$out .= "</form>";
