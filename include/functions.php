@@ -174,6 +174,7 @@ function settings_group()
 	$arr_settings = array(
 		'setting_emails_per_hour' => __("Outgoing e-mails per hour", 'lang_group'),
 		'setting_group_see_other_roles' => __("See groups created by other roles", 'lang_group'),
+		'setting_group_outgoing_text' => __("Outgoing Text", 'lang_group'),
 		'setting_group_import' => __("Add all imported to this group", 'lang_group'),
 	);
 
@@ -192,7 +193,7 @@ function setting_emails_per_hour_callback()
 	$setting_key = get_setting_key(__FUNCTION__);
 	$option = get_option($setting_key, 200);
 
-	echo show_textfield(array('name' => $setting_key, 'value' => $option, 'type' => 'number', 'suffix' => __("0 or empty means infinte", 'lang_group')));
+	echo show_textfield(array('type' => 'number', 'name' => $setting_key, 'value' => $option, 'suffix' => __("0 or empty means infinte", 'lang_group')));
 }
 
 function setting_group_see_other_roles_callback()
@@ -201,6 +202,14 @@ function setting_group_see_other_roles_callback()
 	$option = get_option($setting_key, 'yes');
 
 	echo show_select(array('data' => get_yes_no_for_select(), 'name' => $setting_key, 'value' => $option));
+}
+
+function setting_group_outgoing_text_callback()
+{
+	$setting_key = get_setting_key(__FUNCTION__);
+	$option = get_option($setting_key);
+
+	echo show_wp_editor(array('name' => $setting_key, 'value' => $option, 'description' => __("This text will be appended to all outgoing e-mails", 'lang_group')));
 }
 
 function setting_group_import_callback()
@@ -299,6 +308,8 @@ function cron_group()
 	if($obj_cron->is_running == false)
 	{
 		$obj_group = new mf_group();
+
+		$setting_group_outgoing_text = get_option('setting_group_outgoing_text');
 
 		/* Send group messages */
 		$result = $wpdb->get_results("SELECT groupID FROM ".$wpdb->prefix."group_queue INNER JOIN ".$wpdb->prefix."group_message USING (messageID) WHERE queueSent = '0' AND (messageSchedule IS NULL OR messageSchedule < NOW()) GROUP BY groupID ORDER BY RAND()");
@@ -409,6 +420,11 @@ function cron_group()
 
 						if($wpdb->num_rows == 0)
 						{
+							if($setting_group_outgoing_text != '')
+							{
+								$mail_content .= apply_filters('the_content', $setting_group_outgoing_text);
+							}
+
 							$sent = send_email(array('to' => $mail_to, 'subject' => $mail_subject, 'content' => $mail_content, 'headers' => $mail_headers, 'attachment' => $mail_attachment, 'save_log' => false));
 
 							if($sent)
