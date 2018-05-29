@@ -510,11 +510,11 @@ class mf_group
 
 			if($wpdb->num_rows == 0)
 			{
-				$setting_group_acceptance_email = get_post_meta($data['group_id'], 'group_acceptance_email', true);
+				$meta_group_acceptance_email = get_post_meta($data['group_id'], 'group_acceptance_email', true);
 
-				$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->prefix."address2group SET addressID = '%d', groupID = '%d', groupAccepted = '%d'", $data['address_id'], $data['group_id'], ($setting_group_acceptance_email == 'yes' ? 0 : 1)));
+				$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->prefix."address2group SET addressID = '%d', groupID = '%d', groupAccepted = '%d'", $data['address_id'], $data['group_id'], ($meta_group_acceptance_email == 'yes' ? 0 : 1)));
 
-				if($setting_group_acceptance_email == 'yes')
+				if($meta_group_acceptance_email == 'yes')
 				{
 					$this->send_acceptance_message($data);
 				}
