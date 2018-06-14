@@ -31,7 +31,7 @@ function get_shortcode_output_group($out)
 	if(count($tbl_group->data) > 0)
 	{
 		$arr_data = array(
-			'' => "-- ".__("Choose here", 'lang_group')." --",
+			'' => "-- ".__("Choose Here", 'lang_group')." --",
 		);
 
 		foreach($tbl_group->data as $template)
@@ -218,7 +218,7 @@ function setting_group_import_callback()
 	$option = get_option($setting_key);
 
 	$arr_data = array();
-	$arr_data[''] = "-- ".__("Choose here", 'lang_group')." --";
+	$arr_data[''] = "-- ".__("Choose Here", 'lang_group')." --";
 
 	$obj_group = new mf_group();
 	$result = $obj_group->get_groups(array('where' => " AND post_status != 'trash'", 'order' => "post_title ASC"));

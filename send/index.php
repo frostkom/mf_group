@@ -44,7 +44,7 @@ echo "<div class='wrap'>
 
 										$arr_data_from = array();
 
-										$arr_data_from[''] = "-- ".__("Choose here", 'lang_group')." --";
+										$arr_data_from[''] = "-- ".__("Choose Here", 'lang_group')." --";
 
 										if($user_email != '')
 										{
@@ -69,10 +69,10 @@ echo "<div class='wrap'>
 
 								case 'sms':
 									$sms_senders = get_option('setting_sms_senders');
-									$sms_phone = get_user_meta(get_current_user_id(), 'mf_sms_phone', true);
+									$sms_phone = get_user_meta(get_current_user_id(), 'meta_sms_phone', true);
 
 									$arr_data_from = array(
-										'' => "-- ".__("Choose here", 'lang_group')." --"
+										'' => "-- ".__("Choose Here", 'lang_group')." --"
 									);
 
 									foreach(explode(",", $sms_senders) as $sender)
@@ -107,7 +107,7 @@ echo "<div class='wrap'>
 								.show_textfield(array('type' => 'time', 'name' => 'dteMessageScheduleTime', 'text' => "&nbsp;", 'value' => $obj_group->message_schedule_time, 'placeholder' => date("H:i")))
 							."</div>
 							<p class='description'>".__("Choose date and time to send the message", 'lang_group')."</p>"
-							.wp_nonce_field('group_send_'.$obj_group->message_type, '_wpnonce', true, false);
+							.wp_nonce_field('group_send_'.$obj_group->message_type, '_wpnonce_group_send', true, false);
 
 							switch($obj_group->message_type)
 							{

@@ -95,7 +95,7 @@ class mf_group
 		switch($this->type)
 		{
 			case 'table':
-				if(isset($_REQUEST['btnGroupDelete']) && $this->id > 0 && wp_verify_nonce($_REQUEST['_wpnonce'], 'group_delete_'.$this->id))
+				if(isset($_REQUEST['btnGroupDelete']) && $this->id > 0 && wp_verify_nonce($_REQUEST['_wpnonce_group_delete'], 'group_delete_'.$this->id))
 				{
 					if(wp_trash_post($this->id))
 					{
@@ -124,7 +124,7 @@ class mf_group
 			break;
 
 			case 'form':
-				if(isset($_POST['btnGroupSend']) && count($this->arr_group_id) > 0 && wp_verify_nonce($_POST['_wpnonce'], 'group_send_'.$this->message_type))
+				if(isset($_POST['btnGroupSend']) && count($this->arr_group_id) > 0 && wp_verify_nonce($_POST['_wpnonce_group_send'], 'group_send_'.$this->message_type))
 				{
 					if($this->message_text == '')
 					{
@@ -244,7 +244,7 @@ class mf_group
 			break;
 
 			case 'create':
-				if(isset($_POST['btnGroupSave']) && wp_verify_nonce($_POST['_wpnonce'], 'group_save_'.$this->id))
+				if(isset($_POST['btnGroupSave']) && wp_verify_nonce($_POST['_wpnonce_group_save'], 'group_save_'.$this->id))
 				{
 					$post_data = array(
 						'post_type' => 'mf_group',
@@ -315,7 +315,7 @@ class mf_group
 					}
 				}
 
-				else if(isset($_POST['btnGroupRemoveRecepients']) && $this->id > 0 && wp_verify_nonce($_POST['_wpnonce'], 'group_remove_recepients_'.$this->id))
+				else if(isset($_POST['btnGroupRemoveRecepients']) && $this->id > 0 && wp_verify_nonce($_POST['_wpnonce_group_remove_recepients'], 'group_remove_recepients_'.$this->id))
 				{
 					if(isset($_POST['intGroupRemoveRecepientsConfirm']) && $_POST['intGroupRemoveRecepientsConfirm'] == 1)
 					{
@@ -677,7 +677,7 @@ class mf_group_table extends mf_list_table
 
 					if($post_author == get_current_user_id() || IS_ADMIN)
 					{
-						$actions['delete'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnGroupDelete&intGroupID=".$post_id), 'group_delete_'.$post_id)."'>".__("Delete", 'lang_group')."</a>";
+						$actions['delete'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnGroupDelete&intGroupID=".$post_id), 'group_delete_'.$post_id, '_wpnonce_group_delete')."'>".__("Delete", 'lang_group')."</a>";
 					}
 
 					$actions['view'] = "<a href='".get_permalink($post_id)."'>".__("View", 'lang_group')."</a>";
@@ -689,11 +689,11 @@ class mf_group_table extends mf_list_table
 
 					if($amount > 0)
 					{
-						$actions['export_csv'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnExportRun&intExportType=".$post_id."&strExportFormat=csv"), 'export_run')."'>".__("CSV", 'lang_group')."</a>";
+						$actions['export_csv'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnExportRun&intExportType=".$post_id."&strExportFormat=csv"), 'export_run', '_wpnonce_export_run')."'>".__("CSV", 'lang_group')."</a>";
 
 						if(is_plugin_active("mf_phpexcel/index.php"))
 						{
-							$actions['export_xls'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnExportRun&intExportType=".$post_id."&strExportFormat=xls"), 'export_run')."'>".__("XLS", 'lang_group')."</a>";
+							$actions['export_xls'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnExportRun&intExportType=".$post_id."&strExportFormat=xls"), 'export_run', '_wpnonce_export_run')."'>".__("XLS", 'lang_group')."</a>";
 						}
 					}
 				}
@@ -976,7 +976,7 @@ class mf_group_sent_table extends mf_list_table
 
 				if($intMessageNotSent > 0)
 				{
-					$actions['abort'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/sent/index.php&btnMessageAbort&intGroupID=".$this->arr_settings['intGroupID']."&intMessageID=".$intMessageID2), 'message_abort_'.$intMessageID2)."'>".__("Abort", 'lang_group')."</a>";
+					$actions['abort'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/sent/index.php&btnMessageAbort&intGroupID=".$this->arr_settings['intGroupID']."&intMessageID=".$intMessageID2), 'message_abort_'.$intMessageID2, '_wpnonce_message_abort')."'>".__("Abort", 'lang_group')."</a>";
 				}
 
 				else

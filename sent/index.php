@@ -10,7 +10,7 @@ if(!IS_EDITOR)
 $intGroupID = check_var('intGroupID');
 $intMessageID = check_var('intMessageID');
 
-if(isset($_REQUEST['btnMessageAbort']) && $intMessageID > 0 && wp_verify_nonce($_REQUEST['_wpnonce'], 'message_abort_'.$intMessageID))
+if(isset($_REQUEST['btnMessageAbort']) && $intMessageID > 0 && wp_verify_nonce($_REQUEST['_wpnonce_message_abort'], 'message_abort_'.$intMessageID))
 {
 	$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueSent = '0'", $intMessageID));
 

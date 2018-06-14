@@ -32,7 +32,7 @@ echo "<div class='wrap'>
 								if($wpdb->num_rows > 0)
 								{
 									$arr_data = array(
-										'' => "-- ".__("Choose here", 'lang_group')." --"
+										'' => "-- ".__("Choose Here", 'lang_group')." --"
 									);
 
 									foreach($result as $r)
@@ -62,26 +62,25 @@ echo "<div class='wrap'>
 
 					if(is_plugin_active("mf_email/index.php"))
 					{
+						$obj_email = new mf_email();
+						//$arr_data_incoming = $obj_email->get_from_for_select(array('type' => 'incoming'));
+						$arr_data_email = $obj_email->get_from_for_select();
+						$arr_data_abuse = $obj_email->get_from_for_select(array('type' => 'abuse'));
+
+						$arr_data_page = array();
+						get_post_children(array('add_choose_here' => true), $arr_data_page);
+
+						/*echo show_select(array('data' => $arr_data_incoming, 'name' => 'intGroupUnsubscribeEmail', 'text' => __("E-mail to Unsubscribe to", 'lang_group'), 'value' => $obj_group->unsubscribe_email))
+						.show_select(array('data' => $arr_data_incoming, 'name' => 'intGroupSubscribeEmail', 'text' => __("E-mail to Subscribe to", 'lang_group'), 'value' => $obj_group->subscribe_email));*/
+
 						echo "<div class='postbox'>
 							<h3 class='hndle'><span>".__("About the Group", 'lang_group')."</span></h3>
-							<div class='inside'>";
-
-								$obj_email = new mf_email();
-								//$arr_data_incoming = $obj_email->get_from_for_select(array('type' => 'incoming'));
-								$arr_data_email = $obj_email->get_from_for_select();
-								$arr_data_abuse = $obj_email->get_from_for_select(array('type' => 'abuse'));
-
-								$arr_data_page = array();
-								get_post_children(array('add_choose_here' => true), $arr_data_page);
-
-								/*echo show_select(array('data' => $arr_data_incoming, 'name' => 'intGroupUnsubscribeEmail', 'text' => __("E-mail to Unsubscribe to", 'lang_group'), 'value' => $obj_group->unsubscribe_email))
-								.show_select(array('data' => $arr_data_incoming, 'name' => 'intGroupSubscribeEmail', 'text' => __("E-mail to Subscribe to", 'lang_group'), 'value' => $obj_group->subscribe_email));*/
-								echo show_select(array('data' => $arr_data_email, 'name' => 'intGroupOwnerEmail', 'text' => __("Owner", 'lang_group'), 'value' => $obj_group->owner_email))
+							<div class='inside'>"
+								.show_select(array('data' => $arr_data_email, 'name' => 'intGroupOwnerEmail', 'text' => __("Owner", 'lang_group'), 'value' => $obj_group->owner_email))
 								.show_select(array('data' => $arr_data_abuse, 'name' => 'intGroupAbuseEmail', 'text' => __("Abuse", 'lang_group'), 'description' => sprintf(__("You should have setup both %s and %s because these addresses are usually used for other servers when sending notices about spam. This is a great way of receiving and handling possible issues within your own domain", 'lang_group'), "abuse@domain.com", "postmaster@domain.com")))
 								.show_select(array('data' => $arr_data_page, 'name' => 'intGroupHelpPage', 'text' => __("Help Page", 'lang_group'), 'value' => $obj_group->help_page))
-								.show_select(array('data' => $arr_data_page, 'name' => 'intGroupArchivePage', 'text' => __("Archive Page", 'lang_group'), 'value' => $obj_group->archive_page));
-
-							echo "</div>
+								.show_select(array('data' => $arr_data_page, 'name' => 'intGroupArchivePage', 'text' => __("Archive Page", 'lang_group'), 'value' => $obj_group->archive_page))
+							."</div>
 						</div>
 					</div>";
 				}
@@ -91,13 +90,14 @@ echo "<div class='wrap'>
 						<div class='inside'>"
 							.show_button(array('name' => 'btnGroupSave', 'text' => __("Save", 'lang_group')))
 							.input_hidden(array('name' => 'intGroupID', 'value' => $obj_group->id))
-							.wp_nonce_field('group_save_'.$obj_group->id, '_wpnonce', true, false)
+							.wp_nonce_field('group_save_'.$obj_group->id, '_wpnonce_group_save', true, false)
 						."</div>
 					</div>
 					<div class='postbox'>
 						<h3 class='hndle'><span>".__("Settings", 'lang_group')."</span></h3>
 						<div class='inside'>"
 							.show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupAllowRegistration', 'text' => __("Allow Registration", 'lang_group'), 'value' => $obj_group->allow_registration));
+
 							//.show_select(array('data' => $obj_group->get_post_status_for_select(), 'name' => 'strGroupPublic', 'text' => __("Status", 'lang_group'), 'value' => $obj_group->public, 'description' => ($obj_group->id > 0 ? get_permalink($obj_group->id) : "")));
 
 							if($obj_group->allow_registration == 'yes')
@@ -136,7 +136,7 @@ echo "<div class='wrap'>
 							{
 								echo show_button(array('name' => 'btnGroupRemoveRecepients', 'text' => __("Remove all recepients", 'lang_group'), 'class' => "button delete"))
 								.show_checkbox(array('name' => 'intGroupRemoveRecepientsConfirm', 'text' => __("Are you really sure?", 'lang_group'), 'value' => 1, 'description' => __("This will remove all recepients from this group and it is not possible to undo this action", 'lang_group')))
-								.wp_nonce_field('group_remove_recepients_'.$obj_group->id, '_wpnonce', true, false);
+								.wp_nonce_field('group_remove_recepients_'.$obj_group->id, '_wpnonce_group_remove_recepients', true, false);
 							}
 
 						echo "</div>

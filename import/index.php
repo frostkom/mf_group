@@ -12,7 +12,7 @@ if(!IS_EDITOR)
 
 $obj_group = new mf_group();
 
-if(isset($_POST['btnGroupImport']) && $strGroupImport != '' && wp_verify_nonce($_POST['_wpnonce'], 'group_import_'.$intGroupID))
+if(isset($_POST['btnGroupImport']) && $strGroupImport != '' && wp_verify_nonce($_POST['_wpnonce_group_import'], 'group_import_'.$intGroupID))
 {
 	$rows = 0;
 
@@ -114,7 +114,7 @@ echo "<div class='wrap'>
 				.show_textarea(array('name' => "strGroupImport", 'text' => __("Text", 'lang_group'), 'value' => $strGroupImport, 'xtra' => "autofocus", 'placeholder' => __("Enter social security numbers or e-mail addresses on separate rows for import", 'lang_group')))
 				.show_button(array('name' => "btnGroupImport", 'text' => __("Import", 'lang_group')))
 				.input_hidden(array('name' => "intGroupID", 'value' => $intGroupID))
-				.wp_nonce_field('group_import_'.$intGroupID, '_wpnonce', true, false)
+				.wp_nonce_field('group_import_'.$intGroupID, '_wpnonce_group_import', true, false)
 			."</form>
 		</div>
 	</div>
