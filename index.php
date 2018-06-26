@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: 
-Version: 5.1.6
+Version: 5.1.7
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: http://frostkom.se
@@ -23,7 +23,6 @@ add_action('cron_base', 'activate_group', mt_rand(1, 10));
 add_action('cron_base', 'cron_group', mt_rand(1, 10));
 
 add_action('init', 'init_group', 1);
-add_action('widgets_init', 'widgets_group');
 
 if(is_admin())
 {
@@ -47,6 +46,7 @@ else
 }
 
 add_shortcode('mf_group', 'shortcode_group');
+add_action('widgets_init', 'widgets_group');
 
 add_filter('single_template', 'custom_templates_group');
 
