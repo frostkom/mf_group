@@ -861,8 +861,8 @@ class mf_group_sent_table extends mf_list_table
 		/*$this->set_views(array(
 			'db_field' => 'proposalDeleted',
 			'types' => array(
-				'0' => __("All", 'lang_company'),
-				'1' => __("Trash", 'lang_company')
+				'0' => __("All", 'lang_group'),
+				'1' => __("Trash", 'lang_group')
 			),
 		));*/
 
