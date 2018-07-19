@@ -22,6 +22,28 @@ class mf_group
 		$this->meta_prefix = "mf_group_";
 	}
 
+	function has_allow_registration_post()
+	{
+		global $wpdb;
+
+		$post_id = $wpdb->get_var($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND ".$wpdb->postmeta.".meta_key = '".$this->meta_prefix."allow_registration' WHERE post_type = 'mf_group' AND meta_value = %s", 'yes'));
+
+		return ($post_id > 0);
+	}
+
+	function add_policy($content)
+	{
+		if($this->has_allow_registration_post())
+		{
+			$content .= "<h3>".__("Group", 'lang_group')."</h3>
+			<p>"
+				.__("We collect personal information when a subscription is begun by entering at least an e-mail address. This makes it possible for us to send the wanted e-mails to the correct recipient.", 'lang_group')
+			."</p>";
+		}
+
+		return $content;
+	}
+
 	function wp_head()
 	{
 		$plugin_include_url = plugin_dir_url(__FILE__);
@@ -160,7 +182,7 @@ class mf_group
 								$query_where .= " AND post_author = '".get_current_user_id()."'";
 							}
 
-							$arr_recepients = array();
+							$arr_recipients = array();
 
 							foreach($this->arr_group_id as $this->group_id)
 							{
@@ -189,13 +211,13 @@ class mf_group
 											$strAddressEmail = $r->addressEmail;
 											$strAddressCellNo = $r->addressCellNo;
 
-											if(!in_array($intAddressID, $arr_recepients) && ($this->message_type == "email" && $strAddressEmail != "" || $this->message_type == "sms" && $strAddressCellNo != ""))
+											if(!in_array($intAddressID, $arr_recipients) && ($this->message_type == "email" && $strAddressEmail != "" || $this->message_type == "sms" && $strAddressCellNo != ""))
 											{
 												$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->prefix."group_queue SET addressID = '%d', messageID = '%d', queueCreated = NOW()", $intAddressID, $this->message_id));
 
 												if($wpdb->rows_affected > 0)
 												{
-													$arr_recepients[] = $intAddressID;
+													$arr_recipients[] = $intAddressID;
 												}
 											}
 										}
@@ -208,7 +230,7 @@ class mf_group
 								}
 							}
 
-							if(count($arr_recepients) > 0)
+							if(count($arr_recipients) > 0)
 							{
 								mf_redirect(admin_url("admin.php?page=mf_group/list/index.php&sent"));
 							}
@@ -315,20 +337,20 @@ class mf_group
 					}
 				}
 
-				else if(isset($_POST['btnGroupRemoveRecepients']) && $this->id > 0 && wp_verify_nonce($_POST['_wpnonce_group_remove_recepients'], 'group_remove_recepients_'.$this->id))
+				else if(isset($_POST['btnGroupRemoveRecipients']) && $this->id > 0 && wp_verify_nonce($_POST['_wpnonce_group_remove_recipients'], 'group_remove_recipients_'.$this->id))
 				{
-					if(isset($_POST['intGroupRemoveRecepientsConfirm']) && $_POST['intGroupRemoveRecepientsConfirm'] == 1)
+					if(isset($_POST['intGroupRemoveRecipientsConfirm']) && $_POST['intGroupRemoveRecipientsConfirm'] == 1)
 					{
 						$this->remove_all_address($this->id);
 
 						if($wpdb->rows_affected > 0)
 						{
-							$done_text = __("I removed all the recepients from this group", 'lang_group');
+							$done_text = __("I removed all the recipients from this group", 'lang_group');
 						}
 
 						else
 						{
-							$error_text = __("I could not remove the recepients from this group", 'lang_group');
+							$error_text = __("I could not remove the recipients from this group", 'lang_group');
 						}
 					}
 				}

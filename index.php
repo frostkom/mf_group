@@ -3,10 +3,10 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: 
-Version: 5.1.9
+Version: 5.1.13
 Licence: GPLv2 or later
 Author: Martin Fors
-Author URI: http://frostkom.se
+Author URI: https://frostkom.se
 Text Domain: lang_group
 Domain Path: /lang
 
@@ -31,6 +31,9 @@ if(is_admin())
 
 	add_action('admin_init', 'settings_group');
 	add_action('admin_menu', 'menu_group');
+	
+	add_filter('wp_get_default_privacy_policy_content', array($obj_group, 'add_policy'));
+
 	add_action('admin_notices', 'notices_group');
 	add_action('delete_post', 'delete_group');
 	add_action('deleted_user', 'deleted_user_group');
@@ -72,7 +75,7 @@ function activate_group()
 		messageAttachment TEXT,
 		messageSchedule DATETIME DEFAULT NULL,
 		messageCreated DATETIME,
-		userID INT UNSIGNED NOT NULL DEFAULT '0',
+		userID INT UNSIGNED DEFAULT NULL,
 		PRIMARY KEY (messageID),
 		KEY groupID (groupID)
 	) DEFAULT CHARSET=".$default_charset);

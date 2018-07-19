@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-05-28 12:00+0100\n"
+"POT-Creation-Date: 2018-07-19 08:12+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -48,7 +48,7 @@ msgstr "Namn"
 #: ../include/functions.php:221
 #: ../send/index.php:47
 #: ../send/index.php:75
-msgid "Choose here"
+msgid "Choose Here"
 msgstr "Välj här"
 
 #: ../create/index.php:43
@@ -85,7 +85,7 @@ msgstr "Exempel"
 msgid "You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below."
 msgstr "Du har blivit tillagd i gruppen %s men kommer inte att få några meddelanden förrän du har bekräftat prenumerationen genom att klicka på länken nedan."
 
-#: ../create/index.php:66
+#: ../create/index.php:77
 msgid "About the Group"
 msgstr "Om gruppen"
 
@@ -110,15 +110,15 @@ msgstr "Hjälpsida"
 msgid "Archive Page"
 msgstr "Arkivsida"
 
-#: ../create/index.php:92
+#: ../create/index.php:91
 msgid "Save"
 msgstr "Spara"
 
-#: ../create/index.php:98
+#: ../create/index.php:97
 msgid "Settings"
 msgstr "Inställningar"
 
-#: ../create/index.php:100
+#: ../create/index.php:99
 msgid "Allow Registration"
 msgstr "Tillåt registrering"
 
@@ -170,7 +170,7 @@ msgid "Add Verify Link"
 msgstr "Lägg till verifieringslänk"
 
 #: ../create/index.php:128
-msgid "In every message a hidden image/link is placed to see if the recepient has opened the message. This increases the risk of being classified as spam"
+msgid "In every message a hidden image/link is placed to see if the recipient has opened the message. This increases the risk of being classified as spam"
 msgstr "I varje meddelande läggs då en dold bild/länk som kollar ifall mottagaren har öppnat meddelandet. Detta ökar risken för att klassas som spam"
 
 #: ../create/index.php:132
@@ -182,7 +182,7 @@ msgid "This will automatically add/remove users and their information to this gr
 msgstr "Detta kommer automatiskt att lägga till/ta bort användare och deras information i denna grupp"
 
 #: ../create/index.php:137
-msgid "Remove all recepients"
+msgid "Remove all recipients"
 msgstr "Ta bort alla mottagare"
 
 #: ../create/index.php:138
@@ -190,7 +190,7 @@ msgid "Are you really sure?"
 msgstr "Är du helt säker?"
 
 #: ../create/index.php:138
-msgid "This will remove all recepients from this group and it is not possible to undo this action"
+msgid "This will remove all recipients from this group and it is not possible to undo this action"
 msgstr "Detta kommer att ta bort alla mottagare från denna grupp och det är inte möjligt att ångra denna åtgärd"
 
 #: ../import/index.php:77
@@ -268,11 +268,11 @@ msgid "The information was not submitted, contact an admin if this persists"
 msgstr "Informationen las inte in, kontakta en administratör om problemet kvarstår"
 
 #: ../include/classes.php:326
-msgid "I removed all the recepients from this group"
+msgid "I removed all the recipients from this group"
 msgstr "Jag tog bort alla mottagare från denna grupp"
 
 #: ../include/classes.php:331
-msgid "I could not remove the recepients from this group"
+msgid "I could not remove the recipients from this group"
 msgstr "Jag kunde inte radera alla mottagare från denna grupp"
 
 #: ../include/classes.php:489

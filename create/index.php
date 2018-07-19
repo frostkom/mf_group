@@ -125,7 +125,7 @@ echo "<div class='wrap'>
 								echo show_select(array('data' => $arr_data, 'name' => 'arrGroupRegistrationFields[]', 'text' => __("Registration Fields", 'lang_group'), 'value' => $obj_group->registration_fields));
 							}
 
-							echo show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupVerifyLink', 'text' => __("Add Verify Link", 'lang_group'), 'value' => $obj_group->verify_link, 'description' => __("In every message a hidden image/link is placed to see if the recepient has opened the message. This increases the risk of being classified as spam", 'lang_group')));
+							echo show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupVerifyLink', 'text' => __("Add Verify Link", 'lang_group'), 'value' => $obj_group->verify_link, 'description' => __("In every message a hidden image/link is placed to see if the recipient has opened the message. This increases the risk of being classified as spam", 'lang_group')));
 
 							if(!($obj_group->id > 0) || $obj_group->sync_users == 'yes')
 							{
@@ -134,9 +134,9 @@ echo "<div class='wrap'>
 
 							if($obj_group->allow_registration == 'no' && $obj_group->sync_users == 'no' && $obj_group->amount_in_group() > 0)
 							{
-								echo show_button(array('name' => 'btnGroupRemoveRecepients', 'text' => __("Remove all recepients", 'lang_group'), 'class' => "button delete"))
-								.show_checkbox(array('name' => 'intGroupRemoveRecepientsConfirm', 'text' => __("Are you really sure?", 'lang_group'), 'value' => 1, 'description' => __("This will remove all recepients from this group and it is not possible to undo this action", 'lang_group')))
-								.wp_nonce_field('group_remove_recepients_'.$obj_group->id, '_wpnonce_group_remove_recepients', true, false);
+								echo show_button(array('name' => 'btnGroupRemoveRecipients', 'text' => __("Remove all recipients", 'lang_group'), 'class' => "button delete"))
+								.show_checkbox(array('name' => 'intGroupRemoveRecipientsConfirm', 'text' => __("Are you really sure?", 'lang_group'), 'value' => 1, 'description' => __("This will remove all recipients from this group and it is not possible to undo this action", 'lang_group')))
+								.wp_nonce_field('group_remove_recipients_'.$obj_group->id, '_wpnonce_group_remove_recipients', true, false);
 							}
 
 						echo "</div>
