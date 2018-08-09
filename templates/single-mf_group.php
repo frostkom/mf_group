@@ -151,7 +151,7 @@ get_header();
 
 						else if($post_allow_registration == 'yes')
 						{
-							echo show_group_registration_form(array('id' => $post_id));
+							echo $obj_group->show_group_registration_form(array('id' => $post_id));
 						}
 
 						else

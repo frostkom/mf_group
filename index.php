@@ -15,32 +15,32 @@ GitHub Plugin URI: frostkom/mf_group
 */
 
 include_once("include/classes.php");
-include_once("include/functions.php");
+//include_once("include/functions.php");
 
 $obj_group = new mf_group();
 
 add_action('cron_base', 'activate_group', mt_rand(1, 10));
-add_action('cron_base', 'cron_group', mt_rand(1, 10));
+add_action('cron_base', array($obj_group, 'run_cron'), mt_rand(1, 10));
 
-add_action('init', 'init_group', 1);
+add_action('init', array($obj_group, 'init'), 1);
 
 if(is_admin())
 {
 	register_activation_hook(__FILE__, 'activate_group');
 	register_uninstall_hook(__FILE__, 'uninstall_group');
 
-	add_action('admin_init', 'settings_group');
-	add_action('admin_menu', 'menu_group');
-	
+	add_action('admin_init', array($obj_group, 'settings_group'));
+	add_action('admin_menu', array($obj_group, 'admin_menu'));
+
 	add_filter('wp_get_default_privacy_policy_content', array($obj_group, 'add_policy'));
 
-	add_action('admin_notices', 'notices_group');
-	add_action('delete_post', 'delete_group');
-	add_action('deleted_user', 'deleted_user_group');
+	add_action('admin_notices', array($obj_group, 'admin_notices'));
+	add_action('delete_post', array($obj_group, 'delete_post'));
+	add_action('deleted_user', array($obj_group, 'deleted_user'));
 
-	add_filter('count_shortcode_button', 'count_shortcode_button_group');
-	add_filter('get_shortcode_output', 'get_shortcode_output_group');
-	add_filter('get_shortcode_list', 'get_shortcode_list_group');
+	add_filter('count_shortcode_button', array($obj_group, 'count_shortcode_button'));
+	add_filter('get_shortcode_output', array($obj_group, 'get_shortcode_output'));
+	add_filter('get_shortcode_list', array($obj_group, 'get_shortcode_list'));
 }
 
 else
@@ -48,8 +48,8 @@ else
 	add_action('wp_head', array($obj_group, 'wp_head'), 0);
 }
 
-add_shortcode('mf_group', 'shortcode_group');
-add_action('widgets_init', 'widgets_group');
+add_shortcode('mf_group', array($obj_group, 'shortcode_group'));
+add_action('widgets_init', array($obj_group, 'widgets_init'));
 
 add_filter('single_template', 'custom_templates_group');
 
