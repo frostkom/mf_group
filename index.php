@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: 
-Version: 5.1.13
+Version: 5.2.1
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://frostkom.se
@@ -15,7 +15,6 @@ GitHub Plugin URI: frostkom/mf_group
 */
 
 include_once("include/classes.php");
-//include_once("include/functions.php");
 
 $obj_group = new mf_group();
 

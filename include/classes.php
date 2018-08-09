@@ -873,6 +873,34 @@ class mf_group
 					}
 				}
 
+				else if(isset($_REQUEST['btnGroupActivate']) && $this->id > 0 && wp_verify_nonce($_REQUEST['_wpnonce_group_activate'], 'group_activate_'.$this->id))
+				{
+					$post_data = array(
+						'ID' => $this->id,
+						'post_status' => 'draft',
+						'post_modified' => date("Y-m-d H:i:s"),
+					);
+
+					if(wp_update_post($post_data) > 0)
+					{
+						$done_text = __("The group was activated", 'lang_group');
+					}
+				}
+
+				else if(isset($_REQUEST['btnGroupInactivate']) && $this->id > 0 && wp_verify_nonce($_REQUEST['_wpnonce_group_inactivate'], 'group_inactivate_'.$this->id))
+				{
+					$post_data = array(
+						'ID' => $this->id,
+						'post_status' => 'ignore',
+						'post_modified' => date("Y-m-d H:i:s"),
+					);
+
+					if(wp_update_post($post_data) > 0)
+					{
+						$done_text = __("The group was inactivated", 'lang_group');
+					}
+				}
+
 				else if(isset($_GET['sent']))
 				{
 					$done_text = __("The information was sent", 'lang_group');
@@ -1437,7 +1465,7 @@ class mf_group_table extends mf_list_table
 
 				$actions = array();
 
-				if($post_status != "trash")
+				if($post_status != 'trash')
 				{
 					$post_edit_url = admin_url("admin.php?page=mf_group/create/index.php&intGroupID=".$post_id);
 
@@ -1448,8 +1476,17 @@ class mf_group_table extends mf_list_table
 						$actions['delete'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnGroupDelete&intGroupID=".$post_id), 'group_delete_'.$post_id, '_wpnonce_group_delete')."'>".__("Delete", 'lang_group')."</a>";
 					}
 
-					$actions['view'] = "<a href='".get_permalink($post_id)."'>".__("View", 'lang_group')."</a>";
+					if($post_status == 'ignore')
+					{
+						$actions['activate'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnGroupActivate&intGroupID=".$post_id), 'group_activate_'.$post_id, '_wpnonce_group_activate')."'>".__("Activate", 'lang_group')."</a>";
+					}
 
+					else
+					{
+						$actions['inactivate'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnGroupInactivate&intGroupID=".$post_id), 'group_inactivate_'.$post_id, '_wpnonce_group_inactivate')."'>".__("Inactivate", 'lang_group')."</a>";
+					}
+
+					$actions['view'] = "<a href='".get_permalink($post_id)."'>".__("View", 'lang_group')."</a>";
 					$actions['addnremove'] = "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id)."'>".__("Add or remove", 'lang_group')."</a>";
 					$actions['import'] = "<a href='".admin_url("admin.php?page=mf_group/import/index.php&intGroupID=".$post_id)."'>".__("Import", 'lang_group')."</a>";
 
@@ -1472,7 +1509,7 @@ class mf_group_table extends mf_list_table
 				}
 
 				$out .= "<a href='".$post_edit_url."'>".$item[$column_name]."</a>"
-				.$obj_group->row_actions($actions);
+				.$this->row_actions($actions);
 			break;
 
 			case 'post_status':
@@ -1513,7 +1550,7 @@ class mf_group_table extends mf_list_table
 				}
 
 				$out .= "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id."&no_ses&is_part_of_group=1")."'>".$amount."</a>"
-				.$obj_group->row_actions($actions);
+				.$this->row_actions($actions);
 			break;
 
 			case 'not_accepted':
@@ -1585,7 +1622,7 @@ class mf_group_table extends mf_list_table
 							$out .= format_date($dteMessageCreated);
 						}
 
-						$out .= $obj_group->row_actions($actions);
+						$out .= $this->row_actions($actions);
 					}
 				}
 			break;
