@@ -558,10 +558,10 @@ class mf_group
 		$setting_key = get_setting_key(__FUNCTION__);
 		$option = get_option($setting_key);
 
-		$arr_data = array();
-		$arr_data[''] = "-- ".__("Choose Here", 'lang_group')." --";
+		$arr_data = array(
+			'' => "-- ".__("Choose Here", 'lang_group')." --"
+		);
 
-		//$obj_group = new mf_group();
 		$result = $this->get_groups(array('where' => " AND post_status != 'trash'", 'order' => "post_title ASC"));
 
 		foreach($result as $r)

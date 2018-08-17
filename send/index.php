@@ -17,7 +17,7 @@ echo "<div class='wrap'>
 
 							$arr_data_to = array();
 
-							$result = $obj_group->get_groups();
+							$result = $obj_group->get_groups(array('where' => " AND post_status NOT IN ('trash', 'ignore')", 'order' => "post_title ASC"));
 
 							foreach($result as $r)
 							{
