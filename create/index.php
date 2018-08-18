@@ -98,8 +98,6 @@ echo "<div class='wrap'>
 						<div class='inside'>"
 							.show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupAllowRegistration', 'text' => __("Allow Registration", 'lang_group'), 'value' => $obj_group->allow_registration));
 
-							//.show_select(array('data' => $obj_group->get_post_status_for_select(), 'name' => 'strGroupPublic', 'text' => __("Status", 'lang_group'), 'value' => $obj_group->public, 'description' => ($obj_group->id > 0 ? get_permalink($obj_group->id) : "")));
-
 							if($obj_group->allow_registration == 'yes')
 							{
 								echo show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupVerifyAddress', 'text' => __("Verify that address is in Address book", 'lang_group'), 'value' => $obj_group->verify_address));
@@ -132,7 +130,7 @@ echo "<div class='wrap'>
 								echo show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupSyncUsers', 'text' => __("Synchronize Users", 'lang_group'), 'value' => $obj_group->sync_users, 'description' => __("This will automatically add/remove users and their information to this group", 'lang_group')));
 							}
 
-							if($obj_group->allow_registration == 'no' && $obj_group->sync_users == 'no' && $obj_group->amount_in_group() > 0)
+							if($obj_group->id > 0 && $obj_group->allow_registration == 'no' && $obj_group->sync_users == 'no' && $obj_group->amount_in_group() > 0)
 							{
 								echo show_button(array('name' => 'btnGroupRemoveRecipients', 'text' => __("Remove all recipients", 'lang_group'), 'class' => "button delete"))
 								.show_checkbox(array('name' => 'intGroupRemoveRecipientsConfirm', 'text' => __("Are you really sure?", 'lang_group'), 'value' => 1, 'description' => __("This will remove all recipients from this group and it is not possible to undo this action", 'lang_group')))
