@@ -602,8 +602,6 @@ class mf_group
 
 	function admin_menu()
 	{
-		//global $wpdb;
-
 		$menu_root = 'mf_group/';
 		$menu_start = $menu_root.'list/index.php';
 		$menu_capability = override_capability(array('page' => $menu_start, 'default' => 'edit_posts'));
