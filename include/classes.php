@@ -581,7 +581,7 @@ class mf_group
 			$arr_data[$r->ID] = $r->post_title;
 		}
 
-		echo show_select(array('data' => $arr_data, 'name' => $setting_key, 'value' => $option, 'suffix' => "<a href='".admin_url("admin.php?page=mf_group/create/index.php")."'><i class='fa fa-plus fa-lg'></i></a>"));
+		echo show_select(array('data' => $arr_data, 'name' => $setting_key, 'value' => $option, 'suffix' => "<a href='".admin_url("admin.php?page=mf_group/create/index.php")."'><i class='fa fa-plus-circle fa-lg'></i></a>"));
 	}
 
 	function count_unsent_group($id = 0)
@@ -1540,7 +1540,7 @@ class mf_group_table extends mf_list_table
 				{
 					if($amount > 0)
 					{
-						$actions['send_email'] = "<a href='".admin_url("admin.php?page=mf_group/send/index.php&intGroupID=".$post_id."&type=email")."'><i class='far fa-envelope fa-lg'></i></a>";
+						$actions['send_email'] = "<a href='".admin_url("admin.php?page=mf_group/send/index.php&intGroupID=".$post_id."&type=email")."'><i class='fa fa-envelope fa-lg'></i></a>";
 
 						if(is_plugin_active("mf_sms/index.php") && sms_is_active())
 						{
@@ -1707,7 +1707,7 @@ class mf_group_sent_table extends mf_list_table
 					'view_data' => "<i class='far fa-eye fa-lg' title='".__("View Content", 'lang_group')."'></i>",
 					//'view' => "<a href='".admin_url("admin.php?page=mf_group/sent/index.php&intGroupID=".$this->arr_settings['intGroupID']."&intMessageID=".$intMessageID2."#message_".$intMessageID2)."'><i class='far fa-eye fa-lg' title='".__("View Content", 'lang_group')."'></i></a>",
 					'send_to_group' => "<a href='".admin_url("admin.php?page=mf_group/send/index.php&intGroupID=".$this->arr_settings['intGroupID']."&intMessageID=".$intMessageID2)."'><i class='far fa-users fa-lg' title='".__("Send to group again", 'lang_group')."'></i></a>",
-					'send_email' => "<a href='".admin_url("admin.php?page=mf_email/send/index.php&intGroupMessageID=".$intMessageID2)."'><i class='far fa-envelope fa-lg' title='".__("Send to e-mail", 'lang_group')."'></i></a>",
+					'send_email' => "<a href='".admin_url("admin.php?page=mf_email/send/index.php&intGroupMessageID=".$intMessageID2)."'><i class='fa fa-envelope fa-lg' title='".__("Send to e-mail", 'lang_group')."'></i></a>",
 				);
 
 				switch($item[$column_name])
