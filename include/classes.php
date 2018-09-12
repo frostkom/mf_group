@@ -581,7 +581,7 @@ class mf_group
 			$arr_data[$r->ID] = $r->post_title;
 		}
 
-		echo show_select(array('data' => $arr_data, 'name' => $setting_key, 'value' => $option, 'suffix' => "<a href='".admin_url("admin.php?page=mf_group/create/index.php")."'><i class='fa fa-lg fa-plus'></i></a>"));
+		echo show_select(array('data' => $arr_data, 'name' => $setting_key, 'value' => $option, 'suffix' => "<a href='".admin_url("admin.php?page=mf_group/create/index.php")."'><i class='fa fa-plus fa-lg'></i></a>"));
 	}
 
 	function count_unsent_group($id = 0)
@@ -1526,7 +1526,7 @@ class mf_group_table extends mf_list_table
 
 					$out .= "<i class='fa fa-globe green'></i>
 					<div class='row-actions'>
-						<a href='".$post_url."'><i class='fa fa-link'></i></a>
+						<a href='".$post_url."'><i class='fas fa-link'></i></a>
 					</div>";
 				}*/
 			break;
@@ -1540,11 +1540,11 @@ class mf_group_table extends mf_list_table
 				{
 					if($amount > 0)
 					{
-						$actions['send_email'] = "<a href='".admin_url("admin.php?page=mf_group/send/index.php&intGroupID=".$post_id."&type=email")."'><i class='fa fa-lg fa-envelope-o'></i></a>";
+						$actions['send_email'] = "<a href='".admin_url("admin.php?page=mf_group/send/index.php&intGroupID=".$post_id."&type=email")."'><i class='far fa-envelope fa-lg'></i></a>";
 
 						if(is_plugin_active("mf_sms/index.php") && sms_is_active())
 						{
-							$actions['send_sms'] = "<a href='".admin_url("admin.php?page=mf_group/send/index.php&intGroupID=".$post_id."&type=sms")."'><i class='fa fa-lg fa-mobile'></i></a>";
+							$actions['send_sms'] = "<a href='".admin_url("admin.php?page=mf_group/send/index.php&intGroupID=".$post_id."&type=sms")."'><i class='fas fa-mobile-alt fa-lg'></i></a>";
 						}
 					}
 				}
@@ -1704,10 +1704,10 @@ class mf_group_sent_table extends mf_list_table
 		{
 			case 'messageType':
 				$actions = array(
-					'view_data' => "<i class='fa fa-lg fa-eye' title='".__("View Content", 'lang_group')."'></i>",
-					//'view' => "<a href='".admin_url("admin.php?page=mf_group/sent/index.php&intGroupID=".$this->arr_settings['intGroupID']."&intMessageID=".$intMessageID2."#message_".$intMessageID2)."'><i class='fa fa-lg fa-eye' title='".__("View Content", 'lang_group')."'></i></a>",
-					'send_to_group' => "<a href='".admin_url("admin.php?page=mf_group/send/index.php&intGroupID=".$this->arr_settings['intGroupID']."&intMessageID=".$intMessageID2)."'><i class='fa fa-lg fa-users' title='".__("Send to group again", 'lang_group')."'></i></a>",
-					'send_email' => "<a href='".admin_url("admin.php?page=mf_email/send/index.php&intGroupMessageID=".$intMessageID2)."'><i class='fa fa-lg fa-envelope-o' title='".__("Send to e-mail", 'lang_group')."'></i></a>",
+					'view_data' => "<i class='far fa-eye fa-lg' title='".__("View Content", 'lang_group')."'></i>",
+					//'view' => "<a href='".admin_url("admin.php?page=mf_group/sent/index.php&intGroupID=".$this->arr_settings['intGroupID']."&intMessageID=".$intMessageID2."#message_".$intMessageID2)."'><i class='far fa-eye fa-lg' title='".__("View Content", 'lang_group')."'></i></a>",
+					'send_to_group' => "<a href='".admin_url("admin.php?page=mf_group/send/index.php&intGroupID=".$this->arr_settings['intGroupID']."&intMessageID=".$intMessageID2)."'><i class='far fa-users fa-lg' title='".__("Send to group again", 'lang_group')."'></i></a>",
+					'send_email' => "<a href='".admin_url("admin.php?page=mf_email/send/index.php&intGroupMessageID=".$intMessageID2)."'><i class='far fa-envelope fa-lg' title='".__("Send to e-mail", 'lang_group')."'></i></a>",
 				);
 
 				switch($item[$column_name])
