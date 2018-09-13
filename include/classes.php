@@ -425,11 +425,13 @@ class mf_group
 
 							if(is_plugin_active("mf_sms/index.php"))
 							{
-								require_once(ABSPATH."wp-content/plugins/mf_sms/include/functions.php");
+								require_once(ABSPATH."wp-content/plugins/mf_sms/include/classes.php");
 							}
 							##################
 
-							$sent = send_sms(array('from' => $strMessageFrom, 'to' => $strAddressCellNo, 'text' => $strMessageText, 'user_id' => $intUserID));
+							$obj_sms = new mf_sms();
+
+							$sent = $obj_sms->send_sms(array('from' => $strMessageFrom, 'to' => $strAddressCellNo, 'text' => $strMessageText, 'user_id' => $intUserID));
 
 							if($sent == "OK")
 							{
@@ -1354,6 +1356,19 @@ class mf_group
 
 		return $wpdb->get_var($wpdb->prepare("SELECT COUNT(addressID) FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE addressDeleted = '0' AND groupAccepted = '%d' AND groupUnsubscribed = '%d'".$query_where, $data['accepted'], $data['unsubscribed']));
 	}
+
+	function sms_is_active()
+	{
+		if((get_option('setting_sms_provider') != '' || get_option('setting_sms_url') != '') && get_option('setting_sms_username') != '' && get_option('setting_sms_password') != '')
+		{
+			return true;
+		}
+
+		else
+		{
+			return false;
+		}
+	}
 }
 
 class mf_group_table extends mf_list_table
@@ -1542,7 +1557,7 @@ class mf_group_table extends mf_list_table
 					{
 						$actions['send_email'] = "<a href='".admin_url("admin.php?page=mf_group/send/index.php&intGroupID=".$post_id."&type=email")."'><i class='fa fa-envelope fa-lg'></i></a>";
 
-						if(is_plugin_active("mf_sms/index.php") && sms_is_active())
+						if(is_plugin_active("mf_sms/index.php") && $this->sms_is_active())
 						{
 							$actions['send_sms'] = "<a href='".admin_url("admin.php?page=mf_group/send/index.php&intGroupID=".$post_id."&type=sms")."'><i class='fas fa-mobile-alt fa-lg'></i></a>";
 						}
