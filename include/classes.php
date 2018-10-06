@@ -264,7 +264,7 @@ class mf_group
 		return $out;
 	}
 
-	function run_cron()
+	function cron_base()
 	{
 		global $wpdb, $error_text;
 
@@ -294,7 +294,7 @@ class mf_group
 
 				$intMessageID_temp = 0;
 
-				$resultAddresses = $wpdb->get_results($wpdb->prepare("SELECT queueID, messageID, addressEmail, addressCellNo FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."group_queue USING (addressID) INNER JOIN ".$wpdb->prefix."group_message USING (messageID) WHERE groupID = '%d' AND queueSent = '0' ORDER BY messageType ASC, queueCreated ASC".$this->get_emails_left_to_send(), $intGroupID));
+				$resultAddresses = $wpdb->get_results($wpdb->prepare("SELECT queueID, messageID, addressEmail, addressCellNo FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."group_queue USING (addressID) INNER JOIN ".$wpdb->prefix."group_message USING (messageID) WHERE groupID = '%d' AND queueSent = '0' ORDER BY messageType ASC, queueCreated ASC".$this->get_message_query_limit(), $intGroupID));
 
 				foreach($resultAddresses as $r)
 				{
@@ -342,73 +342,84 @@ class mf_group
 									$strMessageFromName = $strMessageFrom;
 								}
 
-								$unsubscribe_url = $this->get_group_url(array('type' => "unsubscribe", 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
-
-								$mail_headers = "From: ".$strMessageFromName." <".$strMessageFrom.">\r\n";
-
-								$unsubscribe_email = $subscribe_email = "";
-
-								/*if($intGroupUnsubscribeEmail > 0)
+								if(apply_filters('get_emails_left_to_send', 0, $strMessageFrom, 'group') > 0)
 								{
-									$unsubscribe_email .= "<mailto:".$."?subject=Unsubscribe>, ";
-								}*/
+									$unsubscribe_url = $this->get_group_url(array('type' => "unsubscribe", 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
 
-								$mail_headers .= "List-Unsubscribe: <".$unsubscribe_url.">\r\n";
+									$mail_headers = "From: ".$strMessageFromName." <".$strMessageFrom.">\r\n";
 
-								/*if($intGroupSubscribeEmail > 0)
-								{
-									$subscribe_email = "<mailto:".$."?subject=Subscribe>, ";
-								}*/
+									$unsubscribe_email = $subscribe_email = "";
 
-								$mail_headers .= "List-Subscribe: ".$subscribe_email."<".$group_url.">\r\n";
+									/*if($intGroupUnsubscribeEmail > 0)
+									{
+										$unsubscribe_email .= "<mailto:".$."?subject=Unsubscribe>, ";
+									}*/
 
-								if($intGroupOwnerEmail > 0)
-								{
-									$mail_headers .= "List-Owner: <mailto:".get_email_address_from_id($intGroupOwnerEmail).">\r\n";
-								}
+									$mail_headers .= "List-Unsubscribe: <".$unsubscribe_url.">\r\n";
 
-								if($intGroupHelpPage > 0)
-								{
-									$mail_headers .= "List-Help: <".get_permalink($intGroupHelpPage).">\r\n";
+									/*if($intGroupSubscribeEmail > 0)
+									{
+										$subscribe_email = "<mailto:".$."?subject=Subscribe>, ";
+									}*/
+
+									$mail_headers .= "List-Subscribe: ".$subscribe_email."<".$group_url.">\r\n";
+
+									if($intGroupOwnerEmail > 0)
+									{
+										$mail_headers .= "List-Owner: <mailto:".get_email_address_from_id($intGroupOwnerEmail).">\r\n";
+									}
+
+									if($intGroupHelpPage > 0)
+									{
+										$mail_headers .= "List-Help: <".get_permalink($intGroupHelpPage).">\r\n";
+									}
+
+									else
+									{
+										$mail_headers .= "List-Help: <".$group_url.">\r\n";
+									}
+
+									if($intGroupArchivePage > 0)
+									{
+										$mail_headers .= "List-Archive: <".get_permalink($intGroupArchivePage).">\r\n";
+									}
+
+									$mail_to = $strAddressEmail;
+									$mail_subject = $strMessageName;
+									$mail_content = stripslashes(apply_filters('the_content', $strMessageText));
+									$mail_content = str_replace("[unsubscribe_link]", $unsubscribe_url, $mail_content);
+
+									if($strGroupVerifyLink == 'yes')
+									{
+										$mail_content .= "<img src='".$this->get_group_url(array('type' => "verify", 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID))."' style='height: 0; visibility: hidden; width: 0'>";
+									}
+
+									list($mail_attachment, $rest) = get_attachment_to_send($strMessageAttachment);
+
+									$wpdb->get_results($wpdb->prepare("SELECT queueID FROM ".$wpdb->prefix."group_queue WHERE queueSent = '1' AND queueID = '%d'", $intQueueID));
+
+									if($wpdb->num_rows == 0)
+									{
+										if($setting_group_outgoing_text != '')
+										{
+											$mail_content .= apply_filters('the_content', $setting_group_outgoing_text);
+										}
+
+										$sent = send_email(array('to' => $mail_to, 'subject' => $mail_subject, 'content' => $mail_content, 'headers' => $mail_headers, 'attachment' => $mail_attachment, 'save_log' => false));
+
+										if($sent)
+										{
+											$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_queue SET queueSent = '1', queueSentTime = NOW() WHERE queueID = '%d'", $intQueueID));
+										}
+									}
 								}
 
 								else
 								{
-									$mail_headers .= "List-Help: <".$group_url.">\r\n";
-								}
+									$hourly_release_time = apply_filters('get_hourly_release_time', '', $strMessageFrom);
+									$mins = time_between_dates(array('start' => $hourly_release_time, 'end' => date("Y-m-d H:i:s"), 'type' => 'round', 'return' => 'minutes'));
 
-								if($intGroupArchivePage > 0)
-								{
-									$mail_headers .= "List-Archive: <".get_permalink($intGroupArchivePage).">\r\n";
-								}
-
-								$mail_to = $strAddressEmail;
-								$mail_subject = $strMessageName;
-								$mail_content = stripslashes(apply_filters('the_content', $strMessageText));
-								$mail_content = str_replace("[unsubscribe_link]", $unsubscribe_url, $mail_content);
-
-								if($strGroupVerifyLink == 'yes')
-								{
-									$mail_content .= "<img src='".$this->get_group_url(array('type' => "verify", 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID))."' style='height: 0; visibility: hidden; width: 0'>";
-								}
-
-								list($mail_attachment, $rest) = get_attachment_to_send($strMessageAttachment);
-
-								$wpdb->get_results($wpdb->prepare("SELECT queueID FROM ".$wpdb->prefix."group_queue WHERE queueSent = '1' AND queueID = '%d'", $intQueueID));
-
-								if($wpdb->num_rows == 0)
-								{
-									if($setting_group_outgoing_text != '')
-									{
-										$mail_content .= apply_filters('the_content', $setting_group_outgoing_text);
-									}
-
-									$sent = send_email(array('to' => $mail_to, 'subject' => $mail_subject, 'content' => $mail_content, 'headers' => $mail_headers, 'attachment' => $mail_attachment, 'save_log' => false));
-
-									if($sent)
-									{
-										$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_queue SET queueSent = '1', queueSentTime = NOW() WHERE queueID = '%d'", $intQueueID));
-									}
+									do_log("E-mails from ".$strMessageFrom." were rejected. Wait for ".$mins." mins (".$wpdb->last_query.")");
 								}
 							}
 
@@ -794,6 +805,89 @@ class mf_group
 		$plugin_version = get_plugin_version(__FILE__);
 
 		mf_enqueue_style('style_group', $plugin_include_url."style.css", $plugin_version);
+	}
+
+	function get_emails_left_to_send($amount, $email, $type = '')
+	{
+		global $wpdb;
+
+		if($type != '' && isset($this->emails_left_to_send[$type][$email]))
+		{
+			//do_log("Group - ".$email." - Got from this: ".$this->emails_left_to_send[$type][$email]);
+
+			$amount_temp = $this->emails_left_to_send[$type][$email];
+		}
+
+		else
+		{
+			$amount_temp = 0;
+
+			if($email == '')
+			{
+				$emails_per_hour = get_option_or_default('setting_emails_per_hour');
+
+				if($emails_per_hour > 0)
+				{
+					$amount_temp += $emails_per_hour;
+				}
+
+				else
+				{
+					$amount_temp += 10000;
+				}
+			}
+
+			$query_where = "";
+
+			if($email != '')
+			{
+				$query_where = " AND messageFrom LIKE '%".esc_sql($email)."'";
+			}
+
+			$wpdb->get_results("SELECT queueID FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) WHERE queueSent = '1' AND queueSentTime > DATE_SUB(NOW(), INTERVAL 1 HOUR)".$query_where);
+
+			$amount_temp -= $wpdb->num_rows;
+
+			if($type != '')
+			{
+				$this->emails_left_to_send[$type][$email] = $amount_temp;
+
+				//do_log("Group - ".$email." - Got from DB: ".$this->emails_left_to_send[$type][$email]." (".(isset($emails_per_hour) ? $emails_per_hour : '').", ".$wpdb->last_query." -> ".$wpdb->num_rows.")");
+			}
+		}
+
+		if($type != '')
+		{
+			$this->emails_left_to_send[$type][$email]--;
+		}
+
+		return ($amount + $amount_temp);
+	}
+
+	function get_hourly_release_time($datetime, $email)
+	{
+		global $wpdb;
+
+		if($datetime == '')
+		{
+			$datetime = date("Y-m-d H:i:s");
+		}
+
+		$query_where = "";
+
+		if($email != '')
+		{
+			$query_where = " AND messageFrom LIKE '%".esc_sql($email)."'";
+		}
+
+		$datetime_temp = $wpdb->get_var("SELECT queueSentTime FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) WHERE queueSent = '1' AND queueSentTime > DATE_SUB(NOW(), INTERVAL 1 HOUR)".$query_where." ORDER BY queueSentTime ASC LIMIT 0, 1");
+
+		if($datetime_temp > DEFAULT_DATE && $datetime_temp < $datetime)
+		{
+			$datetime = $datetime_temp;
+		}
+
+		return $datetime;
 	}
 
 	function shortcode_group($atts)
@@ -1240,9 +1334,18 @@ class mf_group
 		}
 	}
 
-	function get_emails_left_to_send()
+	function get_message_query_limit()
 	{
-		global $wpdb;
+		$query_limit = "";
+
+		$emails_left_to_send = apply_filters('get_emails_left_to_send', 0, '');
+
+		if($emails_left_to_send > -1)
+		{
+			$query_limit = " LIMIT 0, ".$emails_left_to_send;
+		}
+
+		/*global $wpdb;
 
 		$query_limit = "";
 
@@ -1265,7 +1368,7 @@ class mf_group
 			}
 
 			$query_limit = " LIMIT 0, ".$emails_left_to_send;
-		}
+		}*/
 
 		return $query_limit;
 	}

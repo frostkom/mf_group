@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: 
-Version: 5.2.10
+Version: 5.3.2
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://frostkom.se
@@ -19,7 +19,7 @@ include_once("include/classes.php");
 $obj_group = new mf_group();
 
 add_action('cron_base', 'activate_group', mt_rand(1, 10));
-add_action('cron_base', array($obj_group, 'run_cron'), mt_rand(1, 10));
+add_action('cron_base', array($obj_group, 'cron_base'), mt_rand(1, 10));
 
 add_action('init', array($obj_group, 'init'), 1);
 
@@ -46,6 +46,9 @@ else
 {
 	add_action('wp_head', array($obj_group, 'wp_head'), 0);
 }
+
+add_filter('get_emails_left_to_send', array($obj_group, 'get_emails_left_to_send'), 10, 4);
+add_filter('get_hourly_release_time', array($obj_group, 'get_hourly_release_time'), 10, 3);
 
 add_shortcode('mf_group', array($obj_group, 'shortcode_group'));
 add_action('widgets_init', array($obj_group, 'widgets_init'));
@@ -139,7 +142,7 @@ function uninstall_group()
 {
 	mf_uninstall_plugin(array(
 		'uploads' => 'mf_group',
-		'options' => array('setting_emails_per_hour', 'setting_group_see_other_roles', 'setting_group_import'),
+		'options' => array('setting_emails_per_hour', 'setting_group_see_other_roles', 'setting_group_outgoing_text', 'setting_group_import'),
 		'post_types' => array('mf_group'),
 		'tables' => array('group_message', 'group_queue', 'address2group'),
 	));
