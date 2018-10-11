@@ -242,7 +242,7 @@ class mf_group
 					}
 
 					$out .= "<div class='form_button'>"
-						.show_checkbox(array('text' => __("I consent to having this website store my submitted information, so that they can contact me as part of this newsletter", 'lang_group'), 'value' => 1, 'required' => true))
+						.show_checkbox(array('name' => 'intGroupConsent', 'text' => __("I consent to having this website store my submitted information, so that they can contact me as part of this newsletter", 'lang_group'), 'value' => 1, 'required' => true))
 						.show_button(array('name' => "btnGroupJoin", 'text' => $data['button_text']))
 					."</div>";
 				}
@@ -255,7 +255,7 @@ class mf_group
 							.show_button(array('name' => "btnGroupJoin", 'text' => $data['button_text']))
 						."</div>
 					</div>"
-					.show_checkbox(array('text' => __("I consent to having this website store my submitted information, so that they can contact me as part of this newsletter", 'lang_group'), 'value' => 1, 'required' => true));
+					.show_checkbox(array('name' => 'intGroupConsent', 'text' => __("I consent to having this website store my submitted information, so that they can contact me as part of this newsletter", 'lang_group'), 'value' => 1, 'required' => true));
 				}
 
 			$out .= "</form>";

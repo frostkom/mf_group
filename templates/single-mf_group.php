@@ -129,7 +129,7 @@ get_header();
 
 									$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_queue SET queueReceived = '1' WHERE queueID = '%d' AND addressID = '%d'", $intQueueID, $intAddressID));
 
-									$obj_address = new mf_address($intAddressID);
+									$obj_address = new mf_address(array('id' => $intAddressID));
 									$obj_address->update_errors(array('action' => 'reset'));
 								}
 							}

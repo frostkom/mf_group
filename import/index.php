@@ -26,21 +26,25 @@ if(isset($_POST['btnGroupImport']) && $strGroupImport != '' && wp_verify_nonce($
 		{
 			$is_email = preg_match("/\@/", $address_row);
 
-			//$address_row = trim($address_row);
+			$query_where = "";
 
 			if($is_email)
 			{
 				$address_row = check_var($address_row, 'email', false);
+				
+				$query_where = "addressEmail = '%s'";
 			}
 
 			else
 			{
 				$address_row = check_var($address_row, 'char', false);
+
+				$query_where = "addressBirthDate = '%s'";
 			}
 
 			if($address_row != '')
 			{
-				$intAddressID = $wpdb->get_var("SELECT addressID FROM ".get_address_table_prefix()."address WHERE ".($is_email ? "addressEmail = '".esc_sql($address_row)."'" : "addressBirthDate LIKE '%".esc_sql($address_row)."%'")." LIMIT 0, 1");
+				$intAddressID = $wpdb->get_var($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address WHERE ".$query_where." LIMIT 0, 1", $address_row));
 
 				if($intAddressID > 0)
 				{
