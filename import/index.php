@@ -31,7 +31,7 @@ if(isset($_POST['btnGroupImport']) && $strGroupImport != '' && wp_verify_nonce($
 			if($is_email)
 			{
 				$address_row = check_var($address_row, 'email', false);
-				
+
 				$query_where = "addressEmail = '%s'";
 			}
 

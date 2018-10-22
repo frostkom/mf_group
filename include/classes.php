@@ -733,6 +733,14 @@ class mf_group
 		$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_message SET userID = '%d' WHERE userID = '%d'", get_current_user_id(), $user_id));
 	}
 
+	function merge_address($id_prev, $id)
+	{
+		global $wpdb;
+
+		$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_queue SET addressID = '%d' WHERE addressID = '%d'", $id, $id_prev));
+		$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."address2group SET addressID = '%d' WHERE addressID = '%d'", $id, $id_prev));
+	}
+
 	function count_shortcode_button($count)
 	{
 		if($count == 0)
