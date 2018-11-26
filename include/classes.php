@@ -53,7 +53,10 @@ class mf_group
 
 		$out = "";
 
-		//$obj_group = new mf_group();
+		if(!($data['id'] > 0))
+		{
+			$error_text = __("I could not find any group ID to display a form for", 'lang_group');
+		}
 
 		$arrGroupRegistrationFields = get_post_meta($data['id'], 'group_registration_fields', true);
 
@@ -269,7 +272,7 @@ class mf_group
 		global $wpdb, $error_text;
 
 		$obj_cron = new mf_cron();
-		$obj_cron->start(__FUNCTION__);
+		$obj_cron->start(__CLASS__);
 
 		if($obj_cron->is_running == false)
 		{
@@ -298,10 +301,10 @@ class mf_group
 
 				foreach($resultAddresses as $r)
 				{
-					if($obj_cron->has_expired(array('margin' => .9)))
+					/*if($obj_cron->has_expired(array('margin' => .9)))
 					{
 						break;
-					}
+					}*/
 
 					$intQueueID = $r->queueID;
 					$intMessageID = $r->messageID;
