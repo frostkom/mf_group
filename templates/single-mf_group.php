@@ -63,7 +63,7 @@ get_header();
 
 				else if(isset($_REQUEST['unsubscribe']))
 				{
-					$intGroupSentAmount = $wpdb->get_var($wpdb->prepare("SELECT COUNT(groupID) FROM ".$wpdb->prefix."group_message WHERE groupID = '%d'", $post_id));
+					$intGroupSentAmount = $wpdb->get_var($wpdb->prepare("SELECT COUNT(groupID) FROM ".$wpdb->prefix."group_message WHERE groupID = '%d' AND messageDeleted = '0'", $post_id));
 
 					if($post_allow_registration == 'yes' || $intGroupSentAmount > 0)
 					{

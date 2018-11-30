@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: 
-Version: 5.4.1
+Version: 5.4.3
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://frostkom.se
@@ -79,6 +79,9 @@ function activate_group()
 		messageSchedule DATETIME DEFAULT NULL,
 		messageCreated DATETIME,
 		userID INT UNSIGNED DEFAULT NULL,
+		messageDeleted ENUM('0', '1') NOT NULL DEFAULT '0',
+		messageDeletedDate DATETIME DEFAULT NULL,
+		messageDeletedID INT UNSIGNED DEFAULT NULL,
 		PRIMARY KEY (messageID),
 		KEY groupID (groupID)
 	) DEFAULT CHARSET=".$default_charset);
@@ -86,6 +89,9 @@ function activate_group()
 	$arr_add_column[$wpdb->prefix."group_message"] = array(
 		'messageAttachment' => "ALTER TABLE [table] ADD [column] TEXT AFTER messageText",
 		'messageSchedule' => "ALTER TABLE [table] ADD [column] DATETIME DEFAULT NULL AFTER messageAttachment",
+		'messageDeleted' => "ALTER TABLE [table] ADD [column] ENUM('0', '1') NOT NULL DEFAULT '0' AFTER userID",
+		'messageDeletedDate' => "ALTER TABLE [table] ADD [column] DATETIME DEFAULT NULL AFTER messageDeleted",
+		'messageDeletedID' => "ALTER TABLE [table] ADD [column] INT UNSIGNED DEFAULT NULL AFTER messageDeletedDate",
 	);
 
 	$arr_add_index[$wpdb->prefix."group_message"] = array(
@@ -133,6 +139,17 @@ function activate_group()
 
 	add_columns($arr_add_column);
 	add_index($arr_add_index);
+
+	delete_base(array(
+		'table' => "group_message",
+		'field_prefix' => "message",
+		'child_tables' => array(
+			'group_queue' => array(
+				'action' => 'delete',
+				'field_prefix' => "message",
+			),
+		),
+	));
 
 	mf_uninstall_plugin(array(
 		'options' => array('setting_group_acceptance_email'),

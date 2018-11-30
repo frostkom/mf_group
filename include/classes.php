@@ -283,11 +283,11 @@ class mf_group
 
 		if($obj_cron->is_running == false)
 		{
-			$setting_group_outgoing_text = get_option('setting_group_outgoing_text');
-
 			/* Send group messages */
 			#############################
-			$result = $wpdb->get_results("SELECT groupID FROM ".$wpdb->prefix."group_queue INNER JOIN ".$wpdb->prefix."group_message USING (messageID) WHERE queueSent = '0' AND (messageSchedule IS NULL OR messageSchedule < NOW()) GROUP BY groupID ORDER BY RAND()");
+			$setting_group_outgoing_text = get_option('setting_group_outgoing_text');
+
+			$result = $wpdb->get_results("SELECT groupID FROM ".$wpdb->prefix."group_queue INNER JOIN ".$wpdb->prefix."group_message USING (messageID) WHERE queueSent = '0' AND messageDeleted = '0' AND (messageSchedule IS NULL OR messageSchedule < NOW()) GROUP BY groupID ORDER BY RAND()");
 
 			foreach($result as $r)
 			{
@@ -305,7 +305,7 @@ class mf_group
 
 				$intMessageID_temp = 0;
 
-				$resultAddresses = $wpdb->get_results($wpdb->prepare("SELECT queueID, messageID, addressEmail, addressCellNo FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."group_queue USING (addressID) INNER JOIN ".$wpdb->prefix."group_message USING (messageID) WHERE groupID = '%d' AND queueSent = '0' ORDER BY messageType ASC, queueCreated ASC".$this->get_message_query_limit(), $intGroupID));
+				$resultAddresses = $wpdb->get_results($wpdb->prepare("SELECT queueID, messageID, addressEmail, addressCellNo FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."group_queue USING (addressID) INNER JOIN ".$wpdb->prefix."group_message USING (messageID) WHERE groupID = '%d' AND messageDeleted = '0' AND queueSent = '0' ORDER BY messageType ASC, queueCreated ASC".$this->get_message_query_limit(), $intGroupID));
 
 				foreach($resultAddresses as $r)
 				{
@@ -350,7 +350,14 @@ class mf_group
 									$strMessageFromName = $strMessageFrom;
 								}
 
-								do_action('group_init_message', array('message_id' => $intMessageID, 'from_name' => $strMessageFromName, 'from' => $strMessageFrom, 'subject' => $strMessageName, 'content' => $strMessageText)); //, 'alt_content' => $phpmailer->AltBody
+								$strMessageText = stripslashes(apply_filters('the_content', $strMessageText));
+
+								if($setting_group_outgoing_text != '')
+								{
+									$strMessageText .= apply_filters('the_content', $setting_group_outgoing_text);
+								}
+
+								do_action('group_init_message', array('message_id' => $intMessageID, 'from_name' => $strMessageFromName, 'from' => $strMessageFrom, 'subject' => $strMessageName, 'content' => $strMessageText, 'alt_content' => $strMessageText));
 							break;
 
 							case 'sms':
@@ -423,8 +430,7 @@ class mf_group
 
 										$mail_to = $strAddressEmail;
 										$mail_subject = $strMessageName;
-										$mail_content = stripslashes(apply_filters('the_content', $strMessageText));
-										$mail_content = str_replace("[unsubscribe_link]", $unsubscribe_url, $mail_content);
+										$mail_content = str_replace("[unsubscribe_link]", $unsubscribe_url, $strMessageText);
 
 										if($strGroupVerifyLink == 'yes')
 										{
@@ -437,11 +443,6 @@ class mf_group
 
 										if($wpdb->num_rows == 0)
 										{
-											if($setting_group_outgoing_text != '')
-											{
-												$mail_content .= apply_filters('the_content', $setting_group_outgoing_text);
-											}
-
 											$sent = send_email(array('to' => $mail_to, 'subject' => $mail_subject, 'content' => $mail_content, 'headers' => $mail_headers, 'attachment' => $mail_attachment, 'save_log' => false));
 
 											if($sent)
@@ -639,7 +640,7 @@ class mf_group
 
 		$count_message = "";
 
-		$rows = $wpdb->get_var("SELECT COUNT(queueID) FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) WHERE queueSent = '0'".($id > 0 ? " AND groupID = '".esc_sql($id)."'" : ""));
+		$rows = $wpdb->get_var("SELECT COUNT(queueID) FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) WHERE queueSent = '0' AND messageDeleted = '0'".($id > 0 ? " AND groupID = '".esc_sql($id)."'" : ""));
 
 		if($rows > 0)
 		{
@@ -1000,6 +1001,10 @@ class mf_group
 
 				$this->id_copy = check_var('intGroupID_copy');
 			break;
+
+			case 'sent':
+				$this->message_id = check_var('intMessageID');
+			break;
 		}
 	}
 
@@ -1278,6 +1283,22 @@ class mf_group
 					}
 				}
 			break;
+
+			case 'sent':
+				if(isset($_REQUEST['btnMessageDelete']) && $this->message_id > 0 && wp_verify_nonce($_REQUEST['_wpnonce_message_delete'], 'message_delete_'.$this->message_id))
+				{
+					$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_message SET messageDeleted = '1', messageDeletedDate = NOW(), messageDeletedID = '%d' WHERE messageID = '%d'", get_current_user_id(), $this->message_id));
+
+					$done_text = __("The message was deleted", 'lang_group');
+				}
+
+				if(isset($_REQUEST['btnMessageAbort']) && $this->message_id > 0 && wp_verify_nonce($_REQUEST['_wpnonce_message_abort'], 'message_abort_'.$this->message_id))
+				{
+					$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueSent = '0'", $this->message_id));
+
+					$done_text = __("The message was aborted", 'lang_group');
+				}
+			break;
 		}
 
 		return $out;
@@ -1351,7 +1372,7 @@ class mf_group
 	{
 		global $wpdb;
 
-		return $wpdb->get_var("SELECT messageFrom FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->posts." ON ".$wpdb->prefix."group_message.groupID = ".$wpdb->posts.".ID AND post_type = 'mf_group' ORDER BY messageCreated DESC LIMIT 0, 1");
+		return $wpdb->get_var("SELECT messageFrom FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->posts." ON ".$wpdb->prefix."group_message.groupID = ".$wpdb->posts.".ID AND post_type = 'mf_group' AND messageDeleted = '0' ORDER BY messageCreated DESC LIMIT 0, 1");
 	}
 
 	function get_name($id = 0)
@@ -1724,7 +1745,7 @@ class mf_group_table extends mf_list_table
 			case 'unsubscribed':
 				$rowsAddressesUnsubscribed = $wpdb->get_var($wpdb->prepare("SELECT COUNT(addressID) FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' AND groupUnsubscribed = '1'", $post_id));
 
-				$dteMessageCreated = $wpdb->get_var($wpdb->prepare("SELECT messageCreated FROM ".$wpdb->prefix."group_message WHERE groupID = '%d' ORDER BY messageCreated DESC", $post_id));
+				$dteMessageCreated = $wpdb->get_var($wpdb->prepare("SELECT messageCreated FROM ".$wpdb->prefix."group_message WHERE groupID = '%d' AND messageDeleted = '0' ORDER BY messageCreated DESC", $post_id));
 
 				$out .= $rowsAddressesUnsubscribed;
 
@@ -1744,7 +1765,7 @@ class mf_group_table extends mf_list_table
 			break;
 
 			case 'sent':
-				$result = $wpdb->get_results($wpdb->prepare("SELECT messageID, messageCreated FROM ".$wpdb->prefix."group_message WHERE groupID = '%d' ORDER BY messageCreated DESC LIMIT 0, 1", $post_id));
+				$result = $wpdb->get_results($wpdb->prepare("SELECT messageID, messageCreated FROM ".$wpdb->prefix."group_message WHERE groupID = '%d' AND messageDeleted = '0' ORDER BY messageCreated DESC LIMIT 0, 1", $post_id));
 
 				foreach($result as $r)
 				{
@@ -1811,12 +1832,14 @@ class mf_group_sent_table extends mf_list_table
 		$this->post_type = "";
 
 		$this->arr_settings['query_select_id'] = "messageID";
-		//$this->arr_settings['query_all_id'] = "0";
-		//$this->arr_settings['query_trash_id'] = "1";
+		$this->arr_settings['query_all_id'] = "0";
+		$this->arr_settings['query_trash_id'] = "1";
 		$this->orderby_default = "messageCreated";
 		$this->orderby_default_order = "DESC";
 
 		$this->arr_settings['intGroupID'] = check_var('intGroupID');
+
+		$this->arr_settings['page_vars'] = array('intGroupID' => $this->arr_settings['intGroupID']);
 
 		$this->query_where .= "groupID = '".esc_sql($this->arr_settings['intGroupID'])."'";
 
@@ -1825,13 +1848,13 @@ class mf_group_sent_table extends mf_list_table
 			$this->query_where .= ($this->query_where != '' ? " AND " : "")."(messageFrom LIKE '%".$this->search."%' OR messageName LIKE '%".$this->search."%' OR messageText LIKE '%".$this->search."%' OR messageCreated LIKE '%".$this->search."%')";
 		}
 
-		/*$this->set_views(array(
-			'db_field' => 'proposalDeleted',
+		$this->set_views(array(
+			'db_field' => 'messageDeleted',
 			'types' => array(
 				'0' => __("All", 'lang_group'),
 				'1' => __("Trash", 'lang_group')
 			),
-		));*/
+		));
 
 		$arr_columns = array(
 			//'cb' => '<input type="checkbox">',
@@ -1906,10 +1929,25 @@ class mf_group_sent_table extends mf_list_table
 				.$this->row_actions($actions);
 			break;
 
-			case 'messageSchedule':
-				if($item[$column_name] > DEFAULT_DATE)
+			case 'messageName':
+				$actions = array();
+
+				if(IS_ADMIN || $item['userID'] == get_current_user_id())
 				{
-					$out .= format_date($item[$column_name]);
+					if($item['messageDeleted'] == 0)
+					{
+						$actions['delete'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/sent/index.php&btnMessageDelete&intGroupID=".$this->arr_settings['intGroupID']."&intMessageID=".$intMessageID2), 'message_delete_'.$intMessageID2, '_wpnonce_message_delete')."'>".__("Delete", 'lang_group')."</a>";
+					}
+				}
+
+				$out .= $item['messageName']
+				.$this->row_actions($actions);
+			break;
+
+			case 'messageSchedule':
+				if($item['messageSchedule'] > DEFAULT_DATE)
+				{
+					$out .= format_date($item['messageSchedule']);
 				}
 			break;
 
