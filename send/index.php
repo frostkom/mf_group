@@ -62,7 +62,7 @@ echo "<div class='wrap'>
 											.show_select(array('data' => $arr_data_from, 'name' => 'strMessageFrom', 'text' => __("From", 'lang_group'), 'value' => $obj_group->message_from, 'required' => true))
 											.show_textfield(array('name' => "strMessageName", 'text' => __("Subject", 'lang_group'), 'value' => $obj_group->message_name, 'required' => true))
 										."</div>"
-										.show_select(array('data' => $arr_data_to, 'name' => 'arrGroupID[]', 'text' => __("To", 'lang_group'), 'value' => $obj_group->arr_group_id, 'maxsize' => 5))
+										.show_select(array('data' => $arr_data_to, 'name' => 'arrGroupID[]', 'text' => __("To", 'lang_group'), 'value' => $obj_group->arr_group_id, 'maxsize' => 6, 'required' => true))
 									."</div>"
 									.show_wp_editor(array('name' => 'strMessageText', 'value' => $obj_group->message_text));
 								break;
@@ -89,7 +89,7 @@ echo "<div class='wrap'>
 									}
 
 									echo show_select(array('data' => $arr_data_from, 'name' => 'strMessageFrom', 'text' => __("From", 'lang_group'), 'value' => $obj_group->message_from, 'required' => true))
-									.show_select(array('data' => $arr_data_to, 'name' => 'arrGroupID[]', 'text' => __("To", 'lang_group'), 'value' => $obj_group->arr_group_id, 'maxsize' => 5))
+									.show_select(array('data' => $arr_data_to, 'name' => 'arrGroupID[]', 'text' => __("To", 'lang_group'), 'value' => $obj_group->arr_group_id, 'maxsize' => 6, 'required' => true))
 									.show_textarea(array('name' => 'strMessageText', 'text' => __("Message", 'lang_group'), 'value' => $obj_group->message_text, 'required' => true));
 								break;
 							}

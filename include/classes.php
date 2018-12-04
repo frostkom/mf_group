@@ -357,7 +357,7 @@ class mf_group
 									$strMessageText .= apply_filters('the_content', $setting_group_outgoing_text);
 								}
 
-								do_action('group_init_message', array('message_id' => $intMessageID, 'from_name' => $strMessageFromName, 'from' => $strMessageFrom, 'subject' => $strMessageName, 'content' => $strMessageText, 'alt_content' => $strMessageText));
+								do_action('group_init_message', array('group_id' => $intGroupID, 'message_id' => $intMessageID, 'from_name' => $strMessageFromName, 'from' => $strMessageFrom, 'subject' => $strMessageName, 'content' => $strMessageText, 'alt_content' => $strMessageText));
 							break;
 
 							case 'sms':
