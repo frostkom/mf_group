@@ -758,7 +758,6 @@ class mf_group
 
 			$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->prefix."group_message WHERE groupID = '%d'", $post_id));
 
-			//$obj_group = new mf_group();
 			$this->remove_all_address($post_id);*/
 		}
 	}
