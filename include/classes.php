@@ -26,19 +26,37 @@ class mf_group
 	{
 		global $wpdb;
 
-		$out = "";
+		if(!isset($data['message_id'])){	$data['message_id'] = 0;}
+		if(!isset($data['queue_id'])){		$data['queue_id'] = 0;}
 
 		$base_url = get_permalink($data['group_id']);
+		$base_url .= (preg_match("/\?/", $base_url) ? "&" : "?");
 
-		$out .= $base_url
-			.(preg_match("/\?/", $base_url) ? "&" : "?")
-			.$data['type']."=".md5((defined('NONCE_SALT') ? NONCE_SALT : '').$data['group_id'].$data['email'])
-			."&gid=".$data['group_id']
-			."&aem=".$data['email'];
+		$out = "";
 
-		if(isset($data['queue_id']) && $data['queue_id'] > 0)
+		switch($data['type'])
 		{
-			$out .= "&qid=".$data['queue_id'];
+			case 'view_in_browser':
+				$out .= $base_url
+					.$data['type']."=".md5((defined('NONCE_SALT') ? NONCE_SALT : '').$data['group_id'].$data['email'].$data['message_id'])
+					."&gid=".$data['group_id']
+					."&aem=".$data['email']
+					."&mid=".$data['message_id'];
+			break;
+
+			case 'subscribe':
+			case 'unsubscribe':
+			case 'verify':
+				$out .= $base_url
+					.$data['type']."=".md5((defined('NONCE_SALT') ? NONCE_SALT : '').$data['group_id'].$data['email'])
+					."&gid=".$data['group_id']
+					."&aem=".$data['email'];
+
+				if($data['queue_id'] > 0)
+				{
+					$out .= "&qid=".$data['queue_id'];
+				}
+			break;
 		}
 
 		return $out;
@@ -211,58 +229,58 @@ class mf_group
 				{
 					if(in_array("name", $arrGroupRegistrationFields))
 					{
-						$out .= show_textfield(array('name' => "strAddressName", 'text' => __("Name", 'lang_group'), 'value' => $strAddressName, 'required' => true));
+						$out .= show_textfield(array('name' => 'strAddressName', 'text' => __("Name", 'lang_group'), 'value' => $strAddressName, 'required' => true));
 					}
 
 					if(in_array("address", $arrGroupRegistrationFields))
 					{
-						$out .= show_textfield(array('name' => "strAddressAddress", 'text' => __("Address", 'lang_group'), 'value' => $strAddressAddress, 'required' => true));
+						$out .= show_textfield(array('name' => 'strAddressAddress', 'text' => __("Address", 'lang_group'), 'value' => $strAddressAddress, 'required' => true));
 					}
 
 					if(in_array("zip", $arrGroupRegistrationFields))
 					{
-						$out .= show_textfield(array('name' => "intAddressZipCode", 'text' => __("Zip Code", 'lang_group'), 'value' => $intAddressZipCode, 'type' => 'number', 'required' => true));
+						$out .= show_textfield(array('name' => 'intAddressZipCode', 'text' => __("Zip Code", 'lang_group'), 'value' => $intAddressZipCode, 'type' => 'number', 'required' => true));
 					}
 
 					if(in_array("city", $arrGroupRegistrationFields))
 					{
-						$out .= show_textfield(array('name' => "strAddressCity", 'text' => __("City", 'lang_group'), 'value' => $strAddressCity, 'required' => true));
+						$out .= show_textfield(array('name' => 'strAddressCity', 'text' => __("City", 'lang_group'), 'value' => $strAddressCity, 'required' => true));
 					}
 
 					if(in_array("country", $arrGroupRegistrationFields))
 					{
 						$obj_address = new mf_address();
 
-						$out .= show_select(array('data' => $obj_address->get_countries_for_select(), 'name' => "intAddressCountry", 'text' => __("Country", 'lang_group'), 'value' => $intAddressCountry, 'required' => true));
+						$out .= show_select(array('data' => $obj_address->get_countries_for_select(), 'name' => 'intAddressCountry', 'text' => __("Country", 'lang_group'), 'value' => $intAddressCountry, 'required' => true));
 					}
 
 					if(in_array("phone", $arrGroupRegistrationFields))
 					{
-						$out .= show_textfield(array('name' => "strAddressTelNo", 'text' => __("Phone Number", 'lang_group'), 'value' => $strAddressTelNo, 'required' => true));
+						$out .= show_textfield(array('name' => 'strAddressTelNo', 'text' => __("Phone Number", 'lang_group'), 'value' => $strAddressTelNo, 'required' => true));
 					}
 
 					if(in_array("email", $arrGroupRegistrationFields))
 					{
-						$out .= show_textfield(array('name' => "strAddressEmail", 'text' => __("E-mail", 'lang_group'), 'value' => $strAddressEmail, 'required' => true));
+						$out .= show_textfield(array('name' => 'strAddressEmail', 'text' => __("E-mail", 'lang_group'), 'value' => $strAddressEmail, 'required' => true));
 					}
 
 					if(in_array("extra", $arrGroupRegistrationFields))
 					{
-						$out .= show_textfield(array('name' => "strAddressExtra", 'text' => get_option_or_default('setting_address_extra', __("Extra", 'lang_group')), 'value' => $strAddressExtra, 'required' => true));
+						$out .= show_textfield(array('name' => 'strAddressExtra', 'text' => get_option_or_default('setting_address_extra', __("Extra", 'lang_group')), 'value' => $strAddressExtra, 'required' => true));
 					}
 
 					$out .= "<div class='form_button'>"
 						.show_checkbox(array('name' => 'intGroupConsent', 'text' => __("I consent to having this website store my submitted information, so that they can contact me as part of this newsletter", 'lang_group'), 'value' => 1, 'required' => true))
-						.show_button(array('name' => "btnGroupJoin", 'text' => $data['button_text']))
+						.show_button(array('name' => 'btnGroupJoin', 'text' => $data['button_text']))
 					."</div>";
 				}
 
 				else
 				{
 					$out .= "<div class='flex_form'>"
-						.show_textfield(array('name' => "strAddressEmail", 'placeholder' => __("Your Email Address", 'lang_group'), 'value' => $strAddressEmail, 'required' => true))
+						.show_textfield(array('name' => 'strAddressEmail', 'placeholder' => __("Your Email Address", 'lang_group'), 'value' => $strAddressEmail, 'required' => true))
 						."<div class='form_button'>"
-							.show_button(array('name' => "btnGroupJoin", 'text' => $data['button_text']))
+							.show_button(array('name' => 'btnGroupJoin', 'text' => $data['button_text']))
 						."</div>
 					</div>"
 					.show_checkbox(array('name' => 'intGroupConsent', 'text' => __("I consent to having this website store my submitted information, so that they can contact me as part of this newsletter", 'lang_group'), 'value' => 1, 'required' => true));
@@ -388,7 +406,8 @@ class mf_group
 								{
 									if(apply_filters('get_emails_left_to_send', 0, $strMessageFrom, 'group') > 0)
 									{
-										$unsubscribe_url = $this->get_group_url(array('type' => "unsubscribe", 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
+										$view_in_browser_url = $this->get_group_url(array('type' => 'view_in_browser', 'group_id' => $intGroupID, 'message_id' => $intMessageID, 'email' => $strAddressEmail));
+										$unsubscribe_url = $this->get_group_url(array('type' => 'unsubscribe', 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
 
 										$mail_headers = "From: ".$strMessageFromName." <".$strMessageFrom.">\r\n";
 
@@ -430,11 +449,15 @@ class mf_group
 
 										$mail_to = $strAddressEmail;
 										$mail_subject = $strMessageName;
-										$mail_content = str_replace("[unsubscribe_link]", $unsubscribe_url, $strMessageText);
+
+										$arr_exclude = array("[view_in_browser_link]", "[message_name]", "[unsubscribe_link]");
+										$arr_include = array($view_in_browser_url, $strMessageName, $unsubscribe_url);
+
+										$mail_content = str_replace($arr_exclude, $arr_include, $strMessageText);
 
 										if($strGroupVerifyLink == 'yes')
 										{
-											$mail_content .= "<img src='".$this->get_group_url(array('type' => "verify", 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID))."' style='height: 0; visibility: hidden; width: 0'>";
+											$mail_content .= "<img src='".$this->get_group_url(array('type' => 'verify', 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID))."' style='height: 0; visibility: hidden; width: 0'>";
 										}
 
 										list($mail_attachment, $rest) = get_attachment_to_send($strMessageAttachment);
@@ -969,7 +992,7 @@ class mf_group
 				$this->message_schedule_time = check_var('dteMessageScheduleTime');
 				$this->message_text_source = check_var('intEmailTextSource');
 				$this->message_attachment = check_var('strMessageAttachment');
-				$this->message_unsubscribe_link = check_var('strMessageUnsubscribeLink', 'char', true, 'yes');
+				//$this->message_unsubscribe_link = check_var('strMessageUnsubscribeLink', 'char', true, 'yes');
 
 				if($this->group_id > 0 && !in_array($this->group_id, $this->arr_group_id))
 				{
@@ -1117,11 +1140,6 @@ class mf_group
 
 								if($wpdb->num_rows > 0)
 								{
-									if($this->message_type == 'email' && $this->message_unsubscribe_link == 'yes')
-									{
-										$this->message_text .= "<p>&nbsp;</p><p><a href='[unsubscribe_link]'>".__("If you don't want to get these messages in the future click this link to unsubscribe", 'lang_group')."</a></p>";
-									}
-
 									$dteMessageSchedule = $this->message_schedule_date != '' && $this->message_schedule_time != '' ? $this->message_schedule_date." ".$this->message_schedule_time : '';
 
 									$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->prefix."group_message SET groupID = '%d', messageType = %s, messageFrom = %s, messageName = %s, messageText = %s, messageAttachment = %s, messageSchedule = %s, messageCreated = NOW(), userID = '%d'", $this->group_id, $this->message_type, $this->message_from, $this->message_name, $this->message_text, $this->message_attachment, $dteMessageSchedule, get_current_user_id()));
@@ -1167,6 +1185,22 @@ class mf_group
 								$error_text = __("The message was not sent to anybody", 'lang_group');
 							}
 						}
+					}
+				}
+
+				else if(isset($_POST['btnGroupAddViewInBrowser']))
+				{
+					if($this->message_type == 'email')
+					{
+						$this->message_text = "<p class='view_in_browser_link' style='text-align: right'><a href='[view_in_browser_link]' style='color: #999; font-size: .8em; text-decoration: none'>".sprintf(__("View %s in browser", 'lang_group'), "[message_name]")."</a></p>".$this->message_text;
+					}
+				}
+
+				else if(isset($_POST['btnGroupAddUnsubscribe']))
+				{
+					if($this->message_type == 'email')
+					{
+						$this->message_text .= "<p><a href='[unsubscribe_link]'>".__("If you don't want to get these messages in the future click this link to unsubscribe", 'lang_group')."</a></p>"; // style='color: #999; font-size: .8em; text-decoration: none'
 					}
 				}
 
@@ -1889,7 +1923,6 @@ class mf_group_sent_table extends mf_list_table
 			case 'messageType':
 				$actions = array(
 					'view_data' => "<i class='fa fa-eye fa-lg' title='".__("View Content", 'lang_group')."'></i>",
-					//'view' => "<a href='".admin_url("admin.php?page=mf_group/sent/index.php&intGroupID=".$this->arr_settings['intGroupID']."&intMessageID=".$intMessageID2."#message_".$intMessageID2)."'><i class='fa fa-eye fa-lg' title='".__("View Content", 'lang_group')."'></i></a>",
 					'send_to_group' => "<a href='".admin_url("admin.php?page=mf_group/send/index.php&intGroupID=".$this->arr_settings['intGroupID']."&intMessageID=".$intMessageID2)."'><i class='fa fa-users fa-lg' title='".__("Send to group again", 'lang_group')."'></i></a>",
 					'send_email' => "<a href='".admin_url("admin.php?page=mf_email/send/index.php&intGroupMessageID=".$intMessageID2)."'><i class='fa fa-envelope fa-lg' title='".__("Send to e-mail", 'lang_group')."'></i></a>",
 				);
@@ -2029,7 +2062,7 @@ class mf_group_sent_table extends mf_list_table
 				$out .= format_date($item[$column_name])
 				."</td></tr><tr class='hide'><td colspan='".count($this->columns)."'>";
 
-				$out .= "<p>".stripslashes(apply_filters('the_content', $item['messageText']))."</p>";
+				$out .= stripslashes(apply_filters('the_content', $item['messageText']));
 
 				if($item['messageAttachment'] != '')
 				{
@@ -2095,7 +2128,7 @@ class widget_group extends WP_Widget
 	function __construct()
 	{
 		$widget_ops = array(
-			'classname' => 'group',
+			'classname' => 'widget_group',
 			'description' => __("Display a group registration form", 'lang_group')
 		);
 

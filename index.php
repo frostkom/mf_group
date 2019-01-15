@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: 
-Version: 5.4.5
+Version: 5.5.2
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://frostkom.se
@@ -52,6 +52,7 @@ add_filter('get_emails_left_to_send', array($obj_group, 'get_emails_left_to_send
 add_filter('get_hourly_release_time', array($obj_group, 'get_hourly_release_time'), 10, 3);
 
 add_shortcode('mf_group', array($obj_group, 'shortcode_group'));
+
 add_action('widgets_init', array($obj_group, 'widgets_init'));
 
 add_filter('single_template', 'custom_templates_group');

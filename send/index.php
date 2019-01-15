@@ -60,7 +60,7 @@ echo "<div class='wrap'>
 									echo "<div class='flex_flow'>
 										<div>"
 											.show_select(array('data' => $arr_data_from, 'name' => 'strMessageFrom', 'text' => __("From", 'lang_group'), 'value' => $obj_group->message_from, 'required' => true))
-											.show_textfield(array('name' => "strMessageName", 'text' => __("Subject", 'lang_group'), 'value' => $obj_group->message_name, 'required' => true))
+											.show_textfield(array('name' => 'strMessageName', 'text' => __("Subject", 'lang_group'), 'value' => $obj_group->message_name, 'required' => true))
 										."</div>"
 										.show_select(array('data' => $arr_data_to, 'name' => 'arrGroupID[]', 'text' => __("To", 'lang_group'), 'value' => $obj_group->arr_group_id, 'maxsize' => 6, 'required' => true))
 									."</div>"
@@ -101,7 +101,7 @@ echo "<div class='wrap'>
 					<div class='postbox'>
 						<h3 class='hndle'>".__("Send", 'lang_group')."</h3>
 						<div class='inside'>"
-							.show_button(array('name' => "btnGroupSend", 'text' => __("Send", 'lang_group')))
+							.show_button(array('name' => 'btnGroupSend', 'text' => __("Send", 'lang_group')))
 							."<div class='flex_flow'>"
 								.show_textfield(array('type' => 'date', 'name' => 'dteMessageScheduleDate', 'text' => __("Schedule", 'lang_group'), 'value' => $obj_group->message_schedule_date, 'placeholder' => date("Y-m-d")))
 								.show_textfield(array('type' => 'time', 'name' => 'dteMessageScheduleTime', 'text' => "&nbsp;", 'value' => $obj_group->message_schedule_time, 'placeholder' => date("H:i")))
@@ -116,7 +116,7 @@ echo "<div class='wrap'>
 								break;
 							}
 
-							echo input_hidden(array('name' => "type", 'value' => $obj_group->message_type))
+							echo input_hidden(array('name' => 'type', 'value' => $obj_group->message_type))
 						."</div>
 					</div>";
 
@@ -127,11 +127,22 @@ echo "<div class='wrap'>
 
 						echo "<div class='postbox'>
 							<h3 class='hndle'>".__("Advanced", 'lang_group')."</h3>
-							<div class='inside'>"
-								.show_select(array('data' => $arr_data_source, 'name' => 'intEmailTextSource', 'text' => __("Text Source", 'lang_group'), 'xtra' => "rel='submit_change' disabled"))
-								.get_media_button(array('name' => 'strMessageAttachment', 'value' => $obj_group->message_attachment))
-								.show_select(array('data' => get_yes_no_for_select(), 'name' => 'strMessageUnsubscribeLink', 'text' => __("Add Unsubscribe Link", 'lang_group'), 'value' => $obj_group->message_unsubscribe_link))
-							."</div>
+							<div class='inside'>";
+
+								echo show_select(array('data' => $arr_data_source, 'name' => 'intEmailTextSource', 'text' => __("Text Source", 'lang_group'), 'xtra' => "rel='submit_change' disabled"))
+								.get_media_button(array('name' => 'strMessageAttachment', 'value' => $obj_group->message_attachment));
+
+								if($obj_group->message_text == '' || $obj_group->message_text != '' && !preg_match("/\[view_in_browser_link\]/", $obj_group->message_text))
+								{
+									echo show_button(array('name' => 'btnGroupAddViewInBrowser', 'text' => __("Add Link to View in Browser", 'lang_group'), 'class' => "button"));
+								}
+
+								if($obj_group->message_text == '' || $obj_group->message_text != '' && !preg_match("/\[unsubscribe_link\]/", $obj_group->message_text))
+								{
+									echo show_button(array('name' => 'btnGroupAddUnsubscribe', 'text' => __("Add Unsubscribe Link", 'lang_group'), 'class' => "button"));
+								}
+
+							echo "</div>
 						</div>";
 					}
 

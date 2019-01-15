@@ -18,14 +18,14 @@ get_header();
 
 				$post_allow_registration = get_post_meta_or_default($post_id, $obj_group->meta_prefix.'allow_registration', true, 'no');
 
-				$out = "";
+				$post_content = "";
 
 				$done_text = $error_text = "";
 
 				if(isset($_REQUEST['subscribe']))
 				{
 					$strSubscribeHash = check_var('subscribe', 'char');
-					$strVerifyHash = check_var('verify', 'char');
+					//$strVerifyHash = check_var('verify', 'char');
 
 					$intGroupID = check_var('gid', 'int');
 					$strAddressEmail = check_var('aem', 'char');
@@ -61,7 +61,7 @@ get_header();
 					}
 				}
 
-				else if(isset($_REQUEST['unsubscribe']))
+				else if(isset($_REQUEST['unsubscribe']) || isset($_REQUEST['verify']))
 				{
 					$intGroupSentAmount = $wpdb->get_var($wpdb->prepare("SELECT COUNT(groupID) FROM ".$wpdb->prefix."group_message WHERE groupID = '%d' AND messageDeleted = '0'", $post_id));
 
@@ -93,7 +93,7 @@ get_header();
 
 									else
 									{
-										$out .= "<form method='post' action='' class='mf_form'>
+										$post_content .= "<form method='post' action='' class='mf_form'>
 											<p>".__("Are you sure that you want to unsubscribe?", 'lang_group')."</p>
 											<div class='form_button'>"
 												.show_button(array('name' => "btnUnsubscribe", 'text' => __("Unsubscribe", 'lang_group')))
@@ -137,16 +137,52 @@ get_header();
 					}
 				}
 
-				$out .= get_notification();
+				else if(isset($_REQUEST['view_in_browser']))
+				{
+					$strViewHash = check_var('view_in_browser', 'char');
 
-				/*if($out != '' || $post_allow_registration == 'yes')
+					$intGroupID = check_var('gid', 'int');
+					$strAddressEmail = check_var('aem', 'char');
+					$intMessageID = check_var('mid', 'int');
+
+					$hash_temp = md5((defined('NONCE_SALT') ? NONCE_SALT : '').$intGroupID.$strAddressEmail.$intMessageID);
+
+					if($strViewHash == $hash_temp)
+					{
+						$result = $wpdb->get_results($wpdb->prepare("SELECT messageName, messageText FROM ".$wpdb->prefix."group_message WHERE messageID = '%d'", $intMessageID));
+
+						foreach($result as $r)
+						{
+							$strMessageName = $r->messageName;
+							$strMessageText = stripslashes(apply_filters('the_content', $r->messageText));
+
+							$view_in_browser_url = $obj_group->get_group_url(array('type' => 'view_in_browser', 'group_id' => $intGroupID, 'message_id' => $intMessageID, 'email' => $strAddressEmail));
+							$unsubscribe_url = $obj_group->get_group_url(array('type' => 'unsubscribe', 'group_id' => $intGroupID, 'email' => $strAddressEmail));
+
+							$arr_exclude = array("[view_in_browser_link]", "[message_name]", "[unsubscribe_link]");
+							$arr_include = array($view_in_browser_url, $strMessageName, $unsubscribe_url);
+
+							$post_title = $strMessageName;
+							$post_content = str_replace($arr_exclude, $arr_include, $strMessageText);
+						}
+					}
+
+					else
+					{
+						$error_text = __("Something went wrong. Please contact an admin if the problem persists", 'lang_group');
+					}
+				}
+
+				$post_content .= get_notification();
+
+				/*if($post_content != '' || $post_allow_registration == 'yes')
 				{*/
 					echo "<h1>".$post_title."</h1>
 					<section>";
 
-						if($out != '')
+						if($post_content != '')
 						{
-							echo $out;
+							echo $post_content;
 						}
 
 						else if($post_allow_registration == 'yes')

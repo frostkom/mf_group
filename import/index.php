@@ -115,9 +115,9 @@ echo "<div class='wrap'>
 		<h3 class='hndle'>".__("Add", 'lang_group')."</h3>
 		<div class='inside'>
 			<form action='#' method='post' class='mf_form mf_settings'>"
-				.show_textarea(array('name' => "strGroupImport", 'text' => __("Text", 'lang_group'), 'value' => $strGroupImport, 'xtra' => "autofocus", 'placeholder' => __("Enter social security numbers or e-mail addresses on separate rows for import", 'lang_group')))
-				.show_button(array('name' => "btnGroupImport", 'text' => __("Import", 'lang_group')))
-				.input_hidden(array('name' => "intGroupID", 'value' => $intGroupID))
+				.show_textarea(array('name' => 'strGroupImport', 'text' => __("Text", 'lang_group'), 'value' => $strGroupImport, 'xtra' => "autofocus", 'placeholder' => __("Enter social security numbers or e-mail addresses on separate rows for import", 'lang_group')))
+				.show_button(array('name' => 'btnGroupImport', 'text' => __("Import", 'lang_group')))
+				.input_hidden(array('name' => 'intGroupID', 'value' => $intGroupID))
 				.wp_nonce_field('group_import_'.$intGroupID, '_wpnonce_group_import', true, false)
 			."</form>
 		</div>
