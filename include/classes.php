@@ -635,7 +635,7 @@ class mf_group
 		$setting_key = get_setting_key(__FUNCTION__);
 		$option = get_option($setting_key);
 
-		echo show_wp_editor(array('name' => $setting_key, 'value' => $option, 'description' => __("This text will be appended to all outgoing e-mails", 'lang_group')));
+		echo show_wp_editor(array('name' => $setting_key, 'value' => $option, 'editor_height' => 200, 'description' => __("This text will be appended to all outgoing e-mails", 'lang_group')));
 	}
 
 	function setting_group_import_callback()
