@@ -327,11 +327,6 @@ class mf_group
 
 				foreach($resultAddresses as $r)
 				{
-					/*if($obj_cron->has_expired(array('margin' => .9)))
-					{
-						break;
-					}*/
-
 					$intQueueID = $r->queueID;
 					$intMessageID = $r->messageID;
 					$strAddressEmail = trim($r->addressEmail);
@@ -1412,12 +1407,7 @@ class mf_group
 	{
 		global $wpdb;
 
-		if($id > 0)
-		{
-			$this->id = $id;
-		}
-
-		return $wpdb->get_var($wpdb->prepare("SELECT post_title FROM ".$wpdb->posts." WHERE post_type = 'mf_group' AND ID = '%d'", $this->id));
+		return $wpdb->get_var($wpdb->prepare("SELECT post_title FROM ".$wpdb->posts." WHERE post_type = 'mf_group' AND ID = '%d'", $id));
 	}
 
 	function check_if_address_exists($query_where)
@@ -2018,7 +2008,7 @@ class mf_group_sent_table extends mf_list_table
 
 				else
 				{
-					if($item['messageCreated'] > date('Y-m-d H:i:s', strtotime("-1 week")))
+					if($item['messageCreated'] > date("Y-m-d H:i:s", strtotime("-1 week")))
 					{
 						$dteQueueSentTime_first = $wpdb->get_var($wpdb->prepare("SELECT MIN(queueSentTime) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueSent = '1'", $intMessageID2));
 

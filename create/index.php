@@ -23,7 +23,7 @@ echo "<div class='wrap'>
 					<div class='postbox'>
 						<h3 class='hndle'><span>".($obj_group->id > 0 ? __("Update", 'lang_group') : __("Add", 'lang_group'))."</span></h3>
 						<div class='inside'>"
-							.show_textfield(array('name' => "strGroupName", 'text' => __("Name", 'lang_group'), 'value' => $obj_group->name, 'xtra' => "autofocus"));
+							.show_textfield(array('name' => 'strGroupName', 'text' => __("Name", 'lang_group'), 'value' => $obj_group->name, 'xtra' => "autofocus"));
 
 							if(!($obj_group->id > 0))
 							{
