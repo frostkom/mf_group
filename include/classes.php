@@ -1692,7 +1692,7 @@ class mf_group_table extends mf_list_table
 						$actions['inactivate'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnGroupInactivate&intGroupID=".$post_id), 'group_inactivate_'.$post_id, '_wpnonce_group_inactivate')."'>".__("Inactivate", 'lang_group')."</a>";
 					}
 
-					$actions['view'] = "<a href='".get_permalink($post_id)."'>".__("View", 'lang_group')."</a>";
+					//$actions['view'] = "<a href='".get_permalink($post_id)."'>".__("View", 'lang_group')."</a>";
 					$actions['addnremove'] = "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id)."'>".__("Add or remove", 'lang_group')."</a>";
 					$actions['import'] = "<a href='".admin_url("admin.php?page=mf_group/import/index.php&intGroupID=".$post_id)."'>".__("Import", 'lang_group')."</a>";
 
@@ -1723,18 +1723,8 @@ class mf_group_table extends mf_list_table
 
 				if($post_allow_registration == 'yes')
 				{
-					$out .= "<i class='fa fa-globe green' title='".__("This group is open for registration", 'lang_group')."'></i>";
+					$out .= "<a href='".get_permalink($post_id)."'><i class='fa fa-globe green' title='".__("This group is open for registration", 'lang_group')."'></i></a>";
 				}
-
-				/*if($item[$column_name] == "publish")
-				{
-					$post_url = get_permalink($post_id);
-
-					$out .= "<i class='fa fa-globe green'></i>
-					<div class='row-actions'>
-						<a href='".$post_url."'><i class='fa fa-link'></i></a>
-					</div>";
-				}*/
 			break;
 
 			case 'amount':
