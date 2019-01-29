@@ -18,7 +18,7 @@ if(isset($_POST['btnGroupImport']) && $strGroupImport != '' && wp_verify_nonce($
 
 	$arr_import = array_map('trim', explode("\n", $strGroupImport));
 
-	$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE post_type = 'mf_group' AND ID = '%d'".$query_xtra." LIMIT 0, 1", $intGroupID));
+	$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE post_type = %s AND ID = '%d'".$query_xtra." LIMIT 0, 1", $obj_group->post_type, $intGroupID));
 
 	if($wpdb->num_rows > 0)
 	{

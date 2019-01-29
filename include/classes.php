@@ -19,7 +19,8 @@ class mf_group
 
 		$this->type = $data['type'];
 
-		$this->meta_prefix = "mf_group_";
+		$this->post_type = 'mf_group';
+		$this->meta_prefix = $this->post_type."_";
 	}
 
 	function get_group_url($data)
@@ -515,7 +516,7 @@ class mf_group
 
 			/* Add users to groups that are set to synchronize */
 			#############################
-			$result = $wpdb->get_results("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = 'mf_group' AND meta_key = '".$this->meta_prefix."sync_users' AND meta_value = 'yes'");
+			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND meta_key = %s AND meta_value = %s", $this->post_type, $this->meta_prefix.'sync_users', 'yes'));
 
 			foreach($result as $r)
 			{
@@ -583,7 +584,7 @@ class mf_group
 			),
 		);
 
-		register_post_type('mf_group', $args);
+		register_post_type($this->post_type, $args);
 	}
 
 	function settings_group()
@@ -697,7 +698,7 @@ class mf_group
 	{
 		global $wpdb;
 
-		$post_id = $wpdb->get_var($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND ".$wpdb->postmeta.".meta_key = '".$this->meta_prefix."allow_registration' WHERE post_type = 'mf_group' AND meta_value = %s", 'yes'));
+		$post_id = $wpdb->get_var($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND ".$wpdb->postmeta.".meta_key = '".$this->meta_prefix."allow_registration' WHERE post_type = %s AND meta_value = %s", $this->post_type, 'yes'));
 
 		return ($post_id > 0);
 	}
@@ -763,7 +764,7 @@ class mf_group
 	{
 		global $post_type;
 
-		if($post_type == 'mf_group')
+		if($post_type == $this->post_type)
 		{
 			do_log("Delete postID (#".$post_id.") from ".$wpdb->prefix."group_message etc.");
 
@@ -835,7 +836,7 @@ class mf_group
 			}
 
 			$out .= "<h3>".__("Choose a Group", 'lang_group')."</h3>"
-			.show_select(array('data' => $arr_data, 'xtra' => "rel='mf_group'"));
+			.show_select(array('data' => $arr_data, 'xtra' => "rel='".$this->post_type."'"));
 		}
 
 		return $out;
@@ -1131,7 +1132,7 @@ class mf_group
 
 							foreach($this->arr_group_id as $this->group_id)
 							{
-								$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE post_type = 'mf_group' AND ID = '%d'".$query_where." LIMIT 0, 1", $this->group_id));
+								$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE post_type = %s AND ID = '%d'".$query_where." LIMIT 0, 1", $this->post_type, $this->group_id));
 
 								if($wpdb->num_rows > 0)
 								{
@@ -1225,7 +1226,7 @@ class mf_group
 				if(isset($_POST['btnGroupSave']) && wp_verify_nonce($_POST['_wpnonce_group_save'], 'group_save_'.$this->id))
 				{
 					$post_data = array(
-						'post_type' => 'mf_group',
+						'post_type' => $this->post_type,
 						//'post_status' => $this->public,
 						'post_status' => 'publish',
 						'post_title' => $this->name,
@@ -1341,7 +1342,7 @@ class mf_group
 			case 'create':
 				if($this->id > 0)
 				{
-					$result = $wpdb->get_results($wpdb->prepare("SELECT post_status, post_title FROM ".$wpdb->posts." WHERE post_type = 'mf_group' AND ID = '%d'".$this->query_where, $this->id));
+					$result = $wpdb->get_results($wpdb->prepare("SELECT post_status, post_title FROM ".$wpdb->posts." WHERE post_type = %s AND ID = '%d'".$this->query_where, $this->post_type, $this->id));
 
 					foreach($result as $r)
 					{
@@ -1368,7 +1369,7 @@ class mf_group
 
 						if($this->public == 'trash')
 						{
-							$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->posts." SET post_status = 'publish' WHERE ID = '%d' AND post_type = 'mf_group'".$this->query_where, $this->id));
+							$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->posts." SET post_status = 'publish' WHERE ID = '%d' AND post_type = %s".$this->query_where, $this->id, $this->post_type));
 						}
 					}
 				}
@@ -1390,24 +1391,24 @@ class mf_group
 			$data['where'] .= " AND post_author = '".get_current_user_id()."'";
 		}
 
-		return $wpdb->get_results(
-			"SELECT ID, post_status, post_name, post_title, post_modified, post_author FROM ".$wpdb->posts." WHERE post_type = 'mf_group'".$data['where']." ORDER BY ".$data['order']
+		return $wpdb->get_results($wpdb->prepare(
+			"SELECT ID, post_status, post_name, post_title, post_modified, post_author FROM ".$wpdb->posts." WHERE post_type = %s".$data['where']." ORDER BY ".$data['order']
 			.($data['limit'] != '' && $data['amount'] != '' ? " LIMIT ".$data['limit'].", ".$data['amount'] : "")
-		);
+		, $this->post_type));
 	}
 
 	function get_from_last()
 	{
 		global $wpdb;
 
-		return $wpdb->get_var("SELECT messageFrom FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->posts." ON ".$wpdb->prefix."group_message.groupID = ".$wpdb->posts.".ID AND post_type = 'mf_group' AND messageDeleted = '0' ORDER BY messageCreated DESC LIMIT 0, 1");
+		return $wpdb->get_var($wpdb->prepare("SELECT messageFrom FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->posts." ON ".$wpdb->prefix."group_message.groupID = ".$wpdb->posts.".ID AND post_type = %s AND messageDeleted = '0' ORDER BY messageCreated DESC LIMIT 0, 1", $this->post_type));
 	}
 
 	function get_name($id = 0)
 	{
 		global $wpdb;
 
-		return $wpdb->get_var($wpdb->prepare("SELECT post_title FROM ".$wpdb->posts." WHERE post_type = 'mf_group' AND ID = '%d'", $id));
+		return $wpdb->get_var($wpdb->prepare("SELECT post_title FROM ".$wpdb->posts." WHERE post_type = %s AND ID = '%d'", $this->post_type, $id));
 	}
 
 	function check_if_address_exists($query_where)
@@ -2120,6 +2121,8 @@ class widget_group extends WP_Widget
 		);
 
 		parent::__construct('group-widget', __("Group", 'lang_group')." / ".__("Newsletter", 'lang_group'), $widget_ops);
+		
+		$this->obj_group = new mf_group();
 	}
 
 	function widget($args, $instance)
@@ -2130,8 +2133,6 @@ class widget_group extends WP_Widget
 
 		if($instance['group_id'] > 0)
 		{
-			$obj_group = new mf_group();
-
 			echo $before_widget;
 
 				if($instance['group_heading'] != '')
@@ -2142,7 +2143,7 @@ class widget_group extends WP_Widget
 				}
 
 				echo "<div class='section'>"
-					.$obj_group->show_group_registration_form(array('id' => $instance['group_id'], 'text' => $instance['group_text'], 'button_text' => $instance['group_button_text']))
+					.$this->obj_group->show_group_registration_form(array('id' => $instance['group_id'], 'text' => $instance['group_text'], 'button_text' => $instance['group_button_text']))
 				."</div>"
 			.$after_widget;
 		}
@@ -2169,7 +2170,7 @@ class widget_group extends WP_Widget
 		$instance = wp_parse_args((array)$instance, $this->arr_default);
 
 		$arr_data = array();
-		get_post_children(array('add_choose_here' => true, 'post_type' => 'mf_group', 'post_status' => '', 'where' => "post_status != 'trash'".(IS_EDITOR ? "" : " AND post_author = '".get_current_user_id()."'")), $arr_data);
+		get_post_children(array('add_choose_here' => true, 'post_type' => $this->obj_group->post_type, 'post_status' => '', 'where' => "post_status != 'trash'".(IS_EDITOR ? "" : " AND post_author = '".get_current_user_id()."'")), $arr_data);
 
 		echo "<div class='mf_form'>"
 			.show_textfield(array('name' => $this->get_field_name('group_heading'), 'text' => __("Heading", 'lang_group'), 'value' => $instance['group_heading'], 'xtra' => " id='group-title'"))

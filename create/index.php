@@ -27,7 +27,7 @@ echo "<div class='wrap'>
 
 							if(!($obj_group->id > 0))
 							{
-								$result = $wpdb->get_results("SELECT ID, post_title FROM ".$wpdb->posts." WHERE post_type = 'mf_group' AND post_status = 'publish'".$obj_group->query_where." ORDER BY post_title ASC");
+								$result = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title FROM ".$wpdb->posts." WHERE post_type = %s AND post_status = %s".$obj_group->query_where." ORDER BY post_title ASC", $obj_group->post_type, 'publish'));
 
 								if($wpdb->num_rows > 0)
 								{
