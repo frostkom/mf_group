@@ -55,11 +55,6 @@ if(isset($_POST['btnGroupImport']) && $strGroupImport != '' && wp_verify_nonce($
 						$obj_group->add_address(array('address_id' => $intAddressID, 'group_id' => $intGroupID));
 					}
 
-					/*else
-					{
-						$done_text = __("The address already existed in the group", 'lang_group')." (".$address_row.")";
-					}*/
-
 					$rows++;
 				}
 
@@ -81,11 +76,6 @@ if(isset($_POST['btnGroupImport']) && $strGroupImport != '' && wp_verify_nonce($
 					$error_text = __("An address with that information did not exist", 'lang_group')." (".$address_row.")";
 				}
 			}
-
-			/*else
-			{
-				$error_text = __("The address had no birth date", 'lang_group');
-			}*/
 		}
 	}
 
@@ -98,7 +88,7 @@ if(isset($_POST['btnGroupImport']) && $strGroupImport != '' && wp_verify_nonce($
 	{
 		$strGroupImport = "";
 
-		$done_text = __("The group was updated with ".$rows." addresses", 'lang_group');
+		$done_text = sprintf(__("The group was updated with %d addresses", 'lang_group'), $rows);
 		$error_text = "";
 	}
 

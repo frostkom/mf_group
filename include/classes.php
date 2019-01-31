@@ -25,8 +25,6 @@ class mf_group
 
 	function get_group_url($data)
 	{
-		global $wpdb;
-
 		if(!isset($data['message_id'])){	$data['message_id'] = 0;}
 		if(!isset($data['queue_id'])){		$data['queue_id'] = 0;}
 
@@ -314,8 +312,6 @@ class mf_group
 
 				$strGroupVerifyLink = get_post_meta($intGroupID, $this->meta_prefix.'verify_link', true);
 
-				$intGroupUnsubscribeEmail = get_post_meta($intGroupID, $this->meta_prefix.'unsubscribe_email', true);
-				$intGroupSubscribeEmail = get_post_meta($intGroupID, $this->meta_prefix.'subscribe_email', true);
 				$intGroupOwnerEmail = get_post_meta($intGroupID, $this->meta_prefix.'owner_email', true);
 				$intGroupHelpPage = get_post_meta($intGroupID, $this->meta_prefix.'help_page', true);
 				$intGroupArchivePage = get_post_meta($intGroupID, $this->meta_prefix.'archive_page', true);
@@ -407,19 +403,7 @@ class mf_group
 
 										$mail_headers = "From: ".$strMessageFromName." <".$strMessageFrom.">\r\n";
 
-										$unsubscribe_email = $subscribe_email = "";
-
-										/*if($intGroupUnsubscribeEmail > 0)
-										{
-											$unsubscribe_email .= "<mailto:".$."?subject=Unsubscribe>, ";
-										}*/
-
 										$mail_headers .= "List-Unsubscribe: <".$unsubscribe_url.">\r\n";
-
-										/*if($intGroupSubscribeEmail > 0)
-										{
-											$subscribe_email = "<mailto:".$."?subject=Subscribe>, ";
-										}*/
 
 										$mail_headers .= "List-Subscribe: ".$subscribe_email."<".$group_url.">\r\n";
 
@@ -1003,8 +987,6 @@ class mf_group
 				$this->acceptance_subject = check_var('strGroupAcceptanceSubject');
 				$this->acceptance_text = check_var('strGroupAcceptanceText');
 
-				/*$this->unsubscribe_email = check_var('intGroupUnsubscribeEmail');
-				$this->subscribe_email = check_var('intGroupSubscribeEmail');*/
 				$this->owner_email = check_var('intGroupOwnerEmail');
 				$this->help_page = check_var('intGroupHelpPage');
 				$this->archive_page = check_var('intGroupArchivePage');
@@ -1251,8 +1233,6 @@ class mf_group
 							update_post_meta($this->id, $this->meta_prefix.'verify_link', $this->verify_link);
 							update_post_meta($this->id, $this->meta_prefix.'sync_users', $this->sync_users);
 
-							/*update_post_meta($this->id, $this->meta_prefix.'unsubscribe_email', $this->unsubscribe_email);
-							update_post_meta($this->id, $this->meta_prefix.'subscribe_email', $this->subscribe_email);*/
 							update_post_meta($this->id, $this->meta_prefix.'owner_email', $this->owner_email);
 							update_post_meta($this->id, $this->meta_prefix.'help_page', $this->help_page);
 							update_post_meta($this->id, $this->meta_prefix.'archive_page', $this->archive_page);
@@ -1361,8 +1341,6 @@ class mf_group
 						$this->verify_link = get_post_meta($this->id, $this->meta_prefix.'verify_link', true);
 						$this->sync_users = get_post_meta($this->id, $this->meta_prefix.'sync_users', true);
 
-						/*$this->unsubscribe_email = get_post_meta($this->id, $this->meta_prefix.'unsubscribe_email', true);
-						$this->subscribe_email = get_post_meta($this->id, $this->meta_prefix.'subscribe_email', true);*/
 						$this->owner_email = get_post_meta($this->id, $this->meta_prefix.'owner_email', true);
 						$this->help_page = get_post_meta($this->id, $this->meta_prefix.'help_page', true);
 						$this->archive_page = get_post_meta($this->id, $this->meta_prefix.'archive_page', true);
@@ -1578,8 +1556,6 @@ class mf_group_table extends mf_list_table
 
 	function init_fetch()
 	{
-		global $wpdb;
-
 		if($this->search != '')
 		{
 			$this->query_where .= ($this->query_where != '' ? " AND " : "")."(post_title LIKE '%".$this->search."%')";
@@ -1693,7 +1669,6 @@ class mf_group_table extends mf_list_table
 						$actions['inactivate'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnGroupInactivate&intGroupID=".$post_id), 'group_inactivate_'.$post_id, '_wpnonce_group_inactivate')."'>".__("Inactivate", 'lang_group')."</a>";
 					}
 
-					//$actions['view'] = "<a href='".get_permalink($post_id)."'>".__("View", 'lang_group')."</a>";
 					$actions['addnremove'] = "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id)."'>".__("Add or remove", 'lang_group')."</a>";
 					$actions['import'] = "<a href='".admin_url("admin.php?page=mf_group/import/index.php&intGroupID=".$post_id)."'>".__("Import", 'lang_group')."</a>";
 
@@ -2121,7 +2096,7 @@ class widget_group extends WP_Widget
 		);
 
 		parent::__construct('group-widget', __("Group", 'lang_group')." / ".__("Newsletter", 'lang_group'), $widget_ops);
-		
+
 		$this->obj_group = new mf_group();
 	}
 
@@ -2165,8 +2140,6 @@ class widget_group extends WP_Widget
 
 	function form($instance)
 	{
-		global $wpdb;
-
 		$instance = wp_parse_args((array)$instance, $this->arr_default);
 
 		$arr_data = array();

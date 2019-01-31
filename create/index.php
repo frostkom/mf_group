@@ -63,15 +63,11 @@ echo "<div class='wrap'>
 					if(is_plugin_active("mf_email/index.php"))
 					{
 						$obj_email = new mf_email();
-						//$arr_data_incoming = $obj_email->get_from_for_select(array('type' => 'incoming'));
 						$arr_data_email = $obj_email->get_from_for_select();
 						$arr_data_abuse = $obj_email->get_from_for_select(array('type' => 'abuse'));
 
 						$arr_data_page = array();
 						get_post_children(array('add_choose_here' => true), $arr_data_page);
-
-						/*echo show_select(array('data' => $arr_data_incoming, 'name' => 'intGroupUnsubscribeEmail', 'text' => __("E-mail to Unsubscribe to", 'lang_group'), 'value' => $obj_group->unsubscribe_email))
-						.show_select(array('data' => $arr_data_incoming, 'name' => 'intGroupSubscribeEmail', 'text' => __("E-mail to Subscribe to", 'lang_group'), 'value' => $obj_group->subscribe_email));*/
 
 						echo "<div class='postbox'>
 							<h3 class='hndle'><span>".__("About the Group", 'lang_group')."</span></h3>
