@@ -800,7 +800,7 @@ class mf_group
 		return $count;
 	}
 
-	function get_shortcode_output($out)
+	function get_for_select()
 	{
 		$tbl_group = new mf_group_table();
 
@@ -808,17 +808,27 @@ class mf_group
 			'select' => "ID, post_title",
 		));
 
+		$arr_data = array();
+
 		if(count($tbl_group->data) > 0)
 		{
-			$arr_data = array(
-				'' => "-- ".__("Choose Here", 'lang_group')." --",
-			);
+			$arr_data[''] = "-- ".__("Choose Here", 'lang_group')." --";
 
 			foreach($tbl_group->data as $template)
 			{
 				$arr_data[$template['ID']] = $template['post_title'];
 			}
+		}
 
+		return $arr_data;
+	}
+
+	function get_shortcode_output($out)
+	{
+		$arr_data = $this->get_for_select();
+
+		if(count($arr_data) > 0)
+		{
 			$out .= "<h3>".__("Choose a Group", 'lang_group')."</h3>"
 			.show_select(array('data' => $arr_data, 'xtra' => "rel='".$this->post_type."'"));
 		}
@@ -955,11 +965,6 @@ class mf_group
 	{
 		switch($this->type)
 		{
-			case 'table':
-				if(isset($_SESSION['intGroupID'])){			unset($_SESSION['intGroupID']);}
-				if(isset($_SESSION['is_part_of_group'])){	unset($_SESSION['is_part_of_group']);}
-			break;
-
 			case 'form':
 				$this->message_type = check_var('type', 'char', true, 'email');
 				$this->group_id = check_var('intGroupID');
@@ -1386,6 +1391,11 @@ class mf_group
 	{
 		global $wpdb;
 
+		if($id == 0)
+		{
+			$id = $this->id;
+		}
+
 		return $wpdb->get_var($wpdb->prepare("SELECT post_title FROM ".$wpdb->posts." WHERE post_type = %s AND ID = '%d'", $this->post_type, $id));
 	}
 
@@ -1490,7 +1500,7 @@ class mf_group
 		}
 	}
 
-	function remove_address($address_id = 0, $group_id = 0)
+	function remove_address($address_id, $group_id)
 	{
 		global $wpdb;
 
@@ -1499,7 +1509,7 @@ class mf_group
 		$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->prefix."address2group WHERE addressID = '%d'".($group_id > 0 ? " AND groupID = '".$group_id."'" : ""), $address_id));
 	}
 
-	function remove_all_address($group_id = 0)
+	function remove_all_address($group_id)
 	{
 		global $wpdb;
 
@@ -1507,6 +1517,15 @@ class mf_group
 		do_log("Deleted all (GID: ".$group_id." (".$this->get_name($group_id)."), User: ".$user_data->display_name.")");*/
 
 		$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->prefix."address2group WHERE groupID = '%d'", $group_id));
+	}
+
+	function unsubscribe_address($address_id, $group_id)
+	{
+		global $wpdb;
+
+		$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."address2group SET groupUnsubscribed = '1' WHERE groupID = '%d' AND addressID = '%d'", $group_id, $address_id));
+
+		return ($wpdb->num_rows == 1);
 	}
 
 	function amount_in_group($data = array())
@@ -1669,16 +1688,16 @@ class mf_group_table extends mf_list_table
 						$actions['inactivate'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnGroupInactivate&intGroupID=".$post_id), 'group_inactivate_'.$post_id, '_wpnonce_group_inactivate')."'>".__("Inactivate", 'lang_group')."</a>";
 					}
 
-					$actions['addnremove'] = "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id)."'>".__("Add or remove", 'lang_group')."</a>";
+					$actions['addnremove'] = "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id."&strFilterIsMember&strFilterAccepted&strFilterUnsubscribed")."'>".__("Add or remove", 'lang_group')."</a>";
 					$actions['import'] = "<a href='".admin_url("admin.php?page=mf_group/import/index.php&intGroupID=".$post_id)."'>".__("Import", 'lang_group')."</a>";
 
-					$amount = $obj_group->amount_in_group();
+					$amount = $obj_group->amount_in_group(array('id' => $post_id));
 
 					if($amount > 0)
 					{
 						$actions['export_csv'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnExportRun&intExportType=".$post_id."&strExportFormat=csv"), 'export_run', '_wpnonce_export_run')."'>".__("CSV", 'lang_group')."</a>";
 
-						if(is_plugin_active("mf_phpexcel/index.php"))
+						if(is_plugin_active('mf_phpexcel/index.php'))
 						{
 							$actions['export_xls'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnExportRun&intExportType=".$post_id."&strExportFormat=xls"), 'export_run', '_wpnonce_export_run')."'>".__("XLS", 'lang_group')."</a>";
 						}
@@ -1704,7 +1723,7 @@ class mf_group_table extends mf_list_table
 			break;
 
 			case 'amount':
-				$amount = $obj_group->amount_in_group();
+				$amount = $obj_group->amount_in_group(array('id' => $post_id));
 
 				$actions = array();
 
@@ -1721,22 +1740,29 @@ class mf_group_table extends mf_list_table
 					}
 				}
 
-				$out .= "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id."&no_ses&is_part_of_group=1")."'>".$amount."</a>"
+				$out .= "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id."&strFilterIsMember=yes&strFilterAccepted=yes&strFilterUnsubscribed=no")."'>".$amount."</a>"
 				.$this->row_actions($actions);
 			break;
 
 			case 'not_accepted':
-				$rowsAddressesNotAccepted = $obj_group->amount_in_group(array('accepted' => 0));
+				$rowsAddressesNotAccepted = $obj_group->amount_in_group(array('id' => $post_id, 'accepted' => 0));
 
-				$out .= $rowsAddressesNotAccepted;
+				if($rowsAddressesNotAccepted > 0)
+				{
+					$out .= "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id."&strFilterIsMember=yes&strFilterAccepted=no&strFilterUnsubscribed")."'>".$rowsAddressesNotAccepted."</a>";
+				}
 			break;
 
 			case 'unsubscribed':
-				$rowsAddressesUnsubscribed = $wpdb->get_var($wpdb->prepare("SELECT COUNT(addressID) FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' AND groupUnsubscribed = '1'", $post_id));
+				//$rowsAddressesUnsubscribed = $wpdb->get_var($wpdb->prepare("SELECT COUNT(addressID) FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' AND groupUnsubscribed = '1'", $post_id));
+				$rowsAddressesUnsubscribed = $obj_group->amount_in_group(array('id' => $post_id, 'unsubscribed' => 1));
 
 				$dteMessageCreated = $wpdb->get_var($wpdb->prepare("SELECT messageCreated FROM ".$wpdb->prefix."group_message WHERE groupID = '%d' AND messageDeleted = '0' ORDER BY messageCreated DESC", $post_id));
 
-				$out .= $rowsAddressesUnsubscribed;
+				if($rowsAddressesUnsubscribed > 0)
+				{
+					$out .= "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id."&strFilterIsMember=yes&strFilterAccepted=yes&strFilterUnsubscribed=yes")."'>".$rowsAddressesUnsubscribed."</a>";
+				}
 
 				if($post_status == 'publish' || $dteMessageCreated != '')
 				{

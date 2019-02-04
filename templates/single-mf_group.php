@@ -86,9 +86,18 @@ get_header();
 								{
 									if(isset($_POST['btnUnsubscribe']))
 									{
-										$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."address2group SET groupUnsubscribed = '1' WHERE groupID = '%d' AND addressID = '%d'", $intGroupID, $intAddressID));
+										//$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."address2group SET groupUnsubscribed = '1' WHERE groupID = '%d' AND addressID = '%d'", $intGroupID, $intAddressID));
+										if($obj_group->unsubscribe_address($intAddressID, $intGroupID))
+										{
+											$done_text = __("You have been successfully unsubscribed", 'lang_group');
+										}
 
-										$done_text = __("You have been successfully unsubscribed", 'lang_group');
+										else
+										{
+											do_log("Unsubscribe Error: ".$wpdb->last_query);
+
+											$done_text = __("I could not unsubscribe you. An admin has been notified about this", 'lang_group');
+										}
 									}
 
 									else
