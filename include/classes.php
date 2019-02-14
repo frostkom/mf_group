@@ -1496,6 +1496,8 @@ class mf_group
 				{
 					$this->send_acceptance_message($data);
 				}
+
+				do_action('group_after_add_address', array('address_id' => $data['address_id']));
 			}
 		}
 	}
