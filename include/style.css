@@ -7,21 +7,19 @@
 	}
 
 	/* Widget */
-	.widget_group{}
+	.widget_group .mf_form > p
+	{
+		margin-bottom: .5em;
+	}
 
-		.widget_group .mf_form > p
-		{
-			margin-bottom: .5em;
-		}
-
-		.widget_group .flex_form .form_textfield input, .widget_group .flex_form button
-		{
-			font-size: inherit;
-			font-weight: normal;
-			height: 3em;
-			padding: .8em 1em;
-			width: 100%;
-		}
+	.widget_group .flex_form .form_textfield input, .widget_group .flex_form button
+	{
+		font-size: inherit;
+		font-weight: normal;
+		height: 3em;
+		padding: .8em 1em;
+		width: 100%;
+	}
 
 	.full_width > div > .widget_group .mf_form
 	{
