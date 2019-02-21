@@ -744,11 +744,11 @@ class mf_group
 		}
 	}
 
-	function delete_post($post_id)
+	function wp_trash_post($post_id)
 	{
-		global $post_type;
+		global $wpdb;
 
-		if($post_type == $this->post_type)
+		if(get_post_type($post_id) == $this->post_type)
 		{
 			do_log("Delete postID (#".$post_id.") from ".$wpdb->prefix."group_message etc.");
 

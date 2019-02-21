@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: 
-Version: 5.5.12
+Version: 5.5.13
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://frostkom.se
@@ -34,8 +34,11 @@ if(is_admin())
 	add_filter('wp_get_default_privacy_policy_content', array($obj_group, 'add_policy'));
 
 	add_action('admin_notices', array($obj_group, 'admin_notices'));
-	add_action('delete_post', array($obj_group, 'delete_post'));
+
+	add_action('wp_trash_post', array($obj_group, 'wp_trash_post'));
+	add_action('delete_post', array($obj_group, 'wp_trash_post')); // Needs to be here until trash is emptied
 	add_action('deleted_user', array($obj_group, 'deleted_user'));
+
 	add_action('merge_address', array($obj_group, 'merge_address'), 10, 2);
 
 	add_filter('count_shortcode_button', array($obj_group, 'count_shortcode_button'));
