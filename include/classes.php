@@ -977,7 +977,6 @@ class mf_group
 				$this->message_schedule_time = check_var('dteMessageScheduleTime');
 				$this->message_text_source = check_var('intEmailTextSource');
 				$this->message_attachment = check_var('strMessageAttachment');
-				//$this->message_unsubscribe_link = check_var('strMessageUnsubscribeLink', 'char', true, 'yes');
 
 				if($this->group_id > 0 && !in_array($this->group_id, $this->arr_group_id))
 				{
@@ -1183,7 +1182,7 @@ class mf_group
 				{
 					if($this->message_type == 'email')
 					{
-						$this->message_text .= "<p><a href='[unsubscribe_link]'>".__("If you don't want to get these messages in the future click this link to unsubscribe", 'lang_group')."</a></p>"; // style='color: #999; font-size: .8em; text-decoration: none'
+						$this->message_text .= "<p><a href='[unsubscribe_link]'>".__("If you don't want to get these messages in the future click this link to unsubscribe", 'lang_group')."</a></p>";
 					}
 				}
 
@@ -1638,7 +1637,7 @@ class mf_group_table extends mf_list_table
 		}
 
 		$arr_columns['unsubscribed'] = __("Unsubscribed", 'lang_group');
-		$arr_columns['post_author'] = shorten_text(array('text' => __("User", 'lang_group'), 'limit' => 4));
+		$arr_columns['post_author'] = shorten_text(array('string' => __("User", 'lang_group'), 'limit' => 4));
 		$arr_columns['sent'] = __("Sent", 'lang_group');
 
 		$this->set_columns($arr_columns);
@@ -1756,7 +1755,6 @@ class mf_group_table extends mf_list_table
 			break;
 
 			case 'unsubscribed':
-				//$rowsAddressesUnsubscribed = $wpdb->get_var($wpdb->prepare("SELECT COUNT(addressID) FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' AND groupUnsubscribed = '1'", $post_id));
 				$rowsAddressesUnsubscribed = $obj_group->amount_in_group(array('id' => $post_id, 'unsubscribed' => 1));
 
 				$dteMessageCreated = $wpdb->get_var($wpdb->prepare("SELECT messageCreated FROM ".$wpdb->prefix."group_message WHERE groupID = '%d' AND messageDeleted = '0' ORDER BY messageCreated DESC", $post_id));
