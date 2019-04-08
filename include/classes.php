@@ -20,7 +20,7 @@ class mf_group
 		$this->type = $data['type'];
 
 		$this->post_type = 'mf_group';
-		$this->meta_prefix = $this->post_type."_";
+		$this->meta_prefix = $this->post_type.'_';
 	}
 
 	function get_group_url($data)
@@ -1496,7 +1496,10 @@ class mf_group
 					$this->send_acceptance_message($data);
 				}
 
-				do_action('group_after_add_address', array('address_id' => $data['address_id']));
+				//$from_email = get_bloginfo('admin_email');
+				$from_email = $wpdb->get_var($wpdb->prepare("SELECT messageFrom FROM ".$wpdb->prefix."group_message WHERE groupID = '%d' AND messageDeleted = '0' ORDER BY messageCreated DESC", $data['group_id']));
+
+				do_action('group_after_add_address', array('address_id' => $data['address_id'], 'from' => $from_email));
 			}
 		}
 	}
@@ -1710,7 +1713,7 @@ class mf_group_table extends mf_list_table
 					$actions['recover'] = "<a href='".admin_url("admin.php?page=mf_group/create/index.php&intGroupID=".$post_id."&recover")."'>".__("Recover", 'lang_group')."</a>";
 				}
 
-				$out .= "<a href='".$post_edit_url."'>".$item[$column_name]."</a>"
+				$out .= "<a href='".$post_edit_url."'>".$item['post_title']."</a>"
 				.$this->row_actions($actions);
 			break;
 
@@ -1776,7 +1779,7 @@ class mf_group_table extends mf_list_table
 			break;
 
 			case 'post_author':
-				$out .= get_user_info(array('id' => $item[$column_name], 'type' => 'short_name'));
+				$out .= get_user_info(array('id' => $item['post_author'], 'type' => 'short_name'));
 			break;
 
 			case 'sent':
@@ -1909,7 +1912,7 @@ class mf_group_sent_table extends mf_list_table
 					'send_email' => "<a href='".admin_url("admin.php?page=mf_email/send/index.php&intGroupMessageID=".$intMessageID2)."'><i class='fa fa-envelope fa-lg' title='".__("Send to e-mail", 'lang_group')."'></i></a>",
 				);
 
-				switch($item[$column_name])
+				switch($item['messageType'])
 				{
 					default:
 					case 'email':
@@ -1926,7 +1929,7 @@ class mf_group_sent_table extends mf_list_table
 			break;
 
 			case 'messageFrom':
-				$strMessageFrom = $item[$column_name];
+				$strMessageFrom = $item['messageFrom'];
 
 				$actions = array();
 
@@ -2041,7 +2044,7 @@ class mf_group_sent_table extends mf_list_table
 			break;
 
 			case 'messageCreated':
-				$out .= format_date($item[$column_name])
+				$out .= format_date($item['messageCreated'])
 				."</td></tr><tr class='hide'><td colspan='".count($this->columns)."'>";
 
 				$out .= stripslashes(apply_filters('the_content', $item['messageText']));

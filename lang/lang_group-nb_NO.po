@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-10-18 15:22+0100\n"
+"POT-Creation-Date: 2019-03-22 09:52+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -14,6 +14,9 @@ msgstr ""
 "X-Poedit-KeywordsList: esc_html__;esc_html_e;esc_attr__;esc_attr_e;__;_e\n"
 "X-Poedit-Basepath: .\n"
 "X-Poedit-SearchPath-0: ..\n"
+
+msgid "Update"
+msgstr "Oppdatere"
 
 msgid "Add"
 msgstr "Legg til"
@@ -33,8 +36,20 @@ msgstr "Innstillinger"
 msgid "Contact Page"
 msgstr "Kontaktside"
 
+msgid "Address"
+msgstr "Adresse"
+
+msgid "Zip Code"
+msgstr "Postnummer"
+
+msgid "Phone Number"
+msgstr "Telefonnummer"
+
 msgid "E-mail"
 msgstr "E-post"
+
+msgid "Extra"
+msgstr "Ekstra"
 
 msgid "Import"
 msgstr "Importere"
@@ -54,6 +69,12 @@ msgstr "Legg Til Ny"
 msgid "All"
 msgstr "Alle"
 
+msgid "Public"
+msgstr "Offentlig"
+
+msgid "Not Public"
+msgstr "Ikke Offentlig"
+
 msgid "User"
 msgstr "Brukere"
 
@@ -68,4 +89,13 @@ msgstr "Aktiver"
 
 msgid "From"
 msgstr "Fra"
+
+msgid "Errors"
+msgstr "Feil"
+
+msgid "Heading"
+msgstr "Overskriften"
+
+msgid "Advanced"
+msgstr "Avansert"
 
