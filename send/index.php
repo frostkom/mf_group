@@ -15,15 +15,6 @@ echo "<div class='wrap'>
 						<h3 class='hndle'>".__("Message", 'lang_group')."</h3>
 						<div class='inside'>";
 
-							$arr_data_to = array();
-
-							$result = $obj_group->get_groups(array('where' => " AND post_status NOT IN ('trash', 'ignore')", 'order' => "post_title ASC"));
-
-							foreach($result as $r)
-							{
-								$arr_data_to[$r->ID] = $r->post_title;
-							}
-
 							switch($obj_group->message_type)
 							{
 								case 'email':
@@ -43,7 +34,6 @@ echo "<div class='wrap'>
 										$admin_email = get_bloginfo('admin_email');
 
 										$arr_data_from = array();
-
 										$arr_data_from[''] = "-- ".__("Choose Here", 'lang_group')." --";
 
 										if($user_email != '')
@@ -62,12 +52,28 @@ echo "<div class='wrap'>
 											.show_select(array('data' => $arr_data_from, 'name' => 'strMessageFrom', 'text' => __("From", 'lang_group'), 'value' => $obj_group->message_from, 'required' => true))
 											.show_textfield(array('name' => 'strMessageName', 'text' => __("Subject", 'lang_group'), 'value' => $obj_group->message_name, 'required' => true))
 										."</div>"
-										.show_select(array('data' => $arr_data_to, 'name' => 'arrGroupID[]', 'text' => __("To", 'lang_group'), 'value' => $obj_group->arr_group_id, 'maxsize' => 6, 'required' => true))
+										.show_select(array('data' => $obj_group->get_for_select(array('add_choose_here' => false)), 'name' => 'arrGroupID[]', 'text' => __("To", 'lang_group'), 'value' => $obj_group->arr_group_id, 'maxsize' => 6, 'required' => true))
 									."</div>"
 									.show_wp_editor(array('name' => 'strMessageText', 'value' => $obj_group->message_text));
 								break;
 
-								case 'sms':
+								default:
+									$result = apply_filters('get_group_message_form_fields', array(
+										'type' => $obj_group->message_type,
+										'from_value' => $obj_group->message_from,
+										'to_select' => $obj_group->get_for_select(array('add_choose_here' => false)),
+										'to_value' => $obj_group->arr_group_id,
+										'message' => $obj_group->message_text,
+										'html' => "",
+									));
+
+									if($result['html'] != '')
+									{
+										echo $result['html'];
+									}
+								break;
+
+								/*case 'sms':
 									$sms_senders = get_option('setting_sms_senders');
 									$sms_phone = get_user_meta(get_current_user_id(), 'meta_sms_phone', true);
 
@@ -91,7 +97,7 @@ echo "<div class='wrap'>
 									echo show_select(array('data' => $arr_data_from, 'name' => 'strMessageFrom', 'text' => __("From", 'lang_group'), 'value' => $obj_group->message_from, 'required' => true))
 									.show_select(array('data' => $arr_data_to, 'name' => 'arrGroupID[]', 'text' => __("To", 'lang_group'), 'value' => $obj_group->arr_group_id, 'maxsize' => 6, 'required' => true))
 									.show_textarea(array('name' => 'strMessageText', 'text' => __("Message", 'lang_group'), 'value' => $obj_group->message_text, 'required' => true));
-								break;
+								break;*/
 							}
 
 						echo "</div>
@@ -101,22 +107,32 @@ echo "<div class='wrap'>
 					<div class='postbox'>
 						<h3 class='hndle'>".__("Send", 'lang_group')."</h3>
 						<div class='inside'>"
-							.show_button(array('name' => 'btnGroupSend', 'text' => __("Send", 'lang_group')))
-							."<div class='flex_flow'>"
-								.show_textfield(array('type' => 'date', 'name' => 'dteMessageScheduleDate', 'text' => __("Schedule", 'lang_group'), 'value' => $obj_group->message_schedule_date, 'placeholder' => date("Y-m-d")))
-								.show_textfield(array('type' => 'time', 'name' => 'dteMessageScheduleTime', 'text' => "&nbsp;", 'value' => $obj_group->message_schedule_time, 'placeholder' => date("H:i")))
-							."</div>
-							<p class='description'>".__("Choose date and time to send the message", 'lang_group')."</p>"
-							.wp_nonce_field('group_send_'.$obj_group->message_type, '_wpnonce_group_send', true, false);
+							.show_button(array('name' => 'btnGroupSend', 'text' => __("Send", 'lang_group')));
 
-							switch($obj_group->message_type)
+							$result = apply_filters('get_group_message_send_fields', array(
+								'type' => $obj_group->message_type,
+								'html' => "",
+							));
+
+							if($result['html'] != '')
+							{
+								echo $result['html'];
+							}
+
+							/*switch($obj_group->message_type)
 							{
 								case 'sms':
 									echo " <span id='chars_left'></span> (<span id='sms_amount'>1</span>)";
 								break;
-							}
+							}*/
 
-							echo input_hidden(array('name' => 'type', 'value' => $obj_group->message_type))
+							echo "<div class='flex_flow'>"
+								.show_textfield(array('type' => 'date', 'name' => 'dteMessageScheduleDate', 'text' => __("Schedule", 'lang_group'), 'value' => $obj_group->message_schedule_date, 'placeholder' => date("Y-m-d")))
+								.show_textfield(array('type' => 'time', 'name' => 'dteMessageScheduleTime', 'text' => "&nbsp;", 'value' => $obj_group->message_schedule_time, 'placeholder' => date("H:i")))
+							."</div>
+							<p class='description'>".__("Choose date and time to send the message", 'lang_group')."</p>"
+							.wp_nonce_field('group_send_'.$obj_group->message_type, '_wpnonce_group_send', true, false)
+							.input_hidden(array('name' => 'type', 'value' => $obj_group->message_type))
 						."</div>
 					</div>";
 

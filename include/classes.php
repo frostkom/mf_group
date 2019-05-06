@@ -23,6 +23,54 @@ class mf_group
 		$this->meta_prefix = $this->post_type.'_';
 	}
 
+	function get_for_select($data = array())
+	{
+		if(!isset($data['add_choose_here'])){		$data['add_choose_here'] = true;}
+
+		$tbl_group = new mf_group_table();
+
+		$tbl_group->select_data(array(
+			'select' => "ID, post_title",
+		));
+
+		$arr_data = array();
+
+		if(count($tbl_group->data) > 0)
+		{
+			if($data['add_choose_here'])
+			{
+				$arr_data[''] = "-- ".__("Choose Here", 'lang_group')." --";
+			}
+
+			foreach($tbl_group->data as $r)
+			{
+				$arr_data[$r['ID']] = $r['post_title'];
+			}
+		}
+
+		return $arr_data;
+	}
+
+	function get_groups($data = array())
+	{
+		global $wpdb;
+
+		if(!isset($data['where'])){		$data['where'] = "";}
+		if(!isset($data['order'])){		$data['order'] = "post_status ASC, post_title ASC";}
+		if(!isset($data['limit'])){		$data['limit'] = "";}
+		if(!isset($data['amount'])){	$data['amount'] = "";}
+
+		if(!IS_EDITOR)
+		{
+			$data['where'] .= " AND post_author = '".get_current_user_id()."'";
+		}
+
+		return $wpdb->get_results($wpdb->prepare(
+			"SELECT ID, post_status, post_name, post_title, post_modified, post_author FROM ".$wpdb->posts." WHERE post_type = %s".$data['where']." ORDER BY ".$data['order']
+			.($data['limit'] != '' && $data['amount'] != '' ? " LIMIT ".$data['limit'].", ".$data['amount'] : "")
+		, $this->post_type));
+	}
+
 	function get_group_url($data)
 	{
 		if(!isset($data['message_id'])){	$data['message_id'] = 0;}
@@ -370,7 +418,11 @@ class mf_group
 								do_action('group_init_message', array('group_id' => $intGroupID, 'message_id' => $intMessageID, 'from_name' => $strMessageFromName, 'from' => $strMessageFrom, 'subject' => $strMessageName, 'content' => $strMessageText, 'alt_content' => $strMessageText));
 							break;
 
-							case 'sms':
+							default:
+								do_action('group_init_other');
+							break;
+
+							/*case 'sms':
 								//Must be here to make sure that send_sms() is loaded
 								##################
 								require_once(ABSPATH."wp-admin/includes/plugin.php");
@@ -382,7 +434,7 @@ class mf_group
 								##################
 
 								$obj_sms = new mf_sms();
-							break;
+							break;*/
 						}
 					}
 
@@ -471,7 +523,28 @@ class mf_group
 							}
 						break;
 
-						case 'sms':
+						default:
+							$success = apply_filters('group_send_other', array(
+								'from' => $strMessageFrom,
+								'to' => $strAddressCellNo,
+								'message' => $strMessageText,
+								'user_id' => $intUserID,
+							));
+
+							if($success == true)
+							{
+								$this->set_message_sent($intQueueID);
+
+								do_log("Not sent to ".$strAddressCellNo, 'trash');
+							}
+
+							else
+							{
+								do_log("Not sent to ".$strAddressCellNo.", ".shorten_text(array('string' => htmlspecialchars($strMessageText), 'limit' => 10)));
+							}
+						break;
+
+						/*case 'sms':
 							$sent = $obj_sms->send_sms(array('from' => $strMessageFrom, 'to' => $strAddressCellNo, 'text' => $strMessageText, 'user_id' => $intUserID));
 
 							if($sent == "OK")
@@ -485,7 +558,7 @@ class mf_group
 							{
 								do_log("Not sent to ".$strAddressCellNo.", ".shorten_text(array('string' => htmlspecialchars($strMessageText), 'limit' => 10)));
 							}
-						break;
+						break;*/
 					}
 				}
 
@@ -623,7 +696,7 @@ class mf_group
 		$setting_key = get_setting_key(__FUNCTION__);
 		$option = get_option($setting_key);
 
-		$arr_data = array(
+		/*$arr_data = array(
 			'' => "-- ".__("Choose Here", 'lang_group')." --"
 		);
 
@@ -632,9 +705,9 @@ class mf_group
 		foreach($result as $r)
 		{
 			$arr_data[$r->ID] = $r->post_title;
-		}
+		}*/
 
-		echo show_select(array('data' => $arr_data, 'name' => $setting_key, 'value' => $option, 'suffix' => "<a href='".admin_url("admin.php?page=mf_group/create/index.php")."'><i class='fa fa-plus-circle fa-lg'></i></a>"));
+		echo show_select(array('data' => $this->get_for_select(), 'name' => $setting_key, 'value' => $option, 'suffix' => "<a href='".admin_url("admin.php?page=mf_group/create/index.php")."'><i class='fa fa-plus-circle fa-lg'></i></a>"));
 	}
 
 	function count_unsent_group($id = 0)
@@ -780,6 +853,30 @@ class mf_group
 		$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."address2group SET addressID = '%d' WHERE addressID = '%d'", $id, $id_prev));
 	}
 
+	function get_groups_to_send_to($arr_data)
+	{
+		return $this->get_for_select(array('add_choose_here' => false));
+	}
+
+	function get_group_addresses($data)
+	{
+		global $wpdb;
+
+		/*foreach($data['group_ids'] as $group_id)
+		{
+			//$data['amount'] += $this->amount_in_group(array('id' => $group_id));
+		}*/
+
+		$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE addressDeleted = '0' AND groupAccepted = '%d' AND groupUnsubscribed = '%d' AND groupID IN ('".implode("','", $data['group_ids'])."')", 1, 0));
+
+		foreach($result as $r)
+		{
+			$data['addresses'][] = $r->ID;
+		}
+
+		return $data;
+	}
+
 	function count_shortcode_button($count)
 	{
 		if($count == 0)
@@ -800,34 +897,11 @@ class mf_group
 		return $count;
 	}
 
-	function get_for_select()
-	{
-		$tbl_group = new mf_group_table();
-
-		$tbl_group->select_data(array(
-			'select' => "ID, post_title",
-		));
-
-		$arr_data = array();
-
-		if(count($tbl_group->data) > 0)
-		{
-			$arr_data[''] = "-- ".__("Choose Here", 'lang_group')." --";
-
-			foreach($tbl_group->data as $template)
-			{
-				$arr_data[$template['ID']] = $template['post_title'];
-			}
-		}
-
-		return $arr_data;
-	}
-
 	function get_shortcode_output($out)
 	{
 		$arr_data = $this->get_for_select();
 
-		if(count($arr_data) > 0)
+		if(count($arr_data) > 1)
 		{
 			$out .= "<h3>".__("Choose a Group", 'lang_group')."</h3>"
 			.show_select(array('data' => $arr_data, 'xtra' => "rel='".$this->post_type."'"));
@@ -1359,26 +1433,6 @@ class mf_group
 		}
 	}
 
-	function get_groups($data = array())
-	{
-		global $wpdb;
-
-		if(!isset($data['where'])){		$data['where'] = "";}
-		if(!isset($data['order'])){		$data['order'] = "post_status ASC, post_title ASC";}
-		if(!isset($data['limit'])){		$data['limit'] = "";}
-		if(!isset($data['amount'])){	$data['amount'] = "";}
-
-		if(!IS_EDITOR)
-		{
-			$data['where'] .= " AND post_author = '".get_current_user_id()."'";
-		}
-
-		return $wpdb->get_results($wpdb->prepare(
-			"SELECT ID, post_status, post_name, post_title, post_modified, post_author FROM ".$wpdb->posts." WHERE post_type = %s".$data['where']." ORDER BY ".$data['order']
-			.($data['limit'] != '' && $data['amount'] != '' ? " LIMIT ".$data['limit'].", ".$data['amount'] : "")
-		, $this->post_type));
-	}
-
 	function get_from_last()
 	{
 		global $wpdb;
@@ -1548,19 +1602,6 @@ class mf_group
 		}
 
 		return $wpdb->get_var($wpdb->prepare("SELECT COUNT(addressID) FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE addressDeleted = '0' AND groupAccepted = '%d' AND groupUnsubscribed = '%d'".$query_where, $data['accepted'], $data['unsubscribed']));
-	}
-
-	function sms_is_active()
-	{
-		if((get_option('setting_sms_provider') != '' || get_option('setting_sms_url') != '') && get_option('setting_sms_username') != '' && get_option('setting_sms_password') != '')
-		{
-			return true;
-		}
-
-		else
-		{
-			return false;
-		}
 	}
 }
 
@@ -1735,12 +1776,9 @@ class mf_group_table extends mf_list_table
 				{
 					if($amount > 0)
 					{
-						$actions['send_email'] = "<a href='".admin_url("admin.php?page=mf_group/send/index.php&intGroupID=".$post_id."&type=email")."'><i class='fa fa-envelope fa-lg'></i></a>";
+						$actions['send_email'] = "<a href='".admin_url("admin.php?page=mf_group/send/index.php&intGroupID=".$post_id."&type=email")."' title='".__("Send e-mail to everyone in the group", 'lang_group')."'><i class='fa fa-paper-plane fa-lg'></i></a>";
 
-						if(is_plugin_active("mf_sms/index.php") && $this->sms_is_active())
-						{
-							$actions['send_sms'] = "<a href='".admin_url("admin.php?page=mf_group/send/index.php&intGroupID=".$post_id."&type=sms")."'><i class='fa fa-mobile-alt fa-lg'></i></a>";
-						}
+						$actions = apply_filters('add_group_list_amount_actions', $actions, $post_id);
 					}
 				}
 
@@ -1914,14 +1952,17 @@ class mf_group_sent_table extends mf_list_table
 
 				switch($item['messageType'])
 				{
-					default:
 					case 'email':
 						$strMessageType = __("E-mail", 'lang_group');
 					break;
 
-					case 'sms':
-						$strMessageType = __("SMS", 'lang_group');
+					default:
+						$strMessageType = apply_filters('get_group_message_type', $item['messageType']);
 					break;
+
+					/*case 'sms':
+						$strMessageType = __("SMS", 'lang_group');
+					break;*/
 				}
 
 				$out .= $strMessageType
