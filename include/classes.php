@@ -867,11 +867,11 @@ class mf_group
 			//$data['amount'] += $this->amount_in_group(array('id' => $group_id));
 		}*/
 
-		$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE addressDeleted = '0' AND groupAccepted = '%d' AND groupUnsubscribed = '%d' AND groupID IN ('".implode("','", $data['group_ids'])."')", 1, 0));
+		$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE addressDeleted = '0' AND groupAccepted = '%d' AND groupUnsubscribed = '%d' AND groupID IN ('".implode("','", $data['group_ids'])."') GROUP BY addressID", 1, 0));
 
 		foreach($result as $r)
 		{
-			$data['addresses'][] = $r->ID;
+			$data['addresses'][] = $r->addressID;
 		}
 
 		return $data;
