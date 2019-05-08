@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: 
-Version: 5.5.18
+Version: 5.5.19
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://frostkom.se
@@ -117,7 +117,9 @@ function activate_group()
 		KEY queueSent (queueSent)
 	) DEFAULT CHARSET=".$default_charset);
 
-	$arr_add_column[$wpdb->prefix."group_queue"]['queueReceived'] = "ALTER TABLE [table] ADD [column] ENUM('-1', '0','1') NOT NULL DEFAULT '0' AFTER queueSent";
+	$arr_add_column[$wpdb->prefix."group_queue"] = array(
+		'queueReceived' => "ALTER TABLE [table] ADD [column] ENUM('-1', '0','1') NOT NULL DEFAULT '0' AFTER queueSent",
+	);
 
 	$arr_add_index[$wpdb->prefix."group_queue"] = array(
 		'messageID' => "ALTER TABLE [table] ADD INDEX [column] ([column])",
