@@ -48,9 +48,10 @@ if(isset($_POST['btnGroupImport']) && $strGroupImport != '' && wp_verify_nonce($
 
 				if($intAddressID > 0)
 				{
-					$wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address2group WHERE addressID = '%d' AND groupID = '%d' LIMIT 0, 1", $intAddressID, $intGroupID));
+					//$wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address2group WHERE addressID = '%d' AND groupID = '%d' LIMIT 0, 1", $intAddressID, $intGroupID));
 
-					if($wpdb->num_rows == 0)
+					//if($wpdb->num_rows == 0)
+					if($obj_group->has_address(array('address_id' => $intAddressID, 'group_id' => $intGroupID)) == false)
 					{
 						$obj_group->add_address(array('address_id' => $intAddressID, 'group_id' => $intGroupID));
 					}

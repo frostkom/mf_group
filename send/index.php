@@ -72,41 +72,15 @@ echo "<div class='wrap'>
 										echo $result['html'];
 									}
 								break;
-
-								/*case 'sms':
-									$sms_senders = get_option('setting_sms_senders');
-									$sms_phone = get_user_meta(get_current_user_id(), 'meta_sms_phone', true);
-
-									$arr_data_from = array(
-										'' => "-- ".__("Choose Here", 'lang_group')." --"
-									);
-
-									foreach(explode(",", $sms_senders) as $sender)
-									{
-										if($sender != '')
-										{
-											$arr_data_from[$sender] = $sender;
-										}
-									}
-
-									if($sms_phone != '')
-									{
-										$arr_data_from[$sms_phone] = $sms_phone;
-									}
-
-									echo show_select(array('data' => $arr_data_from, 'name' => 'strMessageFrom', 'text' => __("From", 'lang_group'), 'value' => $obj_group->message_from, 'required' => true))
-									.show_select(array('data' => $arr_data_to, 'name' => 'arrGroupID[]', 'text' => __("To", 'lang_group'), 'value' => $obj_group->arr_group_id, 'maxsize' => 6, 'required' => true))
-									.show_textarea(array('name' => 'strMessageText', 'text' => __("Message", 'lang_group'), 'value' => $obj_group->message_text, 'required' => true));
-								break;*/
 							}
 
 						echo "</div>
 					</div>
 				</div>
 				<div id='postbox-container-1'>
-					<div class='postbox'>
-						<h3 class='hndle'>".__("Send", 'lang_group')."</h3>
-						<div class='inside'>"
+					<div class='postbox'>"
+						//."<h3 class='hndle'>".__("Send", 'lang_group')."</h3>"
+						."<div class='inside'>"
 							.show_button(array('name' => 'btnGroupSend', 'text' => __("Send", 'lang_group')));
 
 							$result = apply_filters('get_group_message_send_fields', array(
@@ -118,13 +92,6 @@ echo "<div class='wrap'>
 							{
 								echo $result['html'];
 							}
-
-							/*switch($obj_group->message_type)
-							{
-								case 'sms':
-									echo " <span id='chars_left'></span> (<span id='sms_amount'>1</span>)";
-								break;
-							}*/
 
 							echo "<div class='flex_flow'>"
 								.show_textfield(array('type' => 'date', 'name' => 'dteMessageScheduleDate', 'text' => __("Schedule", 'lang_group'), 'value' => $obj_group->message_schedule_date, 'placeholder' => date("Y-m-d")))
