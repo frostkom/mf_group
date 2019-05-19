@@ -1472,31 +1472,6 @@ class mf_group
 			$query_limit = " LIMIT 0, ".$emails_left_to_send;
 		}
 
-		/*global $wpdb;
-
-		$query_limit = "";
-
-		$setting_emails_per_hour = get_option_or_default('setting_emails_per_hour');
-
-		if($setting_emails_per_hour > 0)
-		{
-			$emails_left_to_send = $setting_emails_per_hour;
-
-			if($emails_left_to_send > 0)
-			{
-				$wpdb->get_results("SELECT messageID FROM ".$wpdb->base_prefix."email_message WHERE messageFrom = '' AND messageCreated > DATE_SUB(NOW(), INTERVAL 1 HOUR)");
-				$emails_left_to_send -= $wpdb->num_rows;
-			}
-
-			if($emails_left_to_send > 0)
-			{
-				$wpdb->get_results("SELECT queueID FROM ".$wpdb->prefix."group_queue WHERE queueSent = '1' AND queueSentTime > DATE_SUB(NOW(), INTERVAL 1 HOUR)");
-				$emails_left_to_send -= $wpdb->num_rows;
-			}
-
-			$query_limit = " LIMIT 0, ".$emails_left_to_send;
-		}*/
-
 		return $query_limit;
 	}
 
@@ -1508,7 +1483,7 @@ class mf_group
 		$obj_address = new mf_address();
 
 		$strAddressEmail = $obj_address->get_address($data['address_id']);
-		$strGroupName = $this->get_name($data['group_id']);
+		$strGroupName = $this->get_name(array('id' => $data['group_id']));
 
 		$mail_to = $strAddressEmail;
 		$mail_subject = sprintf($strGroupAcceptanceSubject, $strGroupName);
@@ -1581,7 +1556,7 @@ class mf_group
 		global $wpdb;
 
 		/*$user_data = get_userdata(get_current_user_id());
-		do_log("Deleted all (GID: ".$group_id." (".$this->get_name($group_id)."), User: ".$user_data->display_name.")");*/
+		do_log("Deleted all (GID: ".$group_id." (".$this->get_name(array('id' => $group_id))."), User: ".$user_data->display_name.")");*/
 
 		$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->prefix."address2group WHERE groupID = '%d'", $group_id));
 	}
@@ -2128,7 +2103,7 @@ class mf_group_export extends mf_export
 		global $wpdb;
 
 		$obj_group = new mf_group();
-		$this->name = $obj_group->get_name($this->type);
+		$this->name = $obj_group->get_name(array('id' => $this->type));
 
 		$obj_address = new mf_address();
 		$arr_countries = $obj_address->get_countries_for_select();
