@@ -1064,6 +1064,8 @@ class mf_group
 				$this->acceptance_email = check_var('strGroupAcceptanceEmail', 'char', true, 'no');
 				$this->acceptance_subject = check_var('strGroupAcceptanceSubject');
 				$this->acceptance_text = check_var('strGroupAcceptanceText');
+				$this->reminder_subject = check_var('strGroupReminderSubject');
+				$this->reminder_text = check_var('strGroupReminderText');
 
 				$this->owner_email = check_var('intGroupOwnerEmail');
 				$this->help_page = check_var('intGroupHelpPage');
@@ -1477,8 +1479,24 @@ class mf_group
 
 	function send_acceptance_message($data)
 	{
-		$strGroupAcceptanceSubject = get_post_meta_or_default($data['group_id'], 'group_acceptance_subject', true, __("Accept subscription to %s", 'lang_group'));
-		$strGroupAcceptanceText = get_post_meta_or_default($data['group_id'], 'group_acceptance_text', true, __("You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below.", 'lang_group'));
+		if(!isset($data['type'])){		$data['type'] = 'acceptance';}
+
+		switch($data['type'])
+		{
+			case 'acceptance':
+			default:
+				$meta_key_subject = 'group_acceptance_subject';
+				$meta_key_text = 'group_acceptance_text';
+			break;
+
+			case 'reminder':
+				$meta_key_subject = 'group_reminder_subject';
+				$meta_key_text = 'group_reminder_text';
+			break;
+		}
+
+		$strGroupAcceptanceSubject = get_post_meta_or_default($data['group_id'], $meta_key_subject, true, __("Accept subscription to %s", 'lang_group'));
+		$strGroupAcceptanceText = get_post_meta_or_default($data['group_id'], $meta_key_text, true, __("You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below.", 'lang_group'));
 
 		$obj_address = new mf_address();
 
@@ -1506,7 +1524,7 @@ class mf_group
 	function has_address($data)
 	{
 		global $wpdb;
-		
+
 		$intAddressID = $wpdb->get_var($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address2group WHERE addressID = '%d' AND groupID = '%d' LIMIT 0, 1", $data['address_id'], $data['group_id']));
 
 		return ($intAddressID > 0);
@@ -1518,9 +1536,6 @@ class mf_group
 
 		if($data['address_id'] > 0 && $data['group_id'] > 0)
 		{
-			//$wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address2group WHERE addressID = '%d' AND groupID = '%d' LIMIT 0, 1", $data['address_id'], $data['group_id']));
-
-			//if($wpdb->num_rows == 0)
 			if($this->has_address($data) == false)
 			{
 				$meta_group_acceptance_email = get_post_meta($data['group_id'], 'group_acceptance_email', true);

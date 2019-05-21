@@ -54,7 +54,14 @@ echo "<div class='wrap'>
 							if($obj_group->acceptance_email == 'yes')
 							{
 								echo show_textfield(array('name' => 'strGroupAcceptanceSubject', 'text' => __("Subject", 'lang_group'), 'value' => $obj_group->acceptance_subject, 'placeholder' => sprintf(__("Accept subscription to %s", 'lang_group'), $obj_group->name)))
-								.show_wp_editor(array('name' => 'strGroupAcceptanceText', 'value' => $obj_group->acceptance_text, 'description' => __("Example", 'lang_group').": ".sprintf(__("You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below.", 'lang_group'), $obj_group->name))); //, 'text' => __("Message", 'lang_group')
+								.show_wp_editor(array('name' => 'strGroupAcceptanceText', 'value' => $obj_group->acceptance_text, 'description' => __("Example", 'lang_group').": ".sprintf(__("You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below.", 'lang_group'), $obj_group->name)));
+
+								if($obj_group->acceptance_subject != '' && $obj_group->acceptance_text != '')
+								{
+									echo "<h3>".__("Reminder if the recipient has not yet accepted", 'lang_group')."</h3>"
+									.show_textfield(array('name' => 'strGroupReminderSubject', 'text' => __("Subject", 'lang_group'), 'value' => $obj_group->reminder_subject, 'placeholder' => sprintf(__("Accept subscription to %s", 'lang_group'), $obj_group->name)))
+									.show_wp_editor(array('name' => 'strGroupReminderText', 'value' => $obj_group->reminder_text, 'description' => __("Example", 'lang_group').": ".sprintf(__("You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below.", 'lang_group'), $obj_group->name)));
+								}
 							}
 
 						echo "</div>
