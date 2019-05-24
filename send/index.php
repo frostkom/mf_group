@@ -5,7 +5,7 @@ $obj_group->fetch_request();
 echo $obj_group->save_data();
 
 echo "<div class='wrap'>
-	<h2>".__("Send message", 'lang_group')."</h2>"
+	<h2>".__("Send Message", 'lang_group')."</h2>"
 	.get_notification()
 	."<div id='poststuff'>
 		<form action='#' method='post' class='mf_form mf_settings'>

@@ -547,7 +547,7 @@ class mf_group
 						/*case 'sms':
 							$sent = $obj_sms->send_sms(array('from' => $strMessageFrom, 'to' => $strAddressCellNo, 'text' => $strMessageText, 'user_id' => $intUserID));
 
-							if($sent == "OK")
+							if($sent)
 							{
 								$this->set_message_sent($intQueueID);
 
@@ -741,7 +741,7 @@ class mf_group
 		$menu_title = __("Add New", 'lang_group');
 		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, $menu_root."create/index.php");
 
-		$menu_title = __("Send New", 'lang_group');
+		$menu_title = __("Send Message", 'lang_group');
 		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, $menu_root."send/index.php");
 
 		$menu_title = __("Sent", 'lang_group');
