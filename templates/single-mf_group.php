@@ -86,7 +86,6 @@ get_header();
 								{
 									if(isset($_POST['btnUnsubscribe']))
 									{
-										//$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."address2group SET groupUnsubscribed = '1' WHERE groupID = '%d' AND addressID = '%d'", $intGroupID, $intAddressID));
 										if($obj_group->unsubscribe_address($intAddressID, $intGroupID))
 										{
 											$done_text = __("You have been successfully unsubscribed", 'lang_group');

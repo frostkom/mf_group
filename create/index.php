@@ -27,45 +27,36 @@ echo "<div class='wrap'>
 
 							if(!($obj_group->id > 0))
 							{
-								$result = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title FROM ".$wpdb->posts." WHERE post_type = %s AND post_status = %s".$obj_group->query_where." ORDER BY post_title ASC", $obj_group->post_type, 'publish'));
-
-								if($wpdb->num_rows > 0)
-								{
-									$arr_data = array(
-										'' => "-- ".__("Choose Here", 'lang_group')." --"
-									);
-
-									foreach($result as $r)
-									{
-										$arr_data[$r->ID] = $r->post_title;
-									}
-
-									echo show_select(array('data' => $arr_data, 'name' => 'intGroupID_copy', 'text' => __("Copy addresses from", 'lang_group')));
-								}
+								echo show_select(array('data' => $obj_group->get_for_select(), 'name' => 'intGroupID_copy', 'text' => __("Copy addresses from", 'lang_group')));
 							}
 
-						echo "</div>
-					</div>
-					<div class='postbox'>
-						<h3 class='hndle'><span>".__("Acceptance e-mail", 'lang_group')."</span></h3>
-						<div class='inside'>"
-							.show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupAcceptanceEmail', 'text' => __("Send before adding to a group", 'lang_group'), 'value' => $obj_group->acceptance_email));
-
-							if($obj_group->acceptance_email == 'yes')
-							{
-								echo show_textfield(array('name' => 'strGroupAcceptanceSubject', 'text' => __("Subject", 'lang_group'), 'value' => $obj_group->acceptance_subject, 'placeholder' => sprintf(__("Accept subscription to %s", 'lang_group'), $obj_group->name)))
-								.show_wp_editor(array('name' => 'strGroupAcceptanceText', 'value' => $obj_group->acceptance_text, 'description' => __("Example", 'lang_group').": ".sprintf(__("You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below.", 'lang_group'), $obj_group->name)));
-
-								if($obj_group->acceptance_subject != '' && $obj_group->acceptance_text != '')
-								{
-									echo "<h3>".__("Reminder if the recipient has not yet accepted", 'lang_group')."</h3>"
-									.show_textfield(array('name' => 'strGroupReminderSubject', 'text' => __("Subject", 'lang_group'), 'value' => $obj_group->reminder_subject, 'placeholder' => sprintf(__("Accept subscription to %s", 'lang_group'), $obj_group->name)))
-									.show_wp_editor(array('name' => 'strGroupReminderText', 'value' => $obj_group->reminder_text, 'description' => __("Example", 'lang_group').": ".sprintf(__("You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below.", 'lang_group'), $obj_group->name)));
-								}
-							}
-
-						echo "</div>
+							echo show_textfield(array('name' => 'strGroupAPI', 'text' => __("API Link", 'lang_group'), 'value' => $obj_group->api))
+						."</div>
 					</div>";
+
+					if($obj_group->api == '')
+					{
+						echo "<div class='postbox'>
+							<h3 class='hndle'><span>".__("Acceptance e-mail", 'lang_group')."</span></h3>
+							<div class='inside'>"
+								.show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupAcceptanceEmail', 'text' => __("Send before adding to a group", 'lang_group'), 'value' => $obj_group->acceptance_email));
+
+								if($obj_group->acceptance_email == 'yes')
+								{
+									echo show_textfield(array('name' => 'strGroupAcceptanceSubject', 'text' => __("Subject", 'lang_group'), 'value' => $obj_group->acceptance_subject, 'placeholder' => sprintf(__("Accept subscription to %s", 'lang_group'), $obj_group->name)))
+									.show_wp_editor(array('name' => 'strGroupAcceptanceText', 'value' => $obj_group->acceptance_text, 'description' => __("Example", 'lang_group').": ".sprintf(__("You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below.", 'lang_group'), $obj_group->name)));
+
+									if($obj_group->acceptance_subject != '' && $obj_group->acceptance_text != '')
+									{
+										echo "<h3>".__("Reminder if the recipient has not yet accepted", 'lang_group')."</h3>"
+										.show_textfield(array('name' => 'strGroupReminderSubject', 'text' => __("Subject", 'lang_group'), 'value' => $obj_group->reminder_subject, 'placeholder' => sprintf(__("Accept subscription to %s", 'lang_group'), $obj_group->name)))
+										.show_wp_editor(array('name' => 'strGroupReminderText', 'value' => $obj_group->reminder_text, 'description' => __("Example", 'lang_group').": ".sprintf(__("You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below.", 'lang_group'), $obj_group->name)));
+									}
+								}
+
+							echo "</div>
+						</div>";
+					}
 
 					if(is_plugin_active("mf_email/index.php"))
 					{
@@ -107,8 +98,12 @@ echo "<div class='wrap'>
 					</div>
 					<div class='postbox'>
 						<h3 class='hndle'><span>".__("Settings", 'lang_group')."</span></h3>
-						<div class='inside'>"
-							.show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupAllowRegistration', 'text' => __("Allow Registration", 'lang_group'), 'value' => $obj_group->allow_registration));
+						<div class='inside'>";
+
+							if($obj_group->api == '')
+							{
+								echo show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupAllowRegistration', 'text' => __("Allow Registration", 'lang_group'), 'value' => $obj_group->allow_registration));
+							}
 
 							if($obj_group->allow_registration == 'yes')
 							{
@@ -142,7 +137,7 @@ echo "<div class='wrap'>
 								echo show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupSyncUsers', 'text' => __("Synchronize Users", 'lang_group'), 'value' => $obj_group->sync_users, 'description' => __("This will automatically add/remove users and their information to this group", 'lang_group')));
 							}
 
-							if($obj_group->id > 0 && $obj_group->allow_registration == 'no' && $obj_group->sync_users == 'no' && $obj_group->amount_in_group() > 0)
+							if($obj_group->id > 0 && $obj_group->api == '' && $obj_group->allow_registration == 'no' && $obj_group->sync_users == 'no' && $obj_group->amount_in_group() > 0)
 							{
 								echo show_button(array('name' => 'btnGroupRemoveRecipients', 'text' => __("Remove all recipients", 'lang_group'), 'class' => "button delete"))
 								.show_checkbox(array('name' => 'intGroupRemoveRecipientsConfirm', 'text' => __("Are you really sure?", 'lang_group'), 'value' => 1, 'description' => __("This will remove all recipients from this group and it is not possible to undo this action", 'lang_group')))

@@ -573,7 +573,7 @@ class mf_group
 
 			/* Add users to groups that are set to synchronize */
 			#############################
-			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND meta_key = %s AND meta_value = %s", $this->post_type, $this->meta_prefix.'sync_users', 'yes'));
+			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND meta_key = %s AND meta_value = %s", $this->post_type, 'publish', $this->meta_prefix.'sync_users', 'yes'));
 
 			foreach($result as $r)
 			{
@@ -617,6 +617,105 @@ class mf_group
 					}
 				}
 			}
+			#############################
+
+			/* Synchronize with API */
+			#############################
+			$result = $wpdb->get_results($wpdb->prepare("SELECT ID, meta_value FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND meta_key = %s AND meta_value != ''", $this->post_type, 'publish', $this->meta_prefix.'api'));
+
+			if($wpdb->num_rows > 0)
+			{
+				foreach($result as $r)
+				{
+					$post_id = $r->ID;
+					$post_meta_api = $r->meta_value;
+
+					//do_log("Sync ".get_post_title($post_id)." with ".$post_meta_api);
+
+					list($content, $headers) = get_url_content(array(
+						'url' => htmlspecialchars_decode($post_meta_api),
+						'catch_head' => true,
+					));
+
+					switch($headers['http_code'])
+					{
+						case 200:
+							$json = json_decode($content, true);
+
+							switch($json['status'])
+							{
+								case 'true':
+									if(isset($json['data']) && count($json['data']) > 0)
+									{
+										//do_log("Group API: ".$post_meta_api." -> ".htmlspecialchars(var_export($json['data'], true)));
+
+										$arr_addresses = array();
+
+										foreach($json['data'] as $item)
+										{
+											$memberSSN = $item['memberSSN'];
+											$firstname = $item['firstname'];
+											$lastname = $item['lastname'];
+											$email = $item['email'];
+
+											$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address WHERE (addressBirthDate = %s AND addressBirthDate != '' OR addressEmail = %s AND addressEmail != '')", $memberSSN, $email));
+
+											if($wpdb->num_rows > 0)
+											{
+												foreach($result as $r)
+												{
+													$arr_addresses[] = $r->addressID;
+
+													//do_log("Add ".$r->addressID." (".$firstname." ".$lastname.") to ".get_post_title($post_id));
+
+													$this->add_address(array('address_id' => $r->addressID, 'group_id' => $post_id));
+												}
+											}
+
+											/*else
+											{
+												do_log("Group API: ".$wpdb->last_query);
+											}*/
+										}
+
+										$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address2group WHERE groupID = '%d' AND addressID NOT IN('".implode("','", $arr_addresses)."')", $post_id));
+
+										if($wpdb->num_rows > 0)
+										{
+											foreach($result as $r)
+											{
+												//do_log("Remove ".$r->addressID." from ".get_post_title($post_id));
+
+												$this->remove_address(array('address_id' => $r->addressID, 'group_id' => $post_id));
+											}
+										}
+
+										/*else
+										{
+											do_log("Group API: ".$wpdb->last_query);
+										}*/
+									}
+								break;
+
+								default:
+									do_log("Group API Error: ".$post_meta_api." -> ".htmlspecialchars(var_export($json, true)));
+								break;
+							}
+
+							do_log("I could not get a successful result from the Group API", 'trash');
+						break;
+
+						default:
+							do_log("I could not get a successful result from the Group API (".$content.", ".htmlspecialchars(var_export($headers, true)).")");
+						break;
+					}
+				}
+			}
+
+			/*else
+			{
+				do_log("Group API: ".$wpdb->last_query);
+			}*/
 			#############################
 		}
 
@@ -1080,6 +1179,7 @@ class mf_group
 				$this->sync_users = check_var('strGroupSyncUsers', 'char', true, 'no');
 
 				$this->id_copy = check_var('intGroupID_copy');
+				$this->api = check_var('strGroupAPI');
 			break;
 
 			case 'sent':
@@ -1301,6 +1401,8 @@ class mf_group
 
 						if(wp_update_post($post_data) > 0)
 						{
+							update_post_meta($this->id, $this->meta_prefix.'api', $this->api);
+
 							update_post_meta($this->id, 'group_acceptance_email', $this->acceptance_email);
 							update_post_meta($this->id, 'group_acceptance_subject', $this->acceptance_subject);
 							update_post_meta($this->id, 'group_acceptance_text', $this->acceptance_text);
@@ -1343,6 +1445,22 @@ class mf_group
 									$this->add_address(array('address_id' => $intAddressID, 'group_id' => $this->id));
 								}
 							}
+
+							update_post_meta($this->id, $this->meta_prefix.'api', $this->api);
+
+							update_post_meta($this->id, 'group_acceptance_email', $this->acceptance_email);
+
+							update_post_meta($this->id, $this->meta_prefix.'allow_registration', $this->allow_registration);
+
+							/*update_post_meta($this->id, 'group_verify_address', $this->verify_address);
+							update_post_meta($this->id, 'group_contact_page', $this->contact_page);
+							update_post_meta($this->id, 'group_registration_fields', $this->registration_fields);*/
+							update_post_meta($this->id, $this->meta_prefix.'verify_link', $this->verify_link);
+							update_post_meta($this->id, $this->meta_prefix.'sync_users', $this->sync_users);
+
+							update_post_meta($this->id, $this->meta_prefix.'owner_email', $this->owner_email);
+							update_post_meta($this->id, $this->meta_prefix.'help_page', $this->help_page);
+							update_post_meta($this->id, $this->meta_prefix.'archive_page', $this->archive_page);
 
 							mf_redirect(admin_url("admin.php?page=mf_group/list/index.php&created"));
 						}
@@ -1408,6 +1526,8 @@ class mf_group
 					{
 						$this->public = $r->post_status;
 						$this->name = $r->post_title;
+
+						$this->api = get_post_meta($this->id, $this->meta_prefix.'api', true);
 
 						$this->acceptance_email = get_post_meta_or_default($this->id, 'group_acceptance_email', true, 'no');
 						$this->acceptance_subject = get_post_meta($this->id, 'group_acceptance_subject', true);
@@ -1538,17 +1658,27 @@ class mf_group
 		{
 			if($this->has_address($data) == false)
 			{
-				$meta_group_acceptance_email = get_post_meta($data['group_id'], 'group_acceptance_email', true);
+				$post_meta_api = get_post_meta($data['group_id'], $this->meta_prefix.'api', true);
 
-				$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->prefix."address2group SET addressID = '%d', groupID = '%d', groupAccepted = '%d'", $data['address_id'], $data['group_id'], ($meta_group_acceptance_email == 'yes' ? 0 : 1)));
+				if($post_meta_api != '')
+				{
+					$post_meta_acceptance_email = 'no';
+				}
 
-				if($meta_group_acceptance_email == 'yes')
+				else
+				{
+					$post_meta_acceptance_email = get_post_meta($data['group_id'], 'group_acceptance_email', true);
+				}
+
+				$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->prefix."address2group SET addressID = '%d', groupID = '%d', groupAccepted = '%d'", $data['address_id'], $data['group_id'], ($post_meta_acceptance_email == 'yes' ? 0 : 1)));
+
+				if($post_meta_acceptance_email == 'yes')
 				{
 					$this->send_acceptance_message($data);
 				}
 
 				//$from_email = get_bloginfo('admin_email');
-				$from_email = $wpdb->get_var($wpdb->prepare("SELECT messageFrom FROM ".$wpdb->prefix."group_message WHERE groupID = '%d' AND messageDeleted = '0' ORDER BY messageCreated DESC", $data['group_id']));
+				$from_email = $wpdb->get_var($wpdb->prepare("SELECT messageFrom FROM ".$wpdb->prefix."group_message WHERE groupID = '%d' AND messageDeleted = '0' ORDER BY messageCreated DESC LIMIT 0, 1", $data['group_id']));
 
 				do_action('group_after_add_address', array('address_id' => $data['address_id'], 'from' => $from_email));
 			}
@@ -1756,7 +1886,7 @@ class mf_group_table extends mf_list_table
 
 				$actions = array();
 
-				if($post_status != "trash")
+				if($post_status == 'publish')
 				{
 					if($amount > 0)
 					{
@@ -1765,17 +1895,22 @@ class mf_group_table extends mf_list_table
 						$actions = apply_filters('add_group_list_amount_actions', $actions, $post_id);
 					}
 
-					$actions['addnremove'] = "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id."&strFilterIsMember&strFilterAccepted&strFilterUnsubscribed")."' title='".__("Add or remove", 'lang_group')."'><i class='fas fa-tasks fa-lg'></i></a>";
+					$post_meta_api = get_post_meta($post_id, $obj_group->meta_prefix.'api', true);
 
-					$actions['import'] = "<a href='".admin_url("admin.php?page=mf_group/import/index.php&intGroupID=".$post_id)."' title='".__("Import Addresses", 'lang_group')."' title='".__("Import", 'lang_group')."'><i class='fas fa-cloud-upload-alt fa-lg'></i></a>";
-
-					if($amount > 0)
+					if($post_meta_api == '')
 					{
-						$actions['export_csv'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnExportRun&intExportType=".$post_id."&strExportFormat=csv"), 'export_run', '_wpnonce_export_run')."' title='".__("Export", 'lang_group')." CSV'><i class='fas fa-file-csv fa-lg'></i></a>";
+						$actions['addnremove'] = "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id."&strFilterIsMember&strFilterAccepted&strFilterUnsubscribed")."' title='".__("Add or remove", 'lang_group')."'><i class='fas fa-tasks fa-lg'></i></a>";
 
-						if(is_plugin_active('mf_phpexcel/index.php'))
+						$actions['import'] = "<a href='".admin_url("admin.php?page=mf_group/import/index.php&intGroupID=".$post_id)."' title='".__("Import Addresses", 'lang_group')."' title='".__("Import", 'lang_group')."'><i class='fas fa-cloud-upload-alt fa-lg'></i></a>";
+
+						if($amount > 0)
 						{
-							$actions['export_xls'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnExportRun&intExportType=".$post_id."&strExportFormat=xls"), 'export_run', '_wpnonce_export_run')."' title='".__("Export", 'lang_group')." XLS'><i class='fas fa-file-excel fa-lg'></i></a>";
+							$actions['export_csv'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnExportRun&intExportType=".$post_id."&strExportFormat=csv"), 'export_run', '_wpnonce_export_run')."' title='".__("Export", 'lang_group')." CSV'><i class='fas fa-file-csv fa-lg'></i></a>";
+
+							if(is_plugin_active('mf_phpexcel/index.php'))
+							{
+								$actions['export_xls'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnExportRun&intExportType=".$post_id."&strExportFormat=xls"), 'export_run', '_wpnonce_export_run')."' title='".__("Export", 'lang_group')." XLS'><i class='fas fa-file-excel fa-lg'></i></a>";
+							}
 						}
 					}
 				}
