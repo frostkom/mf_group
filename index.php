@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: 
-Version: 5.6.1
+Version: 5.6.2
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://frostkom.se
@@ -130,6 +130,7 @@ function activate_group()
 		addressID INT UNSIGNED NOT NULL,
 		groupID INT UNSIGNED NOT NULL,
 		groupAccepted ENUM('0', '1') NOT NULL DEFAULT '1',
+		groupAcceptanceSent DATETIME DEFAULT NULL,
 		groupUnsubscribed ENUM('0', '1') NOT NULL DEFAULT '0',
 		KEY addressID (addressID),
 		KEY groupID (groupID)
@@ -138,6 +139,7 @@ function activate_group()
 	$arr_add_column[$wpdb->prefix."address2group"] = array(
 		'groupUnsubscribed' => "ALTER TABLE [table] ADD [column] ENUM('0', '1') NOT NULL DEFAULT '0' AFTER groupID",
 		'groupAccepted' => "ALTER TABLE [table] ADD [column] ENUM('0', '1') NOT NULL DEFAULT '1' AFTER groupUnsubscribed",
+		'groupAcceptanceSent' => "ALTER TABLE [table] ADD [column] DATETIME DEFAULT NULL AFTER groupAccepted",
 	);
 
 	$arr_add_index[$wpdb->prefix."address2group"] = array(
@@ -157,10 +159,6 @@ function activate_group()
 				'field_prefix' => "message",
 			),
 		),
-	));
-
-	mf_uninstall_plugin(array(
-		'options' => array('setting_group_acceptance_email'),
 	));
 }
 

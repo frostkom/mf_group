@@ -658,7 +658,12 @@ class mf_group
 											$lastname = $item['lastname'];
 											$email = $item['email'];
 
-											$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address WHERE (addressBirthDate = %s AND addressBirthDate != '' OR addressEmail = %s AND addressEmail != '')", $memberSSN, $email));
+											$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address WHERE (addressBirthDate = %s AND addressBirthDate != '')", $memberSSN));
+
+											if($wpdb->num_rows == 0)
+											{
+												$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address WHERE (addressEmail = %s AND addressEmail != '')", $email));
+											}
 
 											if($wpdb->num_rows > 0)
 											{
@@ -1597,8 +1602,19 @@ class mf_group
 		return $query_limit;
 	}
 
+	function is_allowed2send_reminder($data)
+	{
+		global $wpdb;
+
+		$dteGroupAcceptanceSent = $wpdb->get_var($wpdb->prepare("SELECT groupAcceptanceSent FROM ".$wpdb->prefix."address2group WHERE addressID = '%d' AND groupID = '%d'", $data['address_id'], $data['group_id']));
+
+		return ($dteGroupAcceptanceSent < date("Y-m-d H:i:s", strtotime("-1 week")));
+	}
+
 	function send_acceptance_message($data)
 	{
+		global $wpdb;
+
 		if(!isset($data['type'])){		$data['type'] = 'acceptance';}
 
 		switch($data['type'])
@@ -1629,7 +1645,14 @@ class mf_group
 
 		$mail_content .= "<p><a href='".$this->get_group_url(array('type' => 'subscribe', 'group_id' => $data['group_id'], 'email' => $strAddressEmail))."'>".__("Accept Link", 'lang_group')."</a></p>";
 
-		return send_email(array('to' => $mail_to, 'subject' => $mail_subject, 'content' => $mail_content));
+		$sent = send_email(array('to' => $mail_to, 'subject' => $mail_subject, 'content' => $mail_content));
+
+		if($sent)
+		{
+			$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."address2group SET groupAcceptanceSent = NOW() WHERE addressID = '%d' AND groupID = '%d'", $data['address_id'], $data['group_id']));
+		}
+
+		return $sent;
 	}
 
 	function accept_address($data)
@@ -1721,6 +1744,7 @@ class mf_group
 
 		if(!isset($data['id'])){				$data['id'] = $this->id;}
 		if(!isset($data['accepted'])){			$data['accepted'] = 1;}
+		if(!isset($data['acceptance_sent'])){	$data['acceptance_sent'] = '';}
 		if(!isset($data['unsubscribed'])){		$data['unsubscribed'] = 0;}
 
 		$query_where = "";
@@ -1728,6 +1752,11 @@ class mf_group
 		if($data['id'] > 0)
 		{
 			$query_where .= " AND groupID = '".esc_sql($data['id'])."'";
+		}
+
+		if($data['acceptance_sent'] > DEFAULT_DATE)
+		{
+			$query_where .= " AND (groupAcceptanceSent IS null OR groupAcceptanceSent <= '".esc_sql($data['acceptance_sent'])."')";
 		}
 
 		return $wpdb->get_var($wpdb->prepare("SELECT COUNT(addressID) FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE addressDeleted = '0' AND groupAccepted = '%d' AND groupUnsubscribed = '%d'".$query_where, $data['accepted'], $data['unsubscribed']));
@@ -1920,11 +1949,20 @@ class mf_group_table extends mf_list_table
 			break;
 
 			case 'not_accepted':
-				$rowsAddressesNotAccepted = $obj_group->amount_in_group(array('id' => $post_id, 'accepted' => 0));
+				$rowsAddressesNotAccepted = $obj_group->amount_in_group(array('id' => $post_id, 'accepted' => 0, 'acceptance_sent' => date("Y-m-d H:i:s", strtotime("-1 week"))));
 
 				if($rowsAddressesNotAccepted > 0)
 				{
 					$out .= "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id."&strFilterIsMember=yes&strFilterAccepted=no&strFilterUnsubscribed")."'>".$rowsAddressesNotAccepted."</a>";
+
+					if(1 == 2)
+					{
+						$out .= "<div class='row-actions'>
+							<a href='".wp_nonce_url($list_url."&btnGroupResend", 'group_resend_'.$intAddressID.'_'.$intGroupID, '_wpnonce_group_resend')."' rel='confirm'>
+								<i class='fa fa-recycle fa-lg' title='".__("Do you want to send a reminder to them again?", 'lang_group')."'></i>
+							</a>
+						</div>";
+					}
 				}
 			break;
 
@@ -2018,7 +2056,7 @@ class mf_group_sent_table extends mf_list_table
 		global $wpdb;
 
 		$this->arr_settings['query_from'] = $wpdb->prefix."group_message";
-		$this->post_type = "";
+		$this->post_type = '';
 
 		$this->arr_settings['query_select_id'] = "messageID";
 		$this->arr_settings['query_all_id'] = "0";

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-05-24 09:58+0100\n"
+"POT-Creation-Date: 2019-06-07 15:21+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -27,11 +27,11 @@ msgstr "Lägg till"
 msgid "Name"
 msgstr "Namn"
 
-msgid "Choose Here"
-msgstr "Välj här"
-
 msgid "Copy addresses from"
 msgstr "Kopiera adresser från"
+
+msgid "API Link"
+msgstr "API-länk"
 
 msgid "Acceptance e-mail"
 msgstr "Bekräftelsemeddelande"
@@ -143,6 +143,9 @@ msgstr "Importera"
 
 msgid "Enter social security numbers or e-mail addresses on separate rows for import"
 msgstr "Lägg in personnummer eller e-postaddresser på separata rader för att importera"
+
+msgid "Choose Here"
+msgstr "Välj här"
 
 msgid "Join"
 msgstr "Gå med"
@@ -371,9 +374,6 @@ msgstr "Rubrik"
 
 msgid "Button Text"
 msgstr "Knapptext"
-
-msgid "Send message"
-msgstr "Skicka meddelande"
 
 msgid "Message"
 msgstr "Meddelande"
