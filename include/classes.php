@@ -1240,6 +1240,42 @@ class mf_group
 					}
 				}
 
+				else if(isset($_GET['btnGroupResend']) && $this->id > 0 && wp_verify_nonce($_REQUEST['_wpnonce_group_resend'], 'group_resend_'.$this->id))
+				{
+					$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE addressDeleted = '0' AND groupID = '%d' AND groupAccepted = '0' AND groupUnsubscribed = '0' AND (groupAcceptanceSent IS null OR groupAcceptanceSent <= '%s') ORDER BY groupAcceptanceSent ASC".$this->get_message_query_limit(), $this->id, date("Y-m-d H:i:s", strtotime("-1 week"))));
+
+					$success = $fail = 0;
+
+					foreach($result as $r)
+					{
+						if($this->send_acceptance_message(array('type' => 'reminder', 'address_id' => $r->addressID, 'group_id' => $this->id)))
+						{
+							$success++;
+						}
+
+						else
+						{
+							$fail++;
+						}
+
+						if(($success + $fail) % 20 == 0)
+						{
+							sleep(0.1);
+							set_time_limit(60);
+						}
+					}
+					
+					if($fail > 0)
+					{
+						$error_text = sprintf(__("%d messages were successful and %d failed", 'lang_group'), $success, $fail);
+					}
+					
+					else
+					{
+						$done_text = sprintf(__("%d messages were sent", 'lang_group'), $success);
+					}
+				}
+
 				else if(isset($_GET['sent']))
 				{
 					$done_text = __("The information was sent", 'lang_group');
@@ -1949,17 +1985,19 @@ class mf_group_table extends mf_list_table
 			break;
 
 			case 'not_accepted':
-				$rowsAddressesNotAccepted = $obj_group->amount_in_group(array('id' => $post_id, 'accepted' => 0, 'acceptance_sent' => date("Y-m-d H:i:s", strtotime("-1 week"))));
+				$rowsAddressesNotAccepted = $obj_group->amount_in_group(array('id' => $post_id, 'accepted' => 0));
 
 				if($rowsAddressesNotAccepted > 0)
 				{
 					$out .= "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id."&strFilterIsMember=yes&strFilterAccepted=no&strFilterUnsubscribed")."'>".$rowsAddressesNotAccepted."</a>";
 
-					if(1 == 2)
+					$rowsAddresses2Remind = $obj_group->amount_in_group(array('id' => $post_id, 'accepted' => 0, 'acceptance_sent' => date("Y-m-d H:i:s", strtotime("-1 week"))));
+
+					if($rowsAddresses2Remind > 0)
 					{
 						$out .= "<div class='row-actions'>
-							<a href='".wp_nonce_url($list_url."&btnGroupResend", 'group_resend_'.$intAddressID.'_'.$intGroupID, '_wpnonce_group_resend')."' rel='confirm'>
-								<i class='fa fa-recycle fa-lg' title='".__("Do you want to send a reminder to them again?", 'lang_group')."'></i>
+							<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnGroupResend&intGroupID=".$post_id), 'group_resend_'.$post_id, '_wpnonce_group_resend')."' rel='confirm'>
+								<i class='fa fa-recycle fa-lg' title='".sprintf(__("There are %d subscribers that can be reminded again. Do you want to do that?", 'lang_group'), $rowsAddresses2Remind)."'></i>
 							</a>
 						</div>";
 					}

@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-07 15:21+0100\n"
+"POT-Creation-Date: 2019-06-08 08:14+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -222,6 +222,12 @@ msgstr "Gruppen aktiverades"
 msgid "The group was inactivated"
 msgstr "Gruppen inaktiverades"
 
+msgid "%d messages were successful and %d failed"
+msgstr "%d meddelanden lyckades och %d misslyckades"
+
+msgid "%d messages were sent"
+msgstr "%d meddelanden skickades"
+
 msgid "The information was sent"
 msgstr "Informationen skickades"
 
@@ -323,6 +329,9 @@ msgstr "Importera adresser"
 
 msgid "Export"
 msgstr "Exportera"
+
+msgid "There are %d subscribers that can be reminded again. Do you want to do that?"
+msgstr "Det finns %d adresser som kan påminnas igen. Vill du göra det?"
 
 msgid "Test"
 msgstr "Testa"
