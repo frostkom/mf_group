@@ -454,9 +454,7 @@ class mf_group
 										$unsubscribe_url = $this->get_group_url(array('type' => 'unsubscribe', 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
 
 										$mail_headers = "From: ".$strMessageFromName." <".$strMessageFrom.">\r\n";
-
 										$mail_headers .= "List-Unsubscribe: <".$unsubscribe_url.">\r\n";
-
 										$mail_headers .= "List-Subscribe: ".$subscribe_email."<".$group_url.">\r\n";
 
 										if($intGroupOwnerEmail > 0)
@@ -1264,12 +1262,12 @@ class mf_group
 							set_time_limit(60);
 						}
 					}
-					
+
 					if($fail > 0)
 					{
 						$error_text = sprintf(__("%d messages were successful and %d failed", 'lang_group'), $success, $fail);
 					}
-					
+
 					else
 					{
 						$done_text = sprintf(__("%d messages were sent", 'lang_group'), $success);
@@ -1771,7 +1769,7 @@ class mf_group
 
 		$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."address2group SET groupUnsubscribed = '1' WHERE groupID = '%d' AND addressID = '%d'", $group_id, $address_id));
 
-		return ($wpdb->num_rows == 1);
+		return ($wpdb->rows_affected == 1);
 	}
 
 	function amount_in_group($data = array())
@@ -2125,7 +2123,7 @@ class mf_group_sent_table extends mf_list_table
 			//'cb' => '<input type="checkbox">',
 			'messageType' => __("Type", 'lang_group'),
 			'messageFrom' => __("From", 'lang_group'),
-			'messageName' => __("Subject", 'lang_group'),
+			'messageName' => __("Content", 'lang_group'),
 			'messageSchedule' => __("Scheduled", 'lang_group'),
 			'sent' => __("Sent", 'lang_group'),
 			'messageCreated' => __("Created", 'lang_group'),
@@ -2197,6 +2195,16 @@ class mf_group_sent_table extends mf_list_table
 			break;
 
 			case 'messageName':
+				if($item['messageName'] != '')
+				{
+					$out .= $item['messageName'];
+				}
+
+				else
+				{
+					$out .= shorten_text(array('string' => $item['messageText'], 'limit' => 20));
+				}
+
 				$actions = array();
 
 				if(IS_ADMIN || $item['userID'] == get_current_user_id())
@@ -2207,8 +2215,7 @@ class mf_group_sent_table extends mf_list_table
 					}
 				}
 
-				$out .= $item['messageName']
-				.$this->row_actions($actions);
+				$out .= $this->row_actions($actions);
 			break;
 
 			case 'messageSchedule':
