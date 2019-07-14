@@ -2397,6 +2397,8 @@ class widget_group extends WP_Widget
 
 				if($instance['group_heading'] != '')
 				{
+					$instance['group_heading'] = apply_filters('widget_title', $instance['group_heading'], $instance, $this->id_base);
+
 					echo $before_title
 						.$instance['group_heading']
 					.$after_title;
