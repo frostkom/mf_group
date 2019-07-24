@@ -1431,6 +1431,21 @@ class mf_group
 						//'post_status' => $this->public,
 						'post_status' => 'publish',
 						'post_title' => $this->name,
+						'meta_input' => array(
+							$this->meta_prefix.'api' => $this->api,
+							'group_acceptance_email' => $this->acceptance_email,
+							'group_acceptance_subject' => $this->acceptance_subject,
+							'group_acceptance_text' => $this->acceptance_text,
+							$this->meta_prefix.'allow_registration' => $this->allow_registration,
+							'group_verify_address' => $this->verify_address,
+							'group_contact_page' => $this->contact_page,
+							'group_registration_fields' => $this->registration_fields,
+							$this->meta_prefix.'verify_link' => $this->verify_link,
+							$this->meta_prefix.'sync_users' => $this->sync_users,
+							$this->meta_prefix.'owner_email' => $this->owner_email,
+							$this->meta_prefix.'help_page' => $this->help_page,
+							$this->meta_prefix.'archive_page' => $this->archive_page,
+						),
 					);
 
 					if($this->id > 0)
@@ -1440,7 +1455,7 @@ class mf_group
 
 						if(wp_update_post($post_data) > 0)
 						{
-							update_post_meta($this->id, $this->meta_prefix.'api', $this->api);
+							/*update_post_meta($this->id, $this->meta_prefix.'api', $this->api);
 
 							update_post_meta($this->id, 'group_acceptance_email', $this->acceptance_email);
 							update_post_meta($this->id, 'group_acceptance_subject', $this->acceptance_subject);
@@ -1456,7 +1471,7 @@ class mf_group
 
 							update_post_meta($this->id, $this->meta_prefix.'owner_email', $this->owner_email);
 							update_post_meta($this->id, $this->meta_prefix.'help_page', $this->help_page);
-							update_post_meta($this->id, $this->meta_prefix.'archive_page', $this->archive_page);
+							update_post_meta($this->id, $this->meta_prefix.'archive_page', $this->archive_page);*/
 
 							mf_redirect(admin_url("admin.php?page=mf_group/list/index.php&updated"));
 						}
@@ -1485,21 +1500,18 @@ class mf_group
 								}
 							}
 
-							update_post_meta($this->id, $this->meta_prefix.'api', $this->api);
+							/*update_post_meta($this->id, $this->meta_prefix.'api', $this->api);
 
 							update_post_meta($this->id, 'group_acceptance_email', $this->acceptance_email);
 
 							update_post_meta($this->id, $this->meta_prefix.'allow_registration', $this->allow_registration);
 
-							/*update_post_meta($this->id, 'group_verify_address', $this->verify_address);
-							update_post_meta($this->id, 'group_contact_page', $this->contact_page);
-							update_post_meta($this->id, 'group_registration_fields', $this->registration_fields);*/
 							update_post_meta($this->id, $this->meta_prefix.'verify_link', $this->verify_link);
 							update_post_meta($this->id, $this->meta_prefix.'sync_users', $this->sync_users);
 
 							update_post_meta($this->id, $this->meta_prefix.'owner_email', $this->owner_email);
 							update_post_meta($this->id, $this->meta_prefix.'help_page', $this->help_page);
-							update_post_meta($this->id, $this->meta_prefix.'archive_page', $this->archive_page);
+							update_post_meta($this->id, $this->meta_prefix.'archive_page', $this->archive_page);*/
 
 							mf_redirect(admin_url("admin.php?page=mf_group/list/index.php&created"));
 						}
