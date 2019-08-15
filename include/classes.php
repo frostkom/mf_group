@@ -1054,6 +1054,7 @@ class mf_group
 		else
 		{
 			$amount_temp = 0;
+			$query_where = "";
 
 			if($email == '')
 			{
@@ -1064,16 +1065,19 @@ class mf_group
 					$amount_temp += $emails_per_hour;
 				}
 
-				else
+				else if($amount == 0)
 				{
 					$amount_temp += 10000;
 				}
 			}
 
-			$query_where = "";
-
-			if($email != '')
+			else
 			{
+				if($amount == 0)
+				{
+					$amount_temp += 10000;
+				}
+
 				$query_where = " AND messageFrom LIKE '%".esc_sql($email)."'";
 			}
 
