@@ -1321,7 +1321,7 @@ class mf_group
 
 						if($attachments_size > $attachments_size_limit)
 						{
-							$error_text = sprintf(__("You are trying to send attachments of a total of %s. I suggest that you send the attachments as inline links instead of attachments. This way I don't have to send too much data which might slow down the server or make it timeout due to memory limits and it also makes the recipients not have to recieve that much in their inboxes.", 'lang_group'), show_final_size($attachments_size));
+							$error_text = sprintf(__("You are trying to send attachments of a total of %s. I suggest that you send the attachments as inline links instead of attachments. This way I do not have to send too much data which might slow down the server or make it timeout due to memory limits and it also makes the recipients not have to recieve that much in their inboxes.", 'lang_group'), show_final_size($attachments_size));
 						}
 
 						else
@@ -1401,7 +1401,7 @@ class mf_group
 				{
 					if($this->message_type == 'email')
 					{
-						$this->message_text .= "<p><a href='[unsubscribe_link]'>".__("If you don't want to get these messages in the future click this link to unsubscribe", 'lang_group')."</a></p>";
+						$this->message_text .= "<p><a href='[unsubscribe_link]'>".__("If you do not want to get these messages in the future click this link to unsubscribe", 'lang_group')."</a></p>";
 					}
 				}
 
@@ -2119,6 +2119,11 @@ class mf_group_sent_table extends mf_list_table
 		$this->arr_settings['intGroupID'] = check_var('intGroupID');
 
 		$this->arr_settings['page_vars'] = array('intGroupID' => $this->arr_settings['intGroupID']);
+	}
+
+	function init_fetch()
+	{
+		global $wpdb;
 
 		$this->query_where .= "groupID = '".esc_sql($this->arr_settings['intGroupID'])."'";
 

@@ -45,13 +45,13 @@ get_header();
 
 							else
 							{
-								$error_text = __("You've already accepted to be a part of the group", 'lang_group');
+								$error_text = __("You have already accepted to be a part of the group", 'lang_group');
 							}
 						}
 
 						else
 						{
-							$error_text = __("Either you're not part of the group or you've already accepted to be a part of the group", 'lang_group');
+							$error_text = __("Either you are not part of the group or you have already accepted to be a part of the group", 'lang_group');
 						}
 					}
 
@@ -115,7 +115,7 @@ get_header();
 
 								else
 								{
-									$error_text = __("Either you're not part of the group or you've already unsubscribed from it", 'lang_group');
+									$error_text = __("Either you are not part of the group or you have already unsubscribed from it", 'lang_group');
 								}
 							}
 

@@ -82,7 +82,7 @@ if(isset($_POST['btnGroupImport']) && $strGroupImport != '' && wp_verify_nonce($
 
 	else
 	{
-		$error_text = __("There doesn't seam to be a group to import to", 'lang_group');
+		$error_text = __("There does not seam to be a group to import to", 'lang_group');
 	}
 
 	if($rows > 0)
@@ -95,7 +95,7 @@ if(isset($_POST['btnGroupImport']) && $strGroupImport != '' && wp_verify_nonce($
 
 	else if(!isset($error_text) || $error_text == '')
 	{
-		$error_text = __("The group wasn't updated with any addresses", 'lang_group');
+		$error_text = __("The group was not updated with any addresses", 'lang_group');
 	}
 }
 
