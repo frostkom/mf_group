@@ -1412,6 +1412,11 @@ class mf_group
 					$user_data = get_userdata(get_current_user_id());
 
 					$this->message_text = str_replace("[name]", $user_data->display_name, $this->message_text);
+
+					// Code to remove if it has been pasted from external source
+					$this->message_text = preg_replace("/ class=[\"\'](.*?)[\"\']/", "", $this->message_text);
+					$this->message_text = str_replace(array("<header>", "</header>", "<!-- wp:paragraph -->", "<!-- /wp:paragraph -->"), "", $this->message_text);
+					$this->message_text = preg_replace(array("/<div>[\n|\r]<div>/", "/<\/div>[\n|\r]<\/div>/"), array("<div>", "</div>"), $this->message_text);
 				}
 
 				else if($this->message_id > 0)
@@ -2044,17 +2049,20 @@ class mf_group_table extends mf_list_table
 			break;
 
 			case 'sent':
-				$result = $wpdb->get_results($wpdb->prepare("SELECT messageID, messageCreated FROM ".$wpdb->prefix."group_message WHERE groupID = '%d' AND messageDeleted = '0' ORDER BY messageCreated DESC LIMIT 0, 1", $post_id));
+				$dteMessageCreated = $wpdb->get_var($wpdb->prepare("SELECT messageCreated FROM ".$wpdb->prefix."group_message WHERE groupID = '%d' AND messageDeleted = '0' ORDER BY messageCreated DESC LIMIT 0, 1", $post_id));
 
-				foreach($result as $r)
+				if($dteMessageCreated > DEFAULT_DATE)
 				{
-					$intMessageID = $r->messageID;
-					$dteMessageCreated = $r->messageCreated;
+					$actions = array();
 
-					if($dteMessageCreated != '')
+					$out .= format_date($dteMessageCreated);
+
+					$actions['sent'] = "<a href='".admin_url("admin.php?page=mf_group/sent/index.php&intGroupID=".$post_id)."'>".__("Sent", 'lang_group')."</a>";
+
+					$intMessageID = $wpdb->get_var($wpdb->prepare("SELECT messageID FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) WHERE groupID = '%d' AND messageDeleted = '0' AND queueSent = '0' GROUP BY messageID ORDER BY messageCreated DESC LIMIT 0, 1", $post_id));
+
+					if($intMessageID > 0)
 					{
-						$actions['sent'] = "<a href='".admin_url("admin.php?page=mf_group/sent/index.php&intGroupID=".$post_id)."'>".__("Sent", 'lang_group')."</a>";
-
 						$intMessageSent = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueSent = '1'", $intMessageID));
 						$intMessageNotSent = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueSent = '0'", $intMessageID));
 
@@ -2062,8 +2070,7 @@ class mf_group_table extends mf_list_table
 						{
 							if($intMessageNotSent == 0)
 							{
-								$out .= format_date($dteMessageCreated)
-								."<i class='set_tr_color' rel='red'></i>";
+								$out .= "<i class='set_tr_color' rel='red'></i>";
 							}
 
 							else
@@ -2078,14 +2085,9 @@ class mf_group_table extends mf_list_table
 							$out .= "<i class='fa fa-spinner fa-spin fa-lg'></i> ".__("Is sending", 'lang_group')
 							."<i class='set_tr_color' rel='yellow'></i>";
 						}
-
-						else
-						{
-							$out .= format_date($dteMessageCreated);
-						}
-
-						$out .= $this->row_actions($actions);
 					}
+
+					$out .= $this->row_actions($actions);
 				}
 			break;
 

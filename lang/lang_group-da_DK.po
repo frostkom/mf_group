@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-09-17 09:44+0100\n"
+"POT-Creation-Date: 2019-09-18 09:41+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -26,6 +26,9 @@ msgstr "Tilføj"
 
 msgid "Name"
 msgstr "Navn"
+
+msgid "Example"
+msgstr "Eksempel"
 
 msgid "Save"
 msgstr "Gem"
@@ -69,14 +72,29 @@ msgstr "Opret ny"
 msgid "All"
 msgstr "Alle"
 
+msgid "Public"
+msgstr "Offentlig"
+
+msgid "Trash"
+msgstr "Affald"
+
 msgid "Amount"
 msgstr "Antal"
+
+msgid "User"
+msgstr "Bruger"
 
 msgid "Edit"
 msgstr "Rediger"
 
 msgid "Delete"
 msgstr "Slet"
+
+msgid "Activate"
+msgstr "Aktiver"
+
+msgid "Export"
+msgstr "Exportere"
 
 msgid "From"
 msgstr "Fra"
@@ -89,6 +107,9 @@ msgstr "Oprettet"
 
 msgid "Heading"
 msgstr "Overskrift"
+
+msgid "Button Text"
+msgstr "Knap tekst"
 
 msgid "To"
 msgstr "Til"
