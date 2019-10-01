@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-06-12 13:47+0100\n"
+"POT-Creation-Date: 2019-09-20 10:40+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -126,23 +126,38 @@ msgstr "Är du helt säker?"
 msgid "This will remove all recipients from this group and it is not possible to undo this action"
 msgstr "Detta kommer att ta bort alla mottagare från denna grupp och det är inte möjligt att ångra denna åtgärd"
 
-msgid "An address with that information did not exist"
-msgstr "En adress med den informationen fanns inte"
+msgid "Add New"
+msgstr "Skapa ny"
 
-msgid "There doesn't seam to be a group to import to"
-msgstr "Det verkar inte finnas en grupp att importera till"
+msgid "You have successfully subscribed"
+msgstr "Din bekräftelse är genomförd"
 
-msgid "The group was updated with %d addresses"
-msgstr "Gruppen uppdaterades med %d adresser"
+msgid "You have already accepted to be a part of the group"
+msgstr "Du har redan accepterat att vara en del av gruppen"
 
-msgid "The group wasn't updated with any addresses"
-msgstr "Gruppen uppdaterades inte med någon adress"
+msgid "Either you are not part of the group or you have already accepted to be a part of the group"
+msgstr "Antingen är du inte med i gruppen eller så har du redan accepterat att vara med i gruppen"
 
-msgid "Import"
-msgstr "Importera"
+msgid "Something went wrong. Please contact an admin if the problem persists"
+msgstr "Något gick snett. Var vänlig kontakta en admin ifall problemet kvarstår"
 
-msgid "Enter social security numbers or e-mail addresses on separate rows for import"
-msgstr "Lägg in personnummer eller e-postaddresser på separata rader för att importera"
+msgid "You have been successfully unsubscribed"
+msgstr "Tråkigt att se dig lämna, men vi lyckades i alla fall avregistrera dig"
+
+msgid "I could not unsubscribe you. An admin has been notified about this"
+msgstr "Jag kunde inte avregistrera dig. En administratör har fått ett meddelande om detta"
+
+msgid "Are you sure that you want to unsubscribe?"
+msgstr "Är du säker på att du vill avregistrera?"
+
+msgid "Unsubscribe"
+msgstr "Avregistrera"
+
+msgid "Either you are not part of the group or you have already unsubscribed from it"
+msgstr "Antingen är du inte med i gruppen eller så har du redan avregistrerat dig från den"
+
+msgid "This group is closed for registration"
+msgstr "Denna grupp är stängd för registrering"
 
 msgid "Choose Here"
 msgstr "Välj här"
@@ -195,14 +210,14 @@ msgstr "Grupper"
 msgid "List"
 msgstr "Lista"
 
-msgid "Add New"
-msgstr "Skapa ny"
-
 msgid "Send Message"
 msgstr "Skicka meddelande"
 
 msgid "Sent"
 msgstr "Skickat"
+
+msgid "Import"
+msgstr "Importera"
 
 msgid "We collect personal information when a subscription is begun by entering at least an e-mail address. This makes it possible for us to send the wanted e-mails to the correct recipient."
 msgstr "Vi samlar in personlig information när en prenumeration påbörjas genom att man fyller i åtminstone en e-postadress. Detta gör det möjligt för oss att skicka de efterfrågade meddelandena till korrekt mottagare."
@@ -240,8 +255,8 @@ msgstr "Gruppen uppdaterades"
 msgid "You have to enter a text to send"
 msgstr "Du måste fylla i en text att skicka"
 
-msgid "You are trying to send attachments of a total of %s. I suggest that you send the attachments as inline links instead of attachments. This way I don't have to send too much data which might slow down the server or make it timeout due to memory limits and it also makes the recipients not have to recieve that much in their inboxes."
-msgstr "Du försöker skicka bifogade filer som totalt är på %s. Jag föreslår att du skickar bifogade filer som länkar i texten istället. På det sättet behöver inte jag skicka för mycket data som kan slöa ner servern eller tom. göra så att jag slår i serverns tak för minne och det gör också att mottagarna inte behöver ta emot så mycket i deras inkorg."
+msgid "You are trying to send attachments of a total of %s. I suggest that you send the attachments as inline links instead of attachments. This way I do not have to send too much data which might slow down the server or make it timeout due to memory limits and it also makes the recipients not have to recieve that much in their inboxes."
+msgstr "Du försöker skicka bifogade filer på total %s. Jag föreslår att du skickar filer som länkar i meddelandet istället som bifogade filer. På detta sätt så slipper jag skicka så mycket data som i sin tur slöar ner servern och det gör också att mottagarnas inboxar tar längre tid att fylla."
 
 msgid "There was an error when saving the message"
 msgstr "Det blev ett fel när meddelandet skulle sparas"
@@ -252,8 +267,8 @@ msgstr "Meddelandet skickades inte till någon"
 msgid "View %s in browser"
 msgstr "Se %s i webbläsaren"
 
-msgid "If you don't want to get these messages in the future click this link to unsubscribe"
-msgstr "Om du inte vill ha dessa meddelanden i framtiden, klicka på länken för att avregistrera dig"
+msgid "If you do not want to get these messages in the future click this link to unsubscribe"
+msgstr "Om du inte vill få dessa meddelanden i framtiden, klicka på denna länk för att avregistrera"
 
 msgid "The information was not submitted, contact an admin if this persists"
 msgstr "Informationen las inte in, kontakta en administratör om problemet kvarstår"
@@ -414,33 +429,18 @@ msgstr "Lägg till länk för att visa i webbläsare"
 msgid "Add Unsubscribe Link"
 msgstr "Lägg till avregistreringslänk"
 
-msgid "You have successfully subscribed"
-msgstr "Din bekräftelse är genomförd"
+msgid "An address with that information did not exist"
+msgstr "En adress med den informationen fanns inte"
 
-msgid "You've already accepted to be a part of the group"
-msgstr "Du har redan bekräftat att du vill vara med i gruppen"
+msgid "There does not seam to be a group to import to"
+msgstr "Det verkar inte finnas en grupp att importera till"
 
-msgid "Either you're not part of the group or you've already accepted to be a part of the group"
-msgstr "Antingen var du inte med i gruppen eller så har du redan bekräftat att du vill vara med i gruppen"
+msgid "The group was updated with %d addresses"
+msgstr "Gruppen uppdaterades med %d adresser"
 
-msgid "Something went wrong. Please contact an admin if the problem persists"
-msgstr "Något gick snett. Var vänlig kontakta en admin ifall problemet kvarstår"
+msgid "The group was not updated with any addresses"
+msgstr "Gruppen uppdaterades inte med någon adress"
 
-msgid "You have been successfully unsubscribed"
-msgstr "Tråkigt att se dig lämna, men vi lyckades i alla fall avregistrera dig"
-
-msgid "I could not unsubscribe you. An admin has been notified about this"
-msgstr "Jag kunde inte avregistrera dig. En administratör har fått ett meddelande om detta"
-
-msgid "Are you sure that you want to unsubscribe?"
-msgstr "Är du säker på att du vill avregistrera?"
-
-msgid "Unsubscribe"
-msgstr "Avregistrera"
-
-msgid "Either you're not part of the group or you've already unsubscribed from it"
-msgstr "Antingen var du inte med i gruppen eller så har du redan avregistrerat dig"
-
-msgid "This group is closed for registration"
-msgstr "Denna grupp är stängd för registrering"
+msgid "Enter social security numbers or e-mail addresses on separate rows for import"
+msgstr "Lägg in personnummer eller e-postaddresser på separata rader för att importera"
 
