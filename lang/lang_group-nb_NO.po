@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2019-03-22 09:52+0100\n"
+"POT-Creation-Date: 2019-10-10 08:45+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -23,9 +23,6 @@ msgstr "Legg til"
 
 msgid "Name"
 msgstr "Navn"
-
-msgid "Choose Here"
-msgstr "Velg Her"
 
 msgid "Example"
 msgstr "Eksempel"
@@ -57,14 +54,26 @@ msgstr "Importere"
 msgid "Text"
 msgstr "Tekst"
 
+msgid "Choose Here"
+msgstr "Velg Her"
+
 msgid "Country"
 msgstr "Land"
 
 msgid "Groups"
 msgstr "Grupper"
 
+msgid "List"
+msgstr "Listen"
+
 msgid "Add New"
 msgstr "Legg Til Ny"
+
+msgid "The information was deleted"
+msgstr "Informasjon ble slettet"
+
+msgid "The information was not submitted, contact an admin if this persists"
+msgstr "Informasjonen ble ikke sendt inn, ta kontakt med en admin hvis dette vedvarer"
 
 msgid "All"
 msgstr "Alle"
@@ -74,6 +83,12 @@ msgstr "Offentlig"
 
 msgid "Not Public"
 msgstr "Ikke Offentlig"
+
+msgid "Trash"
+msgstr "Søppel"
+
+msgid "Amount"
+msgstr "Beløp"
 
 msgid "User"
 msgstr "Brukere"
@@ -87,6 +102,9 @@ msgstr "Slett"
 msgid "Activate"
 msgstr "Aktiver"
 
+msgid "Recover"
+msgstr "Gjenopprette"
+
 msgid "From"
 msgstr "Fra"
 
@@ -95,6 +113,15 @@ msgstr "Feil"
 
 msgid "Heading"
 msgstr "Overskriften"
+
+msgid "Button Text"
+msgstr "Knapp tekst"
+
+msgid "To"
+msgstr "Til"
+
+msgid "Schedule"
+msgstr "Planen"
 
 msgid "Advanced"
 msgstr "Avansert"
