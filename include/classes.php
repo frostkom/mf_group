@@ -455,7 +455,7 @@ class mf_group
 
 										$mail_headers = "From: ".$strMessageFromName." <".$strMessageFrom.">\r\n";
 										$mail_headers .= "List-Unsubscribe: <".$unsubscribe_url.">\r\n";
-										$mail_headers .= "List-Subscribe: ".$subscribe_email."<".$group_url.">\r\n";
+										//$mail_headers .= "List-Subscribe: ".$subscribe_email."<".$group_url.">\r\n";
 
 										if($intGroupOwnerEmail > 0)
 										{
@@ -2075,7 +2075,7 @@ class mf_group_table extends mf_list_table
 
 							else
 							{
-								$out .= "<i class='fa fa-spinner fa-spin fa-lg'></i> ".sprintf(__("Will be sent %s", 'lang_group'), get_next_cron())
+								$out .= "<div><i class='fa fa-spinner fa-spin fa-lg'></i> ".sprintf(__("Will be sent %s", 'lang_group'), get_next_cron())."</div>"
 								."<i class='set_tr_color' rel='yellow'></i>";
 							}
 						}
