@@ -964,12 +964,18 @@ class mf_group
 	{
 		global $wpdb;
 
-		/*foreach($data['group_ids'] as $group_id)
-		{
-			//$data['amount'] += $this->amount_in_group(array('id' => $group_id));
-		}*/
+		if(!isset($data['type'])){		$data['type'] = 'all';}
+		
+		$query_where = "";
 
-		$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE addressDeleted = '0' AND groupAccepted = '%d' AND groupUnsubscribed = '%d' AND groupID IN ('".implode("','", $data['group_ids'])."') GROUP BY addressID", 1, 0));
+		switch($data['type'])
+		{
+			case 'address':
+				$query_where = " AND addressAddress != ''";
+			break;
+		}
+
+		$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE addressDeleted = '0' AND groupAccepted = '%d' AND groupUnsubscribed = '%d' AND groupID IN ('".implode("','", $data['group_ids'])."')".$query_where." GROUP BY addressID", 1, 0));
 
 		foreach($result as $r)
 		{
