@@ -112,7 +112,7 @@ echo "<div class='wrap'>
 							<h3 class='hndle'>".__("Advanced", 'lang_group')."</h3>
 							<div class='inside'>";
 
-								echo show_select(array('data' => $arr_data_source, 'name' => 'intEmailTextSource', 'text' => __("Text Source", 'lang_group'), 'xtra' => "rel='submit_change' disabled"))
+								echo show_select(array('data' => $arr_data_source, 'name' => 'intEmailTextSource', 'text' => __("Text Source", 'lang_group'), 'xtra' => "rel='submit_change' class='is_disabled' disabled"))
 								.get_media_button(array('name' => 'strMessageAttachment', 'value' => $obj_group->message_attachment));
 
 								if($obj_group->message_text == '' || $obj_group->message_text != '' && !preg_match("/\[view_in_browser_link\]/", $obj_group->message_text))

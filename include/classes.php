@@ -840,7 +840,7 @@ class mf_group
 		$menu_title = __("List", 'lang_group');
 		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, $menu_start);
 
-		$menu_title = __("Add New", 'lang_group');
+		$menu_title = " - ".__("Add New", 'lang_group');
 		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, $menu_root."create/index.php");
 
 		$menu_title = __("Send Message", 'lang_group');
@@ -965,7 +965,7 @@ class mf_group
 		global $wpdb;
 
 		if(!isset($data['type'])){		$data['type'] = 'all';}
-		
+
 		$query_where = "";
 
 		switch($data['type'])
