@@ -1038,6 +1038,31 @@ class mf_group
 		return array($post_id, $content_list);
 	}
 
+	function filter_is_file_used($arr_used)
+	{
+		global $wpdb;
+
+		$result = $wpdb->get_results($wpdb->prepare("SELECT groupID, messageID FROM ".$wpdb->prefix."group_message WHERE messageDeleted = '0' AND (messageText LIKE %s OR messageAttachment LIKE %s)", "%".$arr_used['file_url']."%", "%".$arr_used['file_url']."%"));
+		$rows = $wpdb->num_rows;
+
+		if($rows > 0)
+		{
+			$arr_used['amount'] += $rows;
+
+			foreach($result as $r)
+			{
+				if($arr_used['example'] != '')
+				{
+					break;
+				}
+
+				$arr_used['example'] = admin_url("admin.php?page=mf_group/sent/index.php&intGroupID=".$r->groupID."&intMessageID=".$r->messageID);
+			}
+		}
+
+		return $arr_used;
+	}
+
 	function wp_head()
 	{
 		$plugin_include_url = plugin_dir_url(__FILE__);

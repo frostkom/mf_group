@@ -62,6 +62,8 @@ add_action('widgets_init', array($obj_group, 'widgets_init'));
 
 add_filter('single_template', 'custom_templates_group');
 
+add_filter('filter_is_file_used', array($obj_group, 'filter_is_file_used'));
+
 load_plugin_textdomain('lang_group', false, dirname(plugin_basename(__FILE__)).'/lang/');
 
 function activate_group()
