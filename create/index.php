@@ -84,9 +84,10 @@ echo "<div class='wrap'>
 								echo show_select(array('data' => $arr_data_page, 'name' => 'intGroupHelpPage', 'text' => __("Help Page", 'lang_group'), 'value' => $obj_group->help_page))
 								.show_select(array('data' => $arr_data_page, 'name' => 'intGroupArchivePage', 'text' => __("Archive Page", 'lang_group'), 'value' => $obj_group->archive_page))
 							."</div>
-						</div>
-					</div>";
-				}
+						</div>";
+					}
+
+				echo "</div>";
 
 				echo "<div id='postbox-container-1'>
 					<div class='postbox'>

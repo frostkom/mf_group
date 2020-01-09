@@ -339,6 +339,13 @@ class mf_group
 		return $out;
 	}
 
+	function get_email_address_from_id($id)
+	{
+		global $wpdb;
+
+		return $wpdb->get_var($wpdb->prepare("SELECT emailAddress FROM ".$wpdb->base_prefix."email WHERE emailID = '%d'", $id));
+	}
+
 	function cron_base()
 	{
 		global $wpdb, $error_text;
@@ -459,7 +466,7 @@ class mf_group
 
 										if($intGroupOwnerEmail > 0)
 										{
-											$mail_headers .= "List-Owner: <mailto:".get_email_address_from_id($intGroupOwnerEmail).">\r\n";
+											$mail_headers .= "List-Owner: <mailto:".$this->get_email_address_from_id($intGroupOwnerEmail).">\r\n";
 										}
 
 										if($intGroupHelpPage > 0)
