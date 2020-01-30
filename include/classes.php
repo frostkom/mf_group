@@ -1446,10 +1446,7 @@ class mf_group
 				else if($this->message_text_source > 0)
 				{
 					$this->message_text = $wpdb->get_var($wpdb->prepare("SELECT post_content FROM ".$wpdb->posts." WHERE post_type = 'page' AND post_status = 'publish' AND ID = '%d'", $this->message_text_source));
-
-					$user_data = get_userdata(get_current_user_id());
-
-					$this->message_text = str_replace("[name]", $user_data->display_name, $this->message_text);
+					$this->message_text = str_replace("[name]", get_user_info(), $this->message_text);
 
 					// Code to remove if it has been pasted from external source
 					$this->message_text = preg_replace("/ class=[\"\'](.*?)[\"\']/", "", $this->message_text);
@@ -1816,8 +1813,7 @@ class mf_group
 	{
 		global $wpdb;
 
-		/*$user_data = get_userdata(get_current_user_id());
-		do_log("Deleted all (GID: ".$group_id." (".$this->get_name(array('id' => $group_id))."), User: ".$user_data->display_name.")");*/
+		//do_log("Deleted all (GID: ".$group_id." (".$this->get_name(array('id' => $group_id))."), User: ".get_user_info().")");
 
 		$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->prefix."address2group WHERE groupID = '%d'", $group_id));
 	}
