@@ -1499,24 +1499,6 @@ class mf_group
 
 						if(wp_update_post($post_data) > 0)
 						{
-							/*update_post_meta($this->id, $this->meta_prefix.'api', $this->api);
-
-							update_post_meta($this->id, 'group_acceptance_email', $this->acceptance_email);
-							update_post_meta($this->id, 'group_acceptance_subject', $this->acceptance_subject);
-							update_post_meta($this->id, 'group_acceptance_text', $this->acceptance_text);
-
-							update_post_meta($this->id, $this->meta_prefix.'allow_registration', $this->allow_registration);
-
-							update_post_meta($this->id, 'group_verify_address', $this->verify_address);
-							update_post_meta($this->id, 'group_contact_page', $this->contact_page);
-							update_post_meta($this->id, 'group_registration_fields', $this->registration_fields);
-							update_post_meta($this->id, $this->meta_prefix.'verify_link', $this->verify_link);
-							update_post_meta($this->id, $this->meta_prefix.'sync_users', $this->sync_users);
-
-							update_post_meta($this->id, $this->meta_prefix.'owner_email', $this->owner_email);
-							update_post_meta($this->id, $this->meta_prefix.'help_page', $this->help_page);
-							update_post_meta($this->id, $this->meta_prefix.'archive_page', $this->archive_page);*/
-
 							mf_redirect(admin_url("admin.php?page=mf_group/list/index.php&updated"));
 						}
 
@@ -1543,19 +1525,6 @@ class mf_group
 									$this->add_address(array('address_id' => $intAddressID, 'group_id' => $this->id));
 								}
 							}
-
-							/*update_post_meta($this->id, $this->meta_prefix.'api', $this->api);
-
-							update_post_meta($this->id, 'group_acceptance_email', $this->acceptance_email);
-
-							update_post_meta($this->id, $this->meta_prefix.'allow_registration', $this->allow_registration);
-
-							update_post_meta($this->id, $this->meta_prefix.'verify_link', $this->verify_link);
-							update_post_meta($this->id, $this->meta_prefix.'sync_users', $this->sync_users);
-
-							update_post_meta($this->id, $this->meta_prefix.'owner_email', $this->owner_email);
-							update_post_meta($this->id, $this->meta_prefix.'help_page', $this->help_page);
-							update_post_meta($this->id, $this->meta_prefix.'archive_page', $this->archive_page);*/
 
 							mf_redirect(admin_url("admin.php?page=mf_group/list/index.php&created"));
 						}
