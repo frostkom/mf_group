@@ -44,7 +44,14 @@ class mf_group
 
 			foreach($tbl_group->data as $r)
 			{
-				$arr_data[$r['ID']] = $r['post_title'];
+				$amount = $this->amount_in_group(array('id' => $r['ID']));
+
+				$arr_data[$r['ID']] = array(
+					'name' => $r['post_title']." (".$amount.")",
+					'attributes' => array(
+						'amount' => $amount,
+					),
+				);
 			}
 		}
 
