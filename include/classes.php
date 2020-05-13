@@ -770,8 +770,12 @@ class mf_group
 			'setting_emails_per_hour' => __("Outgoing e-mails per hour", 'lang_group'),
 			'setting_group_see_other_roles' => __("See groups created by other roles", 'lang_group'),
 			'setting_group_outgoing_text' => __("Outgoing Text", 'lang_group'),
-			'setting_group_import' => __("Add all imported to this group", 'lang_group'),
 		);
+
+		if($this->get_for_select() > 0)
+		{
+			$arr_settings['setting_group_import'] = __("Add all imported to this group", 'lang_group');
+		}
 
 		show_settings_fields(array('area' => $options_area, 'object' => $this, 'settings' => $arr_settings));
 	}
@@ -811,17 +815,6 @@ class mf_group
 	{
 		$setting_key = get_setting_key(__FUNCTION__);
 		$option = get_option($setting_key);
-
-		/*$arr_data = array(
-			'' => "-- ".__("Choose Here", 'lang_group')." --"
-		);
-
-		$result = $this->get_groups(array('where' => " AND post_status != 'trash'", 'order' => "post_title ASC"));
-
-		foreach($result as $r)
-		{
-			$arr_data[$r->ID] = $r->post_title;
-		}*/
 
 		echo show_select(array('data' => $this->get_for_select(), 'name' => $setting_key, 'value' => $option, 'suffix' => "<a href='".admin_url("admin.php?page=mf_group/create/index.php")."'><i class='fa fa-plus-circle fa-lg'></i></a>"));
 	}
