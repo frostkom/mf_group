@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: 
-Version: 5.6.24
+Version: 5.6.25
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://frostkom.se
@@ -95,15 +95,15 @@ function activate_group()
 	) DEFAULT CHARSET=".$default_charset);
 
 	$arr_add_column[$wpdb->prefix."group_message"] = array(
-		'messageAttachment' => "ALTER TABLE [table] ADD [column] TEXT AFTER messageText",
+		/*'messageAttachment' => "ALTER TABLE [table] ADD [column] TEXT AFTER messageText",
 		'messageSchedule' => "ALTER TABLE [table] ADD [column] DATETIME DEFAULT NULL AFTER messageAttachment",
 		'messageDeleted' => "ALTER TABLE [table] ADD [column] ENUM('0', '1') NOT NULL DEFAULT '0' AFTER userID",
 		'messageDeletedDate' => "ALTER TABLE [table] ADD [column] DATETIME DEFAULT NULL AFTER messageDeleted",
-		'messageDeletedID' => "ALTER TABLE [table] ADD [column] INT UNSIGNED DEFAULT NULL AFTER messageDeletedDate",
+		'messageDeletedID' => "ALTER TABLE [table] ADD [column] INT UNSIGNED DEFAULT NULL AFTER messageDeletedDate",*/
 	);
 
 	$arr_add_index[$wpdb->prefix."group_message"] = array(
-		'groupID' => "ALTER TABLE [table] ADD INDEX [column] ([column])",
+		//'groupID' => "ALTER TABLE [table] ADD INDEX [column] ([column])",
 	);
 
 	$wpdb->query("CREATE TABLE IF NOT EXISTS ".$wpdb->prefix."group_queue (
@@ -120,12 +120,12 @@ function activate_group()
 	) DEFAULT CHARSET=".$default_charset);
 
 	$arr_add_column[$wpdb->prefix."group_queue"] = array(
-		'queueReceived' => "ALTER TABLE [table] ADD [column] ENUM('-1', '0','1') NOT NULL DEFAULT '0' AFTER queueSent",
+		//'queueReceived' => "ALTER TABLE [table] ADD [column] ENUM('-1', '0','1') NOT NULL DEFAULT '0' AFTER queueSent",
 	);
 
 	$arr_add_index[$wpdb->prefix."group_queue"] = array(
-		'messageID' => "ALTER TABLE [table] ADD INDEX [column] ([column])",
-		'queueSent' => "ALTER TABLE [table] ADD INDEX [column] ([column])",
+		/*'messageID' => "ALTER TABLE [table] ADD INDEX [column] ([column])",
+		'queueSent' => "ALTER TABLE [table] ADD INDEX [column] ([column])",*/
 	);
 
 	$wpdb->query("CREATE TABLE IF NOT EXISTS ".$wpdb->prefix."address2group (
@@ -139,14 +139,14 @@ function activate_group()
 	) DEFAULT CHARSET=".$default_charset);
 
 	$arr_add_column[$wpdb->prefix."address2group"] = array(
-		'groupUnsubscribed' => "ALTER TABLE [table] ADD [column] ENUM('0', '1') NOT NULL DEFAULT '0' AFTER groupID",
+		/*'groupUnsubscribed' => "ALTER TABLE [table] ADD [column] ENUM('0', '1') NOT NULL DEFAULT '0' AFTER groupID",
 		'groupAccepted' => "ALTER TABLE [table] ADD [column] ENUM('0', '1') NOT NULL DEFAULT '1' AFTER groupUnsubscribed",
-		'groupAcceptanceSent' => "ALTER TABLE [table] ADD [column] DATETIME DEFAULT NULL AFTER groupAccepted",
+		'groupAcceptanceSent' => "ALTER TABLE [table] ADD [column] DATETIME DEFAULT NULL AFTER groupAccepted",*/
 	);
 
 	$arr_add_index[$wpdb->prefix."address2group"] = array(
-		'addressID' => "ALTER TABLE [table] ADD INDEX [column] ([column])",
-		'groupID' => "ALTER TABLE [table] ADD INDEX [column] ([column])",
+		/*'addressID' => "ALTER TABLE [table] ADD INDEX [column] ([column])",
+		'groupID' => "ALTER TABLE [table] ADD INDEX [column] ([column])",*/
 	);
 
 	add_columns($arr_add_column);

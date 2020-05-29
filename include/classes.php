@@ -825,11 +825,14 @@ class mf_group
 
 		$count_message = "";
 
-		$rows = $wpdb->get_var("SELECT COUNT(queueID) FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) WHERE queueSent = '0' AND messageDeleted = '0'".($id > 0 ? " AND groupID = '".esc_sql($id)."'" : ""));
-
-		if($rows > 0)
+		if(does_table_exist($wpdb->prefix."group_message"))
 		{
-			$count_message = "&nbsp;<i class='fa fa-spinner fa-spin'></i>";
+			$rows = $wpdb->get_var("SELECT COUNT(queueID) FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) WHERE queueSent = '0' AND messageDeleted = '0'".($id > 0 ? " AND groupID = '".esc_sql($id)."'" : ""));
+
+			if($rows > 0)
+			{
+				$count_message = "&nbsp;<i class='fa fa-spinner fa-spin'></i>";
+			}
 		}
 
 		return $count_message;
@@ -886,7 +889,7 @@ class mf_group
 	{
 		global $wpdb, $error_text;
 
-		if(IS_ADMIN)
+		if(IS_ADMIN && does_table_exist($wpdb->prefix."group_message"))
 		{
 			$result = $wpdb->get_results("SELECT messageType, addressID, addressFirstName, addressSurName, addressEmail, addressCellNo FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) INNER JOIN ".get_address_table_prefix()."address USING (addressID) WHERE queueSent = '0' AND queueCreated < DATE_SUB(NOW(), INTERVAL 3 HOUR) LIMIT 0, 6");
 
@@ -1800,24 +1803,32 @@ class mf_group
 	{
 		global $wpdb;
 
-		if(!isset($data['id'])){				$data['id'] = $this->id;}
-		if(!isset($data['accepted'])){			$data['accepted'] = 1;}
-		if(!isset($data['acceptance_sent'])){	$data['acceptance_sent'] = '';}
-		if(!isset($data['unsubscribed'])){		$data['unsubscribed'] = 0;}
-
-		$query_where = "";
-
-		if($data['id'] > 0)
+		if(does_table_exist($wpdb->prefix."address2group"))
 		{
-			$query_where .= " AND groupID = '".esc_sql($data['id'])."'";
+			if(!isset($data['id'])){				$data['id'] = $this->id;}
+			if(!isset($data['accepted'])){			$data['accepted'] = 1;}
+			if(!isset($data['acceptance_sent'])){	$data['acceptance_sent'] = '';}
+			if(!isset($data['unsubscribed'])){		$data['unsubscribed'] = 0;}
+
+			$query_where = "";
+
+			if($data['id'] > 0)
+			{
+				$query_where .= " AND groupID = '".esc_sql($data['id'])."'";
+			}
+
+			if($data['acceptance_sent'] > DEFAULT_DATE)
+			{
+				$query_where .= " AND (groupAcceptanceSent IS null OR groupAcceptanceSent <= '".esc_sql($data['acceptance_sent'])."')";
+			}
+
+			return $wpdb->get_var($wpdb->prepare("SELECT COUNT(addressID) FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE addressDeleted = '0' AND groupAccepted = '%d' AND groupUnsubscribed = '%d'".$query_where, $data['accepted'], $data['unsubscribed']));
 		}
 
-		if($data['acceptance_sent'] > DEFAULT_DATE)
+		else
 		{
-			$query_where .= " AND (groupAcceptanceSent IS null OR groupAcceptanceSent <= '".esc_sql($data['acceptance_sent'])."')";
+			return 0;
 		}
-
-		return $wpdb->get_var($wpdb->prepare("SELECT COUNT(addressID) FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE addressDeleted = '0' AND groupAccepted = '%d' AND groupUnsubscribed = '%d'".$query_where, $data['accepted'], $data['unsubscribed']));
 	}
 }
 
