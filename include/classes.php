@@ -772,7 +772,7 @@ class mf_group
 			'setting_group_outgoing_text' => __("Outgoing Text", 'lang_group'),
 		);
 
-		if($this->get_for_select() > 0)
+		if(count($this->get_for_select()) > 0)
 		{
 			$arr_settings['setting_group_import'] = __("Add all imported to this group", 'lang_group');
 		}
