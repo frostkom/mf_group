@@ -2406,7 +2406,7 @@ class widget_group extends WP_Widget
 {
 	function __construct()
 	{
-		$widget_ops = array(
+		$this->widget_ops = array(
 			'classname' => 'widget_group',
 			'description' => __("Display a group registration form", 'lang_group')
 		);
@@ -2418,7 +2418,7 @@ class widget_group extends WP_Widget
 			'group_button_text' => '',
 		);
 
-		parent::__construct('group-widget', __("Group", 'lang_group')." / ".__("Newsletter", 'lang_group'), $widget_ops);
+		parent::__construct('group-widget', __("Group", 'lang_group')." / ".__("Newsletter", 'lang_group'), $this->widget_ops);
 
 		$this->obj_group = new mf_group();
 	}
@@ -2469,7 +2469,7 @@ class widget_group extends WP_Widget
 		get_post_children(array('add_choose_here' => true, 'post_type' => $this->obj_group->post_type, 'post_status' => '', 'where' => "post_status != 'trash'".(IS_EDITOR ? "" : " AND post_author = '".get_current_user_id()."'")), $arr_data);
 
 		echo "<div class='mf_form'>"
-			.show_textfield(array('name' => $this->get_field_name('group_heading'), 'text' => __("Heading", 'lang_group'), 'value' => $instance['group_heading'], 'xtra' => " id='group-title'"))
+			.show_textfield(array('name' => $this->get_field_name('group_heading'), 'text' => __("Heading", 'lang_group'), 'value' => $instance['group_heading'], 'xtra' => " id='".$this->widget_ops['classname']."-title'"))
 			.show_textarea(array('name' => $this->get_field_name('group_text'), 'text' => __("Text", 'lang_group'), 'value' => $instance['group_text']))
 			.show_select(array('data' => $arr_data, 'name' => $this->get_field_name('group_id'), 'text' => __("Group", 'lang_group'), 'value' => $instance['group_id']))
 			.show_textfield(array('name' => $this->get_field_name('group_button_text'), 'text' => __("Button Text", 'lang_group'), 'value' => $instance['group_button_text'], 'placeholder' => __("Join", 'lang_group')))
