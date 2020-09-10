@@ -2049,8 +2049,10 @@ class mf_group_table extends mf_list_table
 
 				if($post_status == 'publish' || $dteMessageCreated != '')
 				{
-					$current_user = wp_get_current_user();
-					$user_email = $current_user->user_email;
+					//$current_user = wp_get_current_user();
+					$user_data = get_userdata(get_current_user_id());
+
+					$user_email = $user_data->user_email;
 
 					$out .= "<div class='row-actions'>
 						<a href='".$obj_group->get_group_url(array('type' => 'unsubscribe', 'group_id' => $post_id, 'email' => $user_email))."' rel='confirm'>".__("Test", 'lang_group')."</a>
