@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: 
-Version: 5.6.28
+Version: 5.6.29
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://frostkom.se
@@ -29,6 +29,7 @@ if(is_admin())
 	register_uninstall_hook(__FILE__, 'uninstall_group');
 
 	add_action('admin_init', array($obj_group, 'settings_group'));
+	add_action('admin_init', array($obj_group, 'admin_init'), 0);
 	add_action('admin_menu', array($obj_group, 'admin_menu'));
 
 	add_filter('wp_get_default_privacy_policy_content', array($obj_group, 'add_policy'));
@@ -64,7 +65,7 @@ add_filter('single_template', 'custom_templates_group');
 
 add_filter('filter_is_file_used', array($obj_group, 'filter_is_file_used'));
 
-load_plugin_textdomain('lang_group', false, dirname(plugin_basename(__FILE__)).'/lang/');
+load_plugin_textdomain('lang_group', false, dirname(plugin_basename(__FILE__))."/lang/");
 
 function activate_group()
 {

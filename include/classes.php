@@ -838,6 +838,14 @@ class mf_group
 		return $count_message;
 	}
 
+	function admin_init()
+	{
+		if(!is_plugin_active("mf_address/index.php") || !is_plugin_active("mf_base/index.php"))
+		{
+			deactivate_plugins(str_replace("include/classes.php", "index.php", plugin_basename(__FILE__)));
+		}
+	}
+
 	function admin_menu()
 	{
 		$menu_root = 'mf_group/';
