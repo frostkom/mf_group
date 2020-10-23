@@ -9,28 +9,89 @@ if(!defined('ABSPATH'))
 	require_once($folder."wp-load.php");
 }
 
-/*require_once("classes.php");
-require_once("functions.php");*/
-
 $json_output = array();
 
 $type = check_var('type', 'char');
 
-if(get_current_user_id() > 0)
+switch($type)
 {
-	if($type == "table_search")
-	{
-		$strSearch = check_var('s', 'char');
+	case 'sync':
+		//$token = check_var('token');
+		$remote_server_ip = $_SERVER['REMOTE_ADDR'];
+		$arr_allowed_server_ips = array(get_option('setting_server_ip'));
 
-		$obj_group = new mf_group();
-
-		$result = $obj_group->get_groups(array('where' => " AND (post_title LIKE '%".$strSearch."%')", 'limit' => 0, 'amount' => 10));
-
-		foreach($result as $r)
+		if($remote_server_ip != '' && !in_array($remote_server_ip, $arr_allowed_server_ips))
 		{
-			$json_output[] = $r->post_title;
+			header("Status: 503 Unknown IP-address");
+
+			if(count($arr_allowed_server_ips) > 0)
+			{
+				$log_message = sprintf(__("The IP address (%s) are not amongst the accepted ones", 'lang_group'), $remote_server_ip);
+			}
+
+			else
+			{
+				$log_message = __("There are no accepted IP addresses", 'lang_group');
+			}
+
+			$json_output['success'] = false;
+			$json_output['message'] = $log_message;
+			
 		}
-	}
+
+		else
+		{
+			$intGroupID = check_var('group_id');
+
+			$result = $wpdb->get_results($wpdb->prepare("SELECT * FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressPublic = '1' AND addressDeleted = '0' GROUP BY addressID ORDER BY addressPublic ASC, addressSurName ASC, addressFirstName ASC", $intGroupID));
+
+			if($wpdb->num_rows > 0)
+			{
+				$json_output['success'] = true;
+				$json_output['data'] = array();
+
+				foreach($result as $r)
+				{
+					$json_output['data'][] = array(
+						'addressBirthDate' => $r->addressBirthDate,
+						'addressFirstName' => $r->addressFirstName,
+						'addressSurName' => $r->addressSurName,
+						'addressAddress' => $r->addressAddress,
+						'addressCo' => $r->addressCo,
+						'addressZipCode' => $r->addressZipCode,
+						'addressCity' => $r->addressCity,
+						'addressCountry' => $r->addressCountry,
+						'addressTelNo' => $r->addressTelNo,
+						'addressCellNo' => $r->addressCellNo,
+						'addressWorkNo' => $r->addressWorkNo,
+						'addressEmail' => $r->addressEmail,
+					);
+				}
+			}
+
+			else
+			{
+				$json_output['success'] = true;
+				$json_output['message'] = __("There are no addresses in the group that you requested", 'lang_group');
+			}
+		}
+	break;
+
+	case 'table_search':
+		if(get_current_user_id() > 0)
+		{
+			$strSearch = check_var('s', 'char');
+
+			$obj_group = new mf_group();
+
+			$result = $obj_group->get_groups(array('where' => " AND (post_title LIKE '%".$strSearch."%')", 'limit' => 0, 'amount' => 10));
+
+			foreach($result as $r)
+			{
+				$json_output[] = $r->post_title;
+			}
+		}
+	break;
 }
 
 echo json_encode($json_output);

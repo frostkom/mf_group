@@ -25,12 +25,19 @@ echo "<div class='wrap'>
 						<div class='inside'>"
 							.show_textfield(array('name' => 'strGroupName', 'text' => __("Name", 'lang_group'), 'value' => $obj_group->name, 'xtra' => "autofocus"));
 
-							if(!($obj_group->id > 0))
+							if($obj_group->id > 0)
 							{
-								echo show_select(array('data' => $obj_group->get_for_select(), 'name' => 'intGroupID_copy', 'text' => __("Copy addresses from", 'lang_group')));
+								$group_api_description = "<a href='".get_site_url()."/wp-content/plugins/mf_group/include/api/?group_id=".$obj_group->id."'>".__("Use this link to synchronize all the addresses from this group to another site", 'lang_group')."</a>";
 							}
 
-							echo show_textfield(array('name' => 'strGroupAPI', 'text' => __("API Link", 'lang_group'), 'value' => $obj_group->api))
+							else
+							{
+								echo show_select(array('data' => $obj_group->get_for_select(), 'name' => 'intGroupID_copy', 'text' => __("Copy addresses from", 'lang_group')));
+
+								$group_api_description = "";
+							}
+
+							echo show_textfield(array('name' => 'strGroupAPI', 'text' => __("API Link", 'lang_group'), 'value' => $obj_group->api, 'description' => $group_api_description))
 						."</div>
 					</div>";
 

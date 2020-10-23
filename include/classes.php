@@ -656,6 +656,7 @@ class mf_group
 
 							switch($json['status'])
 							{
+								case true:
 								case 'true':
 									if(isset($json['data']) && count($json['data']) > 0)
 									{
@@ -665,16 +666,51 @@ class mf_group
 
 										foreach($json['data'] as $item)
 										{
-											$memberSSN = $item['memberSSN'];
-											$firstname = $item['firstname'];
-											$lastname = $item['lastname'];
-											$email = $item['email'];
+											if(isset($item['memberSSN']))
+											{
+												$intAddressPublic = 1;
 
-											$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address WHERE (addressBirthDate = %s AND addressBirthDate != '')", $memberSSN));
+												$strAddressBirthDate = $item['memberSSN'];
+												$strAddressFirstName = $item['firstname'];
+												$strAddressSurName = $item['lastname'];
+												$strAddressAddress = $item['cb_adress'];
+												$intAddressZipCode = $item['cb_postnr'];
+												$strAddressCity = $item['cb_postadress'];
+												$strAddressCellNo = $item['cb_telmob'];
+												$strAddressEmail = $item['email'];
+												$strAddressCo = $intAddressCountry = $strAddressTelNo = $strAddressWorkNo = '';
+											}
+
+											else
+											{
+												$intAddressPublic = 1;
+
+												$strAddressBirthDate = $item['addressBirthDate'];
+												$strAddressFirstName = $item['addressFirstName'];
+												$strAddressSurName = $item['addressSurName'];
+												$strAddressAddress = $item['addressAddress'];
+												$strAddressCo = $item['addressCo'];
+												$intAddressZipCode = $item['addressZipCode'];
+												$strAddressCity = $item['addressCity'];
+												$intAddressCountry = $item['addressCountry'];
+												$strAddressTelNo = $item['addressTelNo'];
+												$strAddressCellNo = $item['addressCellNo'];
+												$strAddressWorkNo = $item['addressWorkNo'];
+												$strAddressEmail = $item['addressEmail'];
+											}
+
+											$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address WHERE (addressBirthDate = %s AND addressBirthDate != '')", $strAddressBirthDate));
 
 											if($wpdb->num_rows == 0)
 											{
-												$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address WHERE (addressEmail = %s AND addressEmail != '')", $email));
+												$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address WHERE (addressEmail = %s AND addressEmail != '')", $strAddressEmail));
+											}
+
+											if($wpdb->num_rows == 0)
+											{
+												$wpdb->query($wpdb->prepare("INSERT INTO ".get_address_table_prefix()."address SET addressPublic = '%d', addressMemberID = '%d', addressBirthDate = %s, addressFirstName = %s, addressSurName = %s, addressZipCode = %s, addressCity = %s, addressCountry = '%d', addressAddress = %s, addressCo = %s, addressTelNo = %s, addressCellNo = %s, addressWorkNo = %s, addressEmail = %s, addressCreated = NOW(), userID = '%d'", $intAddressPublic, $strAddressBirthDate, $strAddressFirstName, $strAddressSurName, $intAddressZipCode, $strAddressCity, $intAddressCountry, $strAddressAddress, $strAddressCo, $strAddressTelNo, $strAddressCellNo, $strAddressWorkNo, $strAddressEmail));
+
+												$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address WHERE (addressBirthDate = %s AND addressBirthDate != '')", $strAddressBirthDate));
 											}
 
 											if($wpdb->num_rows > 0)
@@ -683,7 +719,7 @@ class mf_group
 												{
 													$arr_addresses[] = $r->addressID;
 
-													//do_log("Add ".$r->addressID." (".$firstname." ".$lastname.") to ".get_post_title($post_id));
+													//do_log("Add ".$r->addressID." (".$strAddressFirstName." ".$strAddressSurName.") to ".get_post_title($post_id));
 
 													$this->add_address(array('address_id' => $r->addressID, 'group_id' => $post_id));
 												}
