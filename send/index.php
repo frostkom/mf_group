@@ -26,7 +26,6 @@ echo "<div class='wrap'>
 
 									else
 									{
-										//$current_user = wp_get_current_user();
 										$user_data = get_userdata(get_current_user_id());
 
 										$user_name = $user_data->display_name;

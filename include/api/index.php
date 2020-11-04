@@ -36,7 +36,6 @@ switch($type)
 
 			$json_output['success'] = false;
 			$json_output['message'] = $log_message;
-			
 		}
 
 		else
