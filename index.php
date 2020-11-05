@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: 
-Version: 5.7.1
+Version: 5.7.2
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://frostkom.se
@@ -75,14 +75,14 @@ function activate_group()
 
 	$default_charset = DB_CHARSET != '' ? DB_CHARSET : "utf8";
 
-	$arr_add_column = $arr_add_index = array();
+	$arr_add_column = $arr_update_column = $arr_add_index = array();
 
 	$wpdb->query("CREATE TABLE IF NOT EXISTS ".$wpdb->prefix."group_message (
 		messageID INT UNSIGNED NOT NULL AUTO_INCREMENT,
 		groupID INT UNSIGNED NOT NULL DEFAULT '0',
 		messageType VARCHAR(10),
 		messageFrom VARCHAR(255),
-		messageName VARCHAR(60),
+		messageName VARCHAR(200),
 		messageText TEXT,
 		messageAttachment TEXT,
 		messageSchedule DATETIME DEFAULT NULL,
@@ -95,17 +95,17 @@ function activate_group()
 		KEY groupID (groupID)
 	) DEFAULT CHARSET=".$default_charset);
 
-	$arr_add_column[$wpdb->prefix."group_message"] = array(
-		/*'messageAttachment' => "ALTER TABLE [table] ADD [column] TEXT AFTER messageText",
-		'messageSchedule' => "ALTER TABLE [table] ADD [column] DATETIME DEFAULT NULL AFTER messageAttachment",
-		'messageDeleted' => "ALTER TABLE [table] ADD [column] ENUM('0', '1') NOT NULL DEFAULT '0' AFTER userID",
-		'messageDeletedDate' => "ALTER TABLE [table] ADD [column] DATETIME DEFAULT NULL AFTER messageDeleted",
-		'messageDeletedID' => "ALTER TABLE [table] ADD [column] INT UNSIGNED DEFAULT NULL AFTER messageDeletedDate",*/
+	/*$arr_add_column[$wpdb->prefix."group_message"] = array(
+		'' => "ALTER TABLE [table] ADD [column]  AFTER ",
+	);*/
+
+	$arr_update_column[$wpdb->base_prefix."group_message"] = array(
+		'messageName' => "ALTER TABLE [table] CHANGE [column] [column] VARCHAR(200)",
 	);
 
-	$arr_add_index[$wpdb->prefix."group_message"] = array(
-		//'groupID' => "ALTER TABLE [table] ADD INDEX [column] ([column])",
-	);
+	/*$arr_add_index[$wpdb->prefix."group_message"] = array(
+		'' => "ALTER TABLE [table] ADD INDEX [column] ([column])",
+	);*/
 
 	$wpdb->query("CREATE TABLE IF NOT EXISTS ".$wpdb->prefix."group_queue (
 		queueID INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -120,15 +120,6 @@ function activate_group()
 		KEY queueSent (queueSent)
 	) DEFAULT CHARSET=".$default_charset);
 
-	$arr_add_column[$wpdb->prefix."group_queue"] = array(
-		//'queueReceived' => "ALTER TABLE [table] ADD [column] ENUM('-1', '0','1') NOT NULL DEFAULT '0' AFTER queueSent",
-	);
-
-	$arr_add_index[$wpdb->prefix."group_queue"] = array(
-		/*'messageID' => "ALTER TABLE [table] ADD INDEX [column] ([column])",
-		'queueSent' => "ALTER TABLE [table] ADD INDEX [column] ([column])",*/
-	);
-
 	$wpdb->query("CREATE TABLE IF NOT EXISTS ".$wpdb->prefix."address2group (
 		addressID INT UNSIGNED NOT NULL,
 		groupID INT UNSIGNED NOT NULL,
@@ -139,17 +130,7 @@ function activate_group()
 		KEY groupID (groupID)
 	) DEFAULT CHARSET=".$default_charset);
 
-	$arr_add_column[$wpdb->prefix."address2group"] = array(
-		/*'groupUnsubscribed' => "ALTER TABLE [table] ADD [column] ENUM('0', '1') NOT NULL DEFAULT '0' AFTER groupID",
-		'groupAccepted' => "ALTER TABLE [table] ADD [column] ENUM('0', '1') NOT NULL DEFAULT '1' AFTER groupUnsubscribed",
-		'groupAcceptanceSent' => "ALTER TABLE [table] ADD [column] DATETIME DEFAULT NULL AFTER groupAccepted",*/
-	);
-
-	$arr_add_index[$wpdb->prefix."address2group"] = array(
-		/*'addressID' => "ALTER TABLE [table] ADD INDEX [column] ([column])",
-		'groupID' => "ALTER TABLE [table] ADD INDEX [column] ([column])",*/
-	);
-
+	update_columns($arr_update_column);
 	add_columns($arr_add_column);
 	add_index($arr_add_index);
 

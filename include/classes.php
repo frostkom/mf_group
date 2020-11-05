@@ -2318,15 +2318,7 @@ class mf_group_sent_table extends mf_list_table
 
 				if($intMessageSent == 0)
 				{
-					if($intMessageNotSent == 0)
-					{
-						$class = "red";
-					}
-
-					else
-					{
-						$class = "yellow";
-					}
+					$class = ($intMessageNotSent == 0 ? "red" : "yellow");
 				}
 
 				else if($intMessageSent < $intMessageTotal)
