@@ -1291,7 +1291,7 @@ class mf_group
 			break;
 		}
 	}
-	
+
 	function get_add_view_in_browser_code()
 	{
 		return "<p class='view_in_browser_link' style='text-align: right'><a href='[view_in_browser_link]' style='color: #999; font-size: .8em; text-decoration: none'>".sprintf(__("View %s in browser", 'lang_group'), "[message_name]")."</a></p>";
@@ -2166,7 +2166,7 @@ if(class_exists('mf_list_table'))
 
 							else if($intMessageSent < ($intMessageSent + $intMessageNotSent))
 							{
-								$out .= "<i class='fa fa-spinner fa-spin fa-lg'></i> ".__("Is sending", 'lang_group')
+								$out .= "&nbsp;<i class='fa fa-spinner fa-spin fa-lg'></i> ".__("Is sending", 'lang_group')
 								."<i class='set_tr_color' rel='yellow'></i>";
 							}
 						}
@@ -2352,12 +2352,7 @@ if(class_exists('mf_list_table'))
 
 					$actions = array();
 
-					if($intMessageNotSent > 0)
-					{
-						$actions['abort'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/sent/index.php&btnMessageAbort&intGroupID=".$this->arr_settings['intGroupID']."&intMessageID=".$intMessageID2), 'message_abort_'.$intMessageID2, '_wpnonce_message_abort')."'>".__("Abort", 'lang_group')."</a>";
-					}
-
-					else
+					if($intMessageSent > 0)
 					{
 						if($item['messageCreated'] > date("Y-m-d H:i:s", strtotime("-1 month")))
 						{
@@ -2406,6 +2401,11 @@ if(class_exists('mf_list_table'))
 						{
 							$actions['read'] = "<i class='fa fa-check green'></i> ".$intMessageReceived." ".__("Read", 'lang_group');
 						}
+					}
+
+					if($intMessageNotSent > 0)
+					{
+						$actions['abort'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/sent/index.php&btnMessageAbort&intGroupID=".$this->arr_settings['intGroupID']."&intMessageID=".$intMessageID2), 'message_abort_'.$intMessageID2, '_wpnonce_message_abort')."'>".__("Abort", 'lang_group')."</a>";
 					}
 
 					$out .= $intMessageSent." / ".$intMessageTotal
