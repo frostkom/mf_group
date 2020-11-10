@@ -1129,6 +1129,13 @@ class mf_group
 		return $arr_used;
 	}
 
+	function wp_sitemaps_post_types($post_types)
+	{
+		unset($post_types[$this->post_type]);
+
+		return $post_types;
+	}
+
 	function wp_head()
 	{
 		$plugin_include_url = plugin_dir_url(__FILE__);

@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: 
-Version: 5.7.5
+Version: 5.7.6
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://frostkom.se
@@ -51,6 +51,8 @@ if(is_admin())
 
 else
 {
+	add_filter('wp_sitemaps_post_types', array($obj_group, 'wp_sitemaps_post_types'));
+
 	add_action('wp_head', array($obj_group, 'wp_head'), 0);
 }
 
