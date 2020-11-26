@@ -158,7 +158,7 @@ class mf_group
 			{
 				if(in_array("name", $arrGroupRegistrationFields))
 				{
-					list($strAddressFirstName, $strAddressSurName) = explode(" ", $strAddressName);
+					@list($strAddressFirstName, $strAddressSurName) = explode(" ", $strAddressName, 2);
 
 					$query_where .= ($query_where != '' ? " AND " : "")."addressFirstName = '".$strAddressFirstName."' AND addressSurName = '".$strAddressSurName."'";
 					$query_set .= ", addressFirstName = '".esc_sql($strAddressFirstName)."', addressSurName = '".esc_sql($strAddressSurName)."'";

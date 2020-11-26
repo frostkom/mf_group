@@ -77,7 +77,7 @@ switch($type)
 	break;
 
 	case 'table_search':
-		if(get_current_user_id() > 0)
+		if(is_user_logged_in())
 		{
 			$strSearch = check_var('s', 'char');
 
