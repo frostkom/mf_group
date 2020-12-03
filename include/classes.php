@@ -228,7 +228,12 @@ class mf_group
 
 					if($strAddressEmail != '')
 					{
-						$obj_form = new mf_form();
+						global $obj_form;
+
+						if(!isset($obj_form))
+						{
+							$obj_form = new mf_form();
+						}
 
 						$obj_form->get_form_id_from_post_content($intGroupContactPage);
 
