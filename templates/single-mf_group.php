@@ -6,7 +6,7 @@ get_header();
 	{
 		$obj_group = new mf_group();
 
-		echo "<article>";
+		echo "<article".(IS_ADMIN ? " class='single-mf_group'" : "").">";
 
 			while(have_posts())
 			{
