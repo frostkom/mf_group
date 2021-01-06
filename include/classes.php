@@ -996,18 +996,18 @@ class mf_group
 
 		if(get_post_type($post_id) == $this->post_type)
 		{
-			do_log("Delete postID (#".$post_id.") from ".$wpdb->prefix."group_message etc.");
+			//do_log("Delete postID (#".$post_id.") from ".$wpdb->prefix."group_message etc.");
 
-			/*$result = $wpdb->get_results($wpdb->prepare("SELECT messageID FROM ".$wpdb->prefix."group_message WHERE groupID = '%d'", $post_id));
+			$result = $wpdb->get_results($wpdb->prepare("SELECT messageID FROM ".$wpdb->prefix."group_message WHERE groupID = '%d'", $post_id));
 
 			foreach($result as $r)
 			{
 				$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d'", $r->messageID));
 			}
 
-			$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->prefix."group_message WHERE groupID = '%d'", $post_id));
+			$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_message SET messageDeleted = '1', messageDeletedDate = NOW(), messageDeletedID = '%d' WHERE groupID = '%d'", get_current_user_id(), $post_id));
 
-			$this->remove_all_address($post_id);*/
+			$this->remove_all_address($post_id);
 		}
 	}
 
@@ -1862,8 +1862,6 @@ class mf_group
 	function remove_all_address($group_id)
 	{
 		global $wpdb;
-
-		//do_log("Deleted all (GID: ".$group_id." (".$this->get_name(array('id' => $group_id))."), User: ".get_user_info().")");
 
 		$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->prefix."address2group WHERE groupID = '%d'", $group_id));
 	}
