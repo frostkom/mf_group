@@ -463,7 +463,7 @@ class mf_group
 							if($strAddressEmail != '' && is_domain_valid($strAddressEmail))
 							{
 								$send = true;
-								$send = apply_filters('group_before_send', $send, array('group_id' => $intGroupID, 'to' => $strAddressEmail, 'queue_id' => $intQueueID));
+								$send = apply_filters('group_before_send', $send, array('group_id' => $intGroupID, 'to' => $strAddressEmail, 'message_id' => $intMessageID, 'queue_id' => $intQueueID));
 
 								if($send == true)
 								{
@@ -1527,7 +1527,18 @@ class mf_group
 				else if($this->message_text_source > 0)
 				{
 					$this->message_text = $wpdb->get_var($wpdb->prepare("SELECT post_content FROM ".$wpdb->posts." WHERE post_type = 'page' AND post_status = 'publish' AND ID = '%d'", $this->message_text_source));
+
 					$this->message_text = str_replace("[name]", get_user_info(), $this->message_text);
+
+					if(is_plugin_active("mf_email/index.php"))
+					{
+						if(!isset($obj_email))
+						{
+							$obj_email = new mf_email();
+						}
+
+						$this->message_text = $obj_email->convert_characters($this->message_text);
+					}
 
 					// Code to remove if it has been pasted from external source
 					$this->message_text = preg_replace("/ class=[\"\'](.*?)[\"\']/", "", $this->message_text);

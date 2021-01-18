@@ -67,7 +67,11 @@ echo "<div class='wrap'>
 
 					if(is_plugin_active("mf_email/index.php"))
 					{
-						$obj_email = new mf_email();
+						if(!isset($obj_email))
+						{
+							$obj_email = new mf_email();
+						}
+
 						$arr_data_email = $obj_email->get_from_for_select();
 						$arr_data_abuse = $obj_email->get_from_for_select(array('type' => 'abuse'));
 
