@@ -515,7 +515,17 @@ class mf_group
 
 										if($wpdb->num_rows == 0)
 										{
-											$sent = send_email(array('to' => $mail_to, 'subject' => $mail_subject, 'content' => $mail_content, 'headers' => $mail_headers, 'attachment' => $mail_attachment, 'save_log' => false));
+											$setting_email_log = get_option('setting_email_log');
+
+											$sent = send_email(array(
+												'to' => $mail_to,
+												'subject' => $mail_subject,
+												'content' => $mail_content,
+												'headers' => $mail_headers,
+												'attachment' => $mail_attachment,
+												'save_log' => (is_array($setting_email_log) && in_array('group', $setting_email_log)),
+												'save_log_type' => 'group',
+											));
 
 											if($sent)
 											{
