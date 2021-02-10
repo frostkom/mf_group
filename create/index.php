@@ -144,12 +144,14 @@ echo "<div class='wrap'>
 
 							echo show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupVerifyLink', 'text' => __("Add Verify Link", 'lang_group'), 'value' => $obj_group->verify_link, 'description' => __("In every message a hidden image/link is placed to see if the recipient has opened the message. This increases the risk of being classified as spam", 'lang_group')));
 
-							if(!($obj_group->id > 0) || $obj_group->sync_users == 'yes')
+							$amount_in_group = $obj_group->amount_in_group();
+
+							if(!($obj_group->id > 0) || $obj_group->sync_users == 'yes' || $amount_in_group == 0)
 							{
 								echo show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupSyncUsers', 'text' => __("Synchronize Users", 'lang_group'), 'value' => $obj_group->sync_users, 'description' => __("This will automatically add/remove users and their information to this group", 'lang_group')));
 							}
 
-							if($obj_group->id > 0 && $obj_group->api == '' && $obj_group->allow_registration == 'no' && $obj_group->sync_users == 'no' && $obj_group->amount_in_group() > 0)
+							if($obj_group->id > 0 && $obj_group->api == '' && $obj_group->allow_registration == 'no' && $obj_group->sync_users == 'no' && $amount_in_group > 0)
 							{
 								echo show_button(array('name' => 'btnGroupRemoveRecipients', 'text' => __("Remove all recipients", 'lang_group'), 'class' => "button delete"))
 								.show_checkbox(array('name' => 'intGroupRemoveRecipientsConfirm', 'text' => __("Are you really sure?", 'lang_group'), 'value' => 1, 'description' => __("This will remove all recipients from this group and it is not possible to undo this action", 'lang_group')))

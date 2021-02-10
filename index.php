@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: 
-Version: 5.8.1
+Version: 5.8.2
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://frostkom.se
@@ -71,7 +71,7 @@ load_plugin_textdomain('lang_group', false, dirname(plugin_basename(__FILE__))."
 
 function activate_group()
 {
-	global $wpdb;
+	global $wpdb, $obj_group;
 
 	require_plugin("mf_address/index.php", "MF Address Book");
 
@@ -146,13 +146,20 @@ function activate_group()
 			),
 		),
 	));
+
+	replace_post_meta(array('old' => 'group_acceptance_email', 'new' => $obj_group->meta_prefix.'acceptance_email'));
+	replace_post_meta(array('old' => 'group_acceptance_subject', 'new' => $obj_group->meta_prefix.'acceptance_subject'));
+	replace_post_meta(array('old' => 'group_acceptance_text', 'new' => $obj_group->meta_prefix.'acceptance_text'));
+	replace_post_meta(array('old' => 'group_verify_address', 'new' => $obj_group->meta_prefix.'verify_address'));
+	replace_post_meta(array('old' => 'group_contact_page', 'new' => $obj_group->meta_prefix.'contact_page'));
+	replace_post_meta(array('old' => 'group_registration_fields', 'new' => $obj_group->meta_prefix.'registration_fields'));
 }
 
 function uninstall_group()
 {
 	mf_uninstall_plugin(array(
 		'uploads' => 'mf_group',
-		'options' => array('setting_emails_per_hour', 'setting_group_see_other_roles', 'setting_group_outgoing_text', 'setting_group_import'),
+		'options' => array('setting_emails_per_hour', 'setting_group_see_other_roles', 'setting_group_outgoing_text', 'setting_group_import', 'setting_group_debug'),
 		'post_types' => array('mf_group'),
 		'tables' => array('group_message', 'group_queue', 'address2group'),
 	));
