@@ -37,8 +37,14 @@ echo "<div class='wrap'>
 								$group_api_description = "";
 							}
 
-							echo show_textfield(array('name' => 'strGroupAPI', 'text' => __("API Link", 'lang_group'), 'value' => $obj_group->api, 'description' => $group_api_description))
-						."</div>
+							echo show_textarea(array('name' => 'strGroupAPI', 'text' => __("API Link", 'lang_group'), 'value' => $obj_group->api, 'description' => $group_api_description));
+
+							if($obj_group->api != '')
+							{
+								echo show_textarea(array('name' => 'strGroupAPIFilter', 'text' => __("Filter API", 'lang_group'), 'value' => $obj_group->api_filter, 'placeholder' => "include:field=[value1,value2]"));
+							}
+
+						echo "</div>
 					</div>";
 
 					if($obj_group->api == '')
