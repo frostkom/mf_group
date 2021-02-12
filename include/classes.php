@@ -794,7 +794,10 @@ class mf_group
 
 												if($post_meta_api_filter != '')
 												{
-													do_log("Group API - ".$post_title." - Filter Type: ".$post_meta_api_filter);
+													if(get_option('setting_group_debug') == 'yes')
+													{
+														do_log("Group API - ".$post_title." - Filter Type: ".$post_meta_api_filter);
+													}
 
 													list($filter_type, $filter_rest) = explode(":", $post_meta_api_filter);
 													list($filter_field, $filter_values) = explode("=", $filter_rest);
@@ -805,6 +808,11 @@ class mf_group
 														case 'include':
 															if(!isset($item[$filter_field]) || !in_array($item[$filter_field], $arr_filter_values))
 															{
+																if(get_option('setting_group_debug') == 'yes')
+																{
+																	do_log("Group API - ".$post_title." - Filter Include: ".$filter_field." != ".var_export($arr_filter_values, true));
+																}
+
 																$do_save = false;
 															}
 														break;
@@ -812,6 +820,11 @@ class mf_group
 														case 'exclude':
 															if(!isset($item[$filter_field]) || in_array($item[$filter_field], $arr_filter_values))
 															{
+																if(get_option('setting_group_debug') == 'yes')
+																{
+																	do_log("Group API - ".$post_title." - Filter Exclude: ".$filter_field." == ".var_export($arr_filter_values, true));
+																}
+
 																$do_save = false;
 															}
 														break;
