@@ -125,7 +125,7 @@ class mf_group
 
 	function show_group_registration_form($data)
 	{
-		global $wpdb, $done_text, $error_text;
+		global $wpdb, $obj_address, $done_text, $error_text;
 
 		if(!isset($data['text'])){											$data['text'] = '';}
 		if(!isset($data['button_text']) || $data['button_text'] == ''){		$data['button_text'] = __("Join", 'lang_group');}
@@ -308,7 +308,10 @@ class mf_group
 
 					if(in_array("country", $arrGroupRegistrationFields))
 					{
-						$obj_address = new mf_address();
+						if(!isset($obj_address))
+						{
+							$obj_address = new mf_address();
+						}
 
 						$out .= show_select(array('data' => $obj_address->get_countries_for_select(), 'name' => 'intAddressCountry', 'text' => __("Country", 'lang_group'), 'value' => $intAddressCountry, 'required' => true));
 					}
@@ -1990,7 +1993,7 @@ class mf_group
 
 	function send_acceptance_message($data)
 	{
-		global $wpdb;
+		global $wpdb, $obj_address;
 
 		if(!isset($data['type'])){		$data['type'] = 'acceptance';}
 
@@ -2011,7 +2014,10 @@ class mf_group
 		$strGroupAcceptanceSubject = get_post_meta_or_default($data['group_id'], $meta_key_subject, true, __("Accept subscription to %s", 'lang_group'));
 		$strGroupAcceptanceText = get_post_meta_or_default($data['group_id'], $meta_key_text, true, __("You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below.", 'lang_group'));
 
-		$obj_address = new mf_address();
+		if(!isset($obj_address))
+		{
+			$obj_address = new mf_address();
+		}
 
 		$strAddressEmail = $obj_address->get_address($data['address_id']);
 		$strGroupName = $this->get_name(array('id' => $data['group_id']));
@@ -2799,12 +2805,20 @@ if(class_exists('mf_export'))
 
 		function get_export_data()
 		{
-			global $wpdb;
+			global $wpdb, $obj_address, $obj_group;
 
-			$obj_group = new mf_group();
+			if(!isset($obj_group))
+			{
+				$obj_group = new mf_group();
+			}
+
 			$this->name = $obj_group->get_name(array('id' => $this->type));
 
-			$obj_address = new mf_address();
+			if(!isset($obj_address))
+			{
+				$obj_address = new mf_address();
+			}
+
 			$arr_countries = $obj_address->get_countries_for_select();
 
 			$result = $wpdb->get_results($wpdb->prepare("SELECT * FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' GROUP BY addressID ORDER BY addressPublic ASC, addressSurName ASC, addressFirstName ASC", $this->type));
