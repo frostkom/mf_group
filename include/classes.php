@@ -21,6 +21,7 @@ class mf_group
 
 		$this->post_type = 'mf_group';
 		$this->meta_prefix = $this->post_type.'_';
+		$this->lang_key = 'lang_group';
 	}
 
 	function get_for_select($data = array())
@@ -39,7 +40,7 @@ class mf_group
 		{
 			if($data['add_choose_here'])
 			{
-				$arr_data[''] = "-- ".__("Choose Here", 'lang_group')." --";
+				$arr_data[''] = "-- ".__("Choose Here", $this->lang_key)." --";
 			}
 
 			foreach($tbl_group->data as $r)
@@ -128,13 +129,13 @@ class mf_group
 		global $wpdb, $obj_address, $done_text, $error_text;
 
 		if(!isset($data['text'])){											$data['text'] = '';}
-		if(!isset($data['button_text']) || $data['button_text'] == ''){		$data['button_text'] = __("Join", 'lang_group');}
+		if(!isset($data['button_text']) || $data['button_text'] == ''){		$data['button_text'] = __("Join", $this->lang_key);}
 
 		$out = "";
 
 		if(!($data['id'] > 0))
 		{
-			$error_text = __("I could not find any group ID to display a form for", 'lang_group');
+			$error_text = __("I could not find any group ID to display a form for", $this->lang_key);
 		}
 
 		$arrGroupRegistrationFields = get_post_meta($data['id'], $this->meta_prefix.'registration_fields', true);
@@ -217,7 +218,7 @@ class mf_group
 
 			if($strGroupVerifyAddress == "yes" && !($intAddressID > 0))
 			{
-				$out .= "<p>".__("The information that you entered is not in our register. Please contact the admin of this page to get your information submitted.", 'lang_group')."</p>";
+				$out .= "<p>".__("The information that you entered is not in our register. Please contact the admin of this page to get your information submitted.", $this->lang_key)."</p>";
 
 				$intGroupContactPage = get_post_meta($data['id'], $this->meta_prefix.'contact_page', true);
 
@@ -265,7 +266,7 @@ class mf_group
 				{
 					$this->add_address(array('address_id' => $intAddressID, 'group_id' => $data['id']));
 
-					$done_text = __("Thank you for showing your interest. You have been added to the group", 'lang_group');
+					$done_text = __("Thank you for showing your interest. You have been added to the group", $this->lang_key);
 				}
 			}
 		}
@@ -288,22 +289,22 @@ class mf_group
 				{
 					if(in_array("name", $arrGroupRegistrationFields))
 					{
-						$out .= show_textfield(array('name' => 'strAddressName', 'text' => __("Name", 'lang_group'), 'value' => $strAddressName, 'required' => true));
+						$out .= show_textfield(array('name' => 'strAddressName', 'text' => __("Name", $this->lang_key), 'value' => $strAddressName, 'required' => true));
 					}
 
 					if(in_array("address", $arrGroupRegistrationFields))
 					{
-						$out .= show_textfield(array('name' => 'strAddressAddress', 'text' => __("Address", 'lang_group'), 'value' => $strAddressAddress, 'required' => true));
+						$out .= show_textfield(array('name' => 'strAddressAddress', 'text' => __("Address", $this->lang_key), 'value' => $strAddressAddress, 'required' => true));
 					}
 
 					if(in_array("zip", $arrGroupRegistrationFields))
 					{
-						$out .= show_textfield(array('name' => 'intAddressZipCode', 'text' => __("Zip Code", 'lang_group'), 'value' => $intAddressZipCode, 'type' => 'number', 'required' => true));
+						$out .= show_textfield(array('name' => 'intAddressZipCode', 'text' => __("Zip Code", $this->lang_key), 'value' => $intAddressZipCode, 'type' => 'number', 'required' => true));
 					}
 
 					if(in_array("city", $arrGroupRegistrationFields))
 					{
-						$out .= show_textfield(array('name' => 'strAddressCity', 'text' => __("City", 'lang_group'), 'value' => $strAddressCity, 'required' => true));
+						$out .= show_textfield(array('name' => 'strAddressCity', 'text' => __("City", $this->lang_key), 'value' => $strAddressCity, 'required' => true));
 					}
 
 					if(in_array("country", $arrGroupRegistrationFields))
@@ -313,26 +314,26 @@ class mf_group
 							$obj_address = new mf_address();
 						}
 
-						$out .= show_select(array('data' => $obj_address->get_countries_for_select(), 'name' => 'intAddressCountry', 'text' => __("Country", 'lang_group'), 'value' => $intAddressCountry, 'required' => true));
+						$out .= show_select(array('data' => $obj_address->get_countries_for_select(), 'name' => 'intAddressCountry', 'text' => __("Country", $this->lang_key), 'value' => $intAddressCountry, 'required' => true));
 					}
 
 					if(in_array("phone", $arrGroupRegistrationFields))
 					{
-						$out .= show_textfield(array('name' => 'strAddressTelNo', 'text' => __("Phone Number", 'lang_group'), 'value' => $strAddressTelNo, 'required' => true));
+						$out .= show_textfield(array('name' => 'strAddressTelNo', 'text' => __("Phone Number", $this->lang_key), 'value' => $strAddressTelNo, 'required' => true));
 					}
 
 					if(in_array("email", $arrGroupRegistrationFields))
 					{
-						$out .= show_textfield(array('name' => 'strAddressEmail', 'text' => __("E-mail", 'lang_group'), 'value' => $strAddressEmail, 'required' => true));
+						$out .= show_textfield(array('name' => 'strAddressEmail', 'text' => __("E-mail", $this->lang_key), 'value' => $strAddressEmail, 'required' => true));
 					}
 
 					if(in_array("extra", $arrGroupRegistrationFields))
 					{
-						$out .= show_textfield(array('name' => 'strAddressExtra', 'text' => get_option_or_default('setting_address_extra', __("Extra", 'lang_group')), 'value' => $strAddressExtra, 'required' => true));
+						$out .= show_textfield(array('name' => 'strAddressExtra', 'text' => get_option_or_default('setting_address_extra', __("Extra", $this->lang_key)), 'value' => $strAddressExtra, 'required' => true));
 					}
 
 					$out .= "<div class='form_button'>"
-						.show_checkbox(array('name' => 'intGroupConsent', 'text' => __("I consent to having this website store my submitted information, so that they can contact me as part of this newsletter", 'lang_group'), 'value' => 1, 'required' => true))
+						.show_checkbox(array('name' => 'intGroupConsent', 'text' => __("I consent to having this website store my submitted information, so that they can contact me as part of this newsletter", $this->lang_key), 'value' => 1, 'required' => true))
 						.show_button(array('name' => 'btnGroupJoin', 'text' => $data['button_text']))
 					."</div>";
 				}
@@ -340,12 +341,12 @@ class mf_group
 				else
 				{
 					$out .= "<div class='flex_form'>"
-						.show_textfield(array('name' => 'strAddressEmail', 'placeholder' => __("Your Email Address", 'lang_group'), 'value' => $strAddressEmail, 'required' => true))
+						.show_textfield(array('name' => 'strAddressEmail', 'placeholder' => __("Your Email Address", $this->lang_key), 'value' => $strAddressEmail, 'required' => true))
 						."<div class='form_button'>"
 							.show_button(array('name' => 'btnGroupJoin', 'text' => $data['button_text']))
 						."</div>
 					</div>"
-					.show_checkbox(array('name' => 'intGroupConsent', 'text' => __("I consent to having this website store my submitted information, so that they can contact me as part of this newsletter", 'lang_group'), 'value' => 1, 'required' => true));
+					.show_checkbox(array('name' => 'intGroupConsent', 'text' => __("I consent to having this website store my submitted information, so that they can contact me as part of this newsletter", $this->lang_key), 'value' => 1, 'required' => true));
 				}
 
 			$out .= "</form>";
@@ -725,14 +726,14 @@ class mf_group
 							'catch_head' => true,
 						));
 
-						$log_message = __("I could not get a successful result from the Group API", 'lang_group');
+						$log_message = __("I could not get a successful result from the Group API", $this->lang_key);
 
 						switch($headers['http_code'])
 						{
 							case 200:
 								$json = json_decode($content, true);
 
-								$log_message_2 = __("The status was wrong in the Group API", 'lang_group');
+								$log_message_2 = __("The status was wrong in the Group API", $this->lang_key);
 
 								switch($json['status'])
 								{
@@ -1009,9 +1010,9 @@ class mf_group
 	function init()
 	{
 		$labels = array(
-			'name' => _x(__("Group", 'lang_group'), 'post type general name'),
-			'singular_name' => _x(__("Group", 'lang_group'), 'post type singular name'),
-			'menu_name' => __("Group", 'lang_group')
+			'name' => _x(__("Group", $this->lang_key), 'post type general name'),
+			'singular_name' => _x(__("Group", $this->lang_key), 'post type singular name'),
+			'menu_name' => __("Group", $this->lang_key)
 		);
 
 		$args = array(
@@ -1020,7 +1021,7 @@ class mf_group
 			'show_in_menu' => false,
 			'exclude_from_search' => true,
 			'rewrite' => array(
-				'slug' => __("group", 'lang_group'),
+				'slug' => __("group", $this->lang_key),
 			),
 		);
 
@@ -1034,17 +1035,17 @@ class mf_group
 		add_settings_section($options_area, "", array($this, $options_area."_callback"), BASE_OPTIONS_PAGE);
 
 		$arr_settings = array(
-			'setting_emails_per_hour' => __("Outgoing e-mails per hour", 'lang_group'),
-			'setting_group_see_other_roles' => __("See groups created by other roles", 'lang_group'),
-			'setting_group_outgoing_text' => __("Outgoing Text", 'lang_group'),
+			'setting_emails_per_hour' => __("Outgoing e-mails per hour", $this->lang_key),
+			'setting_group_see_other_roles' => __("See groups created by other roles", $this->lang_key),
+			'setting_group_outgoing_text' => __("Outgoing Text", $this->lang_key),
 		);
 
 		if(count($this->get_for_select()) > 0)
 		{
-			$arr_settings['setting_group_import'] = __("Add all imported to this group", 'lang_group');
+			$arr_settings['setting_group_import'] = __("Add all imported to this group", $this->lang_key);
 		}
 
-		$arr_settings['setting_group_debug'] = __("Debug", 'lang_group');
+		$arr_settings['setting_group_debug'] = __("Debug", $this->lang_key);
 
 		show_settings_fields(array('area' => $options_area, 'object' => $this, 'settings' => $arr_settings));
 	}
@@ -1053,7 +1054,7 @@ class mf_group
 	{
 		$setting_key = get_setting_key(__FUNCTION__);
 
-		echo settings_header($setting_key, __("Groups", 'lang_group'));
+		echo settings_header($setting_key, __("Groups", $this->lang_key));
 	}
 
 	function setting_emails_per_hour_callback()
@@ -1062,7 +1063,7 @@ class mf_group
 		settings_save_site_wide($setting_key);
 		$option = get_site_option($setting_key, get_option($setting_key, 200));
 
-		echo show_textfield(array('type' => 'number', 'name' => $setting_key, 'value' => $option, 'suffix' => __("0 or empty means infinte", 'lang_group')));
+		echo show_textfield(array('type' => 'number', 'name' => $setting_key, 'value' => $option, 'suffix' => __("0 or empty means infinte", $this->lang_key)));
 	}
 
 	function setting_group_see_other_roles_callback()
@@ -1078,7 +1079,7 @@ class mf_group
 		$setting_key = get_setting_key(__FUNCTION__);
 		$option = get_option($setting_key);
 
-		echo show_wp_editor(array('name' => $setting_key, 'value' => $option, 'editor_height' => 200, 'description' => __("This text will be appended to all outgoing e-mails", 'lang_group')));
+		echo show_wp_editor(array('name' => $setting_key, 'value' => $option, 'editor_height' => 200, 'description' => __("This text will be appended to all outgoing e-mails", $this->lang_key)));
 	}
 
 	function setting_group_import_callback()
@@ -1132,22 +1133,22 @@ class mf_group
 		$menu_start = $menu_root.'list/index.php';
 		$menu_capability = override_capability(array('page' => $menu_start, 'default' => 'edit_posts'));
 
-		$menu_title = __("Groups", 'lang_group');
+		$menu_title = __("Groups", $this->lang_key);
 		add_menu_page("", $menu_title.$this->count_unsent_group(), $menu_capability, $menu_start, '', 'dashicons-groups', 99);
 
-		$menu_title = __("List", 'lang_group');
+		$menu_title = __("List", $this->lang_key);
 		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, $menu_start);
 
-		$menu_title = " - ".__("Add New", 'lang_group');
+		$menu_title = " - ".__("Add New", $this->lang_key);
 		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, $menu_root."create/index.php");
 
-		$menu_title = __("Send Message", 'lang_group');
+		$menu_title = __("Send Message", $this->lang_key);
 		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, $menu_root."send/index.php");
 
-		$menu_title = __("Sent", 'lang_group');
+		$menu_title = __("Sent", $this->lang_key);
 		add_submenu_page($menu_root, $menu_title, $menu_title, $menu_capability, $menu_root."sent/index.php");
 
-		$menu_title = __("Import", 'lang_group');
+		$menu_title = __("Import", $this->lang_key);
 		add_submenu_page($menu_root, $menu_title, $menu_title, $menu_capability, $menu_root."import/index.php");
 	}
 
@@ -1164,9 +1165,9 @@ class mf_group
 	{
 		if($this->has_allow_registration_post())
 		{
-			$content .= "<h3>".__("Group", 'lang_group')."</h3>
+			$content .= "<h3>".__("Group", $this->lang_key)."</h3>
 			<p>"
-				.__("We collect personal information when a subscription is begun by entering at least an e-mail address. This makes it possible for us to send the wanted e-mails to the correct recipient.", 'lang_group')
+				.__("We collect personal information when a subscription is begun by entering at least an e-mail address. This makes it possible for us to send the wanted e-mails to the correct recipient.", $this->lang_key)
 			."</p>";
 		}
 
@@ -1209,7 +1210,7 @@ class mf_group
 					}
 				}
 
-				$error_text = __("There were unsent messages", 'lang_group')." (".$unsent_links.($rows == 6 ? "&hellip;" : "").")";
+				$error_text = __("There were unsent messages", $this->lang_key)." (".$unsent_links.($rows == 6 ? "&hellip;" : "").")";
 
 				echo get_notification();
 			}
@@ -1308,7 +1309,7 @@ class mf_group
 
 		if(count($arr_data) > 1)
 		{
-			$out .= "<h3>".__("Choose a Group", 'lang_group')."</h3>"
+			$out .= "<h3>".__("Choose a Group", $this->lang_key)."</h3>"
 			.show_select(array('data' => $arr_data, 'xtra' => "rel='".$this->post_type."'"));
 		}
 
@@ -1532,12 +1533,12 @@ class mf_group
 
 	function get_add_view_in_browser_code()
 	{
-		return "<p class='view_in_browser_link' style='text-align: right'><a href='[view_in_browser_link]' style='color: #999; font-size: .8em; text-decoration: none'>".sprintf(__("View %s in browser", 'lang_group'), "[message_name]")."</a></p>";
+		return "<p class='view_in_browser_link' style='text-align: right'><a href='[view_in_browser_link]' style='color: #999; font-size: .8em; text-decoration: none'>".sprintf(__("View %s in browser", $this->lang_key), "[message_name]")."</a></p>";
 	}
 
 	function get_unsubscribe_code()
 	{
-		return "<p><a href='[unsubscribe_link]'>".__("If you do not want to get these messages in the future click this link to unsubscribe", 'lang_group')."</a></p>";
+		return "<p><a href='[unsubscribe_link]'>".__("If you do not want to get these messages in the future click this link to unsubscribe", $this->lang_key)."</a></p>";
 	}
 
 	function save_data()
@@ -1555,7 +1556,7 @@ class mf_group
 					{
 						$this->remove_all_address($this->id);
 
-						$done_text = __("The information was deleted", 'lang_group');
+						$done_text = __("The information was deleted", $this->lang_key);
 					}
 				}
 
@@ -1569,7 +1570,7 @@ class mf_group
 
 					if(wp_update_post($post_data) > 0)
 					{
-						$done_text = __("The group was activated", 'lang_group');
+						$done_text = __("The group was activated", $this->lang_key);
 					}
 				}
 
@@ -1583,7 +1584,7 @@ class mf_group
 
 					if(wp_update_post($post_data) > 0)
 					{
-						$done_text = __("The group was inactivated", 'lang_group');
+						$done_text = __("The group was inactivated", $this->lang_key);
 					}
 				}
 
@@ -1614,28 +1615,28 @@ class mf_group
 
 					if($fail > 0)
 					{
-						$error_text = sprintf(__("%d messages were successful and %d failed", 'lang_group'), $success, $fail);
+						$error_text = sprintf(__("%d messages were successful and %d failed", $this->lang_key), $success, $fail);
 					}
 
 					else
 					{
-						$done_text = sprintf(__("%d messages were sent", 'lang_group'), $success);
+						$done_text = sprintf(__("%d messages were sent", $this->lang_key), $success);
 					}
 				}
 
 				else if(isset($_GET['sent']))
 				{
-					$done_text = __("The information was sent", 'lang_group');
+					$done_text = __("The information was sent", $this->lang_key);
 				}
 
 				else if(isset($_GET['created']))
 				{
-					$done_text = __("The group was created", 'lang_group');
+					$done_text = __("The group was created", $this->lang_key);
 				}
 
 				else if(isset($_GET['updated']))
 				{
-					$done_text = __("The group was updated", 'lang_group');
+					$done_text = __("The group was updated", $this->lang_key);
 				}
 
 				$obj_export = new mf_group_export();
@@ -1646,7 +1647,7 @@ class mf_group
 				{
 					if($this->message_text == '')
 					{
-						$error_text = __("You have to enter a text to send", 'lang_group');
+						$error_text = __("You have to enter a text to send", $this->lang_key);
 					}
 
 					else if($this->message_type == 'email' || $this->message_type == 'sms')
@@ -1666,7 +1667,7 @@ class mf_group
 
 						if($attachments_size > $attachments_size_limit)
 						{
-							$error_text = sprintf(__("You are trying to send attachments of a total of %s. I suggest that you send the attachments as inline links instead of attachments. This way I do not have to send too much data which might slow down the server or make it timeout due to memory limits and it also makes the recipients not have to recieve that much in their inboxes.", 'lang_group'), show_final_size($attachments_size));
+							$error_text = sprintf(__("You are trying to send attachments of a total of %s. I suggest that you send the attachments as inline links instead of attachments. This way I do not have to send too much data which might slow down the server or make it timeout due to memory limits and it also makes the recipients not have to recieve that much in their inboxes.", $this->lang_key), show_final_size($attachments_size));
 						}
 
 						else
@@ -1717,7 +1718,7 @@ class mf_group
 
 									else
 									{
-										$error_text = __("There was an error when saving the message", 'lang_group');
+										$error_text = __("There was an error when saving the message", $this->lang_key);
 									}
 								}
 							}
@@ -1729,7 +1730,7 @@ class mf_group
 
 							else
 							{
-								$error_text = __("The message was not sent to anybody", 'lang_group');
+								$error_text = __("The message was not sent to anybody", $this->lang_key);
 							}
 						}
 					}
@@ -1824,7 +1825,7 @@ class mf_group
 
 						else
 						{
-							$error_text = __("The information was not submitted, contact an admin if this persists", 'lang_group');
+							$error_text = __("The information was not submitted, contact an admin if this persists", $this->lang_key);
 						}
 					}
 
@@ -1851,7 +1852,7 @@ class mf_group
 
 						else
 						{
-							$error_text = __("The information was not submitted, contact an admin if this persists", 'lang_group');
+							$error_text = __("The information was not submitted, contact an admin if this persists", $this->lang_key);
 						}
 					}
 				}
@@ -1864,12 +1865,12 @@ class mf_group
 
 						if($wpdb->rows_affected > 0)
 						{
-							$done_text = __("I removed all the recipients from this group", 'lang_group');
+							$done_text = __("I removed all the recipients from this group", $this->lang_key);
 						}
 
 						else
 						{
-							$error_text = __("I could not remove the recipients from this group", 'lang_group');
+							$error_text = __("I could not remove the recipients from this group", $this->lang_key);
 						}
 					}
 				}
@@ -1880,14 +1881,14 @@ class mf_group
 				{
 					$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_message SET messageDeleted = '1', messageDeletedDate = NOW(), messageDeletedID = '%d' WHERE messageID = '%d'", get_current_user_id(), $this->message_id));
 
-					$done_text = __("The message was deleted", 'lang_group');
+					$done_text = __("The message was deleted", $this->lang_key);
 				}
 
 				if(isset($_REQUEST['btnMessageAbort']) && $this->message_id > 0 && wp_verify_nonce($_REQUEST['_wpnonce_message_abort'], 'message_abort_'.$this->message_id))
 				{
 					$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueSent = '0'", $this->message_id));
 
-					$done_text = __("The message was aborted", 'lang_group');
+					$done_text = __("The message was aborted", $this->lang_key);
 				}
 			break;
 		}
@@ -2011,8 +2012,8 @@ class mf_group
 			break;
 		}
 
-		$strGroupAcceptanceSubject = get_post_meta_or_default($data['group_id'], $meta_key_subject, true, __("Accept subscription to %s", 'lang_group'));
-		$strGroupAcceptanceText = get_post_meta_or_default($data['group_id'], $meta_key_text, true, __("You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below.", 'lang_group'));
+		$strGroupAcceptanceSubject = get_post_meta_or_default($data['group_id'], $meta_key_subject, true, __("Accept subscription to %s", $this->lang_key));
+		$strGroupAcceptanceText = get_post_meta_or_default($data['group_id'], $meta_key_text, true, __("You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below.", $this->lang_key));
 
 		if(!isset($obj_address))
 		{
@@ -2026,7 +2027,7 @@ class mf_group
 		$mail_subject = sprintf($strGroupAcceptanceSubject, $strGroupName);
 		$mail_content = apply_filters('the_content', sprintf($strGroupAcceptanceText, $strGroupName));
 
-		$mail_content .= "<p><a href='".$this->get_group_url(array('type' => 'subscribe', 'group_id' => $data['group_id'], 'email' => $strAddressEmail))."'>".__("Accept Link", 'lang_group')."</a></p>";
+		$mail_content .= "<p><a href='".$this->get_group_url(array('type' => 'subscribe', 'group_id' => $data['group_id'], 'email' => $strAddressEmail))."'>".__("Accept Link", $this->lang_key)."</a></p>";
 
 		$sent = send_email(array('to' => $mail_to, 'subject' => $mail_subject, 'content' => $mail_content));
 
@@ -2128,6 +2129,7 @@ class mf_group
 			if(!isset($data['accepted'])){			$data['accepted'] = 1;}
 			if(!isset($data['acceptance_sent'])){	$data['acceptance_sent'] = '';}
 			if(!isset($data['unsubscribed'])){		$data['unsubscribed'] = 0;}
+			if(!isset($data['deleted'])){			$data['deleted'] = 0;}
 
 			$query_where = "";
 
@@ -2141,7 +2143,7 @@ class mf_group
 				$query_where .= " AND (groupAcceptanceSent IS null OR groupAcceptanceSent <= '".esc_sql($data['acceptance_sent'])."')";
 			}
 
-			return $wpdb->get_var($wpdb->prepare("SELECT COUNT(addressID) FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE addressDeleted = '0' AND groupAccepted = '%d' AND groupUnsubscribed = '%d'".$query_where, $data['accepted'], $data['unsubscribed']));
+			return $wpdb->get_var($wpdb->prepare("SELECT COUNT(addressID) FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE addressDeleted = '%d' AND groupAccepted = '%d' AND groupUnsubscribed = '%d'".$query_where, $data['deleted'], $data['accepted'], $data['unsubscribed']));
 		}
 
 		else
@@ -2168,6 +2170,13 @@ if(class_exists('mf_list_table'))
 
 		function init_fetch()
 		{
+			global $obj_group;
+
+			if(!isset($obj_group))
+			{
+				$obj_group = new mf_group();
+			}
+
 			if($this->search != '')
 			{
 				$this->query_where .= ($this->query_where != '' ? " AND " : "")."(post_title LIKE '%".$this->search."%' OR SOUNDEX(post_title) = SOUNDEX('".$this->search."'))";
@@ -2205,32 +2214,31 @@ if(class_exists('mf_list_table'))
 			$this->set_views(array(
 				'db_field' => 'post_status',
 				'types' => array(
-					'all' => __("All", 'lang_group'),
-					'publish' => __("Public", 'lang_group'),
-					'draft' => __("Not Public", 'lang_group'),
-					'ignore' => __("Inactive", 'lang_group'),
-					'trash' => __("Trash", 'lang_group')
+					'all' => __("All", $obj_group->lang_key),
+					'publish' => __("Public", $obj_group->lang_key),
+					'draft' => __("Not Public", $obj_group->lang_key),
+					'ignore' => __("Inactive", $obj_group->lang_key),
+					'trash' => __("Trash", $obj_group->lang_key)
 				),
 			));
 
-			$obj_group = new mf_group();
 			$rowsAddressesNotAccepted = $obj_group->amount_in_group(array('id' => 0, 'accepted' => 0));
 
 			$arr_columns = array(
 				'cb' => '<input type="checkbox">',
-				'post_title' => __("Name", 'lang_group'),
+				'post_title' => __("Name", $obj_group->lang_key),
 				'post_status' => "",
-				'amount' => __("Amount", 'lang_group'),
+				'amount' => __("Amount", $obj_group->lang_key),
 			);
 
 			if($rowsAddressesNotAccepted > 0)
 			{
-				$arr_columns['not_accepted'] = __("Not Accepted", 'lang_group');
+				$arr_columns['not_accepted'] = __("Not Accepted", $obj_group->lang_key);
 			}
 
-			$arr_columns['unsubscribed'] = __("Unsubscribed", 'lang_group');
-			$arr_columns['post_author'] = shorten_text(array('string' => __("User", 'lang_group'), 'limit' => 4));
-			$arr_columns['sent'] = __("Sent", 'lang_group');
+			$arr_columns['unsubscribed'] = __("Unsubscribed", $obj_group->lang_key);
+			$arr_columns['post_author'] = shorten_text(array('string' => __("User", $obj_group->lang_key), 'limit' => 4));
+			$arr_columns['sent'] = __("Sent", $obj_group->lang_key);
 
 			$this->set_columns($arr_columns);
 
@@ -2264,27 +2272,27 @@ if(class_exists('mf_list_table'))
 					{
 						$post_edit_url = admin_url("admin.php?page=mf_group/create/index.php&intGroupID=".$post_id);
 
-						$actions['edit'] = "<a href='".$post_edit_url."'>".__("Edit", 'lang_group')."</a>";
+						$actions['edit'] = "<a href='".$post_edit_url."'>".__("Edit", $obj_group->lang_key)."</a>";
 
 						if($post_author == get_current_user_id() || IS_ADMIN)
 						{
-							$actions['delete'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnGroupDelete&intGroupID=".$post_id), 'group_delete_'.$post_id, '_wpnonce_group_delete')."'>".__("Delete", 'lang_group')."</a>";
+							$actions['delete'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnGroupDelete&intGroupID=".$post_id), 'group_delete_'.$post_id, '_wpnonce_group_delete')."'>".__("Delete", $obj_group->lang_key)."</a>";
 						}
 
 						if($post_status == 'ignore')
 						{
-							$actions['activate'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnGroupActivate&intGroupID=".$post_id), 'group_activate_'.$post_id, '_wpnonce_group_activate')."'>".__("Activate", 'lang_group')."</a>";
+							$actions['activate'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnGroupActivate&intGroupID=".$post_id), 'group_activate_'.$post_id, '_wpnonce_group_activate')."'>".__("Activate", $obj_group->lang_key)."</a>";
 						}
 
 						else
 						{
-							$actions['inactivate'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnGroupInactivate&intGroupID=".$post_id), 'group_inactivate_'.$post_id, '_wpnonce_group_inactivate')."'>".__("Inactivate", 'lang_group')."</a>";
+							$actions['inactivate'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnGroupInactivate&intGroupID=".$post_id), 'group_inactivate_'.$post_id, '_wpnonce_group_inactivate')."'>".__("Inactivate", $obj_group->lang_key)."</a>";
 						}
 					}
 
 					else
 					{
-						$actions['recover'] = "<a href='".admin_url("admin.php?page=mf_group/create/index.php&intGroupID=".$post_id."&recover")."'>".__("Recover", 'lang_group')."</a>";
+						$actions['recover'] = "<a href='".admin_url("admin.php?page=mf_group/create/index.php&intGroupID=".$post_id."&recover")."'>".__("Recover", $obj_group->lang_key)."</a>";
 					}
 
 					$out .= "<a href='".$post_edit_url."'>".$item['post_title']."</a>"
@@ -2295,56 +2303,56 @@ if(class_exists('mf_list_table'))
 					$arr_statuses = array(
 						'allow_registration' => array(
 							'type' => 'bool',
-							'name' => __("Allow Registration", 'lang_group'),
+							'name' => __("Allow Registration", $obj_group->lang_key),
 							'icon' => 'fa fa-globe',
 							'single' => true,
 							'link' => get_permalink($post_id),
 						),
 						'api' => array(
 							'type' => 'empty',
-							'name' => __("API Link", 'lang_group'),
+							'name' => __("API Link", $obj_group->lang_key),
 							'icon' => 'fas fa-network-wired',
 							'single' => true,
 						),
 						'api_filter' => array(
 							'type' => 'empty',
-							'name' => __("Filter API", 'lang_group'),
+							'name' => __("Filter API", $obj_group->lang_key),
 							'icon' => 'fas fa-plus',
 							'single' => true,
 						),
 						'sync_users' => array(
 							'type' => 'bool',
-							'name' => __("Synchronize Users", 'lang_group'),
+							'name' => __("Synchronize Users", $obj_group->lang_key),
 							'icon' => 'fas fa-users',
 							'single' => true,
 						),
 						'verify_link' => array(
 							'type' => 'bool',
-							'name' => __("Add Verify Link", 'lang_group'),
+							'name' => __("Add Verify Link", $obj_group->lang_key),
 							'icon' => 'fas fa-link',
 							'single' => true,
 						),
 						'acceptance_email' => array(
 							'type' => 'bool',
-							'name' => __("Send before adding to a group", 'lang_group'),
+							'name' => __("Send before adding to a group", $obj_group->lang_key),
 							'icon' => 'fa fa-paper-plane',
 							'single' => true,
 						),
 						'owner_email' => array(
 							'type' => 'empty',
-							'name' => __("Owner", 'lang_group'),
+							'name' => __("Owner", $obj_group->lang_key),
 							'icon' => 'fas fa-user-tie',
 							'single' => true,
 						),
 						'help_page' => array(
 							'type' => 'empty',
-							'name' => __("Help Page", 'lang_group'),
+							'name' => __("Help Page", $obj_group->lang_key),
 							'icon' => 'far fa-question-circle',
 							'single' => true,
 						),
 						'archive_page' => array(
 							'type' => 'empty',
-							'name' => __("Archive Page", 'lang_group'),
+							'name' => __("Archive Page", $obj_group->lang_key),
 							'icon' => 'fas fa-archive',
 							'single' => true,
 						),
@@ -2408,7 +2416,7 @@ if(class_exists('mf_list_table'))
 					{
 						if($amount > 0)
 						{
-							$actions['send_email'] = "<a href='".admin_url("admin.php?page=mf_group/send/index.php&intGroupID=".$post_id."&type=email")."' title='".__("Send e-mail to everyone in the group", 'lang_group')."'><i class='fa fa-paper-plane fa-lg'></i></a>";
+							$actions['send_email'] = "<a href='".admin_url("admin.php?page=mf_group/send/index.php&intGroupID=".$post_id."&type=email")."' title='".__("Send e-mail to everyone in the group", $obj_group->lang_key)."'><i class='fa fa-paper-plane fa-lg'></i></a>";
 
 							$actions = apply_filters('add_group_list_amount_actions', $actions, $post_id);
 						}
@@ -2417,23 +2425,33 @@ if(class_exists('mf_list_table'))
 
 						if($post_meta_api == '')
 						{
-							$actions['addnremove'] = "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id."&strFilterIsMember&strFilterAccepted&strFilterUnsubscribed")."' title='".__("Add or remove", 'lang_group')."'><i class='fas fa-tasks fa-lg'></i></a>";
+							$actions['addnremove'] = "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id."&strFilterIsMember&strFilterAccepted&strFilterUnsubscribed")."' title='".__("Add or remove", $obj_group->lang_key)."'><i class='fas fa-tasks fa-lg'></i></a>";
 
-							$actions['import'] = "<a href='".admin_url("admin.php?page=mf_group/import/index.php&intGroupID=".$post_id)."' title='".__("Import Addresses", 'lang_group')."'><i class='fas fa-cloud-upload-alt fa-lg'></i></a>";
+							$actions['import'] = "<a href='".admin_url("admin.php?page=mf_group/import/index.php&intGroupID=".$post_id)."' title='".__("Import Addresses", $obj_group->lang_key)."'><i class='fas fa-cloud-upload-alt fa-lg'></i></a>";
 
 							if($amount > 0)
 							{
-								$actions['export_csv'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnExportRun&intExportType=".$post_id."&strExportFormat=csv"), 'export_run', '_wpnonce_export_run')."' title='".__("Export", 'lang_group')." CSV'><i class='fas fa-file-csv fa-lg'></i></a>";
+								$actions['export_csv'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnExportRun&intExportType=".$post_id."&strExportFormat=csv"), 'export_run', '_wpnonce_export_run')."' title='".__("Export", $obj_group->lang_key)." CSV'><i class='fas fa-file-csv fa-lg'></i></a>";
 
 								if(is_plugin_active("mf_phpexcel/index.php"))
 								{
-									$actions['export_xls'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnExportRun&intExportType=".$post_id."&strExportFormat=xls"), 'export_run', '_wpnonce_export_run')."' title='".__("Export", 'lang_group')." XLS'><i class='fas fa-file-excel fa-lg'></i></a>";
+									$actions['export_xls'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnExportRun&intExportType=".$post_id."&strExportFormat=xls"), 'export_run', '_wpnonce_export_run')."' title='".__("Export", $obj_group->lang_key)." XLS'><i class='fas fa-file-excel fa-lg'></i></a>";
 								}
 							}
 						}
 					}
 
-					$out .= "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id."&strFilterIsMember=yes&strFilterAccepted=yes&strFilterUnsubscribed=no")."'>".$amount."</a>"
+					$out .= "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id."&strFilterIsMember=yes&strFilterAccepted=yes&strFilterUnsubscribed=no")."'>"
+						.$amount;
+
+						$amount_deleted = $obj_group->amount_in_group(array('id' => $post_id, 'deleted' => 1));
+
+						if($amount_deleted > 0)
+						{
+							$out .= " <span class='grey' title='".__("Deleted", $obj_group->lang_key)."'>+ ".$amount_deleted."</span>";
+						}
+
+					$out .= "</a>"
 					.$this->row_actions($actions);
 				break;
 
@@ -2450,7 +2468,7 @@ if(class_exists('mf_list_table'))
 						{
 							$out .= "<div class='row-actions'>
 								<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnGroupResend&intGroupID=".$post_id), 'group_resend_'.$post_id, '_wpnonce_group_resend')."' rel='confirm'>
-									<i class='fa fa-recycle fa-lg' title='".sprintf(__("There are %d subscribers that can be reminded again. Do you want to do that?", 'lang_group'), $rowsAddresses2Remind)."'></i>
+									<i class='fa fa-recycle fa-lg' title='".sprintf(__("There are %d subscribers that can be reminded again. Do you want to do that?", $obj_group->lang_key), $rowsAddresses2Remind)."'></i>
 								</a>
 							</div>";
 						}
@@ -2475,7 +2493,7 @@ if(class_exists('mf_list_table'))
 						$user_email = $user_data->user_email;
 
 						$out .= "<div class='row-actions'>
-							<a href='".$obj_group->get_group_url(array('type' => 'unsubscribe', 'group_id' => $post_id, 'email' => $user_email))."' rel='confirm'>".__("Test", 'lang_group')."</a>
+							<a href='".$obj_group->get_group_url(array('type' => 'unsubscribe', 'group_id' => $post_id, 'email' => $user_email))."' rel='confirm'>".__("Test", $obj_group->lang_key)."</a>
 						</div>";
 					}
 				break;
@@ -2493,7 +2511,7 @@ if(class_exists('mf_list_table'))
 
 						$out .= format_date($dteMessageCreated);
 
-						$actions['sent'] = "<a href='".admin_url("admin.php?page=mf_group/sent/index.php&intGroupID=".$post_id)."'>".__("Sent", 'lang_group')."</a>";
+						$actions['sent'] = "<a href='".admin_url("admin.php?page=mf_group/sent/index.php&intGroupID=".$post_id)."'>".__("Sent", $obj_group->lang_key)."</a>";
 
 						$intMessageID = $wpdb->get_var($wpdb->prepare("SELECT messageID FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) WHERE groupID = '%d' AND messageDeleted = '0' AND queueSent = '0' GROUP BY messageID ORDER BY messageCreated DESC LIMIT 0, 1", $post_id));
 
@@ -2511,14 +2529,14 @@ if(class_exists('mf_list_table'))
 
 								else
 								{
-									$out .= "<div><i class='fa fa-spinner fa-spin fa-lg'></i> ".sprintf(__("Will be sent %s", 'lang_group'), get_next_cron())."</div>"
+									$out .= "<div><i class='fa fa-spinner fa-spin fa-lg'></i> ".sprintf(__("Will be sent %s", $obj_group->lang_key), get_next_cron())."</div>"
 									."<i class='set_tr_color' rel='yellow'></i>";
 								}
 							}
 
 							else if($intMessageSent < ($intMessageSent + $intMessageNotSent))
 							{
-								$out .= "&nbsp;<i class='fa fa-spinner fa-spin fa-lg'></i> ".__("Is sending", 'lang_group')
+								$out .= "&nbsp;<i class='fa fa-spinner fa-spin fa-lg'></i> ".__("Is sending", $obj_group->lang_key)
 								."<i class='set_tr_color' rel='yellow'></i>";
 							}
 						}
@@ -2561,7 +2579,7 @@ if(class_exists('mf_list_table'))
 
 		function init_fetch()
 		{
-			global $wpdb;
+			global $wpdb, $obj_group;
 
 			$this->query_where .= "groupID = '".esc_sql($this->arr_settings['intGroupID'])."'";
 
@@ -2573,19 +2591,19 @@ if(class_exists('mf_list_table'))
 			$this->set_views(array(
 				'db_field' => 'messageDeleted',
 				'types' => array(
-					'0' => __("All", 'lang_group'),
-					'1' => __("Trash", 'lang_group')
+					'0' => __("All", $obj_group->lang_key),
+					'1' => __("Trash", $obj_group->lang_key)
 				),
 			));
 
 			$arr_columns = array(
 				//'cb' => '<input type="checkbox">',
-				'messageType' => __("Type", 'lang_group'),
-				'messageFrom' => __("From", 'lang_group'),
-				'messageName' => __("Content", 'lang_group'),
-				'messageSchedule' => __("Scheduled", 'lang_group'),
-				'sent' => __("Sent", 'lang_group'),
-				'messageCreated' => __("Created", 'lang_group'),
+				'messageType' => __("Type", $obj_group->lang_key),
+				'messageFrom' => __("From", $obj_group->lang_key),
+				'messageName' => __("Content", $obj_group->lang_key),
+				'messageSchedule' => __("Scheduled", $obj_group->lang_key),
+				'sent' => __("Sent", $obj_group->lang_key),
+				'messageCreated' => __("Created", $obj_group->lang_key),
 			);
 
 			$this->set_columns($arr_columns);
@@ -2601,7 +2619,7 @@ if(class_exists('mf_list_table'))
 
 		function column_default($item, $column_name)
 		{
-			global $wpdb;
+			global $wpdb, $obj_group;
 
 			$out = "";
 
@@ -2611,15 +2629,15 @@ if(class_exists('mf_list_table'))
 			{
 				case 'messageType':
 					$actions = array(
-						'view_data' => "<i class='fa fa-eye fa-lg' title='".__("View Content", 'lang_group')."'></i>",
-						'send_to_group' => "<a href='".admin_url("admin.php?page=mf_group/send/index.php&intGroupID=".$this->arr_settings['intGroupID']."&intMessageID=".$intMessageID2)."'><i class='fa fa-users fa-lg' title='".__("Send to group again", 'lang_group')."'></i></a>",
-						'send_email' => "<a href='".admin_url("admin.php?page=mf_email/send/index.php&intGroupMessageID=".$intMessageID2)."'><i class='fa fa-envelope fa-lg' title='".__("Send to e-mail", 'lang_group')."'></i></a>",
+						'view_data' => "<i class='fa fa-eye fa-lg' title='".__("View Content", $obj_group->lang_key)."'></i>",
+						'send_to_group' => "<a href='".admin_url("admin.php?page=mf_group/send/index.php&intGroupID=".$this->arr_settings['intGroupID']."&intMessageID=".$intMessageID2)."'><i class='fa fa-users fa-lg' title='".__("Send to group again", $obj_group->lang_key)."'></i></a>",
+						'send_email' => "<a href='".admin_url("admin.php?page=mf_email/send/index.php&intGroupMessageID=".$intMessageID2)."'><i class='fa fa-envelope fa-lg' title='".__("Send to e-mail", $obj_group->lang_key)."'></i></a>",
 					);
 
 					switch($item['messageType'])
 					{
 						case 'email':
-							$strMessageType = __("E-mail", 'lang_group');
+							$strMessageType = __("E-mail", $obj_group->lang_key);
 						break;
 
 						default:
@@ -2627,7 +2645,7 @@ if(class_exists('mf_list_table'))
 						break;
 
 						/*case 'sms':
-							$strMessageType = __("SMS", 'lang_group');
+							$strMessageType = __("SMS", $obj_group->lang_key);
 						break;*/
 					}
 
@@ -2670,7 +2688,7 @@ if(class_exists('mf_list_table'))
 					{
 						if($item['messageDeleted'] == 0)
 						{
-							$actions['delete'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/sent/index.php&btnMessageDelete&intGroupID=".$this->arr_settings['intGroupID']."&intMessageID=".$intMessageID2), 'message_delete_'.$intMessageID2, '_wpnonce_message_delete')."'>".__("Delete", 'lang_group')."</a>";
+							$actions['delete'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/sent/index.php&btnMessageDelete&intGroupID=".$this->arr_settings['intGroupID']."&intMessageID=".$intMessageID2), 'message_delete_'.$intMessageID2, '_wpnonce_message_delete')."'>".__("Delete", $obj_group->lang_key)."</a>";
 						}
 					}
 
@@ -2746,18 +2764,18 @@ if(class_exists('mf_list_table'))
 
 						if($intMessageErrors > 0)
 						{
-							$actions['errors'] = mf_format_number($intMessageErrors / $intMessageSent * 100, 1)."% ".__("Errors", 'lang_group');
+							$actions['errors'] = mf_format_number($intMessageErrors / $intMessageSent * 100, 1)."% ".__("Errors", $obj_group->lang_key);
 						}
 
 						if($intMessageReceived > 0)
 						{
-							$actions['read'] = "<i class='fa fa-check green'></i> ".$intMessageReceived." ".__("Read", 'lang_group');
+							$actions['read'] = "<i class='fa fa-check green'></i> ".$intMessageReceived." ".__("Read", $obj_group->lang_key);
 						}
 					}
 
 					if($intMessageNotSent > 0)
 					{
-						$actions['abort'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/sent/index.php&btnMessageAbort&intGroupID=".$this->arr_settings['intGroupID']."&intMessageID=".$intMessageID2), 'message_abort_'.$intMessageID2, '_wpnonce_message_abort')."'>".__("Abort", 'lang_group')."</a>";
+						$actions['abort'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/sent/index.php&btnMessageAbort&intGroupID=".$this->arr_settings['intGroupID']."&intMessageID=".$intMessageID2), 'message_abort_'.$intMessageID2, '_wpnonce_message_abort')."'>".__("Abort", $obj_group->lang_key)."</a>";
 					}
 
 					$out .= $intMessageSent." / ".$intMessageTotal
@@ -2850,9 +2868,11 @@ class widget_group extends WP_Widget
 {
 	function __construct()
 	{
+		$this->obj_group = new mf_group();
+
 		$this->widget_ops = array(
 			'classname' => 'widget_group',
-			'description' => __("Display a group registration form", 'lang_group')
+			'description' => __("Display a group registration form", $this->obj_group->lang_key)
 		);
 
 		$this->arr_default = array(
@@ -2862,9 +2882,8 @@ class widget_group extends WP_Widget
 			'group_button_text' => '',
 		);
 
-		parent::__construct('group-widget', __("Group", 'lang_group')." / ".__("Newsletter", 'lang_group'), $this->widget_ops);
+		parent::__construct('group-widget', __("Group", $this->obj_group->lang_key)." / ".__("Newsletter", $this->obj_group->lang_key), $this->widget_ops);
 
-		$this->obj_group = new mf_group();
 	}
 
 	function widget($args, $instance)
@@ -2913,10 +2932,10 @@ class widget_group extends WP_Widget
 		get_post_children(array('add_choose_here' => true, 'post_type' => $this->obj_group->post_type, 'post_status' => '', 'where' => "post_status != 'trash'".(IS_EDITOR ? "" : " AND post_author = '".get_current_user_id()."'")), $arr_data);
 
 		echo "<div class='mf_form'>"
-			.show_textfield(array('name' => $this->get_field_name('group_heading'), 'text' => __("Heading", 'lang_group'), 'value' => $instance['group_heading'], 'xtra' => " id='".$this->widget_ops['classname']."-title'"))
-			.show_textarea(array('name' => $this->get_field_name('group_text'), 'text' => __("Text", 'lang_group'), 'value' => $instance['group_text']))
-			.show_select(array('data' => $arr_data, 'name' => $this->get_field_name('group_id'), 'text' => __("Group", 'lang_group'), 'value' => $instance['group_id']))
-			.show_textfield(array('name' => $this->get_field_name('group_button_text'), 'text' => __("Button Text", 'lang_group'), 'value' => $instance['group_button_text'], 'placeholder' => __("Join", 'lang_group')))
+			.show_textfield(array('name' => $this->get_field_name('group_heading'), 'text' => __("Heading", $this->obj_group->lang_key), 'value' => $instance['group_heading'], 'xtra' => " id='".$this->widget_ops['classname']."-title'"))
+			.show_textarea(array('name' => $this->get_field_name('group_text'), 'text' => __("Text", $this->obj_group->lang_key), 'value' => $instance['group_text']))
+			.show_select(array('data' => $arr_data, 'name' => $this->get_field_name('group_id'), 'text' => __("Group", $this->obj_group->lang_key), 'value' => $instance['group_id']))
+			.show_textfield(array('name' => $this->get_field_name('group_button_text'), 'text' => __("Button Text", $this->obj_group->lang_key), 'value' => $instance['group_button_text'], 'placeholder' => __("Join", $this->obj_group->lang_key)))
 		."</div>";
 	}
 }

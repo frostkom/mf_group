@@ -40,24 +40,24 @@ get_header();
 						{
 							if($obj_group->accept_address(array('address_id' => $intAddressID, 'group_id' => $intGroupID)))
 							{
-								$done_text = __("You have successfully subscribed", 'lang_group');
+								$done_text = __("You have successfully subscribed", $obj_group->lang_key);
 							}
 
 							else
 							{
-								$error_text = __("You have already accepted to be a part of the group", 'lang_group');
+								$error_text = __("You have already accepted to be a part of the group", $obj_group->lang_key);
 							}
 						}
 
 						else
 						{
-							$error_text = __("Either you are not part of the group or you have already accepted to be a part of the group", 'lang_group');
+							$error_text = __("Either you are not part of the group or you have already accepted to be a part of the group", $obj_group->lang_key);
 						}
 					}
 
 					else
 					{
-						$error_text = __("Something went wrong. Please contact an admin if the problem persists", 'lang_group');
+						$error_text = __("Something went wrong. Please contact an admin if the problem persists", $obj_group->lang_key);
 					}
 				}
 
@@ -88,23 +88,23 @@ get_header();
 									{
 										if($obj_group->unsubscribe_address($intAddressID, $intGroupID))
 										{
-											$done_text = __("You have been successfully unsubscribed", 'lang_group');
+											$done_text = __("You have been successfully unsubscribed", $obj_group->lang_key);
 										}
 
 										else
 										{
 											do_log("Unsubscribe Error: ".$wpdb->last_query);
 
-											$done_text = __("I could not unsubscribe you. An admin has been notified about this", 'lang_group');
+											$done_text = __("I could not unsubscribe you. An admin has been notified about this", $obj_group->lang_key);
 										}
 									}
 
 									else
 									{
 										$post_content .= "<form method='post' action='' class='mf_form'>
-											<p>".__("Are you sure that you want to unsubscribe?", 'lang_group')."</p>
+											<p>".__("Are you sure that you want to unsubscribe?", $obj_group->lang_key)."</p>
 											<div class='form_button'>"
-												.show_button(array('name' => 'btnUnsubscribe', 'text' => __("Unsubscribe", 'lang_group')))
+												.show_button(array('name' => 'btnUnsubscribe', 'text' => __("Unsubscribe", $obj_group->lang_key)))
 											."</div>"
 											.input_hidden(array('name' => 'unsubscribe', 'value' => $strUnsubscribeHash))
 											.input_hidden(array('name' => 'gid', 'value' => $intGroupID))
@@ -115,13 +115,13 @@ get_header();
 
 								else
 								{
-									$error_text = __("Either you are not part of the group or you have already unsubscribed from it", 'lang_group');
+									$error_text = __("Either you are not part of the group or you have already unsubscribed from it", $obj_group->lang_key);
 								}
 							}
 
 							else
 							{
-								$error_text = __("Something went wrong. Please contact an admin if the problem persists", 'lang_group');
+								$error_text = __("Something went wrong. Please contact an admin if the problem persists", $obj_group->lang_key);
 							}
 						}
 
@@ -177,7 +177,7 @@ get_header();
 
 					else
 					{
-						$error_text = __("Something went wrong. Please contact an admin if the problem persists", 'lang_group');
+						$error_text = __("Something went wrong. Please contact an admin if the problem persists", $obj_group->lang_key);
 					}
 				}
 
@@ -200,7 +200,7 @@ get_header();
 
 						else
 						{
-							echo apply_filters('the_content', __("This group is closed for registration", 'lang_group'));
+							echo apply_filters('the_content', __("This group is closed for registration", $obj_group->lang_key));
 						}
 
 					echo "</section>";
