@@ -1125,6 +1125,16 @@ class mf_group
 		{
 			deactivate_plugins(str_replace("include/classes.php", "index.php", plugin_basename(__FILE__)));
 		}
+
+		if(function_exists('wp_add_privacy_policy_content'))
+		{
+			if($this->has_allow_registration_post())
+			{
+				$content = __("We collect personal information when a subscription is begun by entering at least an e-mail address. This makes it possible for us to send the wanted e-mails to the correct recipient.", $this->lang_key);
+
+				wp_add_privacy_policy_content(__("Group", $this->lang_key), $content);
+			}
+		}
 	}
 
 	function admin_menu()
@@ -1139,8 +1149,8 @@ class mf_group
 		$menu_title = __("List", $this->lang_key);
 		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, $menu_start);
 
-		$menu_title = " - ".__("Add New", $this->lang_key);
-		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, $menu_root."create/index.php");
+		$menu_title = __("Add New", $this->lang_key);
+		add_submenu_page($menu_start, $menu_title, " - ".$menu_title, $menu_capability, $menu_root."create/index.php");
 
 		$menu_title = __("Send Message", $this->lang_key);
 		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, $menu_root."send/index.php");
@@ -1161,7 +1171,7 @@ class mf_group
 		return ($post_id > 0);
 	}
 
-	function add_policy($content)
+	/*function add_policy($content)
 	{
 		if($this->has_allow_registration_post())
 		{
@@ -1172,7 +1182,7 @@ class mf_group
 		}
 
 		return $content;
-	}
+	}*/
 
 	function admin_notices()
 	{
