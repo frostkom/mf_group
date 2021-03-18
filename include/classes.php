@@ -562,6 +562,8 @@ class mf_group
 											$setting_email_log = get_option('setting_email_log');
 
 											$sent = send_email(array(
+												'from' => $strMessageFrom,
+												'from_name' => $strMessageFromName,
 												'to' => $mail_to,
 												'subject' => $mail_subject,
 												'content' => $mail_content,
