@@ -1123,11 +1123,6 @@ class mf_group
 
 	function admin_init()
 	{
-		if(!is_plugin_active("mf_address/index.php") || !is_plugin_active("mf_base/index.php"))
-		{
-			deactivate_plugins(str_replace("include/classes.php", "index.php", plugin_basename(__FILE__)));
-		}
-
 		if(function_exists('wp_add_privacy_policy_content'))
 		{
 			if($this->has_allow_registration_post())
@@ -2270,6 +2265,8 @@ if(class_exists('mf_list_table'))
 			$post_id = $item['ID'];
 			$post_status = $item['post_status'];
 
+			$list_url = admin_url("admin.php?page=mf_group/list/index.php&intGroupID=".$post_id."&post_status=".check_var('post_status'));
+
 			$obj_group = new mf_group(array('id' => $post_id));
 
 			switch($column_name)
@@ -2288,17 +2285,17 @@ if(class_exists('mf_list_table'))
 
 						if($post_author == get_current_user_id() || IS_ADMIN)
 						{
-							$actions['delete'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnGroupDelete&intGroupID=".$post_id), 'group_delete_'.$post_id, '_wpnonce_group_delete')."'>".__("Delete", $obj_group->lang_key)."</a>";
+							$actions['delete'] = "<a href='".wp_nonce_url($list_url."&btnGroupDelete", 'group_delete_'.$post_id, '_wpnonce_group_delete')."'>".__("Delete", $obj_group->lang_key)."</a>";
 						}
 
 						if($post_status == 'ignore')
 						{
-							$actions['activate'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnGroupActivate&intGroupID=".$post_id), 'group_activate_'.$post_id, '_wpnonce_group_activate')."'>".__("Activate", $obj_group->lang_key)."</a>";
+							$actions['activate'] = "<a href='".wp_nonce_url($list_url."&btnGroupActivate", 'group_activate_'.$post_id, '_wpnonce_group_activate')."'>".__("Activate", $obj_group->lang_key)."</a>";
 						}
 
 						else
 						{
-							$actions['inactivate'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnGroupInactivate&intGroupID=".$post_id), 'group_inactivate_'.$post_id, '_wpnonce_group_inactivate')."'>".__("Inactivate", $obj_group->lang_key)."</a>";
+							$actions['inactivate'] = "<a href='".wp_nonce_url($list_url."&btnGroupInactivate", 'group_inactivate_'.$post_id, '_wpnonce_group_inactivate')."'>".__("Inactivate", $obj_group->lang_key)."</a>";
 						}
 					}
 
@@ -2443,11 +2440,13 @@ if(class_exists('mf_list_table'))
 
 							if($amount > 0)
 							{
-								$actions['export_csv'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnExportRun&intExportType=".$post_id."&strExportFormat=csv"), 'export_run', '_wpnonce_export_run')."' title='".__("Export", $obj_group->lang_key)." CSV'><i class='fas fa-file-csv fa-lg'></i></a>";
+								//$actions['export_csv'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnExportRun&intExportType=".$post_id."&strExportFormat=csv"), 'export_run', '_wpnonce_export_run')."' title='".__("Export", $obj_group->lang_key)." CSV'><i class='fas fa-file-csv fa-lg'></i></a>";
+								$actions['export_csv'] = "<a href='".wp_nonce_url($list_url."&btnExportRun&intExportType=".$post_id."&strExportFormat=csv", 'export_run', '_wpnonce_export_run')."' title='".__("Export", $obj_group->lang_key)." CSV'><i class='fas fa-file-csv fa-lg'></i></a>";
 
 								if(is_plugin_active("mf_phpexcel/index.php"))
 								{
-									$actions['export_xls'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnExportRun&intExportType=".$post_id."&strExportFormat=xls"), 'export_run', '_wpnonce_export_run')."' title='".__("Export", $obj_group->lang_key)." XLS'><i class='fas fa-file-excel fa-lg'></i></a>";
+									//$actions['export_xls'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnExportRun&intExportType=".$post_id."&strExportFormat=xls"), 'export_run', '_wpnonce_export_run')."' title='".__("Export", $obj_group->lang_key)." XLS'><i class='fas fa-file-excel fa-lg'></i></a>";
+									$actions['export_xls'] = "<a href='".wp_nonce_url($list_url."&btnExportRun&intExportType=".$post_id."&strExportFormat=xls", 'export_run', '_wpnonce_export_run')."' title='".__("Export", $obj_group->lang_key)." XLS'><i class='fas fa-file-excel fa-lg'></i></a>";
 								}
 							}
 						}
@@ -2479,7 +2478,7 @@ if(class_exists('mf_list_table'))
 						if($rowsAddresses2Remind > 0)
 						{
 							$out .= "<div class='row-actions'>
-								<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnGroupResend&intGroupID=".$post_id), 'group_resend_'.$post_id, '_wpnonce_group_resend')."' rel='confirm'>
+								<a href='".wp_nonce_url($list_url."&btnGroupResend", 'group_resend_'.$post_id, '_wpnonce_group_resend')."' rel='confirm'>
 									<i class='fa fa-recycle fa-lg' title='".sprintf(__("There are %d subscribers that can be reminded again. Do you want to do that?", $obj_group->lang_key), $rowsAddresses2Remind)."'></i>
 								</a>
 							</div>";
@@ -2808,6 +2807,52 @@ if(class_exists('mf_list_table'))
 					if($item['messageAttachment'] != '')
 					{
 						$out .= "<p>".get_media_button(array('name' => 'strMessageAttachment', 'value' => $item['messageAttachment'], 'show_add_button' => false))."</p>";
+					}
+
+					$result_sent = $wpdb->get_results($wpdb->prepare("SELECT addressFirstName, addressSurName, addressEmail, addressCellNo, queueSent FROM ".$wpdb->prefix."group_queue INNER JOIN ".get_address_table_prefix()."address USING (addressID) WHERE messageID = '%d' ORDER BY queueID ASC LIMIT 0, 100", $intMessageID2));
+
+					if($wpdb->num_rows > 0)
+					{
+						$out .= "<ol>";
+
+							foreach($result_sent as $r)
+							{
+								$strAddressFirstName = $r->addressFirstName;
+								$strAddressSurName = $r->addressSurName;
+								$strAddressEmail = $r->addressEmail;
+								$strAddressCellNo = $r->addressCellNo;
+								$intQueueSent = $r->queueSent;
+
+								$out .= "<li>"
+									."<i class='".($intQueueSent == 1 ? "fa fa-check green" : "fa fa-times red")."'></i> ";
+
+									if($strAddressFirstName != '' || $strAddressSurName != '')
+									{
+										$out .= $strAddressFirstName." ".$strAddressSurName;
+									}
+
+									else
+									{
+										switch($item['messageType'])
+										{
+											case 'email':
+												$out .= $strAddressEmail;
+											break;
+
+											default:
+												//
+											break;
+
+											case 'sms':
+												$out .= $strAddressCellNo;
+											break;
+										}
+									}
+								
+								$out .= "</li>";
+							}
+
+						$out .= "</ol>";
 					}
 				break;
 
