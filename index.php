@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: 
-Version: 5.8.10
+Version: 5.8.13
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://frostkom.se
@@ -134,6 +134,22 @@ if(is_plugin_active("mf_base/index.php"))
 			KEY groupID (groupID)
 		) DEFAULT CHARSET=".$default_charset);
 
+		$wpdb->query("CREATE TABLE IF NOT EXISTS ".$wpdb->prefix."group_version (
+			versionID INT UNSIGNED NOT NULL AUTO_INCREMENT,
+			versionType VARCHAR(20),
+			addressID INT UNSIGNED NOT NULL,
+			groupID INT UNSIGNED NOT NULL,
+			versionCreated DATETIME DEFAULT NULL,
+			userID INT UNSIGNED DEFAULT NULL,
+			PRIMARY KEY (versionID),
+			KEY addressID (addressID),
+			KEY groupID (groupID)
+		) DEFAULT CHARSET=".$default_charset);
+
+		$arr_add_column[$wpdb->prefix."group_version"] = array(
+			'userID' => "ALTER TABLE [table] ADD [column] INT UNSIGNED DEFAULT NULL AFTER versionCreated",
+		);
+
 		update_columns($arr_update_column);
 		add_columns($arr_add_column);
 		add_index($arr_add_index);
@@ -149,21 +165,25 @@ if(is_plugin_active("mf_base/index.php"))
 			),
 		));
 
-		replace_post_meta(array('old' => 'group_acceptance_email', 'new' => $obj_group->meta_prefix.'acceptance_email'));
+		/*replace_post_meta(array('old' => 'group_acceptance_email', 'new' => $obj_group->meta_prefix.'acceptance_email'));
 		replace_post_meta(array('old' => 'group_acceptance_subject', 'new' => $obj_group->meta_prefix.'acceptance_subject'));
 		replace_post_meta(array('old' => 'group_acceptance_text', 'new' => $obj_group->meta_prefix.'acceptance_text'));
 		replace_post_meta(array('old' => 'group_verify_address', 'new' => $obj_group->meta_prefix.'verify_address'));
 		replace_post_meta(array('old' => 'group_contact_page', 'new' => $obj_group->meta_prefix.'contact_page'));
-		replace_post_meta(array('old' => 'group_registration_fields', 'new' => $obj_group->meta_prefix.'registration_fields'));
+		replace_post_meta(array('old' => 'group_registration_fields', 'new' => $obj_group->meta_prefix.'registration_fields'));*/
+
+		mf_uninstall_plugin(array(
+			'options' => array('setting_group_versioning'),
+		));
 	}
 
 	function uninstall_group()
 	{
 		mf_uninstall_plugin(array(
 			'uploads' => 'mf_group',
-			'options' => array('setting_emails_per_hour', 'setting_group_see_other_roles', 'setting_group_outgoing_text', 'setting_group_import', 'setting_group_debug'),
+			'options' => array('setting_emails_per_hour', 'setting_group_versioning', 'setting_group_see_other_roles', 'setting_group_outgoing_text', 'setting_group_import', 'setting_group_debug'),
 			'post_types' => array('mf_group'),
-			'tables' => array('group_message', 'group_queue', 'address2group'),
+			'tables' => array('group_message', 'group_queue', 'address2group', 'group_version'),
 		));
 	}
 

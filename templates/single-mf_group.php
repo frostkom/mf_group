@@ -86,7 +86,7 @@ get_header();
 								{
 									if(isset($_POST['btnUnsubscribe']))
 									{
-										if($obj_group->unsubscribe_address($intAddressID, $intGroupID))
+										if($obj_group->unsubscribe_address(array('address_id' => $intAddressID, 'group_id' => $intGroupID)))
 										{
 											$done_text = __("You have been successfully unsubscribed", $obj_group->lang_key);
 										}

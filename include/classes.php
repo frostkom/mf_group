@@ -714,7 +714,7 @@ class mf_group
 						do_log("Group API - ".$post_title." - Sync: ".var_export($arr_post_meta_api, true));
 					}
 
-					$count_incoming = $count_found = $count_found_error = $count_inserted = $count_inserted_error = $count_added = $count_exists_in_group = $count_exists_in_array = $count_removed = 0;
+					$count_incoming = $count_found = $count_found_error = $count_inserted = $count_inserted_error = $count_added = $count_exists_in_group = $count_exists_in_array = $count_removed = $count_removed_error = 0;
 
 					$arr_addresses = array();
 
@@ -767,7 +767,8 @@ class mf_group
 													$strAddressCity = $item['cb_postadress'];
 													$strAddressCellNo = $item['cb_telmob'];
 													$strAddressEmail = $item['email'];
-													$strAddressCo = $intAddressCountry = $strAddressTelNo = $strAddressWorkNo = '';
+													$strAddressExtra = $item['associationName'];
+													$strAddressCo = $intAddressCountry = $strAddressTelNo = $strAddressWorkNo = "";
 												}
 
 												else if(isset($item['addressBirthDate']) || isset($item['addressEmail']))
@@ -786,6 +787,7 @@ class mf_group
 													$strAddressCellNo = $item['addressCellNo'];
 													$strAddressWorkNo = $item['addressWorkNo'];
 													$strAddressEmail = $item['addressEmail'];
+													$strAddressExtra = "";
 												}
 
 												else
@@ -850,11 +852,13 @@ class mf_group
 
 														if($rows == 0)
 														{
-															$wpdb->query($wpdb->prepare("INSERT INTO ".get_address_table_prefix()."address SET addressPublic = '%d', addressBirthDate = %s, addressFirstName = %s, addressSurName = %s, addressZipCode = %s, addressCity = %s, addressCountry = '%d', addressAddress = %s, addressCo = %s, addressTelNo = %s, addressCellNo = %s, addressWorkNo = %s, addressEmail = %s, addressCreated = NOW(), userID = '%d'", $intAddressPublic, $strAddressBirthDate, $strAddressFirstName, $strAddressSurName, $intAddressZipCode, $strAddressCity, $intAddressCountry, $strAddressAddress, $strAddressCo, $strAddressTelNo, $strAddressCellNo, $strAddressWorkNo, $strAddressEmail, get_current_user_id()));
+															$wpdb->query($wpdb->prepare("INSERT INTO ".get_address_table_prefix()."address SET addressPublic = '%d', addressBirthDate = %s, addressFirstName = %s, addressSurName = %s, addressZipCode = %s, addressCity = %s, addressCountry = '%d', addressAddress = %s, addressCo = %s, addressTelNo = %s, addressCellNo = %s, addressWorkNo = %s, addressEmail = %s, addressExtra = %s, addressCreated = NOW(), userID = '%d'", $intAddressPublic, $strAddressBirthDate, $strAddressFirstName, $strAddressSurName, $intAddressZipCode, $strAddressCity, $intAddressCountry, $strAddressAddress, $strAddressCo, $strAddressTelNo, $strAddressCellNo, $strAddressWorkNo, $strAddressEmail, $strAddressExtra, get_current_user_id()));
 
 															if($wpdb->rows_affected > 0)
 															{
 																$intAddressID_temp = $wpdb->insert_id;
+
+																$wpdb->query($wpdb->prepare("UPDATE ".get_address_table_prefix()."address SET addressSyncedDate = NOW() WHERE addressID = '%d'", $intAddressID_temp));
 
 																if(get_option('setting_group_debug') == 'yes')
 																{
@@ -883,7 +887,9 @@ class mf_group
 
 																if(!in_array($intAddressID, $arr_addresses))
 																{
-																	$wpdb->query($wpdb->prepare("UPDATE ".get_address_table_prefix()."address SET addressBirthDate = %s, addressFirstName = %s, addressSurName = %s, addressZipCode = %s, addressCity = %s, addressCountry = '%d', addressAddress = %s, addressCo = %s, addressTelNo = %s, addressCellNo = %s, addressWorkNo = %s, addressEmail = %s WHERE addressID = '%d'", $strAddressBirthDate, $strAddressFirstName, $strAddressSurName, $intAddressZipCode, $strAddressCity, $intAddressCountry, $strAddressAddress, $strAddressCo, $strAddressTelNo, $strAddressCellNo, $strAddressWorkNo, $strAddressEmail, $intAddressID));
+																	$wpdb->query($wpdb->prepare("UPDATE ".get_address_table_prefix()."address SET addressBirthDate = %s, addressFirstName = %s, addressSurName = %s, addressZipCode = %s, addressCity = %s, addressCountry = '%d', addressAddress = %s, addressCo = %s, addressTelNo = %s, addressCellNo = %s, addressWorkNo = %s, addressEmail = %s, addressExtra = %s WHERE addressID = '%d'", $strAddressBirthDate, $strAddressFirstName, $strAddressSurName, $intAddressZipCode, $strAddressCity, $intAddressCountry, $strAddressAddress, $strAddressCo, $strAddressTelNo, $strAddressCellNo, $strAddressWorkNo, $strAddressEmail, $strAddressExtra, $intAddressID));
+
+																	$wpdb->query($wpdb->prepare("UPDATE ".get_address_table_prefix()."address SET addressSyncedDate = NOW() WHERE addressID = '%d'", $intAddressID));
 
 																	if($this->has_address(array('address_id' => $intAddressID, 'group_id' => $post_id)) == false)
 																	{
@@ -970,9 +976,15 @@ class mf_group
 										do_log("Group API - Remove from group: ".$intAddressID." (".$strAddressFirstName." ".$strAddressSurName.") from ".$post_title);
 									}
 
-									$this->remove_address(array('address_id' => $intAddressID, 'group_id' => $post_id));
+									if($this->remove_address(array('address_id' => $intAddressID, 'group_id' => $post_id)))
+									{
+										$count_removed++;
+									}
 
-									$count_removed++;
+									else
+									{
+										$count_removed_error++;
+									}
 								}
 							}
 						}
@@ -999,7 +1011,7 @@ class mf_group
 
 					if(get_option('setting_group_debug') == 'yes')
 					{
-						do_log("Group API - ".$post_title." - Report: ".$count_found."/".$count_incoming." found with ".$count_found_error." errors. ".$count_inserted." inserted with ".$count_inserted_error." errors. ".$count_added." added, ".$count_exists_in_group." (+".$count_exists_in_array." duplicates) exists and ".$count_removed." removed");
+						do_log("Group API - ".$post_title." - Report: ".$count_found."/".$count_incoming." found with ".$count_found_error." errors. ".$count_inserted." inserted with ".$count_inserted_error." errors. ".$count_added." added, ".$count_exists_in_group." (+".$count_exists_in_array." duplicates) exists and ".$count_removed." removed with ".$count_removed_error." errors");
 					}
 				}
 			}
@@ -1123,6 +1135,21 @@ class mf_group
 
 	function admin_init()
 	{
+		global $pagenow;
+
+		$plugin_include_url = plugin_dir_url(__FILE__);
+		$plugin_version = get_plugin_version(__FILE__);
+
+		if($pagenow == 'admin.php')
+		{
+			switch(check_var('page'))
+			{
+				case "mf_group/version/index.php":
+					mf_enqueue_style('style_group_timeline', $plugin_include_url."style_timeline.css", $plugin_version);
+				break;
+			}
+		}
+
 		if(function_exists('wp_add_privacy_policy_content'))
 		{
 			if($this->has_allow_registration_post())
@@ -1157,6 +1184,9 @@ class mf_group
 
 		$menu_title = __("Import", $this->lang_key);
 		add_submenu_page($menu_root, $menu_title, $menu_title, $menu_capability, $menu_root."import/index.php");
+
+		$menu_title = __("History", $this->lang_key);
+		add_submenu_page($menu_root, $menu_title, $menu_title, $menu_capability, $menu_root.'version/index.php');
 	}
 
 	function has_allow_registration_post()
@@ -1252,12 +1282,36 @@ class mf_group
 		$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_message SET userID = '%d' WHERE userID = '%d'", get_current_user_id(), $user_id));
 	}
 
+	function add_version($data)
+	{
+		global $wpdb;
+
+		if(!isset($data['group_id'])){		$data['group_id'] = 0;}
+		if(!isset($data['address_id'])){	$data['address_id'] = 0;}
+
+		$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->prefix."group_version SET versionType = %s, groupID = %s, addressID = %s, versionCreated = NOW(), userID = '%d'", $data['type'], $data['group_id'], $data['address_id'], get_current_user_id()));
+	}
+
 	function merge_address($id_prev, $id)
 	{
 		global $wpdb;
 
 		$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_queue SET addressID = '%d' WHERE addressID = '%d'", $id, $id_prev));
-		$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."address2group SET addressID = '%d' WHERE addressID = '%d'", $id, $id_prev));
+		//$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."address2group SET addressID = '%d' WHERE addressID = '%d'", $id, $id_prev));
+
+		$result = $wpdb->get_results($wpdb->prepare("SELECT groupID FROM ".$wpdb->prefix."address2group WHERE addressID = '%d'", $id_prev));
+
+		foreach($result as $r)
+		{
+			$intGroupID = $r->groupID;
+
+			$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."address2group SET addressID = '%d' WHERE addressID = '%d' AND groupID = '%d'", $id, $id_prev, $intGroupID));
+
+			if($wpdb->rows_affected > 0)
+			{
+				$this->add_version(array('type' => 'merge', 'address_id' => $id, 'group_id' => $intGroupID));
+			}
+		}
 	}
 
 	function get_groups_to_send_to($arr_data)
@@ -2041,6 +2095,13 @@ class mf_group
 		if($sent)
 		{
 			$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."address2group SET groupAcceptanceSent = NOW() WHERE addressID = '%d' AND groupID = '%d'", $data['address_id'], $data['group_id']));
+
+			if($wpdb->rows_affected > 0)
+			{
+				$data['type'] = 'acceptance_sent';
+
+				$this->add_version($data);
+			}
 		}
 
 		return $sent;
@@ -2052,7 +2113,19 @@ class mf_group
 
 		$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."address2group SET groupAccepted = '1' WHERE addressID = '%d' AND groupID = '%d'", $data['address_id'], $data['group_id']));
 
-		return ($wpdb->rows_affected > 0);
+		if($wpdb->rows_affected > 0)
+		{
+			$data['type'] = 'accept';
+
+			$this->add_version($data);
+
+			return true;
+		}
+
+		else
+		{
+			return false;
+		}
 	}
 
 	function has_address($data)
@@ -2086,6 +2159,13 @@ class mf_group
 
 				$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->prefix."address2group SET addressID = '%d', groupID = '%d', groupAccepted = '%d'", $data['address_id'], $data['group_id'], ($post_meta_acceptance_email == 'yes' ? 0 : 1)));
 
+				if($wpdb->rows_affected > 0)
+				{
+					$data['type'] = 'add';
+
+					$this->add_version($data);
+				}
+
 				if($post_meta_acceptance_email == 'yes')
 				{
 					$this->send_acceptance_message($data);
@@ -2105,9 +2185,21 @@ class mf_group
 
 		if(!isset($data['group_id'])){		$data['group_id'] = 0;}
 
-		//do_log("Deleted (AID: ".$data['address_id'].", GID: ".$data['group_id'].")");
-
 		$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->prefix."address2group WHERE addressID = '%d'".($data['group_id'] > 0 ? " AND groupID = '".$data['group_id']."'" : ""), $data['address_id']));
+
+		if($wpdb->rows_affected > 0)
+		{
+			$data['type'] = 'remove';
+
+			$this->add_version($data);
+
+			return true;
+		}
+
+		else
+		{
+			return false;
+		}
 	}
 
 	function remove_all_address($group_id)
@@ -2115,15 +2207,39 @@ class mf_group
 		global $wpdb;
 
 		$wpdb->query($wpdb->prepare("DELETE FROM ".$wpdb->prefix."address2group WHERE groupID = '%d'", $group_id));
+
+		if($wpdb->rows_affected > 0)
+		{
+			$this->add_version(array('type' => 'remove_all', 'group_id' => $group_id));
+
+			return true;
+		}
+
+		else
+		{
+			return false;
+		}
 	}
 
-	function unsubscribe_address($address_id, $group_id)
+	function unsubscribe_address($data)
 	{
 		global $wpdb;
 
-		$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."address2group SET groupUnsubscribed = '1' WHERE groupID = '%d' AND addressID = '%d'", $group_id, $address_id));
+		$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."address2group SET groupUnsubscribed = '1' WHERE groupID = '%d' AND addressID = '%d'", $data['group_id'], $data['address_id']));
 
-		return ($wpdb->rows_affected == 1);
+		if($wpdb->rows_affected > 0)
+		{
+			$data['type'] = 'unsubscribe';
+
+			$this->add_version($data);
+
+			return true;
+		}
+
+		else
+		{
+			return false;
+		}
 	}
 
 	function amount_in_group($data = array())
@@ -2236,6 +2352,7 @@ if(class_exists('mf_list_table'))
 				'post_title' => __("Name", $obj_group->lang_key),
 				'post_status' => "",
 				'amount' => __("Amount", $obj_group->lang_key),
+				'versioning' => __("History", $obj_group->lang_key),
 			);
 
 			if($rowsAddressesNotAccepted > 0)
@@ -2464,6 +2581,15 @@ if(class_exists('mf_list_table'))
 
 					$out .= "</a>"
 					.$this->row_actions($actions);
+				break;
+
+				case 'versioning':
+					$version_amount = $wpdb->get_var($wpdb->prepare("SELECT COUNT(versionID) FROM ".$wpdb->prefix."group_version WHERE groupID = '%d'", $post_id));
+
+					if($version_amount > 0)
+					{
+						$out .= "<a href='".admin_url("admin.php?page=mf_group/version/index.php&intGroupID=".$post_id)."'>".$version_amount."</a>";
+					}
 				break;
 
 				case 'not_accepted':
@@ -2848,7 +2974,7 @@ if(class_exists('mf_list_table'))
 											break;
 										}
 									}
-								
+
 								$out .= "</li>";
 							}
 
