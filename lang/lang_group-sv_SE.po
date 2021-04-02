@@ -716,7 +716,7 @@ msgstr "Adressen godkändes i denna grupp"
 
 #: ../version/index.php:90
 msgid "The address was sent a message to be accepted to the group"
-msgstr "Adressen fick ett meddelande och godkännande till denna grupp"
+msgstr "Adressen fick ett meddelande om godkännande till denna grupp"
 
 #: ../version/index.php:95
 msgid "The address was added to the group"

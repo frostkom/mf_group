@@ -27,6 +27,7 @@ class mf_group
 	function get_for_select($data = array())
 	{
 		if(!isset($data['add_choose_here'])){		$data['add_choose_here'] = true;}
+		if(!isset($data['include_amount'])){		$data['include_amount'] = true;}
 
 		$tbl_group = new mf_group_table();
 
@@ -45,14 +46,24 @@ class mf_group
 
 			foreach($tbl_group->data as $r)
 			{
-				$amount = $this->amount_in_group(array('id' => $r['ID']));
+				if($data['include_amount'] == true)
+				{
+					$amount = $this->amount_in_group(array('id' => $r['ID']));
 
-				$arr_data[$r['ID']] = array(
-					'name' => $r['post_title']." (".$amount.")",
-					'attributes' => array(
-						'amount' => $amount,
-					),
-				);
+					$arr_data[$r['ID']] = array(
+						'name' => $r['post_title']." (".$amount.")",
+						'attributes' => array(
+							'amount' => $amount,
+						),
+					);
+				}
+
+				else
+				{
+					$arr_data[$r['ID']] = array(
+						'name' => $r['post_title'],
+					);
+				}
 			}
 		}
 
@@ -652,7 +663,8 @@ class mf_group
 			{
 				$intGroupID = $r->ID;
 
-				$this->remove_all_address($intGroupID);
+				//$this->remove_all_address($intGroupID);
+				$arr_address_ids = array();
 
 				$users = get_users(array('fields' => 'all'));
 
@@ -687,7 +699,16 @@ class mf_group
 					if($intAddressID > 0)
 					{
 						$this->add_address(array('address_id' => $intAddressID, 'group_id' => $intGroupID));
+
+						$arr_address_ids[] = $intAddressID;
 					}
+				}
+
+				$result_addresses = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address2group WHERE groupID = '%d' AND addressID NOT IN ('".implode("','", $arr_address_ids)."')", $intGroupID));
+
+				foreach($result_addresses as $r)
+				{
+					$this->remove_address(array('address_id' => $r->addressID, 'group_id' => $intGroupID));
 				}
 			}
 			#############################
@@ -2132,50 +2153,47 @@ class mf_group
 	{
 		global $wpdb;
 
-		$intAddressID = $wpdb->get_var($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address2group WHERE addressID = '%d' AND groupID = '%d' LIMIT 0, 1", $data['address_id'], $data['group_id']));
+		$wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address2group WHERE addressID = '%d' AND groupID = '%d' LIMIT 0, 1", $data['address_id'], $data['group_id']));
 
-		return ($intAddressID > 0);
+		return ($wpdb->num_rows > 0);
 	}
 
 	function add_address($data)
 	{
 		global $wpdb;
 
-		if($data['address_id'] > 0 && $data['group_id'] > 0)
+		if($data['address_id'] > 0 && $data['group_id'] > 0 && $this->has_address($data) == false)
 		{
-			if($this->has_address($data) == false)
+			$post_meta_api = get_post_meta($data['group_id'], $this->meta_prefix.'api', true);
+
+			if($post_meta_api != '')
 			{
-				$post_meta_api = get_post_meta($data['group_id'], $this->meta_prefix.'api', true);
-
-				if($post_meta_api != '')
-				{
-					$post_meta_acceptance_email = 'no';
-				}
-
-				else
-				{
-					$post_meta_acceptance_email = get_post_meta($data['group_id'], $this->meta_prefix.'acceptance_email', true);
-				}
-
-				$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->prefix."address2group SET addressID = '%d', groupID = '%d', groupAccepted = '%d'", $data['address_id'], $data['group_id'], ($post_meta_acceptance_email == 'yes' ? 0 : 1)));
-
-				if($wpdb->rows_affected > 0)
-				{
-					$data['type'] = 'add';
-
-					$this->add_version($data);
-				}
-
-				if($post_meta_acceptance_email == 'yes')
-				{
-					$this->send_acceptance_message($data);
-				}
-
-				//$from_email = get_bloginfo('admin_email');
-				$from_email = $wpdb->get_var($wpdb->prepare("SELECT messageFrom FROM ".$wpdb->prefix."group_message WHERE groupID = '%d' AND messageDeleted = '0' ORDER BY messageCreated DESC LIMIT 0, 1", $data['group_id']));
-
-				do_action('group_after_add_address', array('address_id' => $data['address_id'], 'from' => $from_email));
+				$post_meta_acceptance_email = 'no';
 			}
+
+			else
+			{
+				$post_meta_acceptance_email = get_post_meta($data['group_id'], $this->meta_prefix.'acceptance_email', true);
+			}
+
+			$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->prefix."address2group SET addressID = '%d', groupID = '%d', groupAccepted = '%d'", $data['address_id'], $data['group_id'], ($post_meta_acceptance_email == 'yes' ? 0 : 1)));
+
+			if($wpdb->rows_affected > 0)
+			{
+				$data['type'] = 'add';
+
+				$this->add_version($data);
+			}
+
+			if($post_meta_acceptance_email == 'yes')
+			{
+				$this->send_acceptance_message($data);
+			}
+
+			//$from_email = get_bloginfo('admin_email');
+			$from_email = $wpdb->get_var($wpdb->prepare("SELECT messageFrom FROM ".$wpdb->prefix."group_message WHERE groupID = '%d' AND messageDeleted = '0' ORDER BY messageCreated DESC LIMIT 0, 1", $data['group_id']));
+
+			do_action('group_after_add_address', array('address_id' => $data['address_id'], 'from' => $from_email));
 		}
 	}
 

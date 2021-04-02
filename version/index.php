@@ -9,7 +9,7 @@ echo "<div class='wrap'>
 	.get_notification()
 	."<div id='poststuff'>";
 
-		$arr_data = $obj_group->get_for_select();
+		$arr_data = $obj_group->get_for_select(array('include_amount' => false));
 
 		if(count($arr_data) > 1)
 		{
