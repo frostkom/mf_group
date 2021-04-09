@@ -2968,7 +2968,7 @@ if(class_exists('mf_list_table'))
 								$intQueueSent = $r->queueSent;
 
 								$out .= "<li>"
-									."<i class='".($intQueueSent == 1 ? "fa fa-check green" : "fa fa-times red")."'></i> ";
+									."<i class='fa ".($intQueueSent == 1 ? "fa-check green" : "fa-times red")."'></i> ";
 
 									if($strAddressFirstName != '' || $strAddressSurName != '')
 									{
