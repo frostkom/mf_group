@@ -83,13 +83,14 @@ switch($type)
 		{
 			$strSearch = check_var('s', 'char');
 
-			$obj_group = new mf_group();
-
 			$result = $obj_group->get_groups(array('where' => " AND (post_title LIKE '%".$strSearch."%')", 'limit' => 0, 'amount' => 10));
 
-			foreach($result as $r)
+			if($wpdb->num_rows > 0)
 			{
-				$json_output[] = $r->post_title;
+				foreach($result as $r)
+				{
+					$json_output[] = $r->post_title;
+				}
 			}
 		}
 	break;

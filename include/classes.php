@@ -414,7 +414,7 @@ class mf_group
 
 	function cron_base()
 	{
-		global $wpdb, $error_text;
+		global $wpdb, $obj_address, $error_text;
 
 		$obj_cron = new mf_cron();
 		$obj_cron->start(__CLASS__);
@@ -629,7 +629,7 @@ class mf_group
 						break;
 
 						/*case 'sms':
-							$sent = $obj_sms->send_sms(array('from' => $strMessageFrom, 'to' => $strAddressCellNo, 'text' => $strMessageText, 'user_id' => $intUserID));
+							list($sent, $message) = $obj_sms->send_sms(array('from' => $strMessageFrom, 'to' => $strAddressCellNo, 'text' => $strMessageText, 'user_id' => $intUserID));
 
 							if($sent)
 							{
@@ -868,6 +868,11 @@ class mf_group
 												{
 													if(isset($strAddressBirthDate) && $strAddressBirthDate != '' || isset($strAddressEmail) && $strAddressEmail != '')
 													{
+														if(!isset($obj_address))
+														{
+															$obj_address = new mf_address();
+														}
+
 														$result = $this->check_if_exists(array('birthdate' => $strAddressBirthDate, 'email' => $strAddressEmail));
 														$rows = $wpdb->num_rows;
 
@@ -879,7 +884,7 @@ class mf_group
 															{
 																$intAddressID_temp = $wpdb->insert_id;
 
-																$wpdb->query($wpdb->prepare("UPDATE ".get_address_table_prefix()."address SET addressSyncedDate = NOW() WHERE addressID = '%d'", $intAddressID_temp));
+																$obj_address->save_sync_date(array('address_id' => $intAddressID_temp));
 
 																if(get_option('setting_group_debug') == 'yes')
 																{
@@ -910,7 +915,7 @@ class mf_group
 																{
 																	$wpdb->query($wpdb->prepare("UPDATE ".get_address_table_prefix()."address SET addressBirthDate = %s, addressFirstName = %s, addressSurName = %s, addressZipCode = %s, addressCity = %s, addressCountry = '%d', addressAddress = %s, addressCo = %s, addressTelNo = %s, addressCellNo = %s, addressWorkNo = %s, addressEmail = %s, addressExtra = %s WHERE addressID = '%d'", $strAddressBirthDate, $strAddressFirstName, $strAddressSurName, $intAddressZipCode, $strAddressCity, $intAddressCountry, $strAddressAddress, $strAddressCo, $strAddressTelNo, $strAddressCellNo, $strAddressWorkNo, $strAddressEmail, $strAddressExtra, $intAddressID));
 
-																	$wpdb->query($wpdb->prepare("UPDATE ".get_address_table_prefix()."address SET addressSyncedDate = NOW() WHERE addressID = '%d'", $intAddressID));
+																	$obj_address->save_sync_date(array('address_id' => $intAddressID));
 
 																	if($this->has_address(array('address_id' => $intAddressID, 'group_id' => $post_id)) == false)
 																	{
@@ -1012,7 +1017,7 @@ class mf_group
 
 						else if(get_option('setting_group_debug') == 'yes')
 						{
-							do_log("Group API - ".$post_title." - No rows found with to remove (Address array): ".$wpdb->last_query);
+							do_log("Group API - ".$post_title." - No rows found to remove (Address array): ".$wpdb->last_query);
 						}
 					}
 					##################################

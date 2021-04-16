@@ -53,7 +53,9 @@ echo "<div class='wrap'>
 
 											if($intAddressID > 0)
 											{
-												$result_address = $wpdb->get_results($wpdb->prepare("SELECT addressFirstName, addressSurName, addressEmail FROM ".get_address_table_prefix()."address WHERE addressID = '%d'", $intAddressID));
+												$strAddressName = $obj_address->get_name(array('address_id' => $intAddressID));
+
+												/*$result_address = $wpdb->get_results($wpdb->prepare("SELECT addressFirstName, addressSurName, addressEmail FROM ".get_address_table_prefix()."address WHERE addressID = '%d'", $intAddressID));
 
 												foreach($result_address as $r)
 												{
@@ -75,7 +77,7 @@ echo "<div class='wrap'>
 													{
 														$strAddressName = $emlAddressEmail;
 													}
-												}
+												}*/
 											}
 
 											switch($strVersionType)
@@ -134,8 +136,9 @@ echo "<div class='wrap'>
 												$user_name = "<em>(".__("unknown", $obj_group->lang_key).")</em>";
 											}
 
-											//$post_edit_url = admin_url("admin.php?page=mf_address/create/index.php&intAddressID=".$intAddressID."&intGroupID=".$obj_group->id);
-											$post_edit_url = "#";
+											//$post_edit_url = admin_url("admin.php?page=mf_address/create/index.php&intAddressID=".$intAddressID); //."&intGroupID=".$obj_group->id
+											$post_edit_url = admin_url("admin.php?page=mf_address/list/index.php&s=".$strAddressName);
+											//$post_edit_url = "#";
 
 											echo "<li class='".$strVersionType."'>
 												<i class='".$icon_class."' title='".$icon_title."'></i>
