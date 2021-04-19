@@ -42,7 +42,7 @@
 				transform: translateX(-50%);
 			}
 
-			.timeline .fa, .timeline .fas
+			.timeline li > .fa, .timeline li > .fas
 			{
 				background: #fff;
 				border: 4px solid #d7e4ed;
@@ -68,23 +68,30 @@
 				width: 40%;
 			}
 
+				.timeline .content.deleted
+				{
+					border-color: #e47676;
+				}
+
 				.timeline h3
 				{
 					font-size: 1em !important;
 					margin: 0 !important;
 				}
 
-					.timeline a
+					.timeline h3 a
 					{
+						display: inline-block;
+						margin-left: .5em;
 						text-decoration: none;
 					}
 
 				.timeline .grey
 				{
-					margin-left: 1em;
+					margin-left: .5em;
 				}
 
-				.timeline .trash > .content
+				.timeline .remove > .content, .timeline .trash > .content
 				{
 					border-color: #e47676;
 					float: right;

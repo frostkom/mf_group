@@ -24,6 +24,19 @@ class mf_group
 		$this->lang_key = 'lang_group';
 	}
 
+	function is_synced($group_id)
+	{
+		if(get_post_meta($group_id, $this->meta_prefix.'api', true) != '' || get_post_meta($group_id, $this->meta_prefix.'sync_users', true) == 'yes')
+		{
+			return true;
+		}
+
+		else
+		{
+			return false;
+		}
+	}
+
 	function get_for_select($data = array())
 	{
 		if(!isset($data['add_choose_here'])){		$data['add_choose_here'] = true;}
@@ -1170,6 +1183,10 @@ class mf_group
 		{
 			switch(check_var('page'))
 			{
+				case "mf_group/create/index.php":
+					mf_enqueue_script('script_group_wp', $plugin_include_url."script_wp.js", $plugin_version);
+				break;
+
 				case "mf_group/version/index.php":
 					mf_enqueue_style('style_group_timeline', $plugin_include_url."style_timeline.css", $plugin_version);
 				break;
@@ -2570,9 +2587,7 @@ if(class_exists('mf_list_table'))
 							$actions = apply_filters('add_group_list_amount_actions', $actions, $post_id);
 						}
 
-						$post_meta_api = get_post_meta($post_id, $obj_group->meta_prefix.'api', true);
-
-						if($post_meta_api == '')
+						if($obj_group->is_synced($post_id) == false)
 						{
 							$actions['addnremove'] = "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id."&strFilterIsMember&strFilterAccepted&strFilterUnsubscribed")."' title='".__("Add or remove", $obj_group->lang_key)."'><i class='fas fa-tasks fa-lg'></i></a>";
 
@@ -2607,11 +2622,11 @@ if(class_exists('mf_list_table'))
 				break;
 
 				case 'versioning':
-					$version_amount = $wpdb->get_var($wpdb->prepare("SELECT COUNT(versionID) FROM ".$wpdb->prefix."group_version WHERE groupID = '%d'", $post_id));
+					$version_amount = $wpdb->get_var($wpdb->prepare("SELECT COUNT(versionID) FROM ".$wpdb->prefix."group_version WHERE groupID = '%d' LIMIT 0, 11", $post_id));
 
 					if($version_amount > 0)
 					{
-						$out .= "<a href='".admin_url("admin.php?page=mf_group/version/index.php&intGroupID=".$post_id)."'>".$version_amount."</a>";
+						$out .= "<a href='".admin_url("admin.php?page=mf_group/version/index.php&intGroupID=".$post_id)."'>".($version_amount > 10 ? "10+" : $version_amount)."</a>";
 					}
 				break;
 

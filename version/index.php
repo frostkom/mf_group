@@ -49,35 +49,18 @@ echo "<div class='wrap'>
 												echo "<li><h2>".$date_this."</h2></li>";
 											}
 
-											$strAddressName = "";
+											$strAddressName = $content_class = "";
 
 											if($intAddressID > 0)
 											{
 												$strAddressName = $obj_address->get_name(array('address_id' => $intAddressID));
 
-												/*$result_address = $wpdb->get_results($wpdb->prepare("SELECT addressFirstName, addressSurName, addressEmail FROM ".get_address_table_prefix()."address WHERE addressID = '%d'", $intAddressID));
-
-												foreach($result_address as $r)
+												if($strAddressName == __("unknown", $obj_group->lang_key))
 												{
-													$strAddressFirstName = $r->addressFirstName;
-													$strAddressSurName = $r->addressSurName;
-													$emlAddressEmail = $r->addressEmail;
+													$intAddressID = 0;
 
-													if($strAddressFirstName != '' || $strAddressSurName != '')
-													{
-														$strAddressName = $strAddressFirstName;
-
-														if($strAddressSurName != '')
-														{
-															$strAddressName .= " ".$strAddressSurName;
-														}
-													}
-
-													else
-													{
-														$strAddressName = $emlAddressEmail;
-													}
-												}*/
+													$content_class .= " deleted";
+												}
 											}
 
 											switch($strVersionType)
@@ -117,9 +100,6 @@ echo "<div class='wrap'>
 													$icon_title = __("The address was unsubscribed from the group", $obj_group->lang_key);
 												break;
 
-												//$icon_class = "fa fa-eye yellow";
-												//$icon_class = "fa fa-check green";
-
 												default:
 													$icon_class = "fa fa-question-circle fa-3x blue";
 													$icon_title = __("An unknown status was saved", $obj_group->lang_key);
@@ -136,17 +116,22 @@ echo "<div class='wrap'>
 												$user_name = "<em>(".__("unknown", $obj_group->lang_key).")</em>";
 											}
 
-											//$post_edit_url = admin_url("admin.php?page=mf_address/create/index.php&intAddressID=".$intAddressID); //."&intGroupID=".$obj_group->id
-											$post_edit_url = admin_url("admin.php?page=mf_address/list/index.php&s=".$strAddressName);
-											//$post_edit_url = "#";
-
 											echo "<li class='".$strVersionType."'>
 												<i class='".$icon_class."' title='".$icon_title."'></i>
-												<div class='content'>
-													<h3><a href='".$post_edit_url."'>".$strAddressName."</a></h3>"
+												<div class='content".$content_class."'>
+													<h3>"
+														.$strAddressName;
+
+														if($intAddressID > 0)
+														{
+															echo "<a href='".admin_url("admin.php?page=mf_address/create/index.php&intAddressID=".$intAddressID)."'><i class='fa fa-wrench'></i></a>"
+															."<a href='".admin_url("admin.php?page=mf_address/list/index.php&s=".$strAddressName)."'><i class='fa fa-search'></i></a>";
+														}
+
+													echo "</h3>"
 													.$time_this
-													."<span class='grey'>".$user_name." <em>#".$intAddressID."</em></span>
-												</div>
+													."<span class='grey'>".sprintf(__("by %s", $obj_group->lang_key), $user_name)."</span>" // <em>#".$intAddressID."</em>
+												."</div>
 												<div>&nbsp;</div>
 											</li>";
 
@@ -177,8 +162,15 @@ echo "<div class='wrap'>
 							<form method='get' action='' class='mf_form mf_settings'>"
 								.show_select(array('data' => $arr_data, 'name' => 'intGroupID', 'text' => __("Group", $obj_group->lang_key), 'value' => $obj_group->id, 'xtra' => " rel='submit_change'"))
 								.show_submit(array('text' => __("Change", $obj_group->lang_key)))
-								.input_hidden(array('name' => 'page', 'value' => check_var('page')))
-							."</form>
+								.input_hidden(array('name' => 'page', 'value' => check_var('page')));
+
+								if($obj_group->id > 0)
+								{
+									echo "<a href='".admin_url("admin.php?page=mf_group/create/index.php&intGroupID=".$obj_group->id)."'><i class='fa fa-wrench fa-lg'></i></a> "
+									."<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$obj_group->id."&strFilterIsMember=yes&strFilterAccepted=yes&strFilterUnsubscribed=no")."'><i class='fa fa-eye fa-lg'></i></a>";
+								}
+
+							echo "</form>
 						</div>
 					</div>
 				</div>
