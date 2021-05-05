@@ -5,7 +5,7 @@ $obj_group->fetch_request();
 echo $obj_group->save_data();
 
 echo "<div class='wrap'>
-	<h2>".__("Sent", $obj_group->lang_key)."</h2>"
+	<h2>".__("Sent", 'lang_group')."</h2>"
 	.get_notification();
 
 	$tbl_group = new mf_group_sent_table();

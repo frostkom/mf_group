@@ -28,12 +28,12 @@ switch($type)
 
 			if(count($arr_allowed_server_ips) > 0)
 			{
-				$log_message = sprintf(__("The IP address (%s) are not amongst the accepted ones", $obj_group->lang_key), $remote_server_ip);
+				$log_message = sprintf(__("The IP address (%s) are not amongst the accepted ones", 'lang_group'), $remote_server_ip);
 			}
 
 			else
 			{
-				$log_message = __("There are no accepted IP addresses", $obj_group->lang_key);
+				$log_message = __("There are no accepted IP addresses", 'lang_group');
 			}
 
 			$json_output['success'] = false;
@@ -73,7 +73,7 @@ switch($type)
 			else
 			{
 				$json_output['success'] = true;
-				$json_output['message'] = __("There are no addresses in the group that you requested", $obj_group->lang_key);
+				$json_output['message'] = __("There are no addresses in the group that you requested", 'lang_group');
 			}
 		}
 	break;

@@ -5,7 +5,7 @@ $obj_group = new mf_group();
 //echo $obj_group->save_data();
 
 echo "<div class='wrap'>
-	<h2>".__("History", $obj_group->lang_key)."</h2>"
+	<h2>".__("History", 'lang_group')."</h2>"
 	.get_notification()
 	."<div id='poststuff'>";
 
@@ -16,7 +16,7 @@ echo "<div class='wrap'>
 			echo "<div id='post-body' class='columns-2'>
 				<div id='post-body-content'>
 					<div class='postbox'>
-						<h3 class='hndle'><span>".__("Versions", $obj_group->lang_key)."</span></h3>
+						<h3 class='hndle'><span>".__("Versions", 'lang_group')."</span></h3>
 						<div class='inside'>";
 
 							if($obj_group->id > 0)
@@ -55,7 +55,7 @@ echo "<div class='wrap'>
 											{
 												$strAddressName = $obj_address->get_name(array('address_id' => $intAddressID));
 
-												if($strAddressName == __("unknown", $obj_group->lang_key))
+												if($strAddressName == __("unknown", 'lang_group'))
 												{
 													$intAddressID = 0;
 
@@ -67,42 +67,42 @@ echo "<div class='wrap'>
 											{
 												case 'accept':
 													$icon_class = "fas fa-user-check fa-2x green";
-													$icon_title = __("The address was accepted to the group", $obj_group->lang_key);
+													$icon_title = __("The address was accepted to the group", 'lang_group');
 												break;
 
 												case 'acceptance_sent':
 													$icon_class = "fas fa-paper-plane fa-3x blue";
-													$icon_title = __("The address was sent a message to be accepted to the group", $obj_group->lang_key);
+													$icon_title = __("The address was sent a message to be accepted to the group", 'lang_group');
 												break;
 
 												case 'add':
 													$icon_class = "fa fa-plus-circle fa-3x green";
-													$icon_title = __("The address was added to the group", $obj_group->lang_key);
+													$icon_title = __("The address was added to the group", 'lang_group');
 												break;
 
 												case 'merge':
 													$icon_class = "fas fa-share-alt fa-3x blue";
-													$icon_title = __("The address was merged in the group", $obj_group->lang_key);
+													$icon_title = __("The address was merged in the group", 'lang_group');
 												break;
 
 												case 'remove':
 													$icon_class = "fa fa-times fa-3x red";
-													$icon_title = __("The address was removed from the group", $obj_group->lang_key);
+													$icon_title = __("The address was removed from the group", 'lang_group');
 												break;
 
 												case 'remove_all':
 													$icon_class = "fas fa-ban fa-3x";
-													$icon_title = __("All addresses were removed from the group", $obj_group->lang_key);
+													$icon_title = __("All addresses were removed from the group", 'lang_group');
 												break;
 
 												case 'unsubscribe':
 													$icon_class = "fas fa-user-slash fa-3x";
-													$icon_title = __("The address was unsubscribed from the group", $obj_group->lang_key);
+													$icon_title = __("The address was unsubscribed from the group", 'lang_group');
 												break;
 
 												default:
 													$icon_class = "fa fa-question-circle fa-3x blue";
-													$icon_title = __("An unknown status was saved", $obj_group->lang_key);
+													$icon_title = __("An unknown status was saved", 'lang_group');
 												break;
 											}
 
@@ -113,7 +113,7 @@ echo "<div class='wrap'>
 
 											else
 											{
-												$user_name = "<em>(".__("unknown", $obj_group->lang_key).")</em>";
+												$user_name = "<em>(".__("unknown", 'lang_group').")</em>";
 											}
 
 											echo "<li class='".$strVersionType."'>
@@ -130,7 +130,7 @@ echo "<div class='wrap'>
 
 													echo "</h3>"
 													.$time_this
-													."<span class='grey'>".sprintf(__("by %s", $obj_group->lang_key), $user_name)."</span>" // <em>#".$intAddressID."</em>
+													."<span class='grey'>".sprintf(__("by %s", 'lang_group'), $user_name)."</span>" // <em>#".$intAddressID."</em>
 												."</div>
 												<div>&nbsp;</div>
 											</li>";
@@ -143,13 +143,13 @@ echo "<div class='wrap'>
 
 								else
 								{
-									echo "<em>".__("I could not find any old versions of this group", $obj_group->lang_key)."</em>";
+									echo "<em>".__("I could not find any old versions of this group", 'lang_group')."</em>";
 								}
 							}
 
 							else
 							{
-								echo "<em>".__("Choose a group to the right and all the previous versions will magically appear here", $obj_group->lang_key)."</em>";
+								echo "<em>".__("Choose a group to the right and all the previous versions will magically appear here", 'lang_group')."</em>";
 							}
 
 						echo "</div>
@@ -157,11 +157,11 @@ echo "<div class='wrap'>
 				</div>
 				<div id='postbox-container-1'>
 					<div class='postbox'>
-						<h3 class='hndle'><span>".__("Groups", $obj_group->lang_key)."</span></h3>
+						<h3 class='hndle'><span>".__("Groups", 'lang_group')."</span></h3>
 						<div class='inside'>
 							<form method='get' action='' class='mf_form mf_settings'>"
-								.show_select(array('data' => $arr_data, 'name' => 'intGroupID', 'text' => __("Group", $obj_group->lang_key), 'value' => $obj_group->id, 'xtra' => " rel='submit_change'"))
-								.show_submit(array('text' => __("Change", $obj_group->lang_key)))
+								.show_select(array('data' => $arr_data, 'name' => 'intGroupID', 'text' => __("Group", 'lang_group'), 'value' => $obj_group->id, 'xtra' => " rel='submit_change'"))
+								.show_submit(array('text' => __("Change", 'lang_group')))
 								.input_hidden(array('name' => 'page', 'value' => check_var('page')));
 
 								if($obj_group->id > 0)

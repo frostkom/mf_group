@@ -73,7 +73,7 @@ if(isset($_POST['btnGroupImport']) && $strGroupImport != '' && wp_verify_nonce($
 
 				else
 				{
-					$error_text = __("An address with that information did not exist", $obj_group->lang_key)." (".$address_row.")";
+					$error_text = __("An address with that information did not exist", 'lang_group')." (".$address_row.")";
 				}
 			}
 		}
@@ -81,32 +81,32 @@ if(isset($_POST['btnGroupImport']) && $strGroupImport != '' && wp_verify_nonce($
 
 	else
 	{
-		$error_text = __("There does not seam to be a group to import to", $obj_group->lang_key);
+		$error_text = __("There does not seam to be a group to import to", 'lang_group');
 	}
 
 	if($rows > 0)
 	{
 		$strGroupImport = "";
 
-		$done_text = sprintf(__("The group was updated with %d addresses", $obj_group->lang_key), $rows);
+		$done_text = sprintf(__("The group was updated with %d addresses", 'lang_group'), $rows);
 		$error_text = "";
 	}
 
 	else if(!isset($error_text) || $error_text == '')
 	{
-		$error_text = __("The group was not updated with any addresses", $obj_group->lang_key);
+		$error_text = __("The group was not updated with any addresses", 'lang_group');
 	}
 }
 
 echo "<div class='wrap'>
-	<h2>".__("Import", $obj_group->lang_key)."</h2>"
+	<h2>".__("Import", 'lang_group')."</h2>"
 	.get_notification()
 	."<div id='poststuff' class='postbox'>
-		<h3 class='hndle'>".__("Add", $obj_group->lang_key)."</h3>
+		<h3 class='hndle'>".__("Add", 'lang_group')."</h3>
 		<div class='inside'>
 			<form action='#' method='post' class='mf_form mf_settings'>"
-				.show_textarea(array('name' => 'strGroupImport', 'text' => __("Text", $obj_group->lang_key), 'value' => $strGroupImport, 'xtra' => "autofocus", 'placeholder' => __("Enter social security numbers or e-mail addresses on separate rows for import", $obj_group->lang_key)))
-				.show_button(array('name' => 'btnGroupImport', 'text' => __("Import", $obj_group->lang_key)))
+				.show_textarea(array('name' => 'strGroupImport', 'text' => __("Text", 'lang_group'), 'value' => $strGroupImport, 'xtra' => "autofocus", 'placeholder' => __("Enter social security numbers or e-mail addresses on separate rows for import", 'lang_group')))
+				.show_button(array('name' => 'btnGroupImport', 'text' => __("Import", 'lang_group')))
 				.input_hidden(array('name' => 'intGroupID', 'value' => $intGroupID))
 				.wp_nonce_field('group_import_'.$intGroupID, '_wpnonce_group_import', true, false)
 			."</form>

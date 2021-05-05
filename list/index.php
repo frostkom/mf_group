@@ -6,8 +6,8 @@ echo $obj_group->save_data();
 
 echo "<div class='wrap'>
 	<h2>"
-		.__("Group", $obj_group->lang_key)
-		."<a href='".admin_url("admin.php?page=mf_group/create/index.php")."' class='add-new-h2'>".__("Add New", $obj_group->lang_key)."</a>"
+		.__("Group", 'lang_group')
+		."<a href='".admin_url("admin.php?page=mf_group/create/index.php")."' class='add-new-h2'>".__("Add New", 'lang_group')."</a>"
 	."</h2>"
 	.get_notification();
 
