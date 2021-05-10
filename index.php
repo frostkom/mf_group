@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: 
-Version: 5.8.26
+Version: 5.9.0
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://frostkom.se
@@ -77,7 +77,7 @@ if(is_plugin_active("mf_base/index.php"))
 
 		require_plugin("mf_address/index.php", "MF Address Book");
 
-		$default_charset = DB_CHARSET != '' ? DB_CHARSET : "utf8";
+		$default_charset = (DB_CHARSET != '' ? DB_CHARSET : 'utf8');
 
 		$arr_add_column = $arr_update_column = $arr_add_index = array();
 

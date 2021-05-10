@@ -1229,6 +1229,9 @@ class mf_group
 
 		$menu_title = __("History", 'lang_group');
 		add_submenu_page($menu_root, $menu_title, $menu_title, $menu_capability, $menu_root.'version/index.php');
+
+		$menu_title = __("Help", 'lang_group');
+		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, $menu_root.'help/index.php');
 	}
 
 	function has_allow_registration_post()
