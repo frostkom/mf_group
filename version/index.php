@@ -1,6 +1,6 @@
 <?php
 
-$obj_group = new mf_group();
+$obj_group = new mf_group(array('type' => 'version'));
 //$obj_group->fetch_request();
 //echo $obj_group->save_data();
 
@@ -63,6 +63,8 @@ echo "<div class='wrap'>
 												}
 											}
 
+											$icon_link = "";
+
 											switch($strVersionType)
 											{
 												case 'accept':
@@ -76,8 +78,28 @@ echo "<div class='wrap'>
 												break;
 
 												case 'add':
-													$icon_class = "fa fa-plus-circle fa-3x green";
-													$icon_title = __("The address was added to the group", 'lang_group');
+													if($obj_group->has_address(array('address_id' => $intAddressID, 'group_id' => $obj_group->id)) == false)
+													{
+														if($intAddressID > 0)
+														{
+															$icon_link = wp_nonce_url(admin_url("admin.php?page=mf_address/list/index.php&intAddressID=".$intAddressID."&intGroupID=".$obj_group->id."&btnAddressAdd"), 'address_add_'.$intAddressID.'_'.$obj_group->id, '_wpnonce_address_add');
+
+															$icon_class = "fa fa-plus-circle fa-3x blue";
+															$icon_title = __("The address was added to the group but is not part of the group anymore. Add again?", 'lang_group');
+														}
+
+														else
+														{
+															$icon_class = "fa fa-plus-circle fa-3x grey";
+															$icon_title = __("The address was added to the group but is not part of the group anymore", 'lang_group');
+														}
+													}
+
+													else
+													{
+														$icon_class = "fa fa-plus-circle fa-3x green";
+														$icon_title = __("The address was added to the group", 'lang_group');
+													}
 												break;
 
 												case 'merge':
@@ -116,9 +138,21 @@ echo "<div class='wrap'>
 												$user_name = "<em>(".__("unknown", 'lang_group').")</em>";
 											}
 
-											echo "<li class='".$strVersionType."'>
-												<i class='".$icon_class."' title='".$icon_title."'></i>
-												<div class='content".$content_class."'>
+											echo "<li class='".$strVersionType."'>";
+
+												if($icon_link != '')
+												{
+													echo "<a href='".$icon_link."'>";
+												}
+
+													echo "<i class='".$icon_class."' title='".$icon_title."'></i>";
+
+												if($icon_link != '')
+												{
+													echo "</a>";
+												}
+
+												echo "<div class='content".$content_class."'>
 													<h3>"
 														.$strAddressName;
 
