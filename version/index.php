@@ -195,7 +195,7 @@ echo "<div class='wrap'>
 						<div class='inside'>
 							<form method='get' action='' class='mf_form mf_settings'>"
 								.show_select(array('data' => $arr_data, 'name' => 'intGroupID', 'text' => __("Group", 'lang_group'), 'value' => $obj_group->id, 'xtra' => " rel='submit_change'"))
-								.show_submit(array('text' => __("Change", 'lang_group')))
+								.show_button(array('text' => __("Change", 'lang_group')))
 								.input_hidden(array('name' => 'page', 'value' => check_var('page')));
 
 								if($obj_group->id > 0)

@@ -1243,19 +1243,6 @@ class mf_group
 		return ($post_id > 0);
 	}
 
-	/*function add_policy($content)
-	{
-		if($this->has_allow_registration_post())
-		{
-			$content .= "<h3>".__("Group", 'lang_group')."</h3>
-			<p>"
-				.__("We collect personal information when a subscription is begun by entering at least an e-mail address. This makes it possible for us to send the wanted e-mails to the correct recipient.", 'lang_group')
-			."</p>";
-		}
-
-		return $content;
-	}*/
-
 	function admin_notices()
 	{
 		global $wpdb, $error_text;
@@ -2324,13 +2311,20 @@ if(class_exists('mf_list_table'))
 	{
 		function set_default()
 		{
-			$this->post_type = "mf_group";
+			global $obj_group;
+
+			if(!isset($obj_group))
+			{
+				$obj_group = new mf_group();
+			}
+
+			$this->post_type = $obj_group->post_type;
 
 			$this->arr_settings['query_select_id'] = "ID";
 			$this->orderby_default = "post_title";
 
 			$this->arr_settings['has_autocomplete'] = true;
-			$this->arr_settings['plugin_name'] = 'mf_group';
+			$this->arr_settings['plugin_name'] = $this->post_type;
 		}
 
 		function init_fetch()
