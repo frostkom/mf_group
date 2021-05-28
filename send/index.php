@@ -34,7 +34,7 @@ echo "<div class='wrap'>
 
 										$user_name = $user_data->display_name;
 										$user_email = $user_data->user_email;
-										$admin_name = get_bloginfo('name');
+										$site_title = get_bloginfo('name');
 										$admin_email = get_bloginfo('admin_email');
 
 										$arr_data_from = array();
@@ -47,7 +47,7 @@ echo "<div class='wrap'>
 
 										if($admin_email != '' && $admin_email != $user_email)
 										{
-											$arr_data_from[$admin_name."|".$admin_email] = $admin_name." (".$admin_email.")";
+											$arr_data_from[$site_title."|".$admin_email] = $site_title." (".$admin_email.")";
 										}
 									}
 
@@ -114,9 +114,8 @@ echo "<div class='wrap'>
 
 						echo "<div class='postbox'>
 							<h3 class='hndle'>".__("Advanced", 'lang_group')."</h3>
-							<div class='inside'>";
-
-								echo show_select(array('data' => $arr_data_source, 'name' => 'intEmailTextSource', 'text' => __("Text Source", 'lang_group'), 'xtra' => "rel='submit_change' class='is_disabled' disabled"))
+							<div class='inside'>"
+								.show_select(array('data' => $arr_data_source, 'name' => 'intEmailTextSource', 'text' => __("Text Source", 'lang_group'), 'xtra' => "rel='submit_change'")) // class='is_disabled' disabled
 								.get_media_button(array('name' => 'strMessageAttachment', 'value' => $obj_group->message_attachment));
 
 								if($obj_group->message_text == '' || $obj_group->message_text != '' && !preg_match("/\[view_in_browser_link\]/", $obj_group->message_text))

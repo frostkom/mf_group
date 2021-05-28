@@ -1,7 +1,5 @@
 jQuery(function($)
 {
-	console.log("Init...");
-
 	var dom_show_and_hide_fields = $("#strGroupAPI, #strGroupAcceptanceEmail, #strGroupAcceptanceSubject, #strGroupAllowRegistration, #strGroupVerifyAddress");
 
 	function show_and_hide_fields()
