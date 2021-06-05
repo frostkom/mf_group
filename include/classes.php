@@ -152,7 +152,10 @@ class mf_group
 		global $wpdb, $obj_address, $done_text, $error_text;
 
 		if(!isset($data['text'])){											$data['text'] = '';}
+		if(!isset($data['label_type'])){									$data['label_type'] = '';}
+		if(!isset($data['display_consent'])){								$data['display_consent'] = 'yes';}
 		if(!isset($data['button_text']) || $data['button_text'] == ''){		$data['button_text'] = __("Join", 'lang_group');}
+		if(!isset($data['group_button_icon'])){								$data['group_button_icon'] = '';}
 
 		$out = "";
 
@@ -310,24 +313,36 @@ class mf_group
 
 				if(is_array($arrGroupRegistrationFields) && count($arrGroupRegistrationFields) > 0)
 				{
+					switch($data['label_type'])
+					{
+						default:
+						case 'label':
+							$label_type = 'text';
+						break;
+
+						case 'placeholder':
+							$label_type = 'placeholder';
+						break;
+					}
+
 					if(in_array("name", $arrGroupRegistrationFields))
 					{
-						$out .= show_textfield(array('name' => 'strAddressName', 'text' => __("Name", 'lang_group'), 'value' => $strAddressName, 'required' => true));
+						$out .= show_textfield(array('name' => 'strAddressName', $label_type => __("Name", 'lang_group'), 'value' => $strAddressName, 'required' => true));
 					}
 
 					if(in_array("address", $arrGroupRegistrationFields))
 					{
-						$out .= show_textfield(array('name' => 'strAddressAddress', 'text' => __("Address", 'lang_group'), 'value' => $strAddressAddress, 'required' => true));
+						$out .= show_textfield(array('name' => 'strAddressAddress', $label_type => __("Address", 'lang_group'), 'value' => $strAddressAddress, 'required' => true));
 					}
 
 					if(in_array("zip", $arrGroupRegistrationFields))
 					{
-						$out .= show_textfield(array('name' => 'intAddressZipCode', 'text' => __("Zip Code", 'lang_group'), 'value' => $intAddressZipCode, 'type' => 'number', 'required' => true));
+						$out .= show_textfield(array('name' => 'intAddressZipCode', $label_type => __("Zip Code", 'lang_group'), 'value' => $intAddressZipCode, 'type' => 'number', 'required' => true));
 					}
 
 					if(in_array("city", $arrGroupRegistrationFields))
 					{
-						$out .= show_textfield(array('name' => 'strAddressCity', 'text' => __("City", 'lang_group'), 'value' => $strAddressCity, 'required' => true));
+						$out .= show_textfield(array('name' => 'strAddressCity', $label_type => __("City", 'lang_group'), 'value' => $strAddressCity, 'required' => true));
 					}
 
 					if(in_array("country", $arrGroupRegistrationFields))
@@ -337,27 +352,42 @@ class mf_group
 							$obj_address = new mf_address();
 						}
 
-						$out .= show_select(array('data' => $obj_address->get_countries_for_select(), 'name' => 'intAddressCountry', 'text' => __("Country", 'lang_group'), 'value' => $intAddressCountry, 'required' => true));
+						switch($data['label_type'])
+						{
+							default:
+							case 'label':
+								$out .= show_select(array('data' => $obj_address->get_countries_for_select(), 'name' => 'intAddressCountry', 'text' => __("Country", 'lang_group'), 'value' => $intAddressCountry, 'required' => true));
+							break;
+
+							case 'placeholder':
+								$out .= show_select(array('data' => $obj_address->get_countries_for_select(array('choose_here_text' => __("Choose Country Here", 'lang_group'))), 'name' => 'intAddressCountry', 'value' => $intAddressCountry, 'required' => true));
+							break;
+						}
 					}
 
 					if(in_array("phone", $arrGroupRegistrationFields))
 					{
-						$out .= show_textfield(array('name' => 'strAddressTelNo', 'text' => __("Phone Number", 'lang_group'), 'value' => $strAddressTelNo, 'required' => true));
+						$out .= show_textfield(array('name' => 'strAddressTelNo', $label_type => __("Phone Number", 'lang_group'), 'value' => $strAddressTelNo, 'required' => true));
 					}
 
 					if(in_array("email", $arrGroupRegistrationFields))
 					{
-						$out .= show_textfield(array('name' => 'strAddressEmail', 'text' => __("E-mail", 'lang_group'), 'value' => $strAddressEmail, 'required' => true));
+						$out .= show_textfield(array('name' => 'strAddressEmail', $label_type => __("E-mail", 'lang_group'), 'value' => $strAddressEmail, 'required' => true));
 					}
 
 					if(in_array("extra", $arrGroupRegistrationFields))
 					{
-						$out .= show_textfield(array('name' => 'strAddressExtra', 'text' => get_option_or_default('setting_address_extra', __("Extra", 'lang_group')), 'value' => $strAddressExtra, 'required' => true));
+						$out .= show_textfield(array('name' => 'strAddressExtra', $label_type => get_option_or_default('setting_address_extra', __("Extra", 'lang_group')), 'value' => $strAddressExtra, 'required' => true));
 					}
 
-					$out .= "<div class='form_button'>"
-						.show_checkbox(array('name' => 'intGroupConsent', 'text' => __("I consent to having this website store my submitted information, so that they can contact me as part of this newsletter", 'lang_group'), 'value' => 1, 'required' => true))
-						.show_button(array('name' => 'btnGroupJoin', 'text' => $data['button_text']))
+					$out .= "<div class='form_button'>";
+
+						if($data['display_consent'] == 'yes')
+						{
+							$out .= show_checkbox(array('name' => 'intGroupConsent', 'text' => __("I consent to having this website store my submitted information, so that they can contact me as part of this newsletter", 'lang_group'), 'value' => 1, 'required' => true));
+						}
+
+						$out .= show_button(array('name' => 'btnGroupJoin', 'text' => $data['button_text'].($data['button_icon'] != '' ? " <i class='".$data['button_icon']."'></i>" : "")))
 					."</div>";
 				}
 
@@ -366,10 +396,14 @@ class mf_group
 					$out .= "<div class='flex_form'>"
 						.show_textfield(array('name' => 'strAddressEmail', 'placeholder' => __("Your Email Address", 'lang_group'), 'value' => $strAddressEmail, 'required' => true))
 						."<div class='form_button'>"
-							.show_button(array('name' => 'btnGroupJoin', 'text' => $data['button_text']))
+							.show_button(array('name' => 'btnGroupJoin', 'text' => $data['button_text'].($data['button_icon'] != '' ? " <i class='".$data['button_icon']."'></i>" : "")))
 						."</div>
-					</div>"
-					.show_checkbox(array('name' => 'intGroupConsent', 'text' => __("I consent to having this website store my submitted information, so that they can contact me as part of this newsletter", 'lang_group'), 'value' => 1, 'required' => true));
+					</div>";
+
+					if($data['display_consent'] == 'yes')
+					{
+						$out .= show_checkbox(array('name' => 'intGroupConsent', 'text' => __("I consent to having this website store my submitted information, so that they can contact me as part of this newsletter", 'lang_group'), 'value' => 1, 'required' => true));
+					}
 				}
 
 			$out .= "</form>";
@@ -2901,11 +2935,11 @@ if(class_exists('mf_list_table'))
 
 							if($dteQueueSentTime_first > DEFAULT_DATE)
 							{
-								$is_same_day = (date("Y-m-d", strtotime($item['messageCreated'])) == date("Y-m-d", strtotime($dteQueueSentTime_first)));
+								$is_same_day = ($item['messageCreated'] < date("Y-m-d H:i:s", strtotime("-7 day")) && date("Y-m-d", strtotime($item['messageCreated'])) == date("Y-m-d", strtotime($dteQueueSentTime_first)));
 
 								if($is_same_day)
 								{
-									$actions['sent'] = date("H:i", strtotime($dteQueueSentTime_first));
+									$actions['sent'] = date("G:i", strtotime($dteQueueSentTime_first));
 								}
 
 								else
@@ -2917,9 +2951,9 @@ if(class_exists('mf_list_table'))
 
 								if($is_same_day)
 								{
-									if(date("H:i", strtotime($dteQueueSentTime_last)) != $actions['sent'])
+									if(date("G:i", strtotime($dteQueueSentTime_last)) != $actions['sent'])
 									{
-										$actions['sent'] .= " - ".date("H:i", strtotime($dteQueueSentTime_last));
+										$actions['sent'] .= " - ".date("G:i", strtotime($dteQueueSentTime_last));
 									}
 								}
 
@@ -2969,11 +3003,44 @@ if(class_exists('mf_list_table'))
 						$out .= "<p>".get_media_button(array('name' => 'strMessageAttachment', 'value' => $item['messageAttachment'], 'show_add_button' => false))."</p>";
 					}
 
-					$result_sent = $wpdb->get_results($wpdb->prepare("SELECT addressFirstName, addressSurName, addressEmail, addressCellNo, queueSent FROM ".$wpdb->prefix."group_queue INNER JOIN ".get_address_table_prefix()."address USING (addressID) WHERE messageID = '%d' ORDER BY queueID ASC LIMIT 0, 100", $intMessageID2));
+					$sent_limit = 100;
+
+					$result_sent = $wpdb->get_results($wpdb->prepare("SELECT addressFirstName, addressSurName, addressEmail, addressCellNo, queueSent, queueSentTime FROM ".$wpdb->prefix."group_queue INNER JOIN ".get_address_table_prefix()."address USING (addressID) WHERE messageID = '%d' ORDER BY queueSentTime ASC, queueID ASC LIMIT 0, ".$sent_limit, $intMessageID2));
 
 					if($wpdb->num_rows > 0)
 					{
-						$out .= "<ol>";
+						$date_created = date("Y-m-d", strtotime($item['messageCreated']));
+						$date_sent = "";
+
+						$out .= "<p>
+							<strong>".__("Created", 'lang_group').":</strong> ".$item['messageCreated'];
+
+							$dteQueueSentTime_first = $wpdb->get_var($wpdb->prepare("SELECT MIN(queueSentTime) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueSent = '1'", $intMessageID2));
+
+							if($dteQueueSentTime_first > DEFAULT_DATE)
+							{
+								$date_sent = date("Y-m-d", strtotime($dteQueueSentTime_first));
+
+								$dteQueueSentTime_last = $wpdb->get_var($wpdb->prepare("SELECT MAX(queueSentTime) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueSent = '1'", $intMessageID2));
+
+								$date_sent_end = date("Y-m-d", strtotime($dteQueueSentTime_last));
+
+								$out .= "<br>
+								<strong>".__("Sent", 'lang_group').":</strong> "
+									.($date_sent > $date_created ? $dteQueueSentTime_first : date("G:i:s", strtotime($dteQueueSentTime_first)));
+
+								if($dteQueueSentTime_last > $dteQueueSentTime_first)
+								{
+									$out .= " - ".($date_sent_end > $date_sent ? $dteQueueSentTime_last : date("G:i:s", strtotime($dteQueueSentTime_last)));
+								}
+							}
+
+						$out .= "</p>
+						<ol>";
+
+							$i = 0;
+
+							$dteQueueSentTime_temp = "";
 
 							foreach($result_sent as $r)
 							{
@@ -2982,6 +3049,9 @@ if(class_exists('mf_list_table'))
 								$strAddressEmail = $r->addressEmail;
 								$strAddressCellNo = $r->addressCellNo;
 								$intQueueSent = $r->queueSent;
+								$dteQueueSentTime = $r->queueSentTime;
+
+								$date_sent_temp = date("Y-m-d", strtotime($dteQueueSentTime));
 
 								$out .= "<li>"
 									."<i class='fa ".($intQueueSent == 1 ? "fa-check green" : "fa-times red")."'></i> ";
@@ -3009,10 +3079,43 @@ if(class_exists('mf_list_table'))
 										}
 									}
 
+									if($dteQueueSentTime > $dteQueueSentTime_temp || ($i + 1 >= $sent_limit))
+									{
+										$out .= " <span class='grey'>";
+
+											if($date_sent == "" || $date_sent_temp != $date_sent)
+											{
+												$out .= $dteQueueSentTime;
+
+												$date_sent_temp = $date_sent;
+											}
+
+											else
+											{
+												$out .= date("G:i:s", strtotime($dteQueueSentTime));
+											}
+
+										$out .= "</span>";
+
+										$dteQueueSentTime_temp = $dteQueueSentTime;
+									}
+
 								$out .= "</li>";
+
+								$i++;
 							}
 
 						$out .= "</ol>";
+
+						if($i >= $sent_limit)
+						{
+							$intMessageTotal = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d'", $intMessageID2));
+
+							if($intMessageTotal > $sent_limit)
+							{
+								$out .= "<p>".sprintf(__("...and %d more", 'lang_group'), ($intMessageTotal - $sent_limit))."</p>";
+							}
+						}
 					}
 				break;
 
@@ -3096,7 +3199,10 @@ class widget_group extends WP_Widget
 			'group_heading' => '',
 			'group_text' => '',
 			'group_id' => '',
+			'group_label_type' => '',
+			'group_display_consent' => 'yes',
 			'group_button_text' => '',
+			'group_button_icon' => '',
 		);
 
 		parent::__construct('group-widget', __("Group", 'lang_group')." / ".__("Newsletter", 'lang_group'), $this->widget_ops);
@@ -3122,7 +3228,7 @@ class widget_group extends WP_Widget
 				}
 
 				echo "<div class='section'>"
-					.$this->obj_group->show_group_registration_form(array('id' => $instance['group_id'], 'text' => $instance['group_text'], 'button_text' => $instance['group_button_text']))
+					.$this->obj_group->show_group_registration_form(array('id' => $instance['group_id'], 'text' => $instance['group_text'], 'label_type' => $instance['group_label_type'], 'display_consent' => $instance['group_display_consent'], 'button_text' => $instance['group_button_text'], 'button_icon' => $instance['group_button_icon']))
 				."</div>"
 			.$after_widget;
 		}
@@ -3136,13 +3242,31 @@ class widget_group extends WP_Widget
 		$instance['group_heading'] = sanitize_text_field($new_instance['group_heading']);
 		$instance['group_text'] = sanitize_text_field($new_instance['group_text']);
 		$instance['group_id'] = sanitize_text_field($new_instance['group_id']);
+		$instance['group_label_type'] = sanitize_text_field($new_instance['group_label_type']);
+		$instance['group_display_consent'] = sanitize_text_field($new_instance['group_display_consent']);
 		$instance['group_button_text'] = sanitize_text_field($new_instance['group_button_text']);
+		$instance['group_button_icon'] = sanitize_text_field($new_instance['group_button_icon']);
 
 		return $instance;
 	}
 
+	function get_label_types_for_select()
+	{
+		return array(
+			'label' => __("Label", 'lang_group'),
+			'placeholder' => __("Placeholder", 'lang_group'),
+		);
+	}
+
 	function form($instance)
 	{
+		global $obj_base;
+
+		if(!isset($obj_base))
+		{
+			$obj_base = new mf_base();
+		}
+
 		$instance = wp_parse_args((array)$instance, $this->arr_default);
 
 		$arr_data = array();
@@ -3152,7 +3276,10 @@ class widget_group extends WP_Widget
 			.show_textfield(array('name' => $this->get_field_name('group_heading'), 'text' => __("Heading", 'lang_group'), 'value' => $instance['group_heading'], 'xtra' => " id='".$this->widget_ops['classname']."-title'"))
 			.show_textarea(array('name' => $this->get_field_name('group_text'), 'text' => __("Text", 'lang_group'), 'value' => $instance['group_text']))
 			.show_select(array('data' => $arr_data, 'name' => $this->get_field_name('group_id'), 'text' => __("Group", 'lang_group'), 'value' => $instance['group_id']))
+			.show_select(array('data' => $this->get_label_types_for_select(), 'name' => $this->get_field_name('group_label_type'), 'text' => __("Display Input Label as", 'lang_group'), 'value' => $instance['group_label_type']))
+			.show_select(array('data' => get_yes_no_for_select(), 'name' => $this->get_field_name('group_display_consent'), 'text' => __("Display Consent", 'lang_group'), 'value' => $instance['group_display_consent']))
 			.show_textfield(array('name' => $this->get_field_name('group_button_text'), 'text' => __("Button Text", 'lang_group'), 'value' => $instance['group_button_text'], 'placeholder' => __("Join", 'lang_group')))
+			.show_select(array('data' => $obj_base->get_icons_for_select(), 'name' => $this->get_field_name('group_button_icon'), 'text' => __("Button Icon", 'lang_group'), 'value' => $instance['group_button_icon']))
 		."</div>";
 	}
 }

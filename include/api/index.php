@@ -9,7 +9,10 @@ if(!defined('ABSPATH'))
 	require_once($folder."wp-load.php");
 }
 
-$obj_group = new mf_group();
+if(!isset($obj_group))
+{
+	$obj_group = new mf_group();
+}
 
 $json_output = array();
 
