@@ -155,7 +155,7 @@ class mf_group
 		if(!isset($data['label_type'])){									$data['label_type'] = '';}
 		if(!isset($data['display_consent'])){								$data['display_consent'] = 'yes';}
 		if(!isset($data['button_text']) || $data['button_text'] == ''){		$data['button_text'] = __("Join", 'lang_group');}
-		if(!isset($data['group_button_icon'])){								$data['group_button_icon'] = '';}
+		if(!isset($data['button_icon'])){									$data['button_icon'] = '';}
 
 		$out = "";
 
