@@ -42,7 +42,7 @@ echo "<div class='wrap'>
 
 			/*echo "<div id='postbox-container-1'>
 				<div class='postbox'>
-					<h3 class='hndle'><span>".__("", 'lang_group')."</span></h3>
+					<h3 class='hndle'><span></span></h3>
 					<div class='inside'></div>
 				</div>
 			</div>";*/

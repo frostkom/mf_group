@@ -337,7 +337,7 @@ class mf_group
 
 					if(in_array("zip", $arrGroupRegistrationFields))
 					{
-						$out .= show_textfield(array('name' => 'intAddressZipCode', $label_type => __("Zip Code", 'lang_group'), 'value' => $intAddressZipCode, 'type' => 'number', 'required' => true));
+						$out .= show_textfield(array('type' => 'number', 'name' => 'intAddressZipCode', $label_type => __("Zip Code", 'lang_group'), 'value' => $intAddressZipCode, 'required' => true));
 					}
 
 					if(in_array("city", $arrGroupRegistrationFields))

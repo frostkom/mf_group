@@ -25,26 +25,14 @@ echo "<div class='wrap'>
 						<div class='inside'>"
 							.show_textfield(array('name' => 'strGroupName', 'text' => __("Name", 'lang_group'), 'value' => $obj_group->name, 'xtra' => "autofocus"));
 
-							$group_api_description = "";
-
-							if($obj_group->id > 0)
-							{
-								//$group_api_description = "<a href='".get_site_url()."/wp-content/plugins/mf_group/include/api/?group_id=".$obj_group->id."'>".__("Use this link to synchronize all the addresses from this group to another site", 'lang_group')."</a>";
-							}
-
-							else
+							if($obj_group->id == 0)
 							{
 								echo show_select(array('data' => $obj_group->get_for_select(), 'name' => 'intGroupID_copy', 'text' => __("Copy addresses from", 'lang_group')));
 							}
 
-							echo show_textarea(array('name' => 'strGroupAPI', 'text' => __("API Link", 'lang_group'), 'value' => $obj_group->api, 'description' => $group_api_description));
-
-							/*if($obj_group->api != '')
-							{*/
-								echo show_textarea(array('name' => 'strGroupAPIFilter', 'text' => __("Filter API", 'lang_group'), 'value' => $obj_group->api_filter, 'placeholder' => "include:field=[value1,value2]"));
-							//}
-
-						echo "</div>
+							echo show_textarea(array('name' => 'strGroupAPI', 'text' => __("API Link", 'lang_group'), 'value' => $obj_group->api))
+							.show_textarea(array('name' => 'strGroupAPIFilter', 'text' => __("Filter API", 'lang_group'), 'value' => $obj_group->api_filter, 'placeholder' => "include:field=[value1,value2]"))
+						."</div>
 					</div>";
 
 					if($obj_group->api == '')
@@ -52,26 +40,17 @@ echo "<div class='wrap'>
 						echo "<div class='postbox'>
 							<h3 class='hndle'><span>".__("Acceptance e-mail", 'lang_group')."</span></h3>
 							<div class='inside'>"
-								.show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupAcceptanceEmail', 'text' => __("Send before adding to a group", 'lang_group'), 'value' => $obj_group->acceptance_email));
-
-								/*if($obj_group->acceptance_email == 'yes')
-								{*/
-									echo "<div class='display_acceptance_message'>"
-										.show_textfield(array('name' => 'strGroupAcceptanceSubject', 'text' => __("Subject", 'lang_group'), 'value' => $obj_group->acceptance_subject, 'placeholder' => sprintf(__("Accept subscription to %s", 'lang_group'), $obj_group->name)))
-										.show_wp_editor(array('name' => 'strGroupAcceptanceText', 'value' => $obj_group->acceptance_text, 'description' => __("Example", 'lang_group').": ".sprintf(__("You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below.", 'lang_group'), $obj_group->name)))
-									."</div>";
-
-									/*if($obj_group->acceptance_subject != '' && $obj_group->acceptance_text != '')
-									{*/
-										echo "<div class='display_reminder_message'>
-											<h3>".__("Reminder if the recipient has not yet accepted", 'lang_group')."</h3>"
-											.show_textfield(array('name' => 'strGroupReminderSubject', 'text' => __("Subject", 'lang_group'), 'value' => $obj_group->reminder_subject, 'placeholder' => sprintf(__("Accept subscription to %s", 'lang_group'), $obj_group->name)))
-											.show_wp_editor(array('name' => 'strGroupReminderText', 'value' => $obj_group->reminder_text, 'description' => __("Example", 'lang_group').": ".sprintf(__("You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below.", 'lang_group'), $obj_group->name)))
-										."</div>";
-									/*}
-								}*/
-
-							echo "</div>
+								.show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupAcceptanceEmail', 'text' => __("Send before adding to a group", 'lang_group'), 'value' => $obj_group->acceptance_email))
+								."<div class='display_acceptance_message'>"
+									.show_textfield(array('name' => 'strGroupAcceptanceSubject', 'text' => __("Subject", 'lang_group'), 'value' => $obj_group->acceptance_subject, 'placeholder' => sprintf(__("Accept subscription to %s", 'lang_group'), $obj_group->name)))
+									.show_wp_editor(array('name' => 'strGroupAcceptanceText', 'value' => $obj_group->acceptance_text, 'description' => __("Example", 'lang_group').": ".sprintf(__("You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below.", 'lang_group'), $obj_group->name)))
+								."</div>
+								<div class='display_reminder_message'>
+									<h3>".__("Reminder if the recipient has not yet accepted", 'lang_group')."</h3>"
+									.show_textfield(array('name' => 'strGroupReminderSubject', 'text' => __("Subject", 'lang_group'), 'value' => $obj_group->reminder_subject, 'placeholder' => sprintf(__("Accept subscription to %s", 'lang_group'), $obj_group->name)))
+									.show_wp_editor(array('name' => 'strGroupReminderText', 'value' => $obj_group->reminder_text, 'description' => __("Example", 'lang_group').": ".sprintf(__("You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below.", 'lang_group'), $obj_group->name)))
+								."</div>
+							</div>
 						</div>";
 					}
 
