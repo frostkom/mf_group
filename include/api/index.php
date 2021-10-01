@@ -21,7 +21,6 @@ $type = check_var('type', 'char');
 switch($type)
 {
 	case 'sync':
-		//$token = check_var('token');
 		$remote_server_ip = $_SERVER['REMOTE_ADDR'];
 		$arr_allowed_server_ips = array(get_option('setting_server_ip'));
 
