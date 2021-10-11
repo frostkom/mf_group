@@ -21,7 +21,7 @@ $type = check_var('type', 'char');
 switch($type)
 {
 	case 'sync':
-		$remote_server_ip = $_SERVER['REMOTE_ADDR'];
+		$remote_server_ip = get_current_visitor_ip();
 		$arr_allowed_server_ips = array(get_option('setting_server_ip'));
 
 		if($remote_server_ip != '' && !in_array($remote_server_ip, $arr_allowed_server_ips))
