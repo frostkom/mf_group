@@ -40,6 +40,7 @@ class mf_group
 	{
 		if(!isset($data['add_choose_here'])){		$data['add_choose_here'] = true;}
 		if(!isset($data['include_amount'])){		$data['include_amount'] = true;}
+		if(!isset($data['return_to_metabox'])){		$data['return_to_metabox'] = true;}
 
 		$tbl_group = new mf_group_table();
 
@@ -62,19 +63,35 @@ class mf_group
 				{
 					$amount = $this->amount_in_group(array('id' => $r['ID']));
 
-					$arr_data[$r['ID']] = array(
-						'name' => $r['post_title']." (".$amount.")",
-						'attributes' => array(
-							'amount' => $amount,
-						),
-					);
+					if($data['return_to_metabox'] == true)
+					{
+						$arr_data[$r['ID']] = $r['post_title']." (".$amount.")";
+					}
+
+					else
+					{
+						$arr_data[$r['ID']] = array(
+							'name' => $r['post_title']." (".$amount.")",
+							'attributes' => array(
+								'amount' => $amount,
+							),
+						);
+					}
 				}
 
 				else
 				{
-					$arr_data[$r['ID']] = array(
-						'name' => $r['post_title'],
-					);
+					if($data['return_to_metabox'] == true)
+					{
+						$arr_data[$r['ID']] = $r['post_title'];
+					}
+
+					else
+					{
+						$arr_data[$r['ID']] = array(
+							'name' => $r['post_title'],
+						);
+					}
 				}
 			}
 		}
@@ -1173,7 +1190,7 @@ class mf_group
 		$setting_key = get_setting_key(__FUNCTION__);
 		$option = get_option($setting_key);
 
-		echo show_select(array('data' => $this->get_for_select(), 'name' => $setting_key, 'value' => $option, 'suffix' => "<a href='".admin_url("admin.php?page=mf_group/create/index.php")."'><i class='fa fa-plus-circle fa-lg'></i></a>"));
+		echo show_select(array('data' => $this->get_for_select(array('return_to_metabox' => false)), 'name' => $setting_key, 'value' => $option, 'suffix' => "<a href='".admin_url("admin.php?page=mf_group/create/index.php")."'><i class='fa fa-plus-circle fa-lg'></i></a>"));
 	}
 
 	function setting_group_debug_callback()
@@ -1382,7 +1399,14 @@ class mf_group
 
 	function get_groups_to_send_to($arr_data)
 	{
-		return $this->get_for_select(array('add_choose_here' => false));
+		$arr_data_temp = $this->get_for_select(array('add_choose_here' => false));
+
+		if(count($arr_data_temp) > 0)
+		{
+			$arr_data = array_merge($arr_data, $arr_data_temp);
+		}
+
+		return $arr_data;
 	}
 
 	function get_group_addresses($data)
@@ -1432,7 +1456,7 @@ class mf_group
 
 	function get_shortcode_output($out)
 	{
-		$arr_data = $this->get_for_select();
+		$arr_data = $this->get_for_select(array('return_to_metabox' => false));
 
 		if(count($arr_data) > 1)
 		{
@@ -1881,7 +1905,7 @@ class mf_group
 
 				else if($this->message_text_source > 0)
 				{
-					$this->message_text = $wpdb->get_var($wpdb->prepare("SELECT post_content FROM ".$wpdb->posts." WHERE post_type = 'page' AND post_status = 'publish' AND ID = '%d'", $this->message_text_source));
+					$this->message_text = $wpdb->get_var($wpdb->prepare("SELECT post_content FROM ".$wpdb->posts." WHERE post_type = %s AND post_status = %s AND ID = '%d'", 'page', 'publish', $this->message_text_source));
 
 					$this->message_text = str_replace("[name]", get_user_info(), $this->message_text);
 
@@ -2060,7 +2084,7 @@ class mf_group
 
 						if($this->public == 'trash')
 						{
-							$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->posts." SET post_status = 'publish' WHERE ID = '%d' AND post_type = %s".$this->query_where, $this->id, $this->post_type));
+							$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->posts." SET post_status = %s WHERE ID = '%d' AND post_type = %s".$this->query_where, 'publish', $this->id, $this->post_type));
 						}
 					}
 				}
