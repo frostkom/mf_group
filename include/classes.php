@@ -113,10 +113,12 @@ class mf_group
 			$data['where'] .= " AND post_author = '".get_current_user_id()."'";
 		}
 
-		return $wpdb->get_results($wpdb->prepare(
-			"SELECT ID, post_status, post_name, post_title, post_modified, post_author FROM ".$wpdb->posts." WHERE post_type = %s".$data['where']." ORDER BY ".$data['order']
+		return $wpdb->get_results(
+			"SELECT ID, post_status, post_name, post_title, post_modified, post_author FROM ".$wpdb->posts." WHERE post_type = '".esc_sql($this->post_type)."'"
+			.$data['where']
+			." ORDER BY ".$data['order']
 			.($data['limit'] != '' && $data['amount'] != '' ? " LIMIT ".$data['limit'].", ".$data['amount'] : "")
-		, $this->post_type));
+		);
 	}
 
 	function get_group_url($data)

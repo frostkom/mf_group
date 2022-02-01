@@ -85,7 +85,7 @@ switch($type)
 		{
 			$strSearch = check_var('s', 'char');
 
-			$result = $obj_group->get_groups(array('where' => " AND (post_title LIKE '%".$strSearch."%')", 'limit' => 0, 'amount' => 10));
+			$result = $obj_group->get_groups(array('where' => " AND (post_title LIKE '%".esc_sql($strSearch)."%')", 'limit' => 0, 'amount' => 10));
 
 			if($wpdb->num_rows > 0)
 			{
