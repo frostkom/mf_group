@@ -99,6 +99,27 @@ class mf_group
 		return $arr_data;
 	}
 
+	function get_types_for_select($data = array())
+	{
+		return array(
+			'normal' => __("Normal", 'lang_group'),
+			'stop' => __("Stop List", 'lang_group'),
+		);
+	}
+
+	function get_registration_fields_for_select()
+	{
+		return array(
+			'name' => __("Name", 'lang_group'),
+			'address' => __("Address", 'lang_group'),
+			'zip' => __("Zip Code", 'lang_group'),
+			'city' => __("City", 'lang_group'),
+			'phone' => __("Phone Number", 'lang_group'),
+			'email' => __("E-mail", 'lang_group'),
+			'extra' => get_option_or_default('setting_address_extra', __("Extra", 'lang_group')),
+		);
+	}
+
 	function get_groups($data = array())
 	{
 		global $wpdb;
@@ -1665,6 +1686,7 @@ class mf_group
 				$this->help_page = check_var('intGroupHelpPage');
 				$this->archive_page = check_var('intGroupArchivePage');
 
+				$this->group_type = check_var('strGroupType');
 				$this->allow_registration = check_var('strGroupAllowRegistration', 'char', true, 'no');
 
 				$this->verify_address = check_var('strGroupVerifyAddress');
@@ -1692,6 +1714,33 @@ class mf_group
 	function get_unsubscribe_code()
 	{
 		return "<p><a href='[unsubscribe_link]'>".__("If you do not want to get these messages in the future click this link to unsubscribe", 'lang_group')."</a></p>";
+	}
+
+	function get_stop_list_recipients()
+	{
+		global $wpdb;
+
+		if(!isset($this->arr_stop_list_recipients))
+		{
+			$this->arr_stop_list_groups = array();
+			$this->arr_stop_list_recipients = array();
+
+			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND ".$wpdb->postmeta.".meta_key = %s AND ".$wpdb->postmeta.".meta_value = %s", $this->post_type, 'publish', $this->meta_prefix.'group_type', 'stop'));
+
+			foreach($result as $r)
+			{
+				$this->arr_stop_list_groups[] = $r->ID;
+
+				$result_address = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address2group WHERE groupID = '%d'", $r->ID));
+
+				foreach($result_address as $r)
+				{
+					$this->arr_stop_list_recipients[] = $r->addressID;
+				}
+			}
+		}
+
+		return $this->arr_stop_list_recipients;
 	}
 
 	function save_data()
@@ -1833,6 +1882,7 @@ class mf_group
 							}
 
 							$arr_recipients = array();
+							$arr_stop_list_recipients = $this->get_stop_list_recipients();
 
 							foreach($this->arr_group_id as $this->group_id)
 							{
@@ -1857,7 +1907,7 @@ class mf_group
 											$strAddressEmail = $r->addressEmail;
 											$strAddressCellNo = $r->addressCellNo;
 
-											if(!in_array($intAddressID, $arr_recipients) && ($this->message_type == "email" && $strAddressEmail != "" || $this->message_type == "sms" && $strAddressCellNo != ""))
+											if(!in_array($intAddressID, $arr_recipients) && !in_array($intAddressID, $arr_stop_list_recipients) && ($this->message_type == "email" && $strAddressEmail != "" || $this->message_type == "sms" && $strAddressCellNo != ""))
 											{
 												$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->prefix."group_queue SET addressID = '%d', messageID = '%d', queueCreated = NOW()", $intAddressID, $this->message_id));
 
@@ -1954,6 +2004,7 @@ class mf_group
 							$this->meta_prefix.'acceptance_email' => $this->acceptance_email,
 							$this->meta_prefix.'acceptance_subject' => $this->acceptance_subject,
 							$this->meta_prefix.'acceptance_text' => $this->acceptance_text,
+							$this->meta_prefix.'group_type' => $this->group_type,
 							$this->meta_prefix.'allow_registration' => $this->allow_registration,
 							$this->meta_prefix.'verify_address' => $this->verify_address,
 							$this->meta_prefix.'contact_page' => $this->contact_page,
@@ -2072,6 +2123,7 @@ class mf_group
 						$this->acceptance_subject = get_post_meta($this->id, $this->meta_prefix.'acceptance_subject', true);
 						$this->acceptance_text = get_post_meta($this->id, $this->meta_prefix.'acceptance_text', true);
 
+						$this->group_type = get_post_meta($this->id, $this->meta_prefix.'group_type', true);
 						$this->allow_registration = get_post_meta_or_default($this->id, $this->meta_prefix.'allow_registration', true, 'no');
 
 						$this->verify_address = get_post_meta_or_default($this->id, $this->meta_prefix.'verify_address', true, 'no');
@@ -2355,6 +2407,14 @@ class mf_group
 				$query_where .= " AND (groupAcceptanceSent IS null OR groupAcceptanceSent <= '".esc_sql($data['acceptance_sent'])."')";
 			}
 
+			/* Display filtered number of addresses after Stop list has been accounted for */
+			$arr_stop_list_recipients = $this->get_stop_list_recipients();
+
+			if(!in_array($data['id'], $this->arr_stop_list_groups) && count($arr_stop_list_recipients) > 0)
+			{
+				$query_where .= " AND addressID NOT IN('".implode("','", $arr_stop_list_recipients)."')";
+			}
+
 			return $wpdb->get_var($wpdb->prepare("SELECT COUNT(addressID) FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE addressDeleted = '%d' AND groupAccepted = '%d' AND groupUnsubscribed = '%d'".$query_where, $data['deleted'], $data['accepted'], $data['unsubscribed']));
 		}
 
@@ -2471,7 +2531,7 @@ if(class_exists('mf_list_table'))
 
 		function column_default($item, $column_name)
 		{
-			global $wpdb;
+			global $wpdb, $obj_group;
 
 			$out = "";
 
@@ -2515,6 +2575,13 @@ if(class_exists('mf_list_table'))
 					else
 					{
 						$actions['recover'] = "<a href='".admin_url("admin.php?page=mf_group/create/index.php&intGroupID=".$post_id."&recover")."'>".__("Recover", 'lang_group')."</a>";
+					}
+
+					if(get_post_meta($post_id, $obj_group->meta_prefix.'group_type', true) == 'stop')
+					{
+						$out .= "<i class='fa fa-exclamation-triangle yellow' title='".__("This will prevent messages to all recipients in this group regardless which group that you are sending to.", 'lang_group')."'></i> ";
+
+						$out .= "<i class='set_tr_color' rel='red'></i>";
 					}
 
 					$out .= "<a href='".$post_edit_url."'>".$item['post_title']."</a>"
@@ -2636,7 +2703,9 @@ if(class_exists('mf_list_table'))
 
 					if($post_status == 'publish')
 					{
-						if($amount > 0)
+						$group_type = get_post_meta($post_id, $obj_group->meta_prefix.'group_type', true);
+
+						if($amount > 0 && $group_type != 'stop')
 						{
 							$actions['send_email'] = "<a href='".admin_url("admin.php?page=mf_group/send/index.php&intGroupID=".$post_id."&type=email")."' title='".__("Send e-mail to everyone in the group", 'lang_group')."'><i class='fa fa-paper-plane fa-lg'></i></a>";
 

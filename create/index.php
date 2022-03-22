@@ -13,6 +13,9 @@ $obj_group->fetch_request();
 echo $obj_group->save_data();
 $obj_group->get_from_db();
 
+$arr_data_page = array();
+get_post_children(array('add_choose_here' => true), $arr_data_page);
+
 echo "<div class='wrap'>
 	<h2>".__("Group", 'lang_group')."</h2>"
 	.get_notification()
@@ -64,9 +67,6 @@ echo "<div class='wrap'>
 						$arr_data_email = $obj_email->get_from_for_select();
 						$arr_data_abuse = $obj_email->get_from_for_select(array('type' => 'abuse'));
 
-						$arr_data_page = array();
-						get_post_children(array('add_choose_here' => true), $arr_data_page);
-
 						echo "<div class='postbox'>
 							<h3 class='hndle'><span>".__("About the Group", 'lang_group')."</span></h3>
 							<div class='inside'>";
@@ -87,9 +87,8 @@ echo "<div class='wrap'>
 						</div>";
 					}
 
-				echo "</div>";
-
-				echo "<div id='postbox-container-1'>
+				echo "</div>
+				<div id='postbox-container-1'>
 					<div class='postbox'>
 						<div class='inside'>"
 							.show_button(array('name' => 'btnGroupSave', 'text' => __("Save", 'lang_group')))
@@ -101,39 +100,21 @@ echo "<div class='wrap'>
 						<h3 class='hndle'><span>".__("Settings", 'lang_group')."</span></h3>
 						<div class='inside'>";
 
-							/*if($obj_group->api == '')
-							{*/
-								echo show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupAllowRegistration', 'text' => __("Allow Registration", 'lang_group'), 'value' => $obj_group->allow_registration));
-							/*}
+							$description = "";
 
-							if($obj_group->allow_registration == 'yes')
-							{*/
-								echo "<div class='display_registration_fields'>"
-									.show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupVerifyAddress', 'text' => __("Verify that address is in Address book", 'lang_group'), 'value' => $obj_group->verify_address));
+							if($obj_group->group_type == 'stop')
+							{
+								$description = "<i class='fa fa-exclamation-triangle yellow'></i> ".__("This will prevent messages to all recipients in this group regardless which group that you are sending to.", 'lang_group');
+							}
 
-									/*if($obj_group->verify_address == "yes")
-									{*/
-										$arr_data = array();
-										get_post_children(array('add_choose_here' => true), $arr_data);
-
-										echo show_select(array('data' => $arr_data, 'name' => 'intGroupContactPage', 'text' => __("Contact Page", 'lang_group'), 'value' => $obj_group->contact_page));
-									//}
-
-									$arr_data = array(
-										'name' => __("Name", 'lang_group'),
-										'address' => __("Address", 'lang_group'),
-										'zip' => __("Zip Code", 'lang_group'),
-										'city' => __("City", 'lang_group'),
-										'phone' => __("Phone Number", 'lang_group'),
-										'email' => __("E-mail", 'lang_group'),
-										'extra' => get_option_or_default('setting_address_extra', __("Extra", 'lang_group')),
-									);
-
-									echo show_select(array('data' => $arr_data, 'name' => 'arrGroupRegistrationFields[]', 'text' => __("Registration Fields", 'lang_group'), 'value' => $obj_group->registration_fields))
-								."</div>";
-							//}
-
-							echo show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupVerifyLink', 'text' => __("Add Verify Link", 'lang_group'), 'value' => $obj_group->verify_link, 'description' => __("In every message a hidden image/link is placed to see if the recipient has opened the message. This increases the risk of being classified as spam", 'lang_group')));
+							echo show_select(array('data' => $obj_group->get_types_for_select(), 'name' => 'strGroupType', 'text' => __("Type", 'lang_group'), 'value' => $obj_group->group_type, 'description' => $description))
+							.show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupAllowRegistration', 'text' => __("Allow Registration", 'lang_group'), 'value' => $obj_group->allow_registration))
+							."<div class='display_registration_fields'>"
+								.show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupVerifyAddress', 'text' => __("Verify that address is in Address book", 'lang_group'), 'value' => $obj_group->verify_address))
+								.show_select(array('data' => $arr_data_page, 'name' => 'intGroupContactPage', 'text' => __("Contact Page", 'lang_group'), 'value' => $obj_group->contact_page))
+								.show_select(array('data' => $obj_group->get_registration_fields_for_select(), 'name' => 'arrGroupRegistrationFields[]', 'text' => __("Registration Fields", 'lang_group'), 'value' => $obj_group->registration_fields))
+							."</div>"
+							.show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupVerifyLink', 'text' => __("Add Verify Link", 'lang_group'), 'value' => $obj_group->verify_link, 'description' => __("In every message a hidden image/link is placed to see if the recipient has opened the message. This increases the risk of being classified as spam", 'lang_group')));
 
 							$amount_in_group = $obj_group->amount_in_group();
 
