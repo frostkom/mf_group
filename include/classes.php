@@ -659,7 +659,7 @@ class mf_group
 
 											if($rows == 0)
 											{
-												$setting_email_log = get_option('setting_email_log');
+												$setting_email_log = get_site_option('setting_email_log');
 
 												$sent = send_email(array(
 													'from' => $strMessageFrom,
