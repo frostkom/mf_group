@@ -570,6 +570,7 @@ class mf_group
 										$strMessageFromName = $strMessageFrom;
 									}
 
+									$strMessageName = stripslashes(stripslashes($strMessageName));
 									$strMessageText = stripslashes(apply_filters('the_content', $strMessageText));
 
 									if($setting_group_outgoing_text != '')
@@ -1982,7 +1983,7 @@ class mf_group
 					foreach($result as $r)
 					{
 						$this->message_from = $r->messageFrom;
-						$this->message_name = $r->messageName;
+						$this->message_name = stripslashes($r->messageName);
 						$this->message_text = stripslashes($r->messageText);
 					}
 				}
@@ -2970,9 +2971,10 @@ if(class_exists('mf_list_table'))
 				break;
 
 				case 'messageName':
+
 					if($item['messageName'] != '')
 					{
-						$out .= $item['messageName'];
+						$out .= stripslashes(stripslashes($item['messageName']));
 					}
 
 					else
