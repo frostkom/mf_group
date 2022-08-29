@@ -1520,7 +1520,7 @@ class mf_group
 	{
 		global $wpdb;
 
-		$result = $wpdb->get_results($wpdb->prepare("SELECT groupID, messageID FROM ".$wpdb->prefix."group_message WHERE messageDeleted = '0' AND (messageText LIKE %s OR messageAttachment LIKE %s)", "%".$arr_used['file_url']."%", "%".$arr_used['file_url']."%"));
+		$result = $wpdb->get_results($wpdb->prepare("SELECT groupID, messageID FROM ".$wpdb->prefix."group_message WHERE messageDeleted = '0' AND (messageText LIKE %s OR messageText LIKE %s OR messageAttachment LIKE %s OR messageAttachment LIKE %s)", "%".$arr_used['file_url']."%", "%".$arr_used['file_thumb_url']."%", "%".$arr_used['file_url']."%", "%".$arr_used['file_thumb_url']."%"));
 		$rows = $wpdb->num_rows;
 
 		if($rows > 0)
