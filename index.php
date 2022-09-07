@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description:
-Version: 5.9.22
+Version: 5.9.23
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://frostkom.se
@@ -97,17 +97,17 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 			KEY groupID (groupID)
 		) DEFAULT CHARSET=".$default_charset);
 
-		/*$arr_add_column[$wpdb->prefix."group_message"] = array(
-			'' => "ALTER TABLE [table] ADD [column]  AFTER ",
-		);*/
-
-		$arr_update_column[$wpdb->base_prefix."group_message"] = array(
-			'messageName' => "ALTER TABLE [table] CHANGE [column] [column] VARCHAR(200)",
+		$arr_add_column[$wpdb->prefix."group_message"] = array(
+			//'' => "ALTER TABLE [table] ADD [column]  AFTER ",
 		);
 
-		/*$arr_add_index[$wpdb->prefix."group_message"] = array(
-			'' => "ALTER TABLE [table] ADD INDEX [column] ([column])",
-		);*/
+		$arr_update_column[$wpdb->base_prefix."group_message"] = array(
+			//'messageName' => "ALTER TABLE [table] CHANGE [column] [column] VARCHAR(200)",
+		);
+
+		$arr_add_index[$wpdb->prefix."group_message"] = array(
+			//'' => "ALTER TABLE [table] ADD INDEX [column] ([column])",
+		);
 
 		$wpdb->query("CREATE TABLE IF NOT EXISTS ".$wpdb->prefix."group_queue (
 			queueID INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -145,7 +145,7 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 		) DEFAULT CHARSET=".$default_charset);
 
 		$arr_add_column[$wpdb->prefix."group_version"] = array(
-			'userID' => "ALTER TABLE [table] ADD [column] INT UNSIGNED DEFAULT NULL AFTER versionCreated",
+			//'userID' => "ALTER TABLE [table] ADD [column] INT UNSIGNED DEFAULT NULL AFTER versionCreated",
 		);
 
 		update_columns($arr_update_column);
