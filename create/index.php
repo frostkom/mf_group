@@ -93,8 +93,28 @@ echo "<div class='wrap'>
 						<div class='inside'>"
 							.show_button(array('name' => 'btnGroupSave', 'text' => __("Save", 'lang_group')))
 							.input_hidden(array('name' => 'intGroupID', 'value' => $obj_group->id))
-							.wp_nonce_field('group_save_'.$obj_group->id, '_wpnonce_group_save', true, false)
-						."</div>
+							.wp_nonce_field('group_save_'.$obj_group->id, '_wpnonce_group_save', true, false);
+
+							if($obj_group->id > 0)
+							{
+								$result = $wpdb->get_results($wpdb->prepare("SELECT post_date, post_modified, post_author FROM ".$wpdb->posts." WHERE ID = '%d'", $obj_group->id));
+
+								foreach($result as $r)
+								{
+									$post_date = $r->post_date;
+									$post_modified = $r->post_modified;
+									$post_author = $r->post_author;
+
+									echo "<br><em>".sprintf(__("Created %s by %s", 'lang_group'), format_date($post_date), get_user_info(array('id' => $post_author)))."</em>";
+
+									if($post_modified > $post_date)
+									{
+										echo "<br><em>".sprintf(__("Updated %s", 'lang_group'), format_date($post_date))."</em>";
+									}
+								}
+							}
+
+						echo "</div>
 					</div>
 					<div class='postbox'>
 						<h3 class='hndle'><span>".__("Settings", 'lang_group')."</span></h3>

@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description:
-Version: 5.9.23
+Version: 5.9.24
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://frostkom.se
@@ -102,7 +102,7 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 		);
 
 		$arr_update_column[$wpdb->base_prefix."group_message"] = array(
-			//'messageName' => "ALTER TABLE [table] CHANGE [column] [column] VARCHAR(200)",
+			//'' => "ALTER TABLE [table] CHANGE [column] [column] )",
 		);
 
 		$arr_add_index[$wpdb->prefix."group_message"] = array(
@@ -144,10 +144,6 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 			KEY groupID (groupID)
 		) DEFAULT CHARSET=".$default_charset);
 
-		$arr_add_column[$wpdb->prefix."group_version"] = array(
-			//'userID' => "ALTER TABLE [table] ADD [column] INT UNSIGNED DEFAULT NULL AFTER versionCreated",
-		);
-
 		update_columns($arr_update_column);
 		add_columns($arr_add_column);
 		add_index($arr_add_index);
@@ -162,13 +158,6 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 				),
 			),
 		));
-
-		/*replace_post_meta(array('old' => 'group_acceptance_email', 'new' => $obj_group->meta_prefix.'acceptance_email'));
-		replace_post_meta(array('old' => 'group_acceptance_subject', 'new' => $obj_group->meta_prefix.'acceptance_subject'));
-		replace_post_meta(array('old' => 'group_acceptance_text', 'new' => $obj_group->meta_prefix.'acceptance_text'));
-		replace_post_meta(array('old' => 'group_verify_address', 'new' => $obj_group->meta_prefix.'verify_address'));
-		replace_post_meta(array('old' => 'group_contact_page', 'new' => $obj_group->meta_prefix.'contact_page'));
-		replace_post_meta(array('old' => 'group_registration_fields', 'new' => $obj_group->meta_prefix.'registration_fields'));*/
 
 		mf_uninstall_plugin(array(
 			'options' => array('setting_group_versioning'),
