@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description:
-Version: 5.9.24
+Version: 5.9.25
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://frostkom.se
@@ -17,8 +17,6 @@ GitHub Plugin URI: frostkom/mf_group
 if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') && is_plugin_active("mf_base/index.php") && is_plugin_active("mf_address/index.php"))
 {
 	include_once("include/classes.php");
-
-	load_plugin_textdomain('lang_group', false, dirname(plugin_basename(__FILE__))."/lang/");
 
 	$obj_group = new mf_group();
 
@@ -68,6 +66,8 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 	add_filter('single_template', 'custom_templates_group');
 
 	add_filter('filter_is_file_used', array($obj_group, 'filter_is_file_used'));
+
+	load_plugin_textdomain('lang_group', false, dirname(plugin_basename(__FILE__))."/lang/");
 
 	function activate_group()
 	{
@@ -166,10 +166,14 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 
 	function uninstall_group()
 	{
+		include_once("include/classes.php");
+
+		$obj_group = new mf_group();
+
 		mf_uninstall_plugin(array(
 			'uploads' => 'mf_group',
 			'options' => array('setting_emails_per_hour', 'setting_group_versioning', 'setting_group_see_other_roles', 'setting_group_outgoing_text', 'setting_group_import', 'setting_group_debug'),
-			'post_types' => array('mf_group'),
+			'post_types' => array($obj_group->post_type),
 			'tables' => array('group_message', 'group_queue', 'address2group', 'group_version'),
 		));
 	}
