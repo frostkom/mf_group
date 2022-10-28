@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description:
-Version: 5.9.25
+Version: 5.9.26
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://frostkom.se
@@ -109,6 +109,13 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 			//'' => "ALTER TABLE [table] ADD INDEX [column] ([column])",
 		);
 
+		$wpdb->query("CREATE TABLE IF NOT EXISTS ".$wpdb->prefix."group_message_link (
+			linkID INT UNSIGNED NOT NULL AUTO_INCREMENT,
+			linkUrl VARCHAR(255),
+			PRIMARY KEY (linkID),
+			KEY linkUrl (linkUrl)
+		) DEFAULT CHARSET=".$default_charset);
+
 		$wpdb->query("CREATE TABLE IF NOT EXISTS ".$wpdb->prefix."group_queue (
 			queueID INT UNSIGNED NOT NULL AUTO_INCREMENT,
 			addressID INT UNSIGNED NOT NULL DEFAULT '0',
@@ -117,10 +124,15 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 			queueReceived ENUM('-1', '0','1') NOT NULL DEFAULT '0',
 			queueCreated DATETIME NOT NULL,
 			queueSentTime DATETIME NOT NULL,
+			queueViewed DATETIME NOT NULL,
 			PRIMARY KEY (queueID),
 			KEY messageID (messageID),
 			KEY queueSent (queueSent)
 		) DEFAULT CHARSET=".$default_charset);
+
+		$arr_add_column[$wpdb->prefix."group_queue"] = array(
+			'queueViewed' => "ALTER TABLE [table] ADD [column] DATETIME NOT NULL AFTER queueSentTime",
+		);
 
 		$wpdb->query("CREATE TABLE IF NOT EXISTS ".$wpdb->prefix."address2group (
 			addressID INT UNSIGNED NOT NULL,
@@ -174,7 +186,7 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 			'uploads' => 'mf_group',
 			'options' => array('setting_emails_per_hour', 'setting_group_versioning', 'setting_group_see_other_roles', 'setting_group_outgoing_text', 'setting_group_import', 'setting_group_debug'),
 			'post_types' => array($obj_group->post_type),
-			'tables' => array('group_message', 'group_queue', 'address2group', 'group_version'),
+			'tables' => array('group_message', 'group_message_link', 'group_queue', 'address2group', 'group_version'),
 		));
 	}
 

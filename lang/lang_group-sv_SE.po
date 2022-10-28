@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-10-03 13:31+0100\n"
+"POT-Creation-Date: 2022-10-28 10:20+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -16,12 +16,12 @@ msgstr ""
 "X-Poedit-SearchPath-0: ..\n"
 
 #: ../create/index.php:20
-#: ../include/classes.php:1144
-#: ../include/classes.php:1145
-#: ../include/classes.php:1146
-#: ../include/classes.php:1280
-#: ../include/classes.php:3306
-#: ../include/classes.php:3376
+#: ../include/classes.php:1164
+#: ../include/classes.php:1165
+#: ../include/classes.php:1166
+#: ../include/classes.php:1300
+#: ../include/classes.php:3364
+#: ../include/classes.php:3434
 #: ../list/index.php:9
 #: ../version/index.php:197
 msgid "Group"
@@ -38,8 +38,8 @@ msgstr "Lägg till"
 
 #: ../create/index.php:29
 #: ../include/classes.php:113
-#: ../include/classes.php:370
-#: ../include/classes.php:2510
+#: ../include/classes.php:390
+#: ../include/classes.php:2530
 msgid "Name"
 msgstr "Namn"
 
@@ -48,12 +48,12 @@ msgid "Copy addresses from"
 msgstr "Kopiera adresser från"
 
 #: ../create/index.php:36
-#: ../include/classes.php:2604
+#: ../include/classes.php:2624
 msgid "API Link"
 msgstr "API-länk"
 
 #: ../create/index.php:37
-#: ../include/classes.php:2610
+#: ../include/classes.php:2630
 msgid "Filter API"
 msgstr "Filtrera API"
 
@@ -62,7 +62,7 @@ msgid "Acceptance e-mail"
 msgstr "Bekräftelsemeddelande"
 
 #: ../create/index.php:46
-#: ../include/classes.php:2628
+#: ../include/classes.php:2648
 msgid "Send before adding to a group"
 msgstr "Skicka före man läggs till i en grupp"
 
@@ -74,7 +74,7 @@ msgstr "Ämne"
 
 #: ../create/index.php:48
 #: ../create/index.php:53
-#: ../include/classes.php:2222
+#: ../include/classes.php:2242
 #, php-format
 msgid "Accept subscription to %s"
 msgstr "Bekräfta prenumeration till %s"
@@ -86,7 +86,7 @@ msgstr "Exempel"
 
 #: ../create/index.php:49
 #: ../create/index.php:54
-#: ../include/classes.php:2223
+#: ../include/classes.php:2243
 #, php-format
 msgid "You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below."
 msgstr "Du har blivit tillagd i gruppen %s men kommer inte att få några meddelanden förrän du har bekräftat prenumerationen genom att klicka på länken nedan."
@@ -100,7 +100,7 @@ msgid "About the Group"
 msgstr "Om gruppen"
 
 #: ../create/index.php:76
-#: ../include/classes.php:2634
+#: ../include/classes.php:2654
 msgid "Owner"
 msgstr "Ägare"
 
@@ -114,12 +114,12 @@ msgid "You should have setup both %s and %s because these addresses are usually 
 msgstr "Du bör aktivera både %s och %s för att dessa adresser ofta används av andra servrar när de skickar information om spam. Detta är ett bra sätt att ta emot och hantera möjliga problem inom din egen domän"
 
 #: ../create/index.php:84
-#: ../include/classes.php:2640
+#: ../include/classes.php:2660
 msgid "Help Page"
 msgstr "Hjälpsida"
 
 #: ../create/index.php:85
-#: ../include/classes.php:2646
+#: ../include/classes.php:2666
 msgid "Archive Page"
 msgstr "Arkivsida"
 
@@ -138,22 +138,22 @@ msgid "Updated %s"
 msgstr "Uppdaterad %s"
 
 #: ../create/index.php:120
-#: ../include/classes.php:1315
+#: ../include/classes.php:1335
 msgid "Settings"
 msgstr "Inställningar"
 
 #: ../create/index.php:127
-#: ../include/classes.php:2584
+#: ../include/classes.php:2604
 msgid "This will prevent messages to all recipients in this group regardless which group that you are sending to."
 msgstr "Detta kommer att stoppa meddelanden till alla mottagare i denna grupp oavsett vilken grupp som du skickar till."
 
 #: ../create/index.php:130
-#: ../include/classes.php:2903
+#: ../include/classes.php:2923
 msgid "Type"
 msgstr "Typ"
 
 #: ../create/index.php:131
-#: ../include/classes.php:2597
+#: ../include/classes.php:2617
 msgid "Allow Registration"
 msgstr "Tillåt registrering"
 
@@ -170,7 +170,7 @@ msgid "Registration Fields"
 msgstr "Fält för registrering"
 
 #: ../create/index.php:137
-#: ../include/classes.php:2622
+#: ../include/classes.php:2642
 msgid "Add Verify Link"
 msgstr "Lägg till verifieringslänk"
 
@@ -179,7 +179,7 @@ msgid "In every message a hidden image/link is placed to see if the recipient ha
 msgstr "I varje meddelande läggs då en dold bild/länk som kollar ifall mottagaren har öppnat meddelandet. Detta ökar risken för att klassas som spam"
 
 #: ../create/index.php:143
-#: ../include/classes.php:2616
+#: ../include/classes.php:2636
 msgid "Synchronize Users"
 msgstr "Synkronisera användare"
 
@@ -200,7 +200,7 @@ msgid "This will remove all recipients from this group and it is not possible to
 msgstr "Detta kommer att ta bort alla mottagare från denna grupp och det är inte möjligt att ångra denna åtgärd"
 
 #: ../help/index.php:6
-#: ../include/classes.php:1312
+#: ../include/classes.php:1332
 msgid "Help"
 msgstr "Hjälp"
 
@@ -280,12 +280,12 @@ msgstr "Gruppen uppdaterades inte med någon adress"
 
 #: ../import/index.php:102
 #: ../import/index.php:109
-#: ../include/classes.php:1306
+#: ../include/classes.php:1326
 msgid "Import"
 msgstr "Importera"
 
 #: ../import/index.php:108
-#: ../include/classes.php:3375
+#: ../include/classes.php:3433
 msgid "Text"
 msgstr ""
 
@@ -307,420 +307,442 @@ msgid "Stop List"
 msgstr "Stopplista"
 
 #: ../include/classes.php:114
-#: ../include/classes.php:375
+#: ../include/classes.php:395
 msgid "Address"
 msgstr "Adress"
 
 #: ../include/classes.php:115
-#: ../include/classes.php:380
+#: ../include/classes.php:400
 msgid "Zip Code"
 msgstr "Postnummer"
 
 #: ../include/classes.php:116
-#: ../include/classes.php:385
+#: ../include/classes.php:405
 msgid "City"
 msgstr "Stad"
 
 #: ../include/classes.php:117
-#: ../include/classes.php:410
+#: ../include/classes.php:430
 msgid "Phone Number"
 msgstr "Telefonnummer"
 
 #: ../include/classes.php:118
-#: ../include/classes.php:415
-#: ../include/classes.php:2942
+#: ../include/classes.php:435
+#: ../include/classes.php:2962
 msgid "E-mail"
 msgstr "E-post"
 
 #: ../include/classes.php:119
-#: ../include/classes.php:420
+#: ../include/classes.php:440
 msgid "Extra"
 msgstr ""
 
-#: ../include/classes.php:197
-#: ../include/classes.php:3379
+#: ../include/classes.php:217
+#: ../include/classes.php:3437
 msgid "Join"
 msgstr "Gå med"
 
-#: ../include/classes.php:204
+#: ../include/classes.php:224
 msgid "I could not find any group ID to display a form for"
 msgstr "Jag kunde inte hitta något grupp-ID att visa ett formulär för"
 
-#: ../include/classes.php:287
+#: ../include/classes.php:307
 msgid "The information that you entered is not in our register. Please contact the admin of this page to get your information submitted."
 msgstr "Informationen som du angav finns inte med i vårt register. Var vänlig kontakta oss så lägger vi in det."
 
-#: ../include/classes.php:335
+#: ../include/classes.php:355
 msgid "Thank you for showing your interest. You have been added to the group"
 msgstr "Tack för visat intresse. Du har lagts till i gruppen"
 
-#: ../include/classes.php:399
+#: ../include/classes.php:419
 msgid "Country"
 msgstr "Land"
 
-#: ../include/classes.php:403
+#: ../include/classes.php:423
 msgid "Choose Country Here"
 msgstr "Välj land här"
 
-#: ../include/classes.php:427
-#: ../include/classes.php:445
+#: ../include/classes.php:447
+#: ../include/classes.php:465
 msgid "I consent to having this website store my submitted information, so that they can contact me as part of this newsletter"
 msgstr "Jag godkänner att denna webbsida sparar min ifyllda information, så att de kan kontakta mig inom ramen för detta nyhetsbrev"
 
-#: ../include/classes.php:437
+#: ../include/classes.php:457
 msgid "Your Email Address"
 msgstr "Din epost"
 
-#: ../include/classes.php:842
+#: ../include/classes.php:862
 msgid "I could not get a successful result from the Group API"
 msgstr "Jag kunde inte få ett lyckat resultat från grupp-APIet"
 
-#: ../include/classes.php:849
+#: ../include/classes.php:869
 msgid "The status was wrong in the Group API"
 msgstr "Statusen var felaktig i grupp-APIet"
 
-#: ../include/classes.php:1155
+#: ../include/classes.php:1175
 msgid "group"
 msgstr "grupp"
 
-#: ../include/classes.php:1169
+#: ../include/classes.php:1189
 msgid "Outgoing e-mails per hour"
 msgstr "Utgående e-post per timme"
 
-#: ../include/classes.php:1170
+#: ../include/classes.php:1190
 msgid "See groups created by other roles"
 msgstr "Se grupper skapade av andra roller"
 
-#: ../include/classes.php:1171
+#: ../include/classes.php:1191
 msgid "Outgoing Text"
 msgstr "Utgående text"
 
-#: ../include/classes.php:1176
+#: ../include/classes.php:1196
 msgid "Add all imported to this group"
 msgstr "Lägg till alla importerade i denna grupp"
 
-#: ../include/classes.php:1179
+#: ../include/classes.php:1199
 msgid "Debug"
 msgstr "Felsök"
 
-#: ../include/classes.php:1188
-#: ../include/classes.php:1291
+#: ../include/classes.php:1208
+#: ../include/classes.php:1311
 #: ../version/index.php:194
 msgid "Groups"
 msgstr "Grupper"
 
-#: ../include/classes.php:1197
+#: ../include/classes.php:1217
 msgid "0 or empty means infinte"
 msgstr "0 eller tomt betyder oändligt"
 
-#: ../include/classes.php:1213
+#: ../include/classes.php:1233
 msgid "This text will be appended to all outgoing e-mails"
 msgstr "Denna text kommer att läggas till sist i alla utgående e-post"
 
-#: ../include/classes.php:1278
+#: ../include/classes.php:1298
 msgid "We collect personal information when a subscription is begun by entering at least an e-mail address. This makes it possible for us to send the wanted e-mails to the correct recipient."
 msgstr "Vi samlar in personlig information när en prenumeration påbörjas genom att man fyller i åtminstone en e-postadress. Detta gör det möjligt för oss att skicka de efterfrågade meddelandena till korrekt mottagare."
 
-#: ../include/classes.php:1294
+#: ../include/classes.php:1314
 msgid "List"
 msgstr "Lista"
 
-#: ../include/classes.php:1297
+#: ../include/classes.php:1317
 #: ../list/index.php:10
 msgid "Add New"
 msgstr "Lägg till ny"
 
-#: ../include/classes.php:1300
+#: ../include/classes.php:1320
 #: ../send/index.php:8
 msgid "Send Message"
 msgstr "Skicka meddelande"
 
-#: ../include/classes.php:1303
-#: ../include/classes.php:2523
-#: ../include/classes.php:2816
-#: ../include/classes.php:2907
-#: ../include/classes.php:3127
+#: ../include/classes.php:1323
+#: ../include/classes.php:2543
+#: ../include/classes.php:2836
+#: ../include/classes.php:2927
+#: ../include/classes.php:3147
+#: ../include/classes.php:3181
 #: ../sent/index.php:8
 msgid "Sent"
 msgstr "Skickat"
 
-#: ../include/classes.php:1309
-#: ../include/classes.php:2513
+#: ../include/classes.php:1329
+#: ../include/classes.php:2533
 #: ../version/index.php:8
 msgid "History"
 msgstr "Historik"
 
-#: ../include/classes.php:1364
+#: ../include/classes.php:1384
 msgid "There were unsent messages"
 msgstr "Det finns oskickade meddelanden"
 
-#: ../include/classes.php:1492
+#: ../include/classes.php:1512
 msgid "Choose a Group"
 msgstr "Välj en grupp"
 
-#: ../include/classes.php:1713
+#: ../include/classes.php:1733
 #, php-format
 msgid "View %s in browser"
 msgstr "Se %s i webbläsaren"
 
-#: ../include/classes.php:1718
+#: ../include/classes.php:1738
 msgid "If you do not want to get these messages in the future click this link to unsubscribe"
 msgstr "Om du inte vill få dessa meddelanden i framtiden, klicka på denna länk för att avregistrera"
 
-#: ../include/classes.php:1763
+#: ../include/classes.php:1783
 msgid "The information was deleted"
 msgstr "Informationen raderades"
 
-#: ../include/classes.php:1777
+#: ../include/classes.php:1797
 msgid "The group was activated"
 msgstr "Gruppen aktiverades"
 
-#: ../include/classes.php:1791
+#: ../include/classes.php:1811
 msgid "The group was inactivated"
 msgstr "Gruppen inaktiverades"
 
-#: ../include/classes.php:1822
+#: ../include/classes.php:1842
 #, php-format
 msgid "%d messages were successful and %d failed"
 msgstr "%d meddelanden lyckades och %d misslyckades"
 
-#: ../include/classes.php:1827
+#: ../include/classes.php:1847
 #, php-format
 msgid "%d messages were sent"
 msgstr "%d meddelanden skickades"
 
-#: ../include/classes.php:1833
+#: ../include/classes.php:1853
 msgid "The information was sent"
 msgstr "Informationen skickades"
 
-#: ../include/classes.php:1838
+#: ../include/classes.php:1858
 msgid "The group was created"
 msgstr "Gruppen skapades"
 
-#: ../include/classes.php:1843
+#: ../include/classes.php:1863
 msgid "The group was updated"
 msgstr "Gruppen uppdaterades"
 
-#: ../include/classes.php:1854
+#: ../include/classes.php:1874
 msgid "You have to enter a text to send"
 msgstr "Du måste fylla i en text att skicka"
 
-#: ../include/classes.php:1874
+#: ../include/classes.php:1894
 #, php-format
 msgid "You are trying to send attachments of a total of %s. I suggest that you send the attachments as inline links instead of attachments. This way I do not have to send too much data which might slow down the server or make it timeout due to memory limits and it also makes the recipients not have to recieve that much in their inboxes."
 msgstr "Du försöker skicka bifogade filer på total %s. Jag föreslår att du skickar filer som länkar i meddelandet istället som bifogade filer. På detta sätt så slipper jag skicka så mycket data som i sin tur slöar ner servern och det gör också att mottagarnas inboxar tar längre tid att fylla."
 
-#: ../include/classes.php:1926
+#: ../include/classes.php:1946
 msgid "There was an error when saving the message"
 msgstr "Det blev ett fel när meddelandet skulle sparas"
 
-#: ../include/classes.php:1938
+#: ../include/classes.php:1958
 msgid "The message was not sent to anybody"
 msgstr "Meddelandet skickades inte till någon"
 
-#: ../include/classes.php:2034
-#: ../include/classes.php:2061
+#: ../include/classes.php:2054
+#: ../include/classes.php:2081
 msgid "The information was not submitted, contact an admin if this persists"
 msgstr "Informationen las inte in, kontakta en administratör om problemet kvarstår"
 
-#: ../include/classes.php:2074
+#: ../include/classes.php:2094
 msgid "I removed all the recipients from this group"
 msgstr "Jag tog bort alla mottagare från denna grupp"
 
-#: ../include/classes.php:2079
+#: ../include/classes.php:2099
 msgid "I could not remove the recipients from this group"
 msgstr "Jag kunde inte radera alla mottagare från denna grupp"
 
-#: ../include/classes.php:2090
+#: ../include/classes.php:2110
 msgid "The message was deleted"
 msgstr "Meddelandet togs bort"
 
-#: ../include/classes.php:2097
+#: ../include/classes.php:2117
 msgid "The message was aborted"
 msgstr "Meddelandet avbröts"
 
-#: ../include/classes.php:2237
+#: ../include/classes.php:2257
 msgid "Accept Link"
 msgstr "Bekräftelselänk"
 
-#: ../include/classes.php:2498
-#: ../include/classes.php:2896
+#: ../include/classes.php:2518
+#: ../include/classes.php:2916
 msgid "All"
 msgstr "Alla"
 
-#: ../include/classes.php:2499
+#: ../include/classes.php:2519
 msgid "Public"
 msgstr "Publik"
 
-#: ../include/classes.php:2500
+#: ../include/classes.php:2520
 msgid "Not Public"
 msgstr "Inte publik"
 
-#: ../include/classes.php:2501
+#: ../include/classes.php:2521
 msgid "Inactive"
 msgstr "Inaktiv"
 
-#: ../include/classes.php:2502
-#: ../include/classes.php:2897
+#: ../include/classes.php:2522
+#: ../include/classes.php:2917
 msgid "Trash"
 msgstr "Papperskorg"
 
-#: ../include/classes.php:2512
+#: ../include/classes.php:2532
 msgid "Amount"
 msgstr "Antal"
 
-#: ../include/classes.php:2518
+#: ../include/classes.php:2538
 msgid "Not Accepted"
 msgstr "Inte bekräftad"
 
-#: ../include/classes.php:2521
+#: ../include/classes.php:2541
 msgid "Unsubscribed"
 msgstr "Avregistrerade"
 
-#: ../include/classes.php:2522
+#: ../include/classes.php:2542
 msgid "User"
 msgstr "Användare"
 
-#: ../include/classes.php:2559
+#: ../include/classes.php:2579
 msgid "Edit"
 msgstr "Redigera"
 
-#: ../include/classes.php:2563
-#: ../include/classes.php:2994
+#: ../include/classes.php:2583
+#: ../include/classes.php:3014
 msgid "Delete"
 msgstr "Radera"
 
-#: ../include/classes.php:2568
+#: ../include/classes.php:2588
 msgid "Activate"
 msgstr "Aktivera"
 
-#: ../include/classes.php:2573
+#: ../include/classes.php:2593
 msgid "Inactivate"
 msgstr "Inaktivera"
 
-#: ../include/classes.php:2579
+#: ../include/classes.php:2599
 msgid "Recover"
 msgstr "Återställ"
 
-#: ../include/classes.php:2712
+#: ../include/classes.php:2732
 msgid "Send e-mail to everyone in the group"
 msgstr "Skicka e-post till alla i gruppen"
 
-#: ../include/classes.php:2719
+#: ../include/classes.php:2739
 msgid "Add or remove"
 msgstr "Lägg till/ta bort"
 
-#: ../include/classes.php:2721
+#: ../include/classes.php:2741
 msgid "Import Addresses"
 msgstr "Importera adresser"
 
-#: ../include/classes.php:2727
-#: ../include/classes.php:2732
+#: ../include/classes.php:2747
+#: ../include/classes.php:2752
 msgid "Export"
 msgstr "Exportera"
 
-#: ../include/classes.php:2744
+#: ../include/classes.php:2764
 msgid "Deleted"
 msgstr "Borttagna"
 
-#: ../include/classes.php:2773
+#: ../include/classes.php:2793
 #, php-format
 msgid "There are %d subscribers that can be reminded again. Do you want to do that?"
 msgstr "Det finns %d adresser som kan påminnas igen. Vill du göra det?"
 
-#: ../include/classes.php:2798
+#: ../include/classes.php:2818
 msgid "Test"
 msgstr "Testa"
 
-#: ../include/classes.php:2834
+#: ../include/classes.php:2854
 #, php-format
 msgid "Will be sent %s"
 msgstr "Kommer att skickas %s"
 
-#: ../include/classes.php:2841
+#: ../include/classes.php:2861
 msgid "Is sending"
 msgstr "Skickar"
 
-#: ../include/classes.php:2904
+#: ../include/classes.php:2924
 #: ../send/index.php:56
 msgid "From"
 msgstr "Från"
 
-#: ../include/classes.php:2905
+#: ../include/classes.php:2925
 msgid "Content"
 msgstr "Innehåll"
 
-#: ../include/classes.php:2906
+#: ../include/classes.php:2926
 msgid "Scheduled"
 msgstr "Schemalagd"
 
-#: ../include/classes.php:2908
-#: ../include/classes.php:3114
+#: ../include/classes.php:2928
+#: ../include/classes.php:3134
 msgid "Created"
 msgstr "Skapad"
 
-#: ../include/classes.php:2934
+#: ../include/classes.php:2954
 msgid "View Content"
 msgstr "Visa innehåll"
 
-#: ../include/classes.php:2935
+#: ../include/classes.php:2955
 msgid "Send to group again"
 msgstr "Skicka till grupp igen"
 
-#: ../include/classes.php:2936
+#: ../include/classes.php:2956
 msgid "Send to e-mail"
 msgstr "Skicka till e-post"
 
-#: ../include/classes.php:3070
+#: ../include/classes.php:3090
 msgid "Errors"
 msgstr "Fel"
 
-#: ../include/classes.php:3075
+#: ../include/classes.php:3095
 msgid "Read"
 msgstr "Lästa"
 
-#: ../include/classes.php:3081
+#: ../include/classes.php:3101
 msgid "Abort"
 msgstr "Avbryt"
 
-#: ../include/classes.php:3214
+#: ../include/classes.php:3186
+msgid "Not Received"
+msgstr "Inte mottagen"
+
+#: ../include/classes.php:3191
+msgid "Not Viewed"
+msgstr "Inte läst"
+
+#: ../include/classes.php:3197
+#, php-format
+msgid "Viewed %s"
+msgstr "Läst %s"
+
+#: ../include/classes.php:3202
+msgid "Viewed"
+msgstr "Läst"
+
+#: ../include/classes.php:3210
+msgid "Not Sent"
+msgstr "Inte skickad"
+
+#: ../include/classes.php:3272
 #, php-format
 msgid "...and %d more"
 msgstr "...och %d till"
 
-#: ../include/classes.php:3293
+#: ../include/classes.php:3351
 msgid "Display a group registration form"
 msgstr "Visa ett registreringsformulär till en grupp"
 
-#: ../include/classes.php:3306
+#: ../include/classes.php:3364
 msgid "Newsletter"
 msgstr "Nyhetsbrev"
 
-#: ../include/classes.php:3354
+#: ../include/classes.php:3412
 msgid "Label"
 msgstr "Etikett"
 
-#: ../include/classes.php:3355
+#: ../include/classes.php:3413
 msgid "Placeholder"
 msgstr "Platshållare"
 
-#: ../include/classes.php:3374
+#: ../include/classes.php:3432
 msgid "Heading"
 msgstr "Rubrik"
 
-#: ../include/classes.php:3377
+#: ../include/classes.php:3435
 msgid "Display Input Label as"
 msgstr "Visa etikett till inmatningsfält som"
 
-#: ../include/classes.php:3378
+#: ../include/classes.php:3436
 msgid "Display Consent"
 msgstr "Visa samtycke"
 
-#: ../include/classes.php:3379
+#: ../include/classes.php:3437
 msgid "Button Text"
 msgstr "Knapptext"
 
-#: ../include/classes.php:3380
+#: ../include/classes.php:3438
 msgid "Button Icon"
 msgstr "Knappikon"
 
@@ -791,32 +813,32 @@ msgid "Either you are not part of the group or you have already accepted to be a
 msgstr "Antingen är du inte med i gruppen eller så har du redan accepterat att vara med i gruppen"
 
 #: ../templates/single-mf_group.php:60
-#: ../templates/single-mf_group.php:124
-#: ../templates/single-mf_group.php:180
+#: ../templates/single-mf_group.php:133
+#: ../templates/single-mf_group.php:199
 msgid "Something went wrong. Please contact an admin if the problem persists"
 msgstr "Något gick snett. Var vänlig kontakta en admin ifall problemet kvarstår"
 
-#: ../templates/single-mf_group.php:91
+#: ../templates/single-mf_group.php:100
 msgid "You have been successfully unsubscribed"
 msgstr "Tråkigt att se dig lämna, men vi lyckades i alla fall avregistrera dig"
 
-#: ../templates/single-mf_group.php:98
+#: ../templates/single-mf_group.php:107
 msgid "I could not unsubscribe you. An admin has been notified about this"
 msgstr "Jag kunde inte avregistrera dig. En administratör har fått ett meddelande om detta"
 
-#: ../templates/single-mf_group.php:105
+#: ../templates/single-mf_group.php:114
 msgid "Are you sure that you want to unsubscribe?"
 msgstr "Är du säker på att du vill avregistrera?"
 
-#: ../templates/single-mf_group.php:107
+#: ../templates/single-mf_group.php:116
 msgid "Unsubscribe"
 msgstr "Avregistrera"
 
-#: ../templates/single-mf_group.php:118
+#: ../templates/single-mf_group.php:127
 msgid "Either you are not part of the group or you have already unsubscribed from it"
 msgstr "Antingen är du inte med i gruppen eller så har du redan avregistrerat dig från den"
 
-#: ../templates/single-mf_group.php:203
+#: ../templates/single-mf_group.php:222
 msgid "This group is closed for registration"
 msgstr "Denna grupp är stängd för registrering"
 
@@ -885,6 +907,9 @@ msgstr "Välj en grupp till höger och alla tidigare versioner kommer magiskt vi
 #: ../version/index.php:198
 msgid "Change"
 msgstr "Byt"
+
+#~ msgid "Received"
+#~ msgstr "Mottagen"
 
 #~ msgid "Add a group"
 #~ msgstr "Lägg till en grupp"

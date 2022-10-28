@@ -1,5 +1,41 @@
 <?php
 
+if(isset($_REQUEST['redirect']))
+{
+	$strViewHash = check_var('redirect', 'char');
+
+	$intGroupID = check_var('gid', 'int');
+	$intMessageID = check_var('mid', 'int');
+	$intQueueID = check_var('qid', 'int');
+	$intLinkID = check_var('lid', 'int');
+
+	if($intQueueID > 0)
+	{
+		$strAddressEmail = $obj_group->get_address_from_queue_id($intQueueID);
+	}
+
+	else
+	{
+		$strAddressEmail = check_var('aem', 'char');
+	}
+
+	$hash_temp = md5((defined('NONCE_SALT') ? NONCE_SALT : '').$intGroupID.$strAddressEmail.$intMessageID);
+
+	if($strViewHash == $hash_temp)
+	{
+		$strLinkUrl = $wpdb->get_var($wpdb->prepare("SELECT linkUrl FROM ".$wpdb->prefix."group_message_link WHERE linkID = '%d'", $intLinkID));
+
+		$obj_group->set_received(array('queue_id' => $intQueueID));
+
+		mf_redirect($strLinkUrl);
+	}
+
+	else
+	{
+		$error_text = __("Something went wrong. Please contact an admin if the problem persists", 'lang_group');
+	}
+}
+
 get_header();
 
 	if(have_posts())
@@ -71,8 +107,17 @@ get_header();
 						$strVerifyHash = check_var('verify', 'char');
 
 						$intGroupID = check_var('gid', 'int');
-						$strAddressEmail = check_var('aem', 'char');
 						$intQueueID = check_var('qid', 'int');
+
+						if($intQueueID > 0)
+						{
+							$strAddressEmail = $obj_group->get_address_from_queue_id($intQueueID);
+						}
+
+						else
+						{
+							$strAddressEmail = check_var('aem', 'char');
+						}
 
 						$hash_temp = md5((defined('NONCE_SALT') ? NONCE_SALT : '').$intGroupID.$strAddressEmail);
 
@@ -127,20 +172,7 @@ get_header();
 
 						if($strUnsubscribeHash != '' && $strUnsubscribeHash == $hash_temp || $strVerifyHash != '' && $strVerifyHash == $hash_temp)
 						{
-							if($intQueueID > 0)
-							{
-								$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."group_queue USING (addressID) WHERE addressEmail = %s AND queueID = '%d'", $strAddressEmail, $intQueueID));
-
-								foreach($result as $r)
-								{
-									$intAddressID = $r->addressID;
-
-									$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_queue SET queueReceived = '1' WHERE queueID = '%d' AND addressID = '%d'", $intQueueID, $intAddressID));
-
-									$obj_address = new mf_address(array('id' => $intAddressID));
-									$obj_address->update_errors(array('action' => 'reset'));
-								}
-							}
+							$obj_group->set_received(array('queue_id' => $intQueueID));
 						}
 					}
 				}
@@ -150,8 +182,18 @@ get_header();
 					$strViewHash = check_var('view_in_browser', 'char');
 
 					$intGroupID = check_var('gid', 'int');
-					$strAddressEmail = check_var('aem', 'char');
 					$intMessageID = check_var('mid', 'int');
+					$intQueueID = check_var('qid', 'int');
+
+					if($intQueueID > 0)
+					{
+						$strAddressEmail = $obj_group->get_address_from_queue_id($intQueueID);
+					}
+
+					else
+					{
+						$strAddressEmail = check_var('aem', 'char');
+					}
 
 					$hash_temp = md5((defined('NONCE_SALT') ? NONCE_SALT : '').$intGroupID.$strAddressEmail.$intMessageID);
 
@@ -164,14 +206,16 @@ get_header();
 							$strMessageName = $r->messageName;
 							$strMessageText = stripslashes(apply_filters('the_content', $r->messageText));
 
-							$view_in_browser_url = $obj_group->get_group_url(array('type' => 'view_in_browser', 'group_id' => $intGroupID, 'message_id' => $intMessageID, 'email' => $strAddressEmail));
-							$unsubscribe_url = $obj_group->get_group_url(array('type' => 'unsubscribe', 'group_id' => $intGroupID, 'email' => $strAddressEmail));
+							$view_in_browser_url = $obj_group->get_group_url(array('type' => 'view_in_browser', 'group_id' => $intGroupID, 'message_id' => $intMessageID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
+							$unsubscribe_url = $obj_group->get_group_url(array('type' => 'unsubscribe', 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
 
 							$arr_exclude = array("[view_in_browser_link]", "[message_name]", "[unsubscribe_link]");
 							$arr_include = array($view_in_browser_url, $strMessageName, $unsubscribe_url);
 
 							$post_title = $strMessageName;
 							$post_content = str_replace($arr_exclude, $arr_include, $strMessageText);
+
+							$obj_group->set_received(array('queue_id' => $intQueueID));
 						}
 					}
 

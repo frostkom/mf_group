@@ -142,6 +142,34 @@ class mf_group
 		);
 	}
 
+	function get_address_from_queue_id($queue_id)
+	{
+		global $wpdb;
+
+		return $wpdb->get_var($wpdb->prepare("SELECT addressEmail FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."group_queue USING (addressID) WHERE queueID = '%d'", $queue_id));
+	}
+
+	function set_received($data)
+	{
+		global $wpdb;
+
+		if($data['queue_id'] > 0)
+		{
+			//$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."group_queue USING (addressID) WHERE addressEmail = %s AND queueID = '%d'", $strAddressEmail, $data['queue_id']));
+			$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."group_queue USING (addressID) WHERE queueID = '%d'", $data['queue_id']));
+
+			foreach($result as $r)
+			{
+				$intAddressID = $r->addressID;
+
+				$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_queue SET queueReceived = '1', queueViewed = NOW() WHERE queueID = '%d'", $data['queue_id']));
+
+				$obj_address = new mf_address(array('id' => $intAddressID));
+				$obj_address->update_errors(array('action' => 'reset'));
+			}
+		}
+	}
+
 	function get_group_url($data)
 	{
 		if(!isset($data['message_id'])){	$data['message_id'] = 0;}
@@ -154,12 +182,22 @@ class mf_group
 
 		switch($data['type'])
 		{
+			case 'redirect':
 			case 'view_in_browser':
 				$out .= $base_url
 					.$data['type']."=".md5((defined('NONCE_SALT') ? NONCE_SALT : '').$data['group_id'].$data['email'].$data['message_id'])
 					."&gid=".$data['group_id']
-					."&aem=".$data['email']
 					."&mid=".$data['message_id'];
+
+				if($data['queue_id'] > 0 || $data['queue_id'] == "[queue_id]")
+				{
+					$out .= "&qid=".$data['queue_id'];
+				}
+
+				else
+				{
+					$out .= "&aem=".$data['email'];
+				}
 			break;
 
 			case 'subscribe':
@@ -167,12 +205,16 @@ class mf_group
 			case 'verify':
 				$out .= $base_url
 					.$data['type']."=".md5((defined('NONCE_SALT') ? NONCE_SALT : '').$data['group_id'].$data['email'])
-					."&gid=".$data['group_id']
-					."&aem=".$data['email'];
+					."&gid=".$data['group_id'];
 
 				if($data['queue_id'] > 0)
 				{
 					$out .= "&qid=".$data['queue_id'];
+				}
+
+				else
+				{
+					$out .= "&aem=".$data['email'];
 				}
 			break;
 		}
@@ -498,6 +540,44 @@ class mf_group
 		return $result;
 	}
 
+	function convert_links($data)
+	{
+		global $wpdb;
+
+		$arr_links = get_match_all('#\bhttps?://[^,\s()<>]+(?:\([\w\d]+\)|([^,[:punct:]\s]|/))#', $data['message_text']);
+
+		if(count($arr_links) > 0)
+		{
+			$site_url_clean = get_site_url_clean(array('trim' => "/"));
+
+			foreach($arr_links as $link)
+			{
+				if(strpos($link, $site_url_clean))
+				{
+					do_log("The link was found but ignored because internal: ".$link);
+				}
+
+				else
+				{
+					//do_log("The link was found: ".$link);
+
+					$intLinkID = $wpdb->get_var($wpdb->prepare("SELECT linkID FROM ".$wpdb->prefix."group_message_link WHERE linkUrl = %s", $link));
+
+					if(!($intLinkID > 0))
+					{
+						$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->prefix."group_message_link SET linkUrl = %s", $link));
+						
+						$intLinkID = $wpdb->insert_id;
+					}
+
+					$data['message_text'] = str_replace($link, "[redirect]&lid=".$intLinkID, $data['message_text']);
+				}
+			}
+		}
+
+		return $data['message_text'];
+	}
+
 	function cron_base()
 	{
 		global $wpdb, $obj_address, $error_text;
@@ -551,6 +631,11 @@ class mf_group
 								$strMessageText = $r->messageText;
 								$strMessageAttachment = $r->messageAttachment;
 								$intUserID = $r->userID;
+
+								if($strMessageType == 'email')
+								{
+									$strMessageText = $this->convert_links(array('message_text' => $strMessageText));
+								}
 							}
 
 							$intMessageID_temp = $intMessageID;
@@ -613,7 +698,7 @@ class mf_group
 									{
 										if(apply_filters('get_emails_left_to_send', 0, $strMessageFrom, 'group') > 0)
 										{
-											$view_in_browser_url = $this->get_group_url(array('type' => 'view_in_browser', 'group_id' => $intGroupID, 'message_id' => $intMessageID, 'email' => $strAddressEmail));
+											$view_in_browser_url = $this->get_group_url(array('type' => 'view_in_browser', 'group_id' => $intGroupID, 'message_id' => $intMessageID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
 											$unsubscribe_url = $this->get_group_url(array('type' => 'unsubscribe', 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
 
 											$mail_headers = "From: ".$strMessageFromName." <".$strMessageFrom.">\r\n";
@@ -651,6 +736,11 @@ class mf_group
 											if($strGroupVerifyLink == 'yes')
 											{
 												$mail_content .= "<img src='".$this->get_group_url(array('type' => 'verify', 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID))."' style='height: 0; visibility: hidden; width: 0'>";
+											}
+
+											if(strpos($mail_content, "[redirect]"))
+											{
+												$mail_content = str_replace("[redirect]", $this->get_group_url(array('type' => 'redirect', 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'message_id' => $intMessageID, 'queue_id' => $intQueueID)), $mail_content);
 											}
 
 											list($mail_attachment, $rest) = get_attachment_to_send($strMessageAttachment);
@@ -2789,7 +2879,6 @@ if(class_exists('mf_list_table'))
 
 					if($post_status == 'publish' || $dteMessageCreated != '')
 					{
-						//$current_user = wp_get_current_user();
 						$user_data = get_userdata(get_current_user_id());
 
 						$user_email = $user_data->user_email;
@@ -3009,7 +3098,7 @@ if(class_exists('mf_list_table'))
 					$intMessageSent = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueSent = '1'", $intMessageID2));
 					$intMessageNotSent = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueSent = '0'", $intMessageID2));
 
-					$intMessageTotal = $intMessageSent + $intMessageNotSent;
+					$intMessageTotal = ($intMessageSent + $intMessageNotSent);
 
 					$class = '';
 
@@ -3103,7 +3192,7 @@ if(class_exists('mf_list_table'))
 
 					$sent_limit = 100;
 
-					$result_sent = $wpdb->get_results($wpdb->prepare("SELECT addressFirstName, addressSurName, addressEmail, addressCellNo, queueSent, queueSentTime FROM ".$wpdb->prefix."group_queue INNER JOIN ".get_address_table_prefix()."address USING (addressID) WHERE messageID = '%d' ORDER BY queueSentTime ASC, queueID ASC LIMIT 0, ".$sent_limit, $intMessageID2));
+					$result_sent = $wpdb->get_results($wpdb->prepare("SELECT addressID, addressFirstName, addressSurName, addressEmail, addressCellNo, queueSent, queueReceived, queueSentTime, queueViewed FROM ".$wpdb->prefix."group_queue INNER JOIN ".get_address_table_prefix()."address USING (addressID) WHERE messageID = '%d' ORDER BY queueSentTime ASC, queueID ASC LIMIT 0, ".$sent_limit, $intMessageID2));
 
 					if($wpdb->num_rows > 0)
 					{
@@ -3142,17 +3231,53 @@ if(class_exists('mf_list_table'))
 
 							foreach($result_sent as $r)
 							{
+								$intAddressID = $r->addressID;
 								$strAddressFirstName = $r->addressFirstName;
 								$strAddressSurName = $r->addressSurName;
 								$strAddressEmail = $r->addressEmail;
 								$strAddressCellNo = $r->addressCellNo;
 								$intQueueSent = $r->queueSent;
+								$intQueueReceived = $r->queueReceived;
 								$dteQueueSentTime = $r->queueSentTime;
+								$dteQueueViewed = $r->queueViewed;
 
 								$date_sent_temp = date("Y-m-d", strtotime($dteQueueSentTime));
 
-								$out .= "<li>"
-									."<i class='fa ".($intQueueSent == 1 ? "fa-check green" : "fa-times red")."'></i> ";
+								$out .= "<li>";
+
+									if($intQueueSent == 1)
+									{
+										$out .= "<i class='fa fa-check green' title='".__("Sent", 'lang_group')."'></i> ";
+
+										switch($intQueueReceived)
+										{
+											case -1:
+												$out .= "<i class='fa fa-eye-slash red' title='".__("Not Received", 'lang_group')."'></i> ";
+											break;
+
+											default:
+											case 0:
+												$out .= "<i class='fa fa-eye-slash grey' title='".__("Not Viewed", 'lang_group')."'></i> ";
+											break;
+
+											case 1:
+												if($dteQueueViewed > DEFAULT_DATE)
+												{
+													$out .= "<i class='fa fa-eye green' title='".sprintf(__("Viewed %s", 'lang_group'), format_date($dteQueueViewed))."'></i> ";
+												}
+
+												else
+												{
+													$out .= "<i class='fa fa-eye green' title='".__("Viewed", 'lang_group')."'></i> ";
+												}
+											break;
+										}
+									}
+
+									else
+									{
+										$out .= "<i class='fa fa-times red' title='".__("Not Sent", 'lang_group')."'></i> ";
+									}
 
 									if($strAddressFirstName != '' || $strAddressSurName != '')
 									{
@@ -3177,7 +3302,9 @@ if(class_exists('mf_list_table'))
 										}
 									}
 
-									if($dteQueueSentTime > $dteQueueSentTime_temp || ($i + 1 >= $sent_limit))
+									//$out .= " <a href='".admin_url("admin.php?page=mf_address/create/index.php&intAddressID=".$intAddressID)."' title='".__("Edit", 'lang_group')."'><i class='fa fa-wrench'></i></a>";
+
+									if($intQueueSent == 1 && ($dteQueueSentTime > $dteQueueSentTime_temp || ($i + 1 >= $sent_limit)))
 									{
 										$out .= " <span class='grey'>";
 
