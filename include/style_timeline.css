@@ -91,7 +91,7 @@
 					margin-left: .5em;
 				}
 
-				.timeline .remove > .content, .timeline .trash > .content
+				.timeline .remove > .content, .timeline .unsubscribe > .content, .timeline .trash > .content
 				{
 					border-color: #e47676;
 					float: right;

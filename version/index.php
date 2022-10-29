@@ -118,7 +118,7 @@ echo "<div class='wrap'>
 												break;
 
 												case 'unsubscribe':
-													$icon_class = "fas fa-user-slash fa-3x";
+													$icon_class = "fas fa-user-slash fa-3x red";
 													$icon_title = __("The address was unsubscribed from the group", 'lang_group');
 												break;
 

@@ -3,19 +3,25 @@
 if(isset($_REQUEST['redirect']))
 {
 	$strViewHash = check_var('redirect', 'char');
-
-	$intGroupID = check_var('gid', 'int');
-	$intMessageID = check_var('mid', 'int');
 	$intQueueID = check_var('qid', 'int');
 	$intLinkID = check_var('lid', 'int');
 
 	if($intQueueID > 0)
 	{
-		$strAddressEmail = $obj_group->get_address_from_queue_id($intQueueID);
+		$result = $wpdb->get_results($wpdb->prepare("SELECT groupID, messageID, addressEmail FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."group_queue USING (addressID) INNER JOIN ".$wpdb->prefix."group_message USING (messageID) WHERE queueID = '%d'", $intQueueID));
+
+		foreach($result as $r)
+		{
+			$intGroupID = $r->groupID;
+			$intMessageID = $r->messageID;
+			$strAddressEmail = $r->addressEmail;
+		}
 	}
 
 	else
 	{
+		$intGroupID = check_var('gid', 'int');
+		$intMessageID = check_var('mid', 'int');
 		$strAddressEmail = check_var('aem', 'char');
 	}
 
@@ -25,6 +31,7 @@ if(isset($_REQUEST['redirect']))
 	{
 		$strLinkUrl = $wpdb->get_var($wpdb->prepare("SELECT linkUrl FROM ".$wpdb->prefix."group_message_link WHERE linkID = '%d'", $intLinkID));
 
+		$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_message_link SET linkUsed = NOW() WHERE linkID = '%d'", $intLinkID));
 		$obj_group->set_received(array('queue_id' => $intQueueID));
 
 		mf_redirect($strLinkUrl);
@@ -105,17 +112,22 @@ get_header();
 					{
 						$strUnsubscribeHash = check_var('unsubscribe', 'char');
 						$strVerifyHash = check_var('verify', 'char');
-
-						$intGroupID = check_var('gid', 'int');
 						$intQueueID = check_var('qid', 'int');
 
 						if($intQueueID > 0)
 						{
-							$strAddressEmail = $obj_group->get_address_from_queue_id($intQueueID);
+							$result = $wpdb->get_results($wpdb->prepare("SELECT groupID, addressEmail FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."group_queue USING (addressID) INNER JOIN ".$wpdb->prefix."group_message USING (messageID) WHERE queueID = '%d'", $intQueueID));
+
+							foreach($result as $r)
+							{
+								$intGroupID = $r->groupID;
+								$strAddressEmail = $r->addressEmail;
+							}
 						}
 
 						else
 						{
+							$intGroupID = check_var('gid', 'int');
 							$strAddressEmail = check_var('aem', 'char');
 						}
 
@@ -180,18 +192,24 @@ get_header();
 				else if(isset($_REQUEST['view_in_browser']))
 				{
 					$strViewHash = check_var('view_in_browser', 'char');
-
-					$intGroupID = check_var('gid', 'int');
-					$intMessageID = check_var('mid', 'int');
 					$intQueueID = check_var('qid', 'int');
 
 					if($intQueueID > 0)
 					{
-						$strAddressEmail = $obj_group->get_address_from_queue_id($intQueueID);
+						$result = $wpdb->get_results($wpdb->prepare("SELECT groupID, messageID, addressEmail FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."group_queue USING (addressID) INNER JOIN ".$wpdb->prefix."group_message USING (messageID) WHERE queueID = '%d'", $intQueueID));
+
+						foreach($result as $r)
+						{
+							$intGroupID = $r->groupID;
+							$intMessageID = $r->messageID;
+							$strAddressEmail = $r->addressEmail;
+						}
 					}
 
 					else
 					{
+						$intGroupID = check_var('gid', 'int');
+						$intMessageID = check_var('mid', 'int');
 						$strAddressEmail = check_var('aem', 'char');
 					}
 
