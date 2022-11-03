@@ -1,7 +1,7 @@
 <?php
 
 $obj_group = new mf_group(array('type' => 'version'));
-//$obj_group->fetch_request();
+$obj_group->fetch_request();
 //echo $obj_group->save_data();
 
 echo "<div class='wrap'>
@@ -9,9 +9,9 @@ echo "<div class='wrap'>
 	.get_notification()
 	."<div id='poststuff'>";
 
-		$arr_data = $obj_group->get_for_select(array('include_amount' => false));
+		$arr_data_groups = $obj_group->get_for_select(array('include_amount' => false));
 
-		if(count($arr_data) > 1)
+		if(count($arr_data_groups) > 1)
 		{
 			echo "<div id='post-body' class='columns-2'>
 				<div id='post-body-content'>
@@ -21,12 +21,21 @@ echo "<div class='wrap'>
 
 							if($obj_group->id > 0)
 							{
+								$arr_data_months = $obj_group->get_version_months_for_select();
+
 								if(!isset($obj_address))
 								{
 									$obj_address = new mf_address();
 								}
 
-								$result = $wpdb->get_results($wpdb->prepare("SELECT addressID, versionType, versionCreated, userID FROM ".$wpdb->prefix."group_version WHERE groupID = '%d' GROUP BY addressID, versionType, versionCreated, userID ORDER BY versionCreated DESC, versionID DESC", $obj_group->id));
+								$query_where = "";
+
+								if($obj_group->group_month != 'all' && $obj_group->group_month != '')
+								{
+									$query_where = " AND versionCreated LIKE '".esc_sql($obj_group->group_month)."%'";
+								}
+
+								$result = $wpdb->get_results($wpdb->prepare("SELECT addressID, versionType, versionCreated, userID FROM ".$wpdb->prefix."group_version WHERE groupID = '%d'".$query_where." GROUP BY addressID, versionType, versionCreated, userID ORDER BY versionCreated DESC, versionID DESC", $obj_group->id));
 
 								if(count($result) > 0)
 								{
@@ -193,18 +202,28 @@ echo "<div class='wrap'>
 					<div class='postbox'>
 						<h3 class='hndle'><span>".__("Groups", 'lang_group')."</span></h3>
 						<div class='inside'>
-							<form method='get' action='' class='mf_form mf_settings'>"
-								.show_select(array('data' => $arr_data, 'name' => 'intGroupID', 'text' => __("Group", 'lang_group'), 'value' => $obj_group->id, 'xtra' => " rel='submit_change'"))
-								.show_button(array('text' => __("Change", 'lang_group')))
-								.input_hidden(array('name' => 'page', 'value' => check_var('page')));
+							<form method='get' action='' class='mf_form mf_settings'>";
+
+								$group_label = __("Group", 'lang_group');
 
 								if($obj_group->id > 0)
 								{
-									echo "<a href='".admin_url("admin.php?page=mf_group/create/index.php&intGroupID=".$obj_group->id)."'><i class='fa fa-wrench fa-lg'></i></a> "
-									."<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$obj_group->id."&strFilterIsMember=yes&strFilterAccepted=yes&strFilterUnsubscribed=no")."'><i class='fa fa-eye fa-lg'></i></a>";
+									$group_label .= "<span>
+										<a href='".admin_url("admin.php?page=mf_group/create/index.php&intGroupID=".$obj_group->id)."' title='".__("Edit", 'lang_group')."'><i class='fa fa-wrench fa-lg'></i></a> "
+										."<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$obj_group->id."&strFilterIsMember=yes&strFilterAccepted=yes&strFilterUnsubscribed=no")."' title='".__("Add or remove", 'lang_group')."'><i class='fas fa-tasks fa-lg'></i></a>
+									</span>";
 								}
 
-							echo "</form>
+								echo show_select(array('data' => $arr_data_groups, 'name' => 'intGroupID', 'text' => $group_label, 'value' => $obj_group->id, 'xtra' => " rel='submit_change'"));
+
+								if($obj_group->id > 0)
+								{
+									echo show_select(array('data' => $arr_data_months, 'name' => 'strGroupMonth', 'text' => __("Month", 'lang_group'), 'value' => $obj_group->group_month, 'xtra' => " rel='submit_change'"));
+								}
+
+								echo show_button(array('text' => __("Change", 'lang_group')))
+								.input_hidden(array('name' => 'page', 'value' => check_var('page')))
+							."</form>
 						</div>
 					</div>
 				</div>
