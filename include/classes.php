@@ -1982,7 +1982,7 @@ class mf_group
 					else if($this->message_type == 'email' || $this->message_type == 'sms')
 					{
 						$attachments_size = 0;
-						$attachments_size_limit = 5 * pow(1024, 2);
+						$attachments_size_limit = (5 * MB_IN_BYTES);
 
 						if($this->message_attachment != '')
 						{
