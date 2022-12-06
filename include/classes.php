@@ -583,21 +583,25 @@ class mf_group
 
 		foreach($arr_links as $link)
 		{
-			$intLinkID = $wpdb->get_var($wpdb->prepare("SELECT linkID FROM ".$wpdb->prefix."group_message_link WHERE linkUrl = %s", $link));
-
-			if($intLinkID > 0)
+			// Ignore images/files
+			if(strpos($link, "/wp-content/") !== false)
 			{
-				$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_message_link SET linkUsed = NOW() WHERE linkID = '%d'", $intLinkID));
-			}
+				$intLinkID = $wpdb->get_var($wpdb->prepare("SELECT linkID FROM ".$wpdb->prefix."group_message_link WHERE linkUrl = %s", $link));
 
-			else
-			{
-				$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->prefix."group_message_link SET linkUrl = %s, linkUsed = NOW()", $link));
-				
-				$intLinkID = $wpdb->insert_id;
-			}
+				if($intLinkID > 0)
+				{
+					$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_message_link SET linkUsed = NOW() WHERE linkID = '%d'", $intLinkID));
+				}
 
-			$data['message_text'] = str_replace($link, "[redirect]&lid=".$intLinkID, $data['message_text']);
+				else
+				{
+					$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->prefix."group_message_link SET linkUrl = %s, linkUsed = NOW()", $link));
+					
+					$intLinkID = $wpdb->insert_id;
+				}
+
+				$data['message_text'] = str_replace($link, "[redirect]&lid=".$intLinkID, $data['message_text']);
+			}
 		}
 
 		return $data['message_text'];
