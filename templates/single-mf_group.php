@@ -114,6 +114,9 @@ get_header();
 						$strVerifyHash = check_var('verify', 'char');
 						$intQueueID = check_var('qid', 'int');
 
+						$intGroupID = check_var('gid', 'int');
+						$strAddressEmail = check_var('aem', 'char');
+
 						if($intQueueID > 0)
 						{
 							$result = $wpdb->get_results($wpdb->prepare("SELECT groupID, addressEmail FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."group_queue USING (addressID) INNER JOIN ".$wpdb->prefix."group_message USING (messageID) WHERE queueID = '%d'", $intQueueID));
@@ -123,12 +126,6 @@ get_header();
 								$intGroupID = $r->groupID;
 								$strAddressEmail = $r->addressEmail;
 							}
-						}
-
-						else
-						{
-							$intGroupID = check_var('gid', 'int');
-							$strAddressEmail = check_var('aem', 'char');
 						}
 
 						$hash_temp = md5((defined('NONCE_SALT') ? NONCE_SALT : '').$intGroupID.$strAddressEmail);
