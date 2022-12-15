@@ -3478,7 +3478,7 @@ class widget_group extends WP_Widget
 
 		if($instance['group_id'] > 0)
 		{
-			echo $before_widget;
+			echo apply_filters('filter_before_widget', $before_widget);
 
 				if($instance['group_heading'] != '')
 				{
