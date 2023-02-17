@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description:
-Version: 5.9.36
+Version: 5.9.37
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://martinfors.se
@@ -116,7 +116,7 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 			PRIMARY KEY (linkID),
 			KEY linkUrl (linkUrl)
 		) DEFAULT CHARSET=".$default_charset);
-		
+
 		$arr_add_column[$wpdb->prefix."group_message_link"] = array(
 			'linkUsed' => "ALTER TABLE [table] ADD [column] DATETIME AFTER linkUrl",
 		);

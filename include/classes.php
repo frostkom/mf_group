@@ -596,7 +596,7 @@ class mf_group
 				else
 				{
 					$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->prefix."group_message_link SET linkUrl = %s, linkUsed = NOW()", $link));
-					
+
 					$intLinkID = $wpdb->insert_id;
 				}
 
@@ -2587,7 +2587,7 @@ if(class_exists('mf_list_table'))
 
 			if($this->search != '')
 			{
-				$this->query_where .= ($this->query_where != '' ? " AND " : "")."(post_title LIKE '%".$this->search."%' OR SOUNDEX(post_title) = SOUNDEX('".$this->search."'))";
+				$this->query_where .= ($this->query_where != '' ? " AND " : "")."(post_title LIKE '".$this->filter_search_before_like($this->search)."' OR SOUNDEX(post_title) = SOUNDEX('".$this->search."'))";
 			}
 
 			if(!IS_EDITOR)
@@ -3013,7 +3013,7 @@ if(class_exists('mf_list_table'))
 
 			if($this->search != '')
 			{
-				$this->query_where .= ($this->query_where != '' ? " AND " : "")."(messageFrom LIKE '%".$this->search."%' OR messageName LIKE '%".$this->search."%' OR messageText LIKE '%".$this->search."%' OR messageCreated LIKE '%".$this->search."%' OR SOUNDEX(messageFrom) = SOUNDEX('".$this->search."') OR SOUNDEX(messageName) = SOUNDEX('".$this->search."') OR SOUNDEX(messageText) = SOUNDEX('".$this->search."'))";
+				$this->query_where .= ($this->query_where != '' ? " AND " : "")."(messageFrom LIKE '".$this->filter_search_before_like($this->search)."' OR messageName LIKE '".$this->filter_search_before_like($this->search)."' OR messageText LIKE '".$this->filter_search_before_like($this->search)."' OR messageCreated LIKE '".$this->filter_search_before_like($this->search)."' OR SOUNDEX(messageFrom) = SOUNDEX('".$this->search."') OR SOUNDEX(messageName) = SOUNDEX('".$this->search."') OR SOUNDEX(messageText) = SOUNDEX('".$this->search."'))";
 			}
 
 			$this->set_views(array(
