@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description:
-Version: 5.9.37
+Version: 5.9.38
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://martinfors.se
@@ -189,7 +189,7 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 
 		mf_uninstall_plugin(array(
 			'uploads' => 'mf_group',
-			'options' => array('setting_emails_per_hour', 'setting_group_versioning', 'setting_group_see_other_roles', 'setting_group_outgoing_text', 'setting_group_import', 'setting_group_debug'),
+			'options' => array('setting_emails_per_hour', 'setting_group_versioning', 'setting_group_see_other_roles', 'setting_group_trace_links', 'setting_group_outgoing_text', 'setting_group_import', 'setting_group_debug'),
 			'post_types' => array($obj_group->post_type),
 			'tables' => array('group_message', 'group_message_link', 'group_queue', 'address2group', 'group_version'),
 		));
