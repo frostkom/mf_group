@@ -1803,7 +1803,7 @@ class mf_group
 				$this->message_text_source = check_var('intEmailTextSource');
 				$this->message_attachment = check_var('strMessageAttachment');
 
-				if($this->group_id > 0 && !in_array($this->group_id, $this->arr_group_id))
+				if($this->group_id > 0 && !in_array($this->group_id, $this->arr_group_id) && !isset($_POST['btnGroupSend']))
 				{
 					$this->arr_group_id[] = $this->group_id;
 				}
