@@ -127,6 +127,8 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 			messageID INT UNSIGNED NOT NULL DEFAULT '0',
 			queueSent ENUM('0','1') NOT NULL DEFAULT '0',
 			queueReceived ENUM('-1', '0','1') NOT NULL DEFAULT '0',
+			queueStatus VARCHAR(20) NOT NULL DEFAULT '',
+			queueStatusMessage TEXT,
 			queueCreated DATETIME NOT NULL,
 			queueSentTime DATETIME NOT NULL,
 			queueViewed DATETIME NOT NULL,
@@ -137,6 +139,8 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 
 		$arr_add_column[$wpdb->prefix."group_queue"] = array(
 			'queueViewed' => "ALTER TABLE [table] ADD [column] DATETIME NOT NULL AFTER queueSentTime",
+			'queueStatus' => "ALTER TABLE [table] ADD [column] VARCHAR(20) NOT NULL DEFAULT '' AFTER queueReceived",
+			'queueStatusMessage' => "ALTER TABLE [table] ADD [column] TEXT AFTER queueStatus",
 		);
 
 		$wpdb->query("CREATE TABLE IF NOT EXISTS ".$wpdb->prefix."address2group (
@@ -165,6 +169,41 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 		add_columns($arr_add_column);
 		add_index($arr_add_index);
 
+		$result = $wpdb->get_results("SELECT queueID, queueReceived FROM ".$wpdb->prefix."group_queue WHERE queueStatus = ''");
+
+		if($wpdb->num_rows > 0)
+		{
+			foreach($result as $r)
+			{
+				$intQueueID = $r->queueID;
+				$intQueueReceived = $r->queueReceived;
+
+				switch($intQueueReceived)
+				{
+					case -1:
+						$strQueueStatus = 'not_received';
+					break;
+
+					case 0:
+					default:
+						$strQueueStatus = 'not_viewed';
+					break;
+
+					case 1:
+						$strQueueStatus = 'viewed';
+					break;
+				}
+
+				$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_queue SET queueStatus = %s WHERE queueID = '%d'", $strQueueStatus, $intQueueID));
+			}
+		}
+
+		else
+		{
+			// Can only be dropped when it does not exist anywhere in the code
+			//$wpdb->query("ALTER TABLE [table] DROP COLUMN queueReceived");
+		}
+
 		delete_base(array(
 			'table' => "group_message",
 			'field_prefix' => "message",
@@ -189,7 +228,7 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 
 		mf_uninstall_plugin(array(
 			'uploads' => 'mf_group',
-			'options' => array('setting_emails_per_hour', 'setting_group_versioning', 'setting_group_see_other_roles', 'setting_group_trace_links', 'setting_group_outgoing_text', 'setting_group_import', 'setting_group_debug'),
+			'options' => array('setting_emails_per_hour', 'setting_group_versioning', 'setting_group_see_other_roles', 'setting_group_trace_links', 'setting_group_outgoing_text', 'setting_group_import', 'setting_group_debug', 'setting_group_log_file'),
 			'post_types' => array($obj_group->post_type),
 			'tables' => array('group_message', 'group_message_link', 'group_queue', 'address2group', 'group_version'),
 		));

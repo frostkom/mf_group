@@ -199,7 +199,7 @@ class mf_group
 			{
 				$intAddressID = $r->addressID;
 
-				$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_queue SET queueReceived = '1', queueViewed = NOW() WHERE queueID = '%d'", $data['queue_id']));
+				$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_queue SET queueStatus = 'viewed', queueViewed = NOW() WHERE queueID = '%d'", $data['queue_id'])); //queueReceived = '1', 
 
 				$obj_address = new mf_address(array('id' => $intAddressID));
 				$obj_address->update_errors(array('action' => 'reset'));
@@ -1253,6 +1253,63 @@ class mf_group
 				}
 				#############################
 
+				// Get error log
+				#############################
+				$setting_group_log_file = get_option('setting_group_log_file');
+
+				if($setting_group_log_file != '' && file_exists($setting_group_log_file))
+				{
+					$error_limit = (MB_IN_BYTES * 50);
+
+					if(filesize($setting_group_log_file) < $error_limit)
+					{
+						$arr_file = file($setting_group_log_file);
+
+						if(is_array($arr_file))
+						{
+							$arr_file = array_unique($arr_file);
+
+							foreach($arr_file as $value)
+							{
+								$value_date = get_match("/^(.*?) www/is", $value, false);
+								$value_type = get_match("/postfix\/(.*?)\[/is", $value, false);
+								$value_email = get_match("/to\=\<(.*?)\>/is", $value, false);
+								$value_status = get_match("/status\=(.*?) /is", $value, false);
+								$value_message = get_match("/ \((.*?)\)$/is", $value, false);
+
+								$value_date = date("Y-m-d H:i:s", strtotime($value_date));
+
+								//echo $value_date.", ".$value_type.", ".$value_email.", ".$value_status.", ".$value_message."<br>";
+								//echo "<em>".htmlspecialchars($value)."</em><br>";
+
+								$result = $wpdb->get_results($wpdb->prepare("SELECT queueID, queueSentTime FROM ".$wpdb->prefix."group_queue INNER JOIN ".get_address_table_prefix()."address USING (addressID) WHERE addressEmail = %s AND queueStatus IN('not_received', 'not_viewed') AND queueSentTime < %s ORDER BY queueSentTime DESC LIMIT 0, 1", $value_email, $value_date));
+
+								foreach($result as $r)
+								{
+									$intQueueID = $r->queueID;
+									$dteQueueSentTime = $r->queueSentTime;
+
+									$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_queue SET queueStatus = %s, queueStatusMessage = %s WHERE queueID = '%d'", $value_status, $value_message, $intQueueID));
+
+									//echo $dteQueueSentTime."<br>";
+								}
+
+								//echo "<br>";
+							}
+						}
+
+						@unlink($setting_group_log_file);
+					}
+
+					else
+					{
+						do_log(sprintf("%s was too large so it was deleted", basename($setting_group_log_file)));
+
+						//@unlink($setting_group_log_file);
+					}
+				}
+				#############################
+
 				/* Remove old links */
 				#############################
 				$wpdb->query("DELETE FROM ".$wpdb->prefix."group_message_link WHERE linkUsed < DATE_SUB(NOW(), INTERVAL 1 YEAR)");
@@ -1303,6 +1360,7 @@ class mf_group
 		}
 
 		$arr_settings['setting_group_debug'] = __("Debug", 'lang_group');
+		$arr_settings['setting_group_log_file'] = __("Log File", 'lang_group');
 
 		show_settings_fields(array('area' => $options_area, 'object' => $this, 'settings' => $arr_settings));
 	}
@@ -1363,6 +1421,39 @@ class mf_group
 		$description = setting_time_limit(array('key' => $setting_key, 'value' => $option));
 
 		echo show_select(array('data' => get_yes_no_for_select(), 'name' => $setting_key, 'value' => $option, 'description' => $description));
+	}
+
+	function setting_group_log_file_callback()
+	{
+		global $wpdb;
+
+		$setting_key = get_setting_key(__FUNCTION__);
+		$option = get_option($setting_key);
+
+		$description = "";
+
+		if($option != '')
+		{
+			if(file_exists($option))
+			{
+				if(!is_readable($option))
+				{
+					$description .= "<em><i class='fa fa-exclamation-triangle yellow'></i> ".__("The file is not readable", 'lang_log')."</em>";
+				}
+			}
+
+			else
+			{
+				$description .= "<em><i class='fa fa-times red'></i> ".__("The file does not exist", 'lang_log')."</em>";
+			}
+		}
+
+		else
+		{
+			$description .= "<em>mail.log = ".ABSPATH."wp-content/mail.log</em>";
+		}
+
+		echo show_textfield(array('name' => $setting_key, 'value' => $option, 'placeholder' => ABSPATH."wp-content/mail.log", 'description' => $description));
 	}
 
 	function count_unsent_group($id = 0)
@@ -3197,17 +3288,23 @@ if(class_exists('mf_list_table'))
 							}
 						}
 
-						$intMessageErrors = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueReceived = '-1'", $intMessageID2));
-						$intMessageReceived = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueReceived = '1'", $intMessageID2));
+						$intMessageNotReceived = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueStatus = 'not_received'", $intMessageID2));
+						$intMessageDeferred = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueStatus = 'deferred'", $intMessageID2));
+						$intMessageViewed = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueStatus = 'viewed'", $intMessageID2));
 
-						if($intMessageErrors > 0)
+						if($intMessageNotReceived > 0)
 						{
-							$actions['errors'] = mf_format_number($intMessageErrors / $intMessageSent * 100, 1)."% ".__("Errors", 'lang_group');
+							$actions['not_received'] = "<i class='fa fa-times red'></i> ".mf_format_number($intMessageNotReceived / $intMessageSent * 100, 1)."% ".__("Not Received", 'lang_group');
 						}
 
-						if($intMessageReceived > 0)
+						if($intMessageDeferred > 0)
 						{
-							$actions['read'] = "<i class='fa fa-check green'></i> ".$intMessageReceived." ".__("Read", 'lang_group');
+							$actions['deferred'] = "<i class='fa fa-times red'></i> ".mf_format_number($intMessageDeferred / $intMessageSent * 100, 1)."% ".__("Deferred", 'lang_group');
+						}
+
+						if($intMessageViewed > 0 && get_option('setting_group_trace_links') == 'yes')
+						{
+							$actions['read'] = "<i class='fa fa-check green'></i> ".mf_format_number($intMessageViewed / $intMessageSent * 100, 1)."% ".__("Read", 'lang_group');
 						}
 					}
 
@@ -3238,7 +3335,7 @@ if(class_exists('mf_list_table'))
 
 					$sent_limit = 100;
 
-					$result_sent = $wpdb->get_results($wpdb->prepare("SELECT addressID, addressFirstName, addressSurName, addressEmail, addressCellNo, queueSent, queueReceived, queueSentTime, queueViewed FROM ".$wpdb->prefix."group_queue INNER JOIN ".get_address_table_prefix()."address USING (addressID) WHERE messageID = '%d' ORDER BY queueSentTime ASC, queueID ASC LIMIT 0, ".$sent_limit, $intMessageID2));
+					$result_sent = $wpdb->get_results($wpdb->prepare("SELECT addressID, addressFirstName, addressSurName, addressEmail, addressCellNo, queueSent, queueStatus, queueStatusMessage, queueSentTime, queueViewed FROM ".$wpdb->prefix."group_queue INNER JOIN ".get_address_table_prefix()."address USING (addressID) WHERE messageID = '%d' ORDER BY queueSentTime ASC, queueID ASC LIMIT 0, ".$sent_limit, $intMessageID2)); //, queueReceived
 
 					if($wpdb->num_rows > 0)
 					{
@@ -3269,7 +3366,7 @@ if(class_exists('mf_list_table'))
 							}
 
 						$out .= "</p>
-						<ol>";
+						<ol class='queue_sent'>";
 
 							$i = 0;
 
@@ -3283,7 +3380,9 @@ if(class_exists('mf_list_table'))
 								$strAddressEmail = $r->addressEmail;
 								$strAddressCellNo = $r->addressCellNo;
 								$intQueueSent = $r->queueSent;
-								$intQueueReceived = $r->queueReceived;
+								//$intQueueReceived = $r->queueReceived;
+								$strQueueStatus = $r->queueStatus;
+								$strQueueStatusMessage = $r->queueStatusMessage;
 								$dteQueueSentTime = $r->queueSentTime;
 								$dteQueueViewed = $r->queueViewed;
 
@@ -3295,29 +3394,63 @@ if(class_exists('mf_list_table'))
 									{
 										$out .= "<i class='fa fa-check green' title='".__("Sent", 'lang_group')."'></i> ";
 
-										switch($intQueueReceived)
+										if($strQueueStatus != '')
 										{
-											case -1:
-												$out .= "<i class='fa fa-eye-slash red' title='".__("Not Received", 'lang_group')."'></i> ";
-											break;
+											switch($strQueueStatus)
+											{
+												case 'not_received':
+													$out .= "<i class='fa fa-eye-slash red' title='".__("Not Received", 'lang_group')."'></i> ";
+												break;
 
-											default:
-											case 0:
-												$out .= "<i class='fa fa-eye-slash grey' title='".__("Not Viewed", 'lang_group')."'></i> ";
-											break;
+												default:
+												case 'not_viewed':
+													$out .= "<i class='fa fa-eye-slash grey' title='".__("Not Viewed", 'lang_group')."'></i> ";
+												break;
 
-											case 1:
-												if($dteQueueViewed > DEFAULT_DATE)
-												{
-													$out .= "<i class='fa fa-eye green' title='".sprintf(__("Viewed %s", 'lang_group'), format_date($dteQueueViewed))."'></i> ";
-												}
+												case 'deferred':
+													$out .= "<i class='fa fa-times red' title='".__("Deferred", 'lang_group')." (".$strQueueStatusMessage.")'></i> ";
+												break;
 
-												else
-												{
-													$out .= "<i class='fa fa-eye green' title='".__("Viewed", 'lang_group')."'></i> ";
-												}
-											break;
+												case 'viewed':
+													if($dteQueueViewed > DEFAULT_DATE)
+													{
+														$out .= "<i class='fa fa-eye green' title='".sprintf(__("Viewed %s", 'lang_group'), format_date($dteQueueViewed))."'></i> ";
+													}
+
+													else
+													{
+														$out .= "<i class='fa fa-eye green' title='".__("Viewed", 'lang_group')."'></i> ";
+													}
+												break;
+											}
 										}
+
+										/*else
+										{
+											switch($intQueueReceived)
+											{
+												case -1:
+													$out .= "<i class='fa fa-eye-slash red' title='".__("Not Received", 'lang_group')."'></i> ";
+												break;
+
+												default:
+												case 0:
+													$out .= "<i class='fa fa-eye-slash grey' title='".__("Not Viewed", 'lang_group')."'></i> ";
+												break;
+
+												case 1:
+													if($dteQueueViewed > DEFAULT_DATE)
+													{
+														$out .= "<i class='fa fa-eye green' title='".sprintf(__("Viewed %s", 'lang_group'), format_date($dteQueueViewed))."'></i> ";
+													}
+
+													else
+													{
+														$out .= "<i class='fa fa-eye green' title='".__("Viewed", 'lang_group')."'></i> ";
+													}
+												break;
+											}
+										}*/
 									}
 
 									else
