@@ -1528,6 +1528,9 @@ class mf_group
 		$menu_title = __("Sent", 'lang_group');
 		add_submenu_page($menu_root, $menu_title, $menu_title, $menu_capability, $menu_root."sent/index.php");
 
+		$menu_title = __("Message", 'lang_group');
+		add_submenu_page($menu_root, $menu_title, $menu_title, $menu_capability, $menu_root."message/index.php");
+
 		$menu_title = __("Import", 'lang_group');
 		add_submenu_page($menu_root, $menu_title, $menu_title, $menu_capability, $menu_root."import/index.php");
 
@@ -1931,6 +1934,10 @@ class mf_group
 				$this->message_id = check_var('intMessageID');
 			break;
 
+			case 'message':
+				$this->queue_id = check_var('intQueueID');
+			break;
+
 			case 'version':
 				$this->group_month = check_var('strGroupMonth');
 			break;
@@ -2325,6 +2332,10 @@ class mf_group
 
 					$done_text = __("The message was aborted", 'lang_group');
 				}
+			break;
+
+			case 'message':
+
 			break;
 		}
 
@@ -3255,6 +3266,8 @@ if(class_exists('mf_list_table'))
 					{
 						if($item['messageCreated'] > date("Y-m-d H:i:s", strtotime("-1 month")))
 						{
+							$actions['message'] = "<a href='".admin_url("admin.php?page=mf_group/message/index.php&intMessageID=".$intMessageID2)."'>".__("View", 'lang_group')."</a>";
+
 							$dteQueueSentTime_first = $wpdb->get_var($wpdb->prepare("SELECT MIN(queueSentTime) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueSent = '1'", $intMessageID2));
 
 							if($dteQueueSentTime_first > DEFAULT_DATE)
@@ -3333,14 +3346,14 @@ if(class_exists('mf_list_table'))
 						$out .= "<p>".get_media_button(array('name' => 'strMessageAttachment', 'value' => $item['messageAttachment'], 'show_add_button' => false))."</p>";
 					}
 
-					$sent_limit = 100;
+					/*$sent_limit = 100;
 
 					$result_sent = $wpdb->get_results($wpdb->prepare("SELECT addressID, addressFirstName, addressSurName, addressEmail, addressCellNo, queueSent, queueStatus, queueStatusMessage, queueSentTime, queueViewed FROM ".$wpdb->prefix."group_queue INNER JOIN ".get_address_table_prefix()."address USING (addressID) WHERE messageID = '%d' ORDER BY queueSentTime ASC, queueID ASC LIMIT 0, ".$sent_limit, $intMessageID2)); //, queueReceived
 
 					if($wpdb->num_rows > 0)
 					{
 						$date_created = date("Y-m-d", strtotime($item['messageCreated']));
-						$date_sent = "";
+						$sent_date = "";
 
 						$out .= "<p>
 							<strong>".__("Created", 'lang_group').":</strong> ".$item['messageCreated'];
@@ -3349,28 +3362,29 @@ if(class_exists('mf_list_table'))
 
 							if($dteQueueSentTime_first > DEFAULT_DATE)
 							{
-								$date_sent = date("Y-m-d", strtotime($dteQueueSentTime_first));
+								$sent_date = date("Y-m-d", strtotime($dteQueueSentTime_first));
 
 								$dteQueueSentTime_last = $wpdb->get_var($wpdb->prepare("SELECT MAX(queueSentTime) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueSent = '1'", $intMessageID2));
 
-								$date_sent_end = date("Y-m-d", strtotime($dteQueueSentTime_last));
+								$sent_date_end = date("Y-m-d", strtotime($dteQueueSentTime_last));
 
 								$out .= "<br>
 								<strong>".__("Sent", 'lang_group').":</strong> "
-									.($date_sent > $date_created ? $dteQueueSentTime_first : date("G:i:s", strtotime($dteQueueSentTime_first)));
+									.($sent_date > $date_created ? $dteQueueSentTime_first : date("G:i:s", strtotime($dteQueueSentTime_first)));
 
 								if($dteQueueSentTime_last > $dteQueueSentTime_first)
 								{
-									$out .= " - ".($date_sent_end > $date_sent ? $dteQueueSentTime_last : date("G:i:s", strtotime($dteQueueSentTime_last)));
+									$out .= " - ".($sent_date_end > $sent_date ? $dteQueueSentTime_last : date("G:i:s", strtotime($dteQueueSentTime_last)));
 								}
 							}
 
-						$out .= "</p>
-						<ol class='queue_sent'>";
+						$out .= "</p>";
+
+						$out .= "<ol class='queue_sent'>";
 
 							$i = 0;
 
-							$dteQueueSentTime_temp = "";
+							$sent_datetime_temp = "";
 
 							foreach($result_sent as $r)
 							{
@@ -3386,7 +3400,7 @@ if(class_exists('mf_list_table'))
 								$dteQueueSentTime = $r->queueSentTime;
 								$dteQueueViewed = $r->queueViewed;
 
-								$date_sent_temp = date("Y-m-d", strtotime($dteQueueSentTime));
+								$sent_date_temp = date("Y-m-d", strtotime($dteQueueSentTime));
 
 								$out .= "<li>";
 
@@ -3424,33 +3438,6 @@ if(class_exists('mf_list_table'))
 												break;
 											}
 										}
-
-										/*else
-										{
-											switch($intQueueReceived)
-											{
-												case -1:
-													$out .= "<i class='fa fa-eye-slash red' title='".__("Not Received", 'lang_group')."'></i> ";
-												break;
-
-												default:
-												case 0:
-													$out .= "<i class='fa fa-eye-slash grey' title='".__("Not Viewed", 'lang_group')."'></i> ";
-												break;
-
-												case 1:
-													if($dteQueueViewed > DEFAULT_DATE)
-													{
-														$out .= "<i class='fa fa-eye green' title='".sprintf(__("Viewed %s", 'lang_group'), format_date($dteQueueViewed))."'></i> ";
-													}
-
-													else
-													{
-														$out .= "<i class='fa fa-eye green' title='".__("Viewed", 'lang_group')."'></i> ";
-													}
-												break;
-											}
-										}*/
 									}
 
 									else
@@ -3483,15 +3470,15 @@ if(class_exists('mf_list_table'))
 
 									//$out .= " <a href='".admin_url("admin.php?page=mf_address/create/index.php&intAddressID=".$intAddressID)."' title='".__("Edit", 'lang_group')."'><i class='fa fa-wrench'></i></a>";
 
-									if($intQueueSent == 1 && ($dteQueueSentTime > $dteQueueSentTime_temp || ($i + 1 >= $sent_limit)))
+									if($intQueueSent == 1 && ($dteQueueSentTime > $sent_datetime_temp || ($i + 1 >= $sent_limit)))
 									{
 										$out .= " <span class='grey'>";
 
-											if($date_sent == "" || $date_sent_temp != $date_sent)
+											if($sent_date == "" || $sent_date_temp != $sent_date)
 											{
 												$out .= $dteQueueSentTime;
 
-												$date_sent_temp = $date_sent;
+												$sent_date_temp = $sent_date;
 											}
 
 											else
@@ -3501,7 +3488,7 @@ if(class_exists('mf_list_table'))
 
 										$out .= "</span>";
 
-										$dteQueueSentTime_temp = $dteQueueSentTime;
+										$sent_datetime_temp = $dteQueueSentTime;
 									}
 
 								$out .= "</li>";
@@ -3519,6 +3506,189 @@ if(class_exists('mf_list_table'))
 							{
 								$out .= "<p>".sprintf(__("...and %d more", 'lang_group'), ($intMessageTotal - $sent_limit))."</p>";
 							}
+						}
+					}*/
+				break;
+
+				default:
+					if(isset($item[$column_name]))
+					{
+						$out .= $item[$column_name];
+					}
+				break;
+			}
+
+			return $out;
+		}
+	}
+
+	class mf_group_message_table extends mf_list_table
+	{
+		function set_default()
+		{
+			global $wpdb;
+
+			$this->arr_settings['query_from'] = $wpdb->prefix."group_queue";
+			$this->post_type = '';
+
+			$this->arr_settings['query_select_id'] = "queueID";
+			//$this->arr_settings['query_all_id'] = "0";
+			//$this->arr_settings['query_trash_id'] = "1";
+			$this->orderby_default = "queueSentTime ASC, queueID";
+			$this->orderby_default_order = "ASC";
+
+			$this->arr_settings['intMessageID'] = check_var('intMessageID');
+
+			$this->arr_settings['page_vars'] = array('intMessageID' => $this->arr_settings['intMessageID']);
+
+			$this->arr_settings['sent_date_temp'] = $this->arr_settings['sent_datetime_temp'] = "";
+		}
+
+		function init_fetch()
+		{
+			global $wpdb; //, $obj_group
+
+			$this->query_where .= "wp_group_queue.messageID = '".esc_sql($this->arr_settings['intMessageID'])."'";
+
+			if($this->search != '')
+			{
+				$this->query_where .= ($this->query_where != '' ? " AND " : "")."("
+				."CONCAT(addressFirstName, ' ', addressSurName) LIKE '".$this->filter_search_before_like($this->search)."'"
+				." OR addressAddress LIKE '".$this->filter_search_before_like($this->search)."'"
+				." OR addressCellNo LIKE '".$this->filter_search_before_like($this->search)."'"
+				." OR addressEmail LIKE '".$this->filter_search_before_like($this->search)."'"
+				." OR SOUNDEX(CONCAT(addressFirstName, ' ', addressSurName)) = SOUNDEX('".$this->search."')"
+			.")";
+			}
+
+			/*$this->set_views(array(
+				'db_field' => 'messageDeleted',
+				'types' => array(
+					'0' => __("All", 'lang_group'),
+					'1' => __("Trash", 'lang_group')
+				),
+			));*/
+
+			$arr_columns = array(
+				//'cb' => '<input type="checkbox">',
+				'addressID' => __("Address", 'lang_group'),
+				'queueStatus' => __("Status", 'lang_group'),
+				//'queueCreated' => __("Created", 'lang_group'),
+				'queueSentTime' => __("Sent", 'lang_group'),
+			);
+
+			$this->set_columns($arr_columns);
+
+			$this->set_sortable_columns(array(
+				'queueStatus',
+				'queueSentTime',
+			));
+		}
+
+		function column_default($item, $column_name)
+		{
+			global $wpdb, $obj_group;
+
+			$out = "";
+
+			//$intMessageID2 = $item['messageID'];
+
+			switch($column_name)
+			{
+				case 'addressID':
+					if($item['addressFirstName'] != '' || $item['addressSurName'] != '')
+					{
+						$out .= $item['addressFirstName']." ".$item['addressSurName'];
+					}
+
+					else
+					{
+						switch($item['messageType'])
+						{
+							case 'email':
+								$out .= $item['addressEmail'];
+							break;
+
+							default:
+								//
+							break;
+
+							case 'sms':
+								$out .= $item['addressCellNo'];
+							break;
+						}
+					}
+				break;
+
+				case 'queueStatus':
+					if($item['queueSent'] == 1)
+					{
+						$out .= "<i class='fa fa-check green' title='".__("Sent", 'lang_group')."'></i> ";
+
+						if($item[$column_name] != '')
+						{
+							switch($item[$column_name])
+							{
+								case 'not_received':
+									$out .= "<i class='fa fa-eye-slash red' title='".__("Not Received", 'lang_group')."'></i> ";
+								break;
+
+								default:
+								case 'not_viewed':
+									$out .= "<i class='fa fa-eye-slash grey' title='".__("Not Viewed", 'lang_group')."'></i> ";
+								break;
+
+								case 'deferred':
+									$out .= "<i class='fa fa-times red' title='".__("Deferred", 'lang_group')." (".$item['queueStatusMessage'].")'></i> ";
+								break;
+
+								case 'viewed':
+									if($dteQueueViewed > DEFAULT_DATE)
+									{
+										$out .= "<i class='fa fa-eye green' title='".sprintf(__("Viewed %s", 'lang_group'), format_date($dteQueueViewed))."'></i> ";
+									}
+
+									else
+									{
+										$out .= "<i class='fa fa-eye green' title='".__("Viewed", 'lang_group')."'></i> ";
+									}
+								break;
+							}
+						}
+					}
+
+					else
+					{
+						$out .= "<i class='fa fa-times red' title='".__("Not Sent", 'lang_group')."'></i> ";
+					}
+				break;
+
+				/*case 'queueCreated':
+					if($item[$column_name] > DEFAULT_DATE)
+					{
+						$out .= format_date($item[$column_name]);
+					}
+				break;*/
+
+				case 'queueSentTime':
+					if($item[$column_name] > DEFAULT_DATE)
+					{
+						if($item['queueSent'] == 1) // && $item[$column_name] > $this->arr_settings['sent_datetime_temp']
+						{
+							$sent_date = date("Y-m-d", strtotime($item[$column_name]));
+
+							if($sent_date != $this->arr_settings['sent_date_temp'])
+							{
+								$out .= $item[$column_name];
+							}
+
+							else
+							{
+								$out .= date("G:i:s", strtotime($item[$column_name]));
+							}
+
+							$this->arr_settings['sent_date_temp'] = $sent_date;
+							$this->arr_settings['sent_datetime_temp'] = $item[$column_name];
 						}
 					}
 				break;
