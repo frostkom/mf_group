@@ -2,6 +2,13 @@
 
 class mf_group
 {
+	var $id = 0;
+	var $type = "";
+	var $post_type = 'mf_group';
+	var $meta_prefix = "";
+	var $arr_stop_list_groups = array();
+	var $arr_stop_list_recipients = array();
+
 	function __construct($data = array())
 	{
 		if(!isset($data['id'])){	$data['id'] = 0;}
@@ -19,7 +26,7 @@ class mf_group
 
 		$this->type = $data['type'];
 
-		$this->post_type = 'mf_group';
+		//$this->post_type = 'mf_group';
 		$this->meta_prefix = $this->post_type.'_';
 	}
 
@@ -1259,7 +1266,7 @@ class mf_group
 
 				if($setting_group_log_file != '' && file_exists($setting_group_log_file))
 				{
-					$error_limit = (MB_IN_BYTES * 50);
+					$error_limit = (MB_IN_BYTES * 5);
 
 					if(filesize($setting_group_log_file) < $error_limit)
 					{
@@ -1958,10 +1965,9 @@ class mf_group
 	{
 		global $wpdb;
 
-		if(!isset($this->arr_stop_list_recipients))
+		if(!isset($this->arr_stop_list_recipients) || $this->arr_stop_list_recipients == false)
 		{
-			$this->arr_stop_list_groups = array();
-			$this->arr_stop_list_recipients = array();
+			$this->arr_stop_list_groups = $this->arr_stop_list_recipients = array();
 
 			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND ".$wpdb->postmeta.".meta_key = %s AND ".$wpdb->postmeta.".meta_value = %s", $this->post_type, 'publish', $this->meta_prefix.'group_type', 'stop'));
 
@@ -3643,9 +3649,9 @@ if(class_exists('mf_list_table'))
 								break;
 
 								case 'viewed':
-									if($dteQueueViewed > DEFAULT_DATE)
+									if($item['queueViewed'] > DEFAULT_DATE)
 									{
-										$out .= "<i class='fa fa-eye green' title='".sprintf(__("Viewed %s", 'lang_group'), format_date($dteQueueViewed))."'></i> ";
+										$out .= "<i class='fa fa-eye green' title='".sprintf(__("Viewed %s", 'lang_group'), format_date($item['queueViewed']))."'></i> ";
 									}
 
 									else
