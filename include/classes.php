@@ -3766,16 +3766,30 @@ if(class_exists('mf_export'))
 
 class widget_group extends WP_Widget
 {
+	var $obj_group = "";
+
+	var $widget_ops = array();
+
+	var $arr_default = array(
+		'group_heading' => '',
+		'group_text' => '',
+		'group_id' => '',
+		'group_label_type' => '',
+		'group_display_consent' => 'yes',
+		'group_button_text' => '',
+		'group_button_icon' => '',
+	);
+
 	function __construct()
 	{
 		$this->obj_group = new mf_group();
 
 		$this->widget_ops = array(
 			'classname' => 'widget_group',
-			'description' => __("Display a group registration form", 'lang_group')
+			'description' => __("Display a group registration form", 'lang_group'),
 		);
 
-		$this->arr_default = array(
+		/*$this->arr_default = array(
 			'group_heading' => '',
 			'group_text' => '',
 			'group_id' => '',
@@ -3783,7 +3797,7 @@ class widget_group extends WP_Widget
 			'group_display_consent' => 'yes',
 			'group_button_text' => '',
 			'group_button_icon' => '',
-		);
+		);*/
 
 		parent::__construct('group-widget', __("Group", 'lang_group')." / ".__("Newsletter", 'lang_group'), $this->widget_ops);
 
