@@ -1564,7 +1564,7 @@ class mf_group
 	{
 		global $wpdb, $error_text;
 
-		if(IS_ADMIN && does_table_exist($wpdb->prefix."group_message"))
+		if(IS_ADMINISTRATOR && does_table_exist($wpdb->prefix."group_message"))
 		{
 			$result = $wpdb->get_results("SELECT messageType, addressID, addressFirstName, addressSurName, addressEmail, addressCellNo FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) INNER JOIN ".get_address_table_prefix()."address USING (addressID) WHERE queueSent = '0' AND queueCreated < DATE_SUB(NOW(), INTERVAL 3 HOUR) LIMIT 0, 6");
 			$rows = $wpdb->num_rows;
@@ -2802,7 +2802,7 @@ if(class_exists('mf_list_table'))
 
 						$actions['edit'] = "<a href='".$post_edit_url."'>".__("Edit", 'lang_group')."</a>";
 
-						if($post_author == get_current_user_id() || IS_ADMIN)
+						if($post_author == get_current_user_id() || IS_ADMINISTRATOR)
 						{
 							$actions['delete'] = "<a href='".wp_nonce_url($list_url."&btnGroupDelete", 'group_delete_'.$post_id, '_wpnonce_group_delete')."'>".__("Delete", 'lang_group')."</a>";
 						}
@@ -3230,7 +3230,7 @@ if(class_exists('mf_list_table'))
 
 					$actions = array();
 
-					if(IS_ADMIN || $item['userID'] == get_current_user_id())
+					if(IS_ADMINISTRATOR || $item['userID'] == get_current_user_id())
 					{
 						if($item['messageDeleted'] == 0)
 						{

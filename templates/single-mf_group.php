@@ -49,7 +49,7 @@ get_header();
 	{
 		$obj_group = new mf_group();
 
-		echo "<article".(IS_ADMIN ? " class='single-mf_group'" : "").">";
+		echo "<article".(IS_ADMINISTRATOR ? " class='single-mf_group'" : "").">";
 
 			while(have_posts())
 			{
