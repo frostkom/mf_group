@@ -1904,6 +1904,10 @@ class mf_group
 				$this->message_text_source = check_var('intEmailTextSource');
 				$this->message_attachment = check_var('strMessageAttachment');
 
+				// Remove empty space between HTML tags and then add <br> on linebreak
+				$this->message_text = preg_replace('/\>\s+\</m', '><', $this->message_text);
+				$this->message_text = nl2br($this->message_text);
+
 				if($this->group_id > 0 && !in_array($this->group_id, $this->arr_group_id) && !isset($_POST['btnGroupSend']))
 				{
 					$this->arr_group_id[] = $this->group_id;

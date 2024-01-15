@@ -58,7 +58,7 @@ echo "<div class='wrap'>
 										."</div>"
 										.show_select(array('data' => $obj_group->get_for_select(array('add_choose_here' => false)), 'name' => 'arrGroupID[]', 'text' => __("To", 'lang_group'), 'value' => $obj_group->arr_group_id, 'maxsize' => 6, 'required' => true, 'allow_hidden_field' => false))
 									."</div>"
-									.show_wp_editor(array('name' => 'strMessageText', 'value' => $obj_group->message_text));
+									.show_wp_editor(array('name' => 'strMessageText', 'value' => $obj_group->message_text)); //, 'wpautop' => true // Does not have any effect
 								break;
 
 								default:
