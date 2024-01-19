@@ -140,7 +140,15 @@ echo "<div class='wrap'>
 
 							if(!($obj_group->id > 0) || $obj_group->sync_users == 'yes' || $amount_in_group == 0)
 							{
-								echo show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupSyncUsers', 'text' => __("Synchronize Users", 'lang_group'), 'value' => $obj_group->sync_users, 'description' => __("This will automatically add/remove users and their information to this group", 'lang_group')));
+								//$arr_data = get_yes_no_for_select();
+								$arr_data = array(
+									'no' => __("No", 'lang_group'),
+									'yes' => __("Users", 'lang_group'),
+								);
+
+								$arr_data = apply_filters('get_group_sync_type', $arr_data);
+
+								echo show_select(array('data' => $arr_data, 'name' => 'strGroupSyncUsers', 'text' => __("Synchronize", 'lang_group'), 'value' => $obj_group->sync_users, 'description' => __("This will automatically add/remove addresses and their information to this group", 'lang_group')));
 							}
 
 							if($obj_group->id > 0 && $obj_group->api == '' && $obj_group->allow_registration == 'no' && $obj_group->sync_users == 'no' && $amount_in_group > 0)

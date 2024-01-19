@@ -26,13 +26,12 @@ class mf_group
 
 		$this->type = $data['type'];
 
-		//$this->post_type = 'mf_group';
 		$this->meta_prefix = $this->post_type.'_';
 	}
 
 	function is_synced($group_id)
 	{
-		if(get_post_meta($group_id, $this->meta_prefix.'api', true) != '' || get_post_meta($group_id, $this->meta_prefix.'sync_users', true) == 'yes')
+		if(get_post_meta($group_id, $this->meta_prefix.'api', true) != '' || get_post_meta($group_id, $this->meta_prefix.'sync_users', true) != 'no')
 		{
 			return true;
 		}
@@ -199,14 +198,13 @@ class mf_group
 
 		if($data['queue_id'] > 0)
 		{
-			//$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."group_queue USING (addressID) WHERE addressEmail = %s AND queueID = '%d'", $strAddressEmail, $data['queue_id']));
 			$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."group_queue USING (addressID) WHERE queueID = '%d'", $data['queue_id']));
 
 			foreach($result as $r)
 			{
 				$intAddressID = $r->addressID;
 
-				$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_queue SET queueStatus = 'viewed', queueViewed = NOW() WHERE queueID = '%d'", $data['queue_id'])); //queueReceived = '1', 
+				$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_queue SET queueStatus = 'viewed', queueViewed = NOW() WHERE queueID = '%d'", $data['queue_id']));
 
 				$obj_address = new mf_address(array('id' => $intAddressID));
 				$obj_address->update_errors(array('action' => 'reset'));
@@ -878,41 +876,62 @@ class mf_group
 
 				/* Add users to groups that are set to synchronize */
 				#############################
-				$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND meta_key = %s AND meta_value = %s", $this->post_type, 'publish', $this->meta_prefix.'sync_users', 'yes'));
+				$result = $wpdb->get_results($wpdb->prepare("SELECT ID, meta_value FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND meta_key = %s AND meta_value != %s", $this->post_type, 'publish', $this->meta_prefix.'sync_users', 'no'));
 
 				foreach($result as $r)
 				{
 					$intGroupID = $r->ID;
+					$sync_type = $r->meta_value;
 
-					//$this->remove_all_address($intGroupID);
+					$arr_addresses = array();
+
+					switch($sync_type)
+					{
+						case 'yes':
+							$users = get_users(array('fields' => 'all'));
+
+							foreach($users as $user)
+							{
+								//$strUserLogin = $user->user_login;
+								$strUserFirstName = $user->first_name;
+								$strUserSurName = $user->last_name;
+								$strUserEmail = $user->user_email;
+
+								//$intAddressCountry = get_the_author_meta('profile_country', $user->ID);
+
+								if($strUserFirstName == '' || $strUserSurName == '')
+								{
+									@list($strUserFirstName, $strUserSurName) = explode(" ", $user->display_name, 2);
+								}
+
+								$arr_addresses[] = array(
+									'email' => $strUserEmail,
+									'first_name' => $strUserFirstName,
+									'sur_name' => $strUserSurName,
+								);
+							}
+						break;
+
+						default:
+							$arr_addresses = apply_filters('get_group_sync_addresses', $arr_addresses, $sync_type);
+						break;
+					}
+
 					$arr_address_ids = array();
 
-					$users = get_users(array('fields' => 'all'));
-
-					foreach($users as $user)
+					foreach($arr_addresses as $arr_address)
 					{
-						$strUserLogin = $user->user_login;
-						$strUserFirstName = $user->first_name;
-						$strUserSurName = $user->last_name;
-						$strUserEmail = $user->user_email;
-
-						$intAddressCountry = get_the_author_meta('profile_country', $user->ID);
-
-						if($strUserFirstName == '' || $strUserSurName == '')
-						{
-							@list($strUserFirstName, $strUserSurName) = explode(" ", $user->display_name, 2);
-						}
-
-						$intAddressID = $wpdb->get_var($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address WHERE addressExtra = %s", $strUserLogin));
+						//$intAddressID = $wpdb->get_var($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address WHERE addressExtra = %s", $strUserLogin));
+						$intAddressID = $wpdb->get_var($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address WHERE addressEmail = %s", $arr_address['email']));
 
 						if($intAddressID > 0)
 						{
-							$wpdb->query($wpdb->prepare("UPDATE ".get_address_table_prefix()."address SET addressFirstName = %s, addressSurName = %s, addressEmail = %s, addressCountry = '%d', addressExtra = %s WHERE addressID = '%d'", $strUserFirstName, $strUserSurName, $strUserEmail, $intAddressCountry, $strUserLogin, $intAddressID));
+							$wpdb->query($wpdb->prepare("UPDATE ".get_address_table_prefix()."address SET addressFirstName = %s, addressSurName = %s WHERE addressID = '%d'", $arr_address['first_name'], $arr_address['sur_name'], $intAddressID));
 						}
 
 						else
 						{
-							$wpdb->query($wpdb->prepare("INSERT INTO ".get_address_table_prefix()."address SET addressFirstName = %s, addressSurName = %s, addressEmail = %s, addressExtra = %s, addressCreated = NOW()", $strUserFirstName, $strUserSurName, $strUserEmail, $strUserLogin));
+							$wpdb->query($wpdb->prepare("INSERT INTO ".get_address_table_prefix()."address SET addressFirstName = %s, addressSurName = %s, addressEmail = %s, addressCreated = NOW()", $arr_address['first_name'], $arr_address['sur_name'], $arr_address['email']));
 
 							$intAddressID = $wpdb->insert_id;
 						}
@@ -2861,7 +2880,7 @@ if(class_exists('mf_list_table'))
 						),
 						'sync_users' => array(
 							'type' => 'bool',
-							'name' => __("Synchronize Users", 'lang_group'),
+							'name' => __("Synchronize", 'lang_group'),
 							'icon' => 'fas fa-users',
 							'single' => true,
 						),
@@ -2908,7 +2927,7 @@ if(class_exists('mf_list_table'))
 						switch($arr_value['type'])
 						{
 							case 'bool':
-								if($post_meta == 'yes')
+								if($post_meta != 'no')
 								{
 									$do_display = true;
 								}
@@ -2971,12 +2990,10 @@ if(class_exists('mf_list_table'))
 
 						if($amount > 0)
 						{
-							//$actions['export_csv'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnExportRun&intExportType=".$post_id."&strExportFormat=csv"), 'export_run', '_wpnonce_export_run')."' title='".__("Export", 'lang_group')." CSV'><i class='fas fa-file-csv fa-lg'></i></a>";
 							$actions['export_csv'] = "<a href='".wp_nonce_url($list_url."&btnExportRun&intExportType=".$post_id."&strExportFormat=csv", 'export_run', '_wpnonce_export_run')."' title='".__("Export", 'lang_group')." CSV'><i class='fas fa-file-csv fa-lg'></i></a>";
 
 							if(is_plugin_active("mf_phpexcel/index.php"))
 							{
-								//$actions['export_xls'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/list/index.php&btnExportRun&intExportType=".$post_id."&strExportFormat=xls"), 'export_run', '_wpnonce_export_run')."' title='".__("Export", 'lang_group')." XLS'><i class='fas fa-file-excel fa-lg'></i></a>";
 								$actions['export_xls'] = "<a href='".wp_nonce_url($list_url."&btnExportRun&intExportType=".$post_id."&strExportFormat=xls", 'export_run', '_wpnonce_export_run')."' title='".__("Export", 'lang_group')." XLS'><i class='fas fa-file-excel fa-lg'></i></a>";
 							}
 						}
@@ -3743,26 +3760,49 @@ if(class_exists('mf_export'))
 
 			$arr_countries = $obj_address->get_countries_for_select();
 
-			$result = $wpdb->get_results($wpdb->prepare("SELECT * FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' GROUP BY addressID ORDER BY addressPublic ASC, addressSurName ASC, addressFirstName ASC", $this->type));
+			$does_data_exist = array(
+				'addressMemberID' => false,
+				'addressBirthDate' => false,
+				'addressFirstName' => false,
+				'addressSurName' => false,
+				'addressAddress' => false,
+				'addressCo' => false,
+				'addressZipCode' => false,
+				'addressCity' => false,
+				'addressCountry' => false,
+				'addressTelNo' => false,
+				'addressCellNo' => false,
+				'addressWorkNo' => false,
+				'addressEmail' => false,
+				'addressExtra' => false,
+			);
+
+			$result = $wpdb->get_results($wpdb->prepare("SELECT * FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' GROUP BY addressID ORDER BY addressPublic ASC, addressSurName ASC, addressFirstName ASC", $this->type), ARRAY_A);
 
 			foreach($result as $r)
 			{
-				$this->data[] = array(
-					$r->addressMemberID,
-					$r->addressBirthDate,
-					$r->addressFirstName,
-					$r->addressSurName,
-					$r->addressAddress,
-					$r->addressCo,
-					$r->addressZipCode,
-					$r->addressCity,
-					($r->addressCountry > 0 && isset($arr_countries[$r->addressCountry]) ? $arr_countries[$r->addressCountry] : ''),
-					$r->addressTelNo,
-					$r->addressCellNo,
-					$r->addressWorkNo,
-					$r->addressEmail,
-					$r->addressExtra,
-				);
+				foreach($does_data_exist as $key => $value)
+				{
+					if($value == false && $r[$key] != '' && $r[$key] != 0 && $r[$key] != '-')
+					{
+						$does_data_exist[$key] = true;
+					}
+				}
+			}
+
+			foreach($result as $r)
+			{
+				$arr_data = array();
+
+				foreach($does_data_exist as $key => $value)
+				{
+					if($value == true)
+					{
+						$arr_data[] = $r[$key];
+					}
+				}
+
+				$this->data[] = $arr_data;
 			}
 		}
 	}
