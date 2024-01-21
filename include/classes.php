@@ -2077,7 +2077,7 @@ class mf_group
 
 						if(($success + $fail) % 20 == 0)
 						{
-							sleep(0.1);
+							sleep(1);
 							set_time_limit(60);
 						}
 					}
