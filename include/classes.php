@@ -1988,7 +1988,7 @@ class mf_group
 	{
 		global $wpdb;
 
-		if(!isset($this->arr_stop_list_recipients) || $this->arr_stop_list_recipients == false)
+		if(count($this->arr_stop_list_recipients) == 0)
 		{
 			$this->arr_stop_list_groups = $this->arr_stop_list_recipients = array();
 
@@ -3737,14 +3737,18 @@ if(class_exists('mf_export'))
 {
 	class mf_group_export extends mf_export
 	{
-		function get_defaults()
-		{
-			$this->plugin = "mf_group";
-		}
+		var $plugin = "mf_group";
+
+		function get_defaults(){}
 
 		function get_export_data()
 		{
 			global $wpdb, $obj_address, $obj_group;
+
+			if(!isset($obj_address))
+			{
+				$obj_address = new mf_address();
+			}
 
 			if(!isset($obj_group))
 			{
@@ -3752,11 +3756,6 @@ if(class_exists('mf_export'))
 			}
 
 			$this->name = $obj_group->get_name(array('id' => $this->type));
-
-			if(!isset($obj_address))
-			{
-				$obj_address = new mf_address();
-			}
 
 			$arr_countries = $obj_address->get_countries_for_select();
 
