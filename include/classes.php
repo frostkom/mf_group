@@ -1464,13 +1464,13 @@ class mf_group
 			{
 				if(!is_readable($option))
 				{
-					$description .= "<em><i class='fa fa-exclamation-triangle yellow'></i> ".__("The file is not readable", 'lang_log')."</em>";
+					$description .= "<em><i class='fa fa-exclamation-triangle yellow'></i> ".__("The file is not readable", 'lang_group')."</em>";
 				}
 			}
 
 			else
 			{
-				$description .= "<em><i class='fa fa-times red'></i> ".__("The file does not exist", 'lang_log')."</em>";
+				$description .= "<em><i class='fa fa-times red'></i> ".__("The file does not exist", 'lang_group')."</em>";
 			}
 		}
 
