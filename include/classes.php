@@ -3737,7 +3737,7 @@ if(class_exists('mf_export'))
 {
 	class mf_group_export extends mf_export
 	{
-		var $plugin = "mf_group";
+		var $plugin = 'mf_group';
 
 		function get_defaults(){}
 
@@ -3782,7 +3782,7 @@ if(class_exists('mf_export'))
 			{
 				foreach($does_data_exist as $key => $value)
 				{
-					if($value == false && $r[$key] != '' && $r[$key] != 0 && $r[$key] != '-')
+					if($value == false && $r[$key] != '' && $r[$key] != '0' && $r[$key] != '-')
 					{
 						$does_data_exist[$key] = true;
 					}
