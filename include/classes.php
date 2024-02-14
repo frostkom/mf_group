@@ -1548,23 +1548,28 @@ class mf_group
 		$menu_title = __("Add New", 'lang_group');
 		add_submenu_page($menu_start, $menu_title, " - ".$menu_title, $menu_capability, $menu_root."create/index.php");
 
-		$menu_title = __("Send Message", 'lang_group');
-		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, $menu_root."send/index.php");
+		$arr_data_temp = $this->get_for_select(array('add_choose_here' => false));
 
-		$menu_title = __("Sent", 'lang_group');
-		add_submenu_page($menu_root, $menu_title, $menu_title, $menu_capability, $menu_root."sent/index.php");
+		if(count($arr_data_temp) > 0)
+		{
+			$menu_title = __("Send Message", 'lang_group');
+			add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, $menu_root."send/index.php");
 
-		$menu_title = __("Message", 'lang_group');
-		add_submenu_page($menu_root, $menu_title, $menu_title, $menu_capability, $menu_root."message/index.php");
+			$menu_title = __("Sent", 'lang_group');
+			add_submenu_page($menu_root, $menu_title, $menu_title, $menu_capability, $menu_root."sent/index.php");
 
-		$menu_title = __("Import", 'lang_group');
-		add_submenu_page($menu_root, $menu_title, $menu_title, $menu_capability, $menu_root."import/index.php");
+			$menu_title = __("Message", 'lang_group');
+			add_submenu_page($menu_root, $menu_title, $menu_title, $menu_capability, $menu_root."message/index.php");
 
-		$menu_title = __("History", 'lang_group');
-		add_submenu_page($menu_root, $menu_title, $menu_title, $menu_capability, $menu_root.'version/index.php');
+			$menu_title = __("Import", 'lang_group');
+			add_submenu_page($menu_root, $menu_title, $menu_title, $menu_capability, $menu_root."import/index.php");
 
-		$menu_title = __("Help", 'lang_group');
-		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, $menu_root.'help/index.php');
+			$menu_title = __("History", 'lang_group');
+			add_submenu_page($menu_root, $menu_title, $menu_title, $menu_capability, $menu_root.'version/index.php');
+		}
+
+		/*$menu_title = __("Help", 'lang_group');
+		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, $menu_root.'help/index.php');*/
 
 		$menu_title = __("Settings", 'lang_group');
 		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, admin_url("options-general.php?page=settings_mf_base#settings_group"));
