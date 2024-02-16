@@ -2,12 +2,24 @@
 
 class mf_group
 {
-	var $id = 0;
-	var $type = "";
+	var $id;
+	var $type;
 	var $post_type = 'mf_group';
-	var $meta_prefix = "";
+	var $meta_prefix;
 	var $arr_stop_list_groups = array();
 	var $arr_stop_list_recipients = array();
+	var $group_month;
+	var $message_type;
+	var $group_id;
+	var $arr_group_id;
+	var $message_id;
+	var $message_from;
+	var $message_name;
+	var $message_text;
+	var $message_schedule_date;
+	var $message_schedule_time;
+	var $message_text_source;
+	var $message_attachment;
 
 	function __construct($data = array())
 	{
@@ -1995,7 +2007,7 @@ class mf_group
 
 		if(count($this->arr_stop_list_recipients) == 0)
 		{
-			$this->arr_stop_list_groups = $this->arr_stop_list_recipients = array();
+			$this->arr_stop_list_groups = array();
 
 			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND ".$wpdb->postmeta.".meta_key = %s AND ".$wpdb->postmeta.".meta_value = %s", $this->post_type, 'publish', $this->meta_prefix.'group_type', 'stop'));
 
