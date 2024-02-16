@@ -1336,14 +1336,20 @@ class mf_group
 							}
 						}
 
-						@unlink($setting_group_log_file);
+						if(file_exists($setting_group_log_file))
+						{
+							unlink($setting_group_log_file);
+						}
 					}
 
 					else
 					{
-						do_log(sprintf("%s was too large so it was deleted", basename($setting_group_log_file)));
+						do_log(sprintf("%s was too large so it should be deleted", basename($setting_group_log_file)));
 
-						//@unlink($setting_group_log_file);
+						/*if(file_exists($setting_group_log_file))
+						{
+							unlink($setting_group_log_file);
+						}*/
 					}
 				}
 				#############################
@@ -3754,9 +3760,10 @@ if(class_exists('mf_export'))
 {
 	class mf_group_export extends mf_export
 	{
-		var $plugin = 'mf_group';
-
-		function get_defaults(){}
+		function get_defaults()
+		{
+			$this->plugin = "mf_group";
+		}
 
 		function get_export_data()
 		{
