@@ -20,6 +20,25 @@ class mf_group
 	var $message_schedule_time;
 	var $message_text_source;
 	var $message_attachment;
+	var $name;
+	var $acceptance_email;
+	var $acceptance_subject;
+	var $acceptance_text;
+	var $reminder_subject;
+	var $reminder_text;
+	var $owner_email;
+	var $help_page;
+	var $archive_page;
+	var $group_type;
+	var $allow_registration;
+	var $verify_address;
+	var $contact_page;
+	var $registration_fields;
+	var $verify_link;
+	var $sync_users;
+	var $id_copy;
+	var $api;
+	var $api_filter;
 
 	function __construct($data = array())
 	{
