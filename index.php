@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description:
-Version: 5.10.15
+Version: 5.10.17
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://martinfors.se
@@ -118,7 +118,7 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 		) DEFAULT CHARSET=".$default_charset);
 
 		$arr_add_column[$wpdb->prefix."group_message_link"] = array(
-			'linkUsed' => "ALTER TABLE [table] ADD [column] DATETIME AFTER linkUrl",
+			//'linkUsed' => "ALTER TABLE [table] ADD [column] DATETIME AFTER linkUrl",
 		);
 
 		$wpdb->query("CREATE TABLE IF NOT EXISTS ".$wpdb->prefix."group_queue (
@@ -138,20 +138,25 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 		) DEFAULT CHARSET=".$default_charset);
 
 		$arr_add_column[$wpdb->prefix."group_queue"] = array(
-			'queueViewed' => "ALTER TABLE [table] ADD [column] DATETIME NOT NULL AFTER queueSentTime",
-			'queueStatus' => "ALTER TABLE [table] ADD [column] VARCHAR(20) NOT NULL DEFAULT '' AFTER queueReceived",
-			'queueStatusMessage' => "ALTER TABLE [table] ADD [column] TEXT AFTER queueStatus",
+			//'queueViewed' => "ALTER TABLE [table] ADD [column] DATETIME NOT NULL AFTER queueSentTime",
+			//'queueStatus' => "ALTER TABLE [table] ADD [column] VARCHAR(20) NOT NULL DEFAULT '' AFTER queueReceived",
+			//'queueStatusMessage' => "ALTER TABLE [table] ADD [column] TEXT AFTER queueStatus",
 		);
 
 		$wpdb->query("CREATE TABLE IF NOT EXISTS ".$wpdb->prefix."address2group (
 			addressID INT UNSIGNED NOT NULL,
 			groupID INT UNSIGNED NOT NULL,
+			addressAdded DATETIME DEFAULT NULL,
 			groupAccepted ENUM('0', '1') NOT NULL DEFAULT '1',
 			groupAcceptanceSent DATETIME DEFAULT NULL,
 			groupUnsubscribed ENUM('0', '1') NOT NULL DEFAULT '0',
 			KEY addressID (addressID),
 			KEY groupID (groupID)
 		) DEFAULT CHARSET=".$default_charset);
+
+		$arr_add_column[$wpdb->prefix."address2group"] = array(
+			'addressAdded' => "ALTER TABLE [table] ADD [column] DATETIME DEFAULT NULL AFTER groupID",
+		);
 
 		$wpdb->query("CREATE TABLE IF NOT EXISTS ".$wpdb->prefix."group_version (
 			versionID INT UNSIGNED NOT NULL AUTO_INCREMENT,

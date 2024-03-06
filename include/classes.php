@@ -62,15 +62,7 @@ class mf_group
 
 	function is_synced($group_id)
 	{
-		if(get_post_meta($group_id, $this->meta_prefix.'api', true) != '' || get_post_meta($group_id, $this->meta_prefix.'sync_users', true) != 'no')
-		{
-			return true;
-		}
-
-		else
-		{
-			return false;
-		}
+		return (get_post_meta($group_id, $this->meta_prefix.'api', true) != '' || get_post_meta($group_id, $this->meta_prefix.'sync_users', true) != 'no');
 	}
 
 	function get_for_select($data = array())
@@ -537,7 +529,7 @@ class mf_group
 
 						if($data['display_consent'] == 'yes')
 						{
-							$out .= show_checkbox(array('name' => 'intGroupConsent', 'text' => __("I consent to having this website store my submitted information, so that they can contact me as part of this newsletter", 'lang_group'), 'value' => 1, 'required' => true));
+							$out .= show_checkbox(array('name' => 'intGroupConsent', 'text' => __("I consent to having this website store my submitted information, so that they can contact me as part of this group", 'lang_group'), 'value' => 1, 'required' => true));
 						}
 
 						$out .= show_button(array('name' => 'btnGroupJoin', 'text' => $data['button_text'].($data['button_icon'] != '' ? " <i class='".$data['button_icon']."'></i>" : "")))
@@ -555,7 +547,7 @@ class mf_group
 
 					if($data['display_consent'] == 'yes')
 					{
-						$out .= show_checkbox(array('name' => 'intGroupConsent', 'text' => __("I consent to having this website store my submitted information, so that they can contact me as part of this newsletter", 'lang_group'), 'value' => 1, 'required' => true));
+						$out .= show_checkbox(array('name' => 'intGroupConsent', 'text' => __("I consent to having this website store my submitted information, so that they can contact me as part of this group", 'lang_group'), 'value' => 1, 'required' => true));
 					}
 				}
 
@@ -2618,7 +2610,7 @@ class mf_group
 				$post_meta_acceptance_email = get_post_meta($data['group_id'], $this->meta_prefix.'acceptance_email', true);
 			}
 
-			$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->prefix."address2group SET addressID = '%d', groupID = '%d', groupAccepted = '%d'", $data['address_id'], $data['group_id'], ($post_meta_acceptance_email == 'yes' ? 0 : 1)));
+			$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->prefix."address2group SET addressID = '%d', groupID = '%d', addressAdded = NOW(), groupAccepted = '%d'", $data['address_id'], $data['group_id'], ($post_meta_acceptance_email == 'yes' ? 0 : 1)));
 
 			if($wpdb->rows_affected > 0)
 			{
@@ -2977,7 +2969,7 @@ if(class_exists('mf_list_table'))
 						switch($arr_value['type'])
 						{
 							case 'bool':
-								if($post_meta != 'no')
+								if($post_meta != 'no' && $post_meta != '')
 								{
 									$do_display = true;
 								}
