@@ -2,8 +2,6 @@
 
 $obj_group = new mf_group(array('type' => 'create'));
 
-$obj_group->query_where = "";
-
 if(!IS_EDITOR)
 {
 	$obj_group->query_where .= " AND post_author = '".get_current_user_id()."'";

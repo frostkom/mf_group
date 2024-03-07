@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description:
-Version: 5.10.17
+Version: 5.10.18
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://martinfors.se
@@ -139,7 +139,7 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 
 		$arr_add_column[$wpdb->prefix."group_queue"] = array(
 			//'queueViewed' => "ALTER TABLE [table] ADD [column] DATETIME NOT NULL AFTER queueSentTime",
-			//'queueStatus' => "ALTER TABLE [table] ADD [column] VARCHAR(20) NOT NULL DEFAULT '' AFTER queueReceived",
+			'queueStatus' => "ALTER TABLE [table] ADD [column] VARCHAR(20) NOT NULL DEFAULT '' AFTER queueReceived",
 			//'queueStatusMessage' => "ALTER TABLE [table] ADD [column] TEXT AFTER queueStatus",
 		);
 

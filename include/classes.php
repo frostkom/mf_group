@@ -20,6 +20,7 @@ class mf_group
 	var $message_schedule_time;
 	var $message_text_source;
 	var $message_attachment;
+	var $public;
 	var $name;
 	var $acceptance_email;
 	var $acceptance_subject;
@@ -39,6 +40,7 @@ class mf_group
 	var $id_copy;
 	var $api;
 	var $api_filter;
+	var $query_where = "";
 
 	function __construct($data = array())
 	{
