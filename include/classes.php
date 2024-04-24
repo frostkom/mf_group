@@ -1387,6 +1387,14 @@ class mf_group
 
 	function block_render_callback($attributes)
 	{
+		if(!isset($attributes['group_id'])){				$attributes['group_id'] = 0;}
+		if(!isset($attributes['group_heading'])){			$attributes['group_heading'] = '';}
+		if(!isset($attributes['group_text'])){				$attributes['group_text'] = '';}
+		if(!isset($attributes['group_label_type'])){		$attributes['group_label_type'] = '';}
+		if(!isset($attributes['group_display_consent'])){	$attributes['group_display_consent'] = 'yes';}
+		if(!isset($attributes['group_button_text'])){		$attributes['group_button_text'] = '';}
+		if(!isset($attributes['group_button_icon'])){		$attributes['group_button_icon'] = '';}
+
 		$out = "";
 
 		if($attributes['group_id'] > 0)
