@@ -44,7 +44,7 @@ if(isset($_POST['btnGroupImport']) && $strGroupImport != '' && wp_verify_nonce($
 
 			if($address_row != '')
 			{
-				$intAddressID = $wpdb->get_var($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address WHERE ".$query_where." LIMIT 0, 1", $address_row));
+				$intAddressID = $wpdb->get_var($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address WHERE ".$query_where." LIMIT 0, 1", $address_row));
 
 				if($intAddressID > 0)
 				{
@@ -53,7 +53,7 @@ if(isset($_POST['btnGroupImport']) && $strGroupImport != '' && wp_verify_nonce($
 						$obj_group->add_address(array('address_id' => $intAddressID, 'group_id' => $intGroupID));
 					}
 
-					$wpdb->query($wpdb->prepare("UPDATE ".get_address_table_prefix()."address SET addressDeleted = '0' WHERE addressID = '%d' AND addressDeleted = '1'", $intAddressID));
+					$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."address SET addressDeleted = '0' WHERE addressID = '%d' AND addressDeleted = '1'", $intAddressID));
 
 					$rows++;
 				}

@@ -223,7 +223,7 @@ class mf_group
 
 		if($data['queue_id'] > 0)
 		{
-			$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."group_queue USING (addressID) WHERE queueID = '%d'", $data['queue_id']));
+			$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."group_queue USING (addressID) WHERE queueID = '%d'", $data['queue_id']));
 
 			foreach($result as $r)
 			{
@@ -318,7 +318,7 @@ class mf_group
 			$query_where = "1 = 2";
 		}
 
-		$result = $wpdb->get_results("SELECT addressID FROM ".get_address_table_prefix()."address WHERE addressDeleted = '0' AND ".$query_where);
+		$result = $wpdb->get_results("SELECT addressID FROM ".$wpdb->prefix."address WHERE addressDeleted = '0' AND ".$query_where);
 		$rows = $wpdb->num_rows;
 
 		if($rows == 0)
@@ -333,7 +333,7 @@ class mf_group
 				$query_where = "1 = 2";
 			}
 
-			$result = $wpdb->get_results("SELECT addressID FROM ".get_address_table_prefix()."address WHERE addressDeleted = '0' AND ".$query_where);
+			$result = $wpdb->get_results("SELECT addressID FROM ".$wpdb->prefix."address WHERE addressDeleted = '0' AND ".$query_where);
 			$rows = $wpdb->num_rows;
 		}
 
@@ -404,7 +404,7 @@ class mf_group
 
 					$intMessageID_temp = 0;
 
-					$resultAddresses = $wpdb->get_results($wpdb->prepare("SELECT queueID, messageID, addressEmail, addressCellNo FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."group_queue USING (addressID) INNER JOIN ".$wpdb->prefix."group_message USING (messageID) WHERE groupID = '%d' AND messageDeleted = '0' AND queueSent = '0' ORDER BY messageType ASC, queueCreated ASC".$this->get_message_query_limit(), $intGroupID));
+					$resultAddresses = $wpdb->get_results($wpdb->prepare("SELECT queueID, messageID, addressEmail, addressCellNo FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."group_queue USING (addressID) INNER JOIN ".$wpdb->prefix."group_message USING (messageID) WHERE groupID = '%d' AND messageDeleted = '0' AND queueSent = '0' ORDER BY messageType ASC, queueCreated ASC".$this->get_message_query_limit(), $intGroupID));
 
 					foreach($resultAddresses as $r)
 					{
@@ -652,12 +652,9 @@ class mf_group
 
 							foreach($users as $user)
 							{
-								//$strUserLogin = $user->user_login;
 								$strUserFirstName = $user->first_name;
 								$strUserSurName = $user->last_name;
 								$strUserEmail = $user->user_email;
-
-								//$intAddressCountry = get_the_author_meta('profile_country', $user->ID);
 
 								if($strUserFirstName == '' || $strUserSurName == '')
 								{
@@ -681,17 +678,16 @@ class mf_group
 
 					foreach($arr_addresses as $arr_address)
 					{
-						//$intAddressID = $wpdb->get_var($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address WHERE addressExtra = %s", $strUserLogin));
-						$intAddressID = $wpdb->get_var($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address WHERE addressEmail = %s", $arr_address['email']));
+						$intAddressID = $wpdb->get_var($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address WHERE addressEmail = %s", $arr_address['email']));
 
 						if($intAddressID > 0)
 						{
-							$wpdb->query($wpdb->prepare("UPDATE ".get_address_table_prefix()."address SET addressFirstName = %s, addressSurName = %s WHERE addressID = '%d'", $arr_address['first_name'], $arr_address['sur_name'], $intAddressID));
+							$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."address SET addressFirstName = %s, addressSurName = %s WHERE addressID = '%d'", $arr_address['first_name'], $arr_address['sur_name'], $intAddressID));
 						}
 
 						else
 						{
-							$wpdb->query($wpdb->prepare("INSERT INTO ".get_address_table_prefix()."address SET addressFirstName = %s, addressSurName = %s, addressEmail = %s, addressCreated = NOW()", $arr_address['first_name'], $arr_address['sur_name'], $arr_address['email']));
+							$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->prefix."address SET addressFirstName = %s, addressSurName = %s, addressEmail = %s, addressCreated = NOW()", $arr_address['first_name'], $arr_address['sur_name'], $arr_address['email']));
 
 							$intAddressID = $wpdb->insert_id;
 						}
@@ -875,7 +871,7 @@ class mf_group
 
 														if($rows == 0)
 														{
-															$wpdb->query($wpdb->prepare("INSERT INTO ".get_address_table_prefix()."address SET addressPublic = '%d', addressBirthDate = %s, addressFirstName = %s, addressSurName = %s, addressZipCode = %s, addressCity = %s, addressCountry = '%d', addressAddress = %s, addressCo = %s, addressTelNo = %s, addressCellNo = %s, addressWorkNo = %s, addressEmail = %s, addressExtra = %s, addressCreated = NOW(), userID = '%d'", $intAddressPublic, $strAddressBirthDate, $strAddressFirstName, $strAddressSurName, $intAddressZipCode, $strAddressCity, $intAddressCountry, $strAddressAddress, $strAddressCo, $strAddressTelNo, $strAddressCellNo, $strAddressWorkNo, $strAddressEmail, $strAddressExtra, get_current_user_id()));
+															$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->prefix."address SET addressPublic = '%d', addressBirthDate = %s, addressFirstName = %s, addressSurName = %s, addressZipCode = %s, addressCity = %s, addressCountry = '%d', addressAddress = %s, addressCo = %s, addressTelNo = %s, addressCellNo = %s, addressWorkNo = %s, addressEmail = %s, addressExtra = %s, addressCreated = NOW(), userID = '%d'", $intAddressPublic, $strAddressBirthDate, $strAddressFirstName, $strAddressSurName, $intAddressZipCode, $strAddressCity, $intAddressCountry, $strAddressAddress, $strAddressCo, $strAddressTelNo, $strAddressCellNo, $strAddressWorkNo, $strAddressEmail, $strAddressExtra, get_current_user_id()));
 
 															if($wpdb->rows_affected > 0)
 															{
@@ -910,7 +906,7 @@ class mf_group
 
 																if(!in_array($intAddressID, $arr_addresses))
 																{
-																	$wpdb->query($wpdb->prepare("UPDATE ".get_address_table_prefix()."address SET addressBirthDate = %s, addressFirstName = %s, addressSurName = %s, addressZipCode = %s, addressCity = %s, addressCountry = '%d', addressAddress = %s, addressCo = %s, addressTelNo = %s, addressCellNo = %s, addressWorkNo = %s, addressEmail = %s, addressExtra = %s WHERE addressID = '%d'", $strAddressBirthDate, $strAddressFirstName, $strAddressSurName, $intAddressZipCode, $strAddressCity, $intAddressCountry, $strAddressAddress, $strAddressCo, $strAddressTelNo, $strAddressCellNo, $strAddressWorkNo, $strAddressEmail, $strAddressExtra, $intAddressID));
+																	$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."address SET addressBirthDate = %s, addressFirstName = %s, addressSurName = %s, addressZipCode = %s, addressCity = %s, addressCountry = '%d', addressAddress = %s, addressCo = %s, addressTelNo = %s, addressCellNo = %s, addressWorkNo = %s, addressEmail = %s, addressExtra = %s WHERE addressID = '%d'", $strAddressBirthDate, $strAddressFirstName, $strAddressSurName, $intAddressZipCode, $strAddressCity, $intAddressCountry, $strAddressAddress, $strAddressCo, $strAddressTelNo, $strAddressCellNo, $strAddressWorkNo, $strAddressEmail, $strAddressExtra, $intAddressID));
 
 																	$obj_address->save_sync_date(array('address_id' => $intAddressID));
 
@@ -1065,10 +1061,7 @@ class mf_group
 
 								$value_date = date("Y-m-d H:i:s", strtotime($value_date));
 
-								//echo $value_date.", ".$value_type.", ".$value_email.", ".$value_status.", ".$value_message."<br>";
-								//echo "<em>".htmlspecialchars($value)."</em><br>";
-
-								$result = $wpdb->get_results($wpdb->prepare("SELECT queueID, queueSentTime FROM ".$wpdb->prefix."group_queue INNER JOIN ".get_address_table_prefix()."address USING (addressID) WHERE addressEmail = %s AND queueStatus IN('not_received', 'not_viewed') AND queueSentTime < %s ORDER BY queueSentTime DESC LIMIT 0, 1", $value_email, $value_date));
+								$result = $wpdb->get_results($wpdb->prepare("SELECT queueID, queueSentTime FROM ".$wpdb->prefix."group_queue INNER JOIN ".$wpdb->prefix."address USING (addressID) WHERE addressEmail = %s AND queueStatus IN('not_received', 'not_viewed') AND queueSentTime < %s ORDER BY queueSentTime DESC LIMIT 0, 1", $value_email, $value_date));
 
 								foreach($result as $r)
 								{
@@ -1076,11 +1069,7 @@ class mf_group
 									$dteQueueSentTime = $r->queueSentTime;
 
 									$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_queue SET queueStatus = %s, queueStatusMessage = %s WHERE queueID = '%d'", $value_status, $value_message, $intQueueID));
-
-									//echo $dteQueueSentTime."<br>";
 								}
-
-								//echo "<br>";
 							}
 						}
 
@@ -1256,7 +1245,7 @@ class mf_group
 			{
 				if(!($intAddressID > 0))
 				{
-					$wpdb->query("INSERT INTO ".get_address_table_prefix()."address SET addressPublic = '1'".$query_set.", addressCreated = NOW()");
+					$wpdb->query("INSERT INTO ".$wpdb->prefix."address SET addressPublic = '1'".$query_set.", addressCreated = NOW()");
 
 					$intAddressID = $wpdb->insert_id;
 				}
@@ -1697,7 +1686,7 @@ class mf_group
 
 		if(IS_ADMINISTRATOR && does_table_exist($wpdb->prefix."group_message"))
 		{
-			$result = $wpdb->get_results("SELECT messageType, addressID, addressFirstName, addressSurName, addressEmail, addressCellNo FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) INNER JOIN ".get_address_table_prefix()."address USING (addressID) WHERE queueSent = '0' AND queueCreated < DATE_SUB(NOW(), INTERVAL 3 HOUR) LIMIT 0, 6");
+			$result = $wpdb->get_results("SELECT messageType, addressID, addressFirstName, addressSurName, addressEmail, addressCellNo FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) INNER JOIN ".$wpdb->prefix."address USING (addressID) WHERE queueSent = '0' AND queueCreated < DATE_SUB(NOW(), INTERVAL 3 HOUR) LIMIT 0, 6");
 			$rows = $wpdb->num_rows;
 
 			if($rows > 0)
@@ -1819,7 +1808,7 @@ class mf_group
 			break;
 		}
 
-		$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE addressDeleted = '0' AND groupAccepted = '%d' AND groupUnsubscribed = '%d' AND groupID IN ('".implode("','", $data['group_ids'])."')".$query_where." GROUP BY addressID", 1, 0));
+		$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE addressDeleted = '0' AND groupAccepted = '%d' AND groupUnsubscribed = '%d' AND groupID IN ('".implode("','", $data['group_ids'])."')".$query_where." GROUP BY addressID", 1, 0));
 
 		foreach($result as $r)
 		{
@@ -2171,7 +2160,7 @@ class mf_group
 
 				else if(isset($_GET['btnGroupResend']) && $this->id > 0 && wp_verify_nonce($_REQUEST['_wpnonce_group_resend'], 'group_resend_'.$this->id))
 				{
-					$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE addressDeleted = '0' AND groupID = '%d' AND groupAccepted = '0' AND groupUnsubscribed = '0' AND (groupAcceptanceSent IS null OR groupAcceptanceSent <= '%s') ORDER BY groupAcceptanceSent ASC".$this->get_message_query_limit(), $this->id, date("Y-m-d H:i:s", strtotime("-1 week"))));
+					$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE addressDeleted = '0' AND groupID = '%d' AND groupAccepted = '0' AND groupUnsubscribed = '0' AND (groupAcceptanceSent IS null OR groupAcceptanceSent <= '%s') ORDER BY groupAcceptanceSent ASC".$this->get_message_query_limit(), $this->id, date("Y-m-d H:i:s", strtotime("-1 week"))));
 
 					$success = $fail = 0;
 
@@ -2278,7 +2267,7 @@ class mf_group
 
 									if($this->message_id > 0)
 									{
-										$result = $wpdb->get_results($wpdb->prepare("SELECT addressID, addressEmail, addressCellNo FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' AND groupAccepted = '1' AND groupUnsubscribed = '0'", $this->group_id));
+										$result = $wpdb->get_results($wpdb->prepare("SELECT addressID, addressEmail, addressCellNo FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' AND groupAccepted = '1' AND groupUnsubscribed = '0'", $this->group_id));
 
 										foreach($result as $r)
 										{
@@ -2420,7 +2409,7 @@ class mf_group
 						{
 							if($this->id_copy > 0)
 							{
-								$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0'", $this->id_copy));
+								$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0'", $this->id_copy));
 
 								foreach($result as $r)
 								{
@@ -2551,7 +2540,7 @@ class mf_group
 
 		if($query_where != '')
 		{
-			$intAddressID = $wpdb->get_var("SELECT addressID FROM ".get_address_table_prefix()."address WHERE addressDeleted = '0' AND ".$query_where);
+			$intAddressID = $wpdb->get_var("SELECT addressID FROM ".$wpdb->prefix."address WHERE addressDeleted = '0' AND ".$query_where);
 
 			return $intAddressID;
 		}
@@ -2796,7 +2785,7 @@ class mf_group
 				$query_where .= " AND addressID NOT IN('".implode("','", $arr_stop_list_recipients)."')";
 			}
 
-			return $wpdb->get_var($wpdb->prepare("SELECT COUNT(addressID) FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE addressDeleted = '%d' AND groupAccepted = '%d' AND groupUnsubscribed = '%d'".$query_where, $data['deleted'], $data['accepted'], $data['unsubscribed']));
+			return $wpdb->get_var($wpdb->prepare("SELECT COUNT(addressID) FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE addressDeleted = '%d' AND groupAccepted = '%d' AND groupUnsubscribed = '%d'".$query_where, $data['deleted'], $data['accepted'], $data['unsubscribed']));
 		}
 
 		else
@@ -3484,169 +3473,6 @@ if(class_exists('mf_list_table'))
 					{
 						$out .= "<p>".get_media_button(array('name' => 'strMessageAttachment', 'value' => $item['messageAttachment'], 'show_add_button' => false))."</p>";
 					}
-
-					/*$sent_limit = 100;
-
-					$result_sent = $wpdb->get_results($wpdb->prepare("SELECT addressID, addressFirstName, addressSurName, addressEmail, addressCellNo, queueSent, queueStatus, queueStatusMessage, queueSentTime, queueViewed FROM ".$wpdb->prefix."group_queue INNER JOIN ".get_address_table_prefix()."address USING (addressID) WHERE messageID = '%d' ORDER BY queueSentTime ASC, queueID ASC LIMIT 0, ".$sent_limit, $intMessageID2)); //, queueReceived
-
-					if($wpdb->num_rows > 0)
-					{
-						$date_created = date("Y-m-d", strtotime($item['messageCreated']));
-						$sent_date = "";
-
-						$out .= "<p>
-							<strong>".__("Created", 'lang_group').":</strong> ".$item['messageCreated'];
-
-							$dteQueueSentTime_first = $wpdb->get_var($wpdb->prepare("SELECT MIN(queueSentTime) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueSent = '1'", $intMessageID2));
-
-							if($dteQueueSentTime_first > DEFAULT_DATE)
-							{
-								$sent_date = date("Y-m-d", strtotime($dteQueueSentTime_first));
-
-								$dteQueueSentTime_last = $wpdb->get_var($wpdb->prepare("SELECT MAX(queueSentTime) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueSent = '1'", $intMessageID2));
-
-								$sent_date_end = date("Y-m-d", strtotime($dteQueueSentTime_last));
-
-								$out .= "<br>
-								<strong>".__("Sent", 'lang_group').":</strong> "
-									.($sent_date > $date_created ? $dteQueueSentTime_first : date("G:i:s", strtotime($dteQueueSentTime_first)));
-
-								if($dteQueueSentTime_last > $dteQueueSentTime_first)
-								{
-									$out .= " - ".($sent_date_end > $sent_date ? $dteQueueSentTime_last : date("G:i:s", strtotime($dteQueueSentTime_last)));
-								}
-							}
-
-						$out .= "</p>";
-
-						$out .= "<ol class='queue_sent'>";
-
-							$i = 0;
-
-							$sent_datetime_temp = "";
-
-							foreach($result_sent as $r)
-							{
-								$intAddressID = $r->addressID;
-								$strAddressFirstName = $r->addressFirstName;
-								$strAddressSurName = $r->addressSurName;
-								$strAddressEmail = $r->addressEmail;
-								$strAddressCellNo = $r->addressCellNo;
-								$intQueueSent = $r->queueSent;
-								//$intQueueReceived = $r->queueReceived;
-								$strQueueStatus = $r->queueStatus;
-								$strQueueStatusMessage = $r->queueStatusMessage;
-								$dteQueueSentTime = $r->queueSentTime;
-								$dteQueueViewed = $r->queueViewed;
-
-								$sent_date_temp = date("Y-m-d", strtotime($dteQueueSentTime));
-
-								$out .= "<li>";
-
-									if($intQueueSent == 1)
-									{
-										$out .= "<i class='fa fa-check green' title='".__("Sent", 'lang_group')."'></i> ";
-
-										if($strQueueStatus != '')
-										{
-											switch($strQueueStatus)
-											{
-												case 'not_received':
-													$out .= "<i class='fa fa-eye-slash red' title='".__("Not Received", 'lang_group')."'></i> ";
-												break;
-
-												default:
-												case 'not_viewed':
-													$out .= "<i class='fa fa-eye-slash grey' title='".__("Not Viewed", 'lang_group')."'></i> ";
-												break;
-
-												case 'deferred':
-													$out .= "<i class='fa fa-times red' title='".__("Deferred", 'lang_group')." (".$strQueueStatusMessage.")'></i> ";
-												break;
-
-												case 'viewed':
-													if($dteQueueViewed > DEFAULT_DATE)
-													{
-														$out .= "<i class='fa fa-eye green' title='".sprintf(__("Viewed %s", 'lang_group'), format_date($dteQueueViewed))."'></i> ";
-													}
-
-													else
-													{
-														$out .= "<i class='fa fa-eye green' title='".__("Viewed", 'lang_group')."'></i> ";
-													}
-												break;
-											}
-										}
-									}
-
-									else
-									{
-										$out .= "<i class='fa fa-times red' title='".__("Not Sent", 'lang_group')."'></i> ";
-									}
-
-									if($strAddressFirstName != '' || $strAddressSurName != '')
-									{
-										$out .= $strAddressFirstName." ".$strAddressSurName;
-									}
-
-									else
-									{
-										switch($item['messageType'])
-										{
-											case 'email':
-												$out .= $strAddressEmail;
-											break;
-
-											default:
-												//
-											break;
-
-											case 'sms':
-												$out .= $strAddressCellNo;
-											break;
-										}
-									}
-
-									//$out .= " <a href='".admin_url("admin.php?page=mf_address/create/index.php&intAddressID=".$intAddressID)."' title='".__("Edit", 'lang_group')."'><i class='fa fa-wrench'></i></a>";
-
-									if($intQueueSent == 1 && ($dteQueueSentTime > $sent_datetime_temp || ($i + 1 >= $sent_limit)))
-									{
-										$out .= " <span class='grey'>";
-
-											if($sent_date == "" || $sent_date_temp != $sent_date)
-											{
-												$out .= $dteQueueSentTime;
-
-												$sent_date_temp = $sent_date;
-											}
-
-											else
-											{
-												$out .= date("G:i:s", strtotime($dteQueueSentTime));
-											}
-
-										$out .= "</span>";
-
-										$sent_datetime_temp = $dteQueueSentTime;
-									}
-
-								$out .= "</li>";
-
-								$i++;
-							}
-
-						$out .= "</ol>";
-
-						if($i >= $sent_limit)
-						{
-							$intMessageTotal = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d'", $intMessageID2));
-
-							if($intMessageTotal > $sent_limit)
-							{
-								$out .= "<p>".sprintf(__("...and %d more", 'lang_group'), ($intMessageTotal - $sent_limit))."</p>";
-							}
-						}
-					}*/
 				break;
 
 				default:
@@ -3889,7 +3715,7 @@ if(class_exists('mf_export'))
 				'addressExtra' => false,
 			);
 
-			$result = $wpdb->get_results($wpdb->prepare("SELECT * FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' GROUP BY addressID ORDER BY addressPublic ASC, addressSurName ASC, addressFirstName ASC", $this->type), ARRAY_A);
+			$result = $wpdb->get_results($wpdb->prepare("SELECT * FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' GROUP BY addressID ORDER BY addressPublic ASC, addressSurName ASC, addressFirstName ASC", $this->type), ARRAY_A);
 
 			foreach($result as $r)
 			{

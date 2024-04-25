@@ -46,7 +46,7 @@ switch($type)
 		{
 			$intGroupID = check_var('group_id');
 
-			$result = $wpdb->get_results($wpdb->prepare("SELECT * FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressPublic = '1' AND addressDeleted = '0' GROUP BY addressID ORDER BY addressPublic ASC, addressSurName ASC, addressFirstName ASC", $intGroupID));
+			$result = $wpdb->get_results($wpdb->prepare("SELECT * FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressPublic = '1' AND addressDeleted = '0' GROUP BY addressID ORDER BY addressPublic ASC, addressSurName ASC, addressFirstName ASC", $intGroupID));
 
 			if($wpdb->num_rows > 0)
 			{

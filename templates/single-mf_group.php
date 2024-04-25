@@ -8,7 +8,7 @@ if(isset($_REQUEST['redirect']))
 
 	if($intQueueID > 0)
 	{
-		$result = $wpdb->get_results($wpdb->prepare("SELECT groupID, messageID, addressEmail FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."group_queue USING (addressID) INNER JOIN ".$wpdb->prefix."group_message USING (messageID) WHERE queueID = '%d'", $intQueueID));
+		$result = $wpdb->get_results($wpdb->prepare("SELECT groupID, messageID, addressEmail FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."group_queue USING (addressID) INNER JOIN ".$wpdb->prefix."group_message USING (messageID) WHERE queueID = '%d'", $intQueueID));
 
 		foreach($result as $r)
 		{
@@ -77,7 +77,7 @@ get_header();
 
 					if($strSubscribeHash == $hash_temp)
 					{
-						$intAddressID = $wpdb->get_var($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressEmail = %s AND addressDeleted = '0' AND groupAccepted = '0' LIMIT 0, 1", $intGroupID, $strAddressEmail));
+						$intAddressID = $wpdb->get_var($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressEmail = %s AND addressDeleted = '0' AND groupAccepted = '0' LIMIT 0, 1", $intGroupID, $strAddressEmail));
 
 						if($intAddressID > 0)
 						{
@@ -119,7 +119,7 @@ get_header();
 
 						if($intQueueID > 0)
 						{
-							$result = $wpdb->get_results($wpdb->prepare("SELECT groupID, addressEmail FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."group_queue USING (addressID) INNER JOIN ".$wpdb->prefix."group_message USING (messageID) WHERE queueID = '%d'", $intQueueID));
+							$result = $wpdb->get_results($wpdb->prepare("SELECT groupID, addressEmail FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."group_queue USING (addressID) INNER JOIN ".$wpdb->prefix."group_message USING (messageID) WHERE queueID = '%d'", $intQueueID));
 
 							foreach($result as $r)
 							{
@@ -134,7 +134,7 @@ get_header();
 						{
 							if($strUnsubscribeHash == $hash_temp)
 							{
-								$intAddressID = $wpdb->get_var($wpdb->prepare("SELECT addressID FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressEmail = %s AND addressDeleted = '0' AND groupUnsubscribed = '0' LIMIT 0, 1", $intGroupID, $strAddressEmail));
+								$intAddressID = $wpdb->get_var($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressEmail = %s AND addressDeleted = '0' AND groupUnsubscribed = '0' LIMIT 0, 1", $intGroupID, $strAddressEmail));
 
 								if($intAddressID > 0)
 								{
@@ -193,7 +193,7 @@ get_header();
 
 					if($intQueueID > 0)
 					{
-						$result = $wpdb->get_results($wpdb->prepare("SELECT groupID, messageID, addressEmail FROM ".get_address_table_prefix()."address INNER JOIN ".$wpdb->prefix."group_queue USING (addressID) INNER JOIN ".$wpdb->prefix."group_message USING (messageID) WHERE queueID = '%d'", $intQueueID));
+						$result = $wpdb->get_results($wpdb->prepare("SELECT groupID, messageID, addressEmail FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."group_queue USING (addressID) INNER JOIN ".$wpdb->prefix."group_message USING (messageID) WHERE queueID = '%d'", $intQueueID));
 
 						foreach($result as $r)
 						{
