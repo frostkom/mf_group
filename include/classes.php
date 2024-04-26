@@ -1671,6 +1671,16 @@ class mf_group
 		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, admin_url("options-general.php?page=settings_mf_base#settings_group"));
 	}
 
+	function filter_sites_table_pages($arr_pages)
+	{
+		$arr_pages[$this->post_type] = array(
+			'icon' => "fas fa-users",
+			'title' => __("Groups", 'lang_group'),
+		);
+
+		return $arr_pages;
+	}
+
 	function has_allow_registration_post()
 	{
 		global $wpdb;
