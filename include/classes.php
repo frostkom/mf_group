@@ -184,15 +184,23 @@ class mf_group
 
 	function get_registration_fields_for_select()
 	{
-		return array(
+		$arr_data = array(
 			'name' => __("Name", 'lang_group'),
 			'address' => __("Address", 'lang_group'),
 			'zip' => __("Zip Code", 'lang_group'),
 			'city' => __("City", 'lang_group'),
 			'phone' => __("Phone Number", 'lang_group'),
 			'email' => __("E-mail", 'lang_group'),
-			'extra' => get_option_or_default('setting_address_extra', __("Extra", 'lang_group')),
 		);
+
+		$setting_address_extra_field = get_option('setting_address_extra_field');
+
+		if(is_array($setting_address_extra_field) && count($setting_address_extra_field) > 0)
+		{
+			$arr_data['extra'] = get_option_or_default('setting_address_extra', __("Extra", 'lang_group'));
+		}
+
+		return $arr_data;
 	}
 
 	function get_groups($data = array())

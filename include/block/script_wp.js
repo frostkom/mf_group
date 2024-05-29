@@ -84,7 +84,7 @@
 		edit: function(props)
 		{
 			var arr_out = [];
-			
+
 			/* Text */
 			/* ################### */
 			arr_out.push(el(
