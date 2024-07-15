@@ -1675,8 +1675,11 @@ class mf_group
 		/*$menu_title = __("Help", 'lang_group');
 		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, $menu_root.'help/index.php');*/
 
-		$menu_title = __("Settings", 'lang_group');
-		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, admin_url("options-general.php?page=settings_mf_base#settings_group"));
+		if(IS_EDITOR)
+		{
+			$menu_title = __("Settings", 'lang_group');
+			add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, admin_url("options-general.php?page=settings_mf_base#settings_group"));
+		}
 	}
 
 	function filter_sites_table_pages($arr_pages)
