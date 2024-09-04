@@ -1436,7 +1436,7 @@ class mf_group
 			'show_in_menu' => false,
 			'exclude_from_search' => true,
 			'rewrite' => array(
-				'slug' => __("group", 'lang_group'),
+				'slug' => 'group',
 			),
 		);
 
