@@ -1396,7 +1396,7 @@ class mf_group
 
 		if($attributes['group_id'] > 0)
 		{
-			$out .= "<div class='widget widget_group'>";
+			$out .= "<div class='widget widget_group".(isset($attributes['className']) && $attributes['className'] != '' ? " ".$attributes['className'] : "")."'>";
 
 				if($attributes['group_heading'] != '')
 				{
