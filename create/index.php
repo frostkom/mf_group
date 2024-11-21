@@ -138,7 +138,6 @@ echo "<div class='wrap'>
 
 							if(!($obj_group->id > 0) || $obj_group->sync_users == 'yes' || $amount_in_group == 0)
 							{
-								//$arr_data = get_yes_no_for_select();
 								$arr_data = array(
 									'no' => __("No", 'lang_group'),
 									'yes' => __("Users", 'lang_group'),

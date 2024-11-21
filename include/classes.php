@@ -642,403 +642,435 @@ class mf_group
 				}
 				#############################
 
+				$is_syncing = false;
+
 				/* Add users to groups that are set to synchronize */
 				#############################
-				$result = $wpdb->get_results($wpdb->prepare("SELECT ID, meta_value FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND meta_key = %s AND meta_value != %s", $this->post_type, 'publish', $this->meta_prefix.'sync_users', 'no'));
-
-				foreach($result as $r)
+				if($is_syncing == false)
 				{
-					$intGroupID = $r->ID;
-					$sync_type = $r->meta_value;
+					$result = $wpdb->get_results($wpdb->prepare("SELECT ID, meta_value FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND meta_key = %s AND meta_value != %s", $this->post_type, 'publish', $this->meta_prefix.'sync_users', 'no'));
 
-					$arr_addresses = array();
-
-					switch($sync_type)
+					if($wpdb->num_rows > 0)
 					{
-						case 'yes':
-							$users = get_users(array('fields' => 'all'));
+						$is_syncing = true;
 
-							foreach($users as $user)
+						foreach($result as $r)
+						{
+							$intGroupID = $r->ID;
+							$sync_type = $r->meta_value;
+
+							$arr_addresses = array();
+
+							switch($sync_type)
 							{
-								$strUserFirstName = $user->first_name;
-								$strUserSurName = $user->last_name;
-								$strUserEmail = $user->user_email;
+								case 'yes':
+									$users = get_users(array('fields' => 'all'));
 
-								if($strUserFirstName == '' || $strUserSurName == '')
-								{
-									@list($strUserFirstName, $strUserSurName) = explode(" ", $user->display_name, 2);
-								}
+									foreach($users as $user)
+									{
+										$strUserFirstName = $user->first_name;
+										$strUserSurName = $user->last_name;
+										$strUserEmail = $user->user_email;
 
-								$arr_addresses[] = array(
-									'email' => $strUserEmail,
-									'first_name' => $strUserFirstName,
-									'sur_name' => $strUserSurName,
-								);
+										if($strUserFirstName == '' || $strUserSurName == '')
+										{
+											@list($strUserFirstName, $strUserSurName) = explode(" ", $user->display_name, 2);
+										}
+
+										$arr_addresses[] = array(
+											'email' => $strUserEmail,
+											'first_name' => $strUserFirstName,
+											'sur_name' => $strUserSurName,
+										);
+									}
+								break;
+
+								default:
+									$arr_addresses = apply_filters('get_group_sync_addresses', $arr_addresses, $sync_type);
+								break;
 							}
-						break;
 
-						default:
-							$arr_addresses = apply_filters('get_group_sync_addresses', $arr_addresses, $sync_type);
-						break;
-					}
+							$arr_address_ids = array();
 
-					$arr_address_ids = array();
+							foreach($arr_addresses as $arr_address)
+							{
+								if($arr_address['email'] != '')
+								{
+									$intAddressID = $wpdb->get_var($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address WHERE addressEmail = %s", $arr_address['email']));
 
-					foreach($arr_addresses as $arr_address)
-					{
-						$intAddressID = $wpdb->get_var($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address WHERE addressEmail = %s", $arr_address['email']));
+									if($intAddressID > 0)
+									{
+										$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."address SET addressFirstName = %s, addressSurName = %s WHERE addressID = '%d'", $arr_address['first_name'], $arr_address['sur_name'], $intAddressID));
+									}
 
-						if($intAddressID > 0)
-						{
-							$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."address SET addressFirstName = %s, addressSurName = %s WHERE addressID = '%d'", $arr_address['first_name'], $arr_address['sur_name'], $intAddressID));
+									else
+									{
+										$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->prefix."address SET addressFirstName = %s, addressSurName = %s, addressEmail = %s, addressCreated = NOW()", $arr_address['first_name'], $arr_address['sur_name'], $arr_address['email']));
+
+										$intAddressID = $wpdb->insert_id;
+									}
+
+									if($intAddressID > 0)
+									{
+										$this->add_address(array('address_id' => $intAddressID, 'group_id' => $intGroupID));
+
+										if(!in_array($intAddressID, $arr_address_ids))
+										{
+											$arr_address_ids[] = $intAddressID;
+										}
+									}
+								}
+							}
+
+							$count_address_ids = count($arr_address_ids);
+
+							if($count_address_ids > 0)
+							{
+								$result_addresses = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address2group WHERE groupID = '%d' AND addressID NOT IN ('".implode("','", $arr_address_ids)."')", $intGroupID));
+
+								if($wpdb->num_rows > 0)
+								{
+									foreach($result_addresses as $r)
+									{
+										$this->remove_address(array('address_id' => $r->addressID, 'group_id' => $intGroupID));
+									}
+								}
+							}
 						}
-
-						else
-						{
-							$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->prefix."address SET addressFirstName = %s, addressSurName = %s, addressEmail = %s, addressCreated = NOW()", $arr_address['first_name'], $arr_address['sur_name'], $arr_address['email']));
-
-							$intAddressID = $wpdb->insert_id;
-						}
-
-						if($intAddressID > 0)
-						{
-							$this->add_address(array('address_id' => $intAddressID, 'group_id' => $intGroupID));
-
-							$arr_address_ids[] = $intAddressID;
-						}
-					}
-
-					$result_addresses = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address2group WHERE groupID = '%d' AND addressID NOT IN ('".implode("','", $arr_address_ids)."')", $intGroupID));
-
-					foreach($result_addresses as $r)
-					{
-						$this->remove_address(array('address_id' => $r->addressID, 'group_id' => $intGroupID));
 					}
 				}
 				#############################
 
 				/* Synchronize with API */
 				#############################
-				$result = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title, meta_value FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND meta_key = %s AND meta_value != ''", $this->post_type, 'publish', $this->meta_prefix.'api'));
-
-				foreach($result as $r)
+				if($is_syncing == false)
 				{
-					$post_id = $r->ID;
-					$post_title = $r->post_title;
-					$post_meta_api = $r->meta_value;
+					$result = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title, meta_value FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND meta_key = %s AND meta_value != ''", $this->post_type, 'publish', $this->meta_prefix.'api'));
 
-					$post_meta_api_filter = get_post_meta($post_id, $this->meta_prefix.'api_filter', true);
-
-					$arr_post_meta_api = explode("\n", $post_meta_api);
-
-					if(get_option('setting_group_debug') == 'yes')
+					if($wpdb->num_rows > 0)
 					{
-						do_log("Group API - ".$post_title." - Sync: ".var_export($arr_post_meta_api, true));
-					}
+						$is_syncing = true;
 
-					$count_incoming = $count_found = $count_found_error = $count_inserted = $count_inserted_error = $count_added = $count_exists_in_group = $count_exists_in_array = $count_removed = $count_removed_error = 0;
-
-					$arr_addresses = array();
-
-					foreach($arr_post_meta_api as $post_meta_api)
-					{
-						// Empty spaces might appear when exploding the string
-						$post_meta_api = trim($post_meta_api);
-
-						list($content, $headers) = get_url_content(array(
-							'url' => htmlspecialchars_decode($post_meta_api),
-							'catch_head' => true,
-						));
-
-						$log_message = __("I could not get a successful result from the Group API", 'lang_group');
-
-						switch($headers['http_code'])
+						foreach($result as $r)
 						{
-							case 200:
-								$json = json_decode($content, true);
+							$post_id = $r->ID;
+							$post_title = $r->post_title;
+							$post_meta_api = $r->meta_value;
 
-								$log_message_2 = __("The status was wrong in the Group API", 'lang_group');
+							$post_meta_api_filter = get_post_meta($post_id, $this->meta_prefix.'api_filter', true);
 
-								switch($json['status'])
+							$arr_post_meta_api = explode("\n", $post_meta_api);
+
+							if(get_option('setting_group_debug') == 'yes')
+							{
+								do_log("Group API - ".$post_title." - Sync: ".var_export($arr_post_meta_api, true));
+							}
+
+							$count_incoming = $count_found = $count_found_error = $count_inserted = $count_inserted_error = $count_added = $count_exists_in_group = $count_exists_in_array = $count_removed = $count_removed_error = 0;
+
+							$arr_address_ids = array();
+
+							foreach($arr_post_meta_api as $post_meta_api)
+							{
+								// Empty spaces might appear when exploding the string
+								$post_meta_api = trim($post_meta_api);
+
+								list($content, $headers) = get_url_content(array(
+									'url' => htmlspecialchars_decode($post_meta_api),
+									'catch_head' => true,
+								));
+
+								$log_message = __("I could not get a successful result from the Group API", 'lang_group');
+
+								switch($headers['http_code'])
 								{
-									case true:
-									case 'true':
-										$count_incoming_temp = count($json['data']);
-										$count_incoming += $count_incoming_temp;
+									case 200:
+										$json = json_decode($content, true);
 
-										if(isset($json['data']) && $count_incoming_temp > 0)
+										$log_message_2 = __("The status was wrong in the Group API", 'lang_group');
+
+										switch($json['status'])
 										{
-											if(get_option('setting_group_debug') == 'yes')
-											{
-												do_log("Group API - ".$post_title." - Returned: ".$post_meta_api." -> ".htmlspecialchars(var_export($json['data'], true)));
-											}
+											case true:
+											case 'true':
+												$count_incoming_temp = count($json['data']);
+												$count_incoming += $count_incoming_temp;
 
-											// Insert or update in group
-											##################################
-											foreach($json['data'] as $item)
-											{
-												if(isset($item['memberSSN']) || isset($item['email']))
-												{
-													$intAddressPublic = 1;
-
-													$strAddressBirthDate = $item['memberSSN'];
-													$strAddressFirstName = $item['firstname'];
-													$strAddressSurName = $item['lastname'];
-													$strAddressAddress = $item['cb_adress'];
-													$intAddressZipCode = $item['cb_postnr'];
-													$strAddressCity = $item['cb_postadress'];
-													$strAddressCellNo = $item['cb_telmob'];
-													$strAddressEmail = $item['email'];
-													$strAddressExtra = $item['associationName'];
-													$strAddressCo = $intAddressCountry = $strAddressTelNo = $strAddressWorkNo = "";
-												}
-
-												else if(isset($item['addressBirthDate']) || isset($item['addressEmail']))
-												{
-													$intAddressPublic = 1;
-
-													$strAddressBirthDate = $item['addressBirthDate'];
-													$strAddressFirstName = $item['addressFirstName'];
-													$strAddressSurName = $item['addressSurName'];
-													$strAddressAddress = $item['addressAddress'];
-													$strAddressCo = $item['addressCo'];
-													$intAddressZipCode = $item['addressZipCode'];
-													$strAddressCity = $item['addressCity'];
-													$intAddressCountry = $item['addressCountry'];
-													$strAddressTelNo = $item['addressTelNo'];
-													$strAddressCellNo = $item['addressCellNo'];
-													$strAddressWorkNo = $item['addressWorkNo'];
-													$strAddressEmail = $item['addressEmail'];
-													$strAddressExtra = "";
-												}
-
-												else
-												{
-													do_log("Group API Error - ".$post_title." - Wrong format in ".$post_meta_api." -> ".htmlspecialchars(var_export($item, true)));
-
-													// If it has been set in a previous loop
-													unset($strAddressBirthDate);
-												}
-
-												$do_save = true;
-
-												if($post_meta_api_filter != '')
+												if(isset($json['data']) && $count_incoming_temp > 0)
 												{
 													if(get_option('setting_group_debug') == 'yes')
 													{
-														do_log("Group API - ".$post_title." - Filter Type: ".$post_meta_api_filter);
+														do_log("Group API - ".$post_title." - Returned: ".$post_meta_api." -> ".htmlspecialchars(var_export($json['data'], true)));
 													}
 
-													list($filter_type, $filter_rest) = explode(":", $post_meta_api_filter);
-													list($filter_field, $filter_values) = explode("=", $filter_rest);
-													$arr_filter_values = explode(",", str_replace(array("[", "]"), "", $filter_values));
-
-													switch($filter_type)
+													// Insert or update in group
+													##################################
+													foreach($json['data'] as $item)
 													{
-														case 'include':
-															if(!isset($item[$filter_field]) || !in_array($item[$filter_field], $arr_filter_values))
-															{
-																if(get_option('setting_group_debug') == 'yes')
-																{
-																	do_log("Group API - ".$post_title." - Filter Include: ".$filter_field." != ".var_export($arr_filter_values, true));
-																}
-
-																$do_save = false;
-															}
-														break;
-
-														case 'exclude':
-															if(!isset($item[$filter_field]) || in_array($item[$filter_field], $arr_filter_values))
-															{
-																if(get_option('setting_group_debug') == 'yes')
-																{
-																	do_log("Group API - ".$post_title." - Filter Exclude: ".$filter_field." == ".var_export($arr_filter_values, true));
-																}
-
-																$do_save = false;
-															}
-														break;
-
-														default:
-															do_log("Group API Error - Unknown Filter Type: ".$filter_type);
-														break;
-													}
-												}
-
-												if($do_save == true)
-												{
-													if(isset($strAddressBirthDate) && $strAddressBirthDate != '' || isset($strAddressEmail) && $strAddressEmail != '')
-													{
-														if(!isset($obj_address))
+														if(isset($item['memberSSN']) || isset($item['email']))
 														{
-															$obj_address = new mf_address();
+															$intAddressPublic = 1;
+
+															$strAddressBirthDate = $item['memberSSN'];
+															$strAddressFirstName = $item['firstname'];
+															$strAddressSurName = $item['lastname'];
+															$strAddressAddress = $item['cb_adress'];
+															$intAddressZipCode = $item['cb_postnr'];
+															$strAddressCity = $item['cb_postadress'];
+															$strAddressCellNo = $item['cb_telmob'];
+															$strAddressEmail = $item['email'];
+															$strAddressExtra = $item['associationName'];
+															$strAddressCo = $intAddressCountry = $strAddressTelNo = $strAddressWorkNo = "";
 														}
 
-														$result = $this->check_if_exists(array('birthdate' => $strAddressBirthDate, 'email' => $strAddressEmail));
-														$rows = $wpdb->num_rows;
-
-														if($rows == 0)
+														else if(isset($item['addressBirthDate']) || isset($item['addressEmail']))
 														{
-															$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->prefix."address SET addressPublic = '%d', addressBirthDate = %s, addressFirstName = %s, addressSurName = %s, addressZipCode = %s, addressCity = %s, addressCountry = '%d', addressAddress = %s, addressCo = %s, addressTelNo = %s, addressCellNo = %s, addressWorkNo = %s, addressEmail = %s, addressExtra = %s, addressCreated = NOW(), userID = '%d'", $intAddressPublic, $strAddressBirthDate, $strAddressFirstName, $strAddressSurName, $intAddressZipCode, $strAddressCity, $intAddressCountry, $strAddressAddress, $strAddressCo, $strAddressTelNo, $strAddressCellNo, $strAddressWorkNo, $strAddressEmail, $strAddressExtra, get_current_user_id()));
+															$intAddressPublic = 1;
 
-															if($wpdb->rows_affected > 0)
+															$strAddressBirthDate = $item['addressBirthDate'];
+															$strAddressFirstName = $item['addressFirstName'];
+															$strAddressSurName = $item['addressSurName'];
+															$strAddressAddress = $item['addressAddress'];
+															$strAddressCo = $item['addressCo'];
+															$intAddressZipCode = $item['addressZipCode'];
+															$strAddressCity = $item['addressCity'];
+															$intAddressCountry = $item['addressCountry'];
+															$strAddressTelNo = $item['addressTelNo'];
+															$strAddressCellNo = $item['addressCellNo'];
+															$strAddressWorkNo = $item['addressWorkNo'];
+															$strAddressEmail = $item['addressEmail'];
+															$strAddressExtra = "";
+														}
+
+														else
+														{
+															do_log("Group API Error - ".$post_title." - Wrong format in ".$post_meta_api." -> ".htmlspecialchars(var_export($item, true)));
+
+															// If it has been set in a previous loop
+															unset($strAddressBirthDate);
+														}
+
+														$do_save = true;
+
+														if($post_meta_api_filter != '')
+														{
+															if(get_option('setting_group_debug') == 'yes')
 															{
-																$intAddressID_temp = $wpdb->insert_id;
+																do_log("Group API - ".$post_title." - Filter Type: ".$post_meta_api_filter);
+															}
 
-																$obj_address->save_sync_date(array('address_id' => $intAddressID_temp));
+															list($filter_type, $filter_rest) = explode(":", $post_meta_api_filter);
+															list($filter_field, $filter_values) = explode("=", $filter_rest);
+															$arr_filter_values = explode(",", str_replace(array("[", "]"), "", $filter_values));
 
-																if(get_option('setting_group_debug') == 'yes')
+															switch($filter_type)
+															{
+																case 'include':
+																	if(!isset($item[$filter_field]) || !in_array($item[$filter_field], $arr_filter_values))
+																	{
+																		if(get_option('setting_group_debug') == 'yes')
+																		{
+																			do_log("Group API - ".$post_title." - Filter Include: ".$filter_field." != ".var_export($arr_filter_values, true));
+																		}
+
+																		$do_save = false;
+																	}
+																break;
+
+																case 'exclude':
+																	if(!isset($item[$filter_field]) || in_array($item[$filter_field], $arr_filter_values))
+																	{
+																		if(get_option('setting_group_debug') == 'yes')
+																		{
+																			do_log("Group API - ".$post_title." - Filter Exclude: ".$filter_field." == ".var_export($arr_filter_values, true));
+																		}
+
+																		$do_save = false;
+																	}
+																break;
+
+																default:
+																	do_log("Group API Error - Unknown Filter Type: ".$filter_type);
+																break;
+															}
+														}
+
+														if($do_save == true)
+														{
+															if(isset($strAddressBirthDate) && $strAddressBirthDate != '' || isset($strAddressEmail) && $strAddressEmail != '')
+															{
+																if(!isset($obj_address))
 																{
-																	do_log("Group API - ".$post_title." - Insert address: ".$intAddressID_temp." (".$strAddressFirstName." ".$strAddressSurName.")");
+																	$obj_address = new mf_address();
 																}
 
 																$result = $this->check_if_exists(array('birthdate' => $strAddressBirthDate, 'email' => $strAddressEmail));
 																$rows = $wpdb->num_rows;
 
-																$count_inserted++;
-															}
-
-															else
-															{
-																do_log("Group API - ".$post_title." - No address was created: ".$wpdb->last_query);
-
-																$count_inserted_error++;
-															}
-														}
-
-														if($rows > 0)
-														{
-															foreach($result as $r)
-															{
-																$intAddressID = $r->addressID;
-
-																if(!in_array($intAddressID, $arr_addresses))
+																if($rows == 0)
 																{
-																	$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."address SET addressBirthDate = %s, addressFirstName = %s, addressSurName = %s, addressZipCode = %s, addressCity = %s, addressCountry = '%d', addressAddress = %s, addressCo = %s, addressTelNo = %s, addressCellNo = %s, addressWorkNo = %s, addressEmail = %s, addressExtra = %s WHERE addressID = '%d'", $strAddressBirthDate, $strAddressFirstName, $strAddressSurName, $intAddressZipCode, $strAddressCity, $intAddressCountry, $strAddressAddress, $strAddressCo, $strAddressTelNo, $strAddressCellNo, $strAddressWorkNo, $strAddressEmail, $strAddressExtra, $intAddressID));
+																	$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->prefix."address SET addressPublic = '%d', addressBirthDate = %s, addressFirstName = %s, addressSurName = %s, addressZipCode = %s, addressCity = %s, addressCountry = '%d', addressAddress = %s, addressCo = %s, addressTelNo = %s, addressCellNo = %s, addressWorkNo = %s, addressEmail = %s, addressExtra = %s, addressCreated = NOW(), userID = '%d'", $intAddressPublic, $strAddressBirthDate, $strAddressFirstName, $strAddressSurName, $intAddressZipCode, $strAddressCity, $intAddressCountry, $strAddressAddress, $strAddressCo, $strAddressTelNo, $strAddressCellNo, $strAddressWorkNo, $strAddressEmail, $strAddressExtra, get_current_user_id()));
 
-																	$obj_address->save_sync_date(array('address_id' => $intAddressID));
-
-																	if($this->has_address(array('address_id' => $intAddressID, 'group_id' => $post_id)) == false)
+																	if($wpdb->rows_affected > 0)
 																	{
-																		$this->add_address(array('address_id' => $intAddressID, 'group_id' => $post_id));
+																		$intAddressID_temp = $wpdb->insert_id;
+
+																		$obj_address->save_sync_date(array('address_id' => $intAddressID_temp));
 
 																		if(get_option('setting_group_debug') == 'yes')
 																		{
-																			do_log("Group API - ".$post_title." - Add to group: ".$intAddressID." (".$strAddressFirstName." ".$strAddressSurName.")");
+																			do_log("Group API - ".$post_title." - Insert address: ".$intAddressID_temp." (".$strAddressFirstName." ".$strAddressSurName.")");
 																		}
 
-																		$count_added++;
+																		$result = $this->check_if_exists(array('birthdate' => $strAddressBirthDate, 'email' => $strAddressEmail));
+																		$rows = $wpdb->num_rows;
+
+																		$count_inserted++;
 																	}
 
 																	else
 																	{
-																		$count_exists_in_group++;
-																	}
+																		do_log("Group API - ".$post_title." - No address was created: ".$wpdb->last_query);
 
-																	$arr_addresses[] = $intAddressID;
+																		$count_inserted_error++;
+																	}
 																}
 
-																else
+																if($rows > 0)
 																{
-																	$count_exists_in_array++;
+																	foreach($result as $r)
+																	{
+																		$intAddressID = $r->addressID;
+
+																		if(!in_array($intAddressID, $arr_address_ids))
+																		{
+																			$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."address SET addressBirthDate = %s, addressFirstName = %s, addressSurName = %s, addressZipCode = %s, addressCity = %s, addressCountry = '%d', addressAddress = %s, addressCo = %s, addressTelNo = %s, addressCellNo = %s, addressWorkNo = %s, addressEmail = %s, addressExtra = %s WHERE addressID = '%d'", $strAddressBirthDate, $strAddressFirstName, $strAddressSurName, $intAddressZipCode, $strAddressCity, $intAddressCountry, $strAddressAddress, $strAddressCo, $strAddressTelNo, $strAddressCellNo, $strAddressWorkNo, $strAddressEmail, $strAddressExtra, $intAddressID));
+
+																			$obj_address->save_sync_date(array('address_id' => $intAddressID));
+
+																			if($this->has_address(array('address_id' => $intAddressID, 'group_id' => $post_id)) == false)
+																			{
+																				$this->add_address(array('address_id' => $intAddressID, 'group_id' => $post_id));
+
+																				if(get_option('setting_group_debug') == 'yes')
+																				{
+																					do_log("Group API - ".$post_title." - Add to group: ".$intAddressID." (".$strAddressFirstName." ".$strAddressSurName.")");
+																				}
+
+																				$count_added++;
+																			}
+
+																			else
+																			{
+																				$count_exists_in_group++;
+																			}
+
+																			$arr_address_ids[] = $intAddressID;
+																		}
+
+																		else
+																		{
+																			$count_exists_in_array++;
+																		}
+																	}
+
+																	$count_found += $rows;
+																}
+
+																else// if(get_option('setting_group_debug') == 'yes')
+																{
+																	do_log("Group API Error - ".$post_title." - No rows found with Birthdate or E-mail: ".$wpdb->last_query);
+
+																	$count_found_error++;
 																}
 															}
 
-															$count_found += $rows;
-														}
-
-														else// if(get_option('setting_group_debug') == 'yes')
-														{
-															do_log("Group API Error - ".$post_title." - No rows found with Birthdate or E-mail: ".$wpdb->last_query);
-
-															$count_found_error++;
+															else
+															{
+																do_log("Group API Error - ".$post_title." - No birthdate or email in ".$post_meta_api." -> ".htmlspecialchars(var_export($item, true)));
+															}
 														}
 													}
-
-													else
-													{
-														do_log("Group API Error - ".$post_title." - No birthdate or email in ".$post_meta_api." -> ".htmlspecialchars(var_export($item, true)));
-													}
+													##################################
 												}
-											}
-											##################################
+
+												do_log($log_message_2, 'trash');
+											break;
+
+											default:
+												do_log($log_message_2.": ".$post_meta_api." -> ".htmlspecialchars(var_export($json, true)));
+											break;
 										}
 
-										do_log($log_message_2, 'trash');
+										do_log($log_message, 'trash');
 									break;
 
 									default:
-										do_log($log_message_2.": ".$post_meta_api." -> ".htmlspecialchars(var_export($json, true)));
+										do_log($log_message." (".$headers['http_code'].")");
 									break;
 								}
+							}
 
-								do_log($log_message, 'trash');
-							break;
+							// Remove not in group anymore
+							##################################
+							$count_address_ids = count($arr_address_ids);
 
-							default:
-								do_log($log_message." (".$headers['http_code'].")");
-							break;
-						}
-					}
-
-					// Remove not in group anymore
-					##################################
-					$count_addresses = count($arr_addresses);
-
-					if($count_addresses > 0)
-					{
-						$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address2group WHERE groupID = '%d' AND addressID NOT IN('".implode("','", $arr_addresses)."')", $post_id));
-						$rows = $wpdb->num_rows;
-
-						if($rows > 0)
-						{
-							foreach($result as $r)
+							if($count_address_ids > 0)
 							{
-								$intAddressID = $r->addressID;
+								$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address2group WHERE groupID = '%d' AND addressID NOT IN('".implode("','", $arr_address_ids)."')", $post_id));
+								$rows = $wpdb->num_rows;
 
-								if($this->has_address(array('address_id' => $intAddressID, 'group_id' => $post_id)) == true)
+								if($rows > 0)
 								{
-									if(get_option('setting_group_debug') == 'yes')
+									foreach($result as $r)
 									{
-										do_log("Group API - Remove from group: ".$intAddressID." (".$strAddressFirstName." ".$strAddressSurName.") from ".$post_title);
-									}
+										$intAddressID = $r->addressID;
 
-									if($this->remove_address(array('address_id' => $intAddressID, 'group_id' => $post_id)))
-									{
-										$count_removed++;
-									}
+										if($this->has_address(array('address_id' => $intAddressID, 'group_id' => $post_id)) == true)
+										{
+											if(get_option('setting_group_debug') == 'yes')
+											{
+												do_log("Group API - Remove from group: ".$intAddressID." (".$strAddressFirstName." ".$strAddressSurName.") from ".$post_title);
+											}
 
-									else
-									{
-										$count_removed_error++;
+											if($this->remove_address(array('address_id' => $intAddressID, 'group_id' => $post_id)))
+											{
+												$count_removed++;
+											}
+
+											else
+											{
+												$count_removed_error++;
+											}
+										}
 									}
 								}
+
+								else if(get_option('setting_group_debug') == 'yes')
+								{
+									do_log("Group API - ".$post_title." - No rows found to remove (Address array): ".$wpdb->last_query);
+								}
+							}
+							##################################
+
+							// Check if correct amount is in group after sync
+							##################################
+							if(get_option('setting_group_debug') == 'yes' && $count_address_ids > 0)
+							{
+								$count_in_group = $this->amount_in_group(array('id' => $post_id));
+
+								if(($count_in_group + $count_exists_in_array) != $count_incoming)
+								{
+									do_log("Group API Error: Wrong amount in group (<a href='".admin_url("admin.php?page=mf_group/create/index.php&intGroupID=".$post_id)."'>".$post_title."</a>) after sync (".$count_in_group." + ".$count_exists_in_array." != ".$count_incoming.")");
+								}
+							}
+							##################################
+
+							if(get_option('setting_group_debug') == 'yes')
+							{
+								do_log("Group API - ".$post_title." - Report: ".$count_found."/".$count_incoming." found with ".$count_found_error." errors. ".$count_inserted." inserted with ".$count_inserted_error." errors. ".$count_added." added, ".$count_exists_in_group." (+".$count_exists_in_array." duplicates) exists and ".$count_removed." removed with ".$count_removed_error." errors");
 							}
 						}
-
-						else if(get_option('setting_group_debug') == 'yes')
-						{
-							do_log("Group API - ".$post_title." - No rows found to remove (Address array): ".$wpdb->last_query);
-						}
-					}
-					##################################
-
-					// Check if correct amount is in group after sync
-					##################################
-					if($count_addresses > 0)
-					{
-						$count_in_group = $this->amount_in_group(array('id' => $post_id));
-
-						if(get_option('setting_group_debug') == 'yes' && ($count_in_group + $count_exists_in_array) != $count_incoming)
-						{
-							do_log("Group API Error: Wrong amount in group (<a href='".admin_url("admin.php?page=mf_group/create/index.php&intGroupID=".$post_id)."'>".$post_title."</a>) after sync (".$count_in_group." + ".$count_exists_in_array." != ".$count_incoming.")");
-						}
-					}
-					##################################
-
-					if(get_option('setting_group_debug') == 'yes')
-					{
-						do_log("Group API - ".$post_title." - Report: ".$count_found."/".$count_incoming." found with ".$count_found_error." errors. ".$count_inserted." inserted with ".$count_inserted_error." errors. ".$count_added." added, ".$count_exists_in_group." (+".$count_exists_in_array." duplicates) exists and ".$count_removed." removed with ".$count_removed_error." errors");
 					}
 				}
 				#############################
@@ -2692,19 +2724,14 @@ class mf_group
 
 			$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->prefix."address2group SET addressID = '%d', groupID = '%d', addressAdded = NOW(), groupAccepted = '%d'", $data['address_id'], $data['group_id'], ($post_meta_acceptance_email == 'yes' ? 0 : 1)));
 
-			if($wpdb->rows_affected > 0)
-			{
-				$data['type'] = 'add';
-
-				$this->add_version($data);
-			}
+			$data['type'] = 'add';
+			$this->add_version($data);
 
 			if($post_meta_acceptance_email == 'yes')
 			{
 				$this->send_acceptance_message($data);
 			}
 
-			//$from_email = get_bloginfo('admin_email');
 			$from_email = $wpdb->get_var($wpdb->prepare("SELECT messageFrom FROM ".$wpdb->prefix."group_message WHERE groupID = '%d' AND messageDeleted = '0' ORDER BY messageCreated DESC LIMIT 0, 1", $data['group_id']));
 
 			do_action('group_after_add_address', array('address_id' => $data['address_id'], 'from' => $from_email));
