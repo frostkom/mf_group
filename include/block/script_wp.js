@@ -13,8 +13,8 @@
 	{
 		title: __("Group", 'lang_group'),
 		description: __("Display a Group", 'lang_group'),
-		icon: 'groups', /* https://developer.wordpress.org/resource/dashicons/ */
-		category: 'widgets', /* common, formatting, layout, widgets, embed */
+		icon: 'groups',
+		category: 'widgets',
 		'attributes':
 		{
 			'align':
@@ -79,6 +79,10 @@
 			{
 				'fontSize': true,
 				'lineHeight': true
+			},
+			"__experimentalBorder":
+			{
+				"radius": true
 			}
 		},
 		edit: function(props)

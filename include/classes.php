@@ -1382,7 +1382,7 @@ class mf_group
 						$out .= show_textfield(array('name' => 'strAddressExtra', $label_type => get_option_or_default('setting_address_extra', __("Extra", 'lang_group')), 'value' => $strAddressExtra, 'required' => true));
 					}
 
-					$out .= "<div class='form_button'>";
+					$out .= "<div".get_form_button_classes().">";
 
 						if($data['display_consent'] == 'yes')
 						{
@@ -1397,7 +1397,7 @@ class mf_group
 				{
 					$out .= "<div class='flex_form'>"
 						.show_textfield(array('name' => 'strAddressEmail', 'placeholder' => __("Your Email Address", 'lang_group'), 'value' => $strAddressEmail, 'required' => true))
-						."<div class='form_button'>"
+						."<div".get_form_button_classes().">"
 							.show_button(array('name' => 'btnGroupJoin', 'text' => $data['button_text'].($data['button_icon'] != '' ? " <i class='".$data['button_icon']."'></i>" : "")))
 						."</div>
 					</div>";

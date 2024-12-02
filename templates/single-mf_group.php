@@ -157,7 +157,7 @@ get_header();
 									{
 										$post_content .= "<form method='post' action='' class='mf_form'>
 											<p>".__("Are you sure that you want to unsubscribe?", 'lang_group')."</p>
-											<div class='form_button'>"
+											<div".get_form_button_classes().">"
 												.show_button(array('name' => 'btnUnsubscribe', 'text' => __("Unsubscribe", 'lang_group')))
 											."</div>"
 											.input_hidden(array('name' => 'unsubscribe', 'value' => $strUnsubscribeHash))
