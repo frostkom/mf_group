@@ -1428,7 +1428,7 @@ class mf_group
 
 		if($attributes['group_id'] > 0)
 		{
-			$out .= "<div class='widget widget_group".(isset($attributes['className']) && $attributes['className'] != '' ? " ".$attributes['className'] : "")."'>";
+			$out .= "<div".parse_block_attributes(array('class' => "widget widget_group", 'attributes' => $attributes)).">";
 
 				if($attributes['group_heading'] != '')
 				{
@@ -1454,6 +1454,8 @@ class mf_group
 
 	function init()
 	{
+		load_plugin_textdomain('lang_group', false, str_replace("/include", "", dirname(plugin_basename(__FILE__)))."/lang/");
+
 		// Post Types
 		#######################
 		$labels = array(
