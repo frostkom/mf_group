@@ -133,18 +133,6 @@
 
 			/* Select */
 			/* ################### */
-			var arr_options = [];
-
-			jQuery.each(script_group_block_wp.group_id, function(index, value)
-			{
-				if(index == "")
-				{
-					index = 0;
-				}
-
-				arr_options.push({label: value, value: index});
-			});
-
 			arr_out.push(el(
 				'div',
 				{className: "wp_mf_block " + props.className},
@@ -153,7 +141,7 @@
 					{
 						label: __("Link", 'lang_group'),
 						value: props.attributes.group_id,
-						options: arr_options,
+						options: convert_php_array_to_block_js(script_group_block_wp.group_id),
 						onChange: function(value)
 						{
 							props.setAttributes({group_id: value});
@@ -165,18 +153,6 @@
 
 			/* Select */
 			/* ################### */
-			var arr_options = [];
-
-			jQuery.each(script_group_block_wp.group_label_type, function(index, value)
-			{
-				if(index == "")
-				{
-					index = 0;
-				}
-
-				arr_options.push({label: value, value: index});
-			});
-
 			arr_out.push(el(
 				'div',
 				{className: "wp_mf_block " + props.className},
@@ -185,7 +161,7 @@
 					{
 						label: __("Display Input Label as", 'lang_group'),
 						value: props.attributes.group_label_type,
-						options: arr_options,
+						options: convert_php_array_to_block_js(script_group_block_wp.group_label_type),
 						onChange: function(value)
 						{
 							props.setAttributes({group_label_type: value});
@@ -197,18 +173,6 @@
 
 			/* Select */
 			/* ################### */
-			var arr_options = [];
-
-			jQuery.each(script_group_block_wp.group_display_consent, function(index, value)
-			{
-				if(index == "")
-				{
-					index = 0;
-				}
-
-				arr_options.push({label: value, value: index});
-			});
-
 			arr_out.push(el(
 				'div',
 				{className: "wp_mf_block " + props.className},
@@ -217,7 +181,7 @@
 					{
 						label: __("Display Consent", 'lang_group'),
 						value: props.attributes.group_display_consent,
-						options: arr_options,
+						options: convert_php_array_to_block_js(script_group_block_wp.group_display_consent),
 						onChange: function(value)
 						{
 							props.setAttributes({group_display_consent: value});
@@ -251,18 +215,6 @@
 
 			/* Select */
 			/* ################### */
-			var arr_options = [];
-
-			jQuery.each(script_group_block_wp.group_button_icon, function(index, value)
-			{
-				if(index == "")
-				{
-					index = 0;
-				}
-
-				arr_options.push({label: value, value: index});
-			});
-
 			arr_out.push(el(
 				'div',
 				{className: "wp_mf_block " + props.className},
@@ -271,7 +223,7 @@
 					{
 						label: __("Button Icon", 'lang_group'),
 						value: props.attributes.group_button_icon,
-						options: arr_options,
+						options: convert_php_array_to_block_js(script_group_block_wp.group_button_icon),
 						onChange: function(value)
 						{
 							props.setAttributes({group_button_icon: value});
