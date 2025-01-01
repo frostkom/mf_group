@@ -1,7 +1,6 @@
 (function()
 {
-	var __ = wp.i18n.__,
-		el = wp.element.createElement,
+	var el = wp.element.createElement,
 		registerBlockType = wp.blocks.registerBlockType,
 		SelectControl = wp.components.SelectControl,
 		TextControl = wp.components.TextControl,
@@ -11,8 +10,8 @@
 
 	registerBlockType('mf/group',
 	{
-		title: __("Group", 'lang_group'),
-		description: __("Display a Group", 'lang_group'),
+		title: script_group_block_wp.block_title,
+		description: script_group_block_wp.block_description,
 		icon: 'groups',
 		category: 'widgets',
 		'attributes':
@@ -87,153 +86,106 @@
 		},
 		edit: function(props)
 		{
-			var arr_out = [];
-
-			/* Text */
-			/* ################### */
-			arr_out.push(el(
+			return el(
 				'div',
-				{className: "wp_mf_block " + props.className},
-				el(
-					TextControl,
-					{
-						label: __("Heading", 'lang_group'),
-						type: 'text',
-						value: props.attributes.group_heading,
-						/*help: __("Description...", 'lang_group'),*/
-						onChange: function(value)
-						{
-							props.setAttributes({group_heading: value});
-						}
-					}
-				)
-			));
-			/* ################### */
-
-			/* Text */
-			/* ################### */
-			arr_out.push(el(
-				'div',
-				{className: "wp_mf_block " + props.className},
-				el(
-					TextControl,
-					{
-						label: __("Text", 'lang_group'),
-						type: 'text',
-						value: props.attributes.group_text,
-						/*help: __("Description...", 'lang_group'),*/
-						onChange: function(value)
-						{
-							props.setAttributes({group_text: value});
-						}
-					}
-				)
-			));
-			/* ################### */
-
-			/* Select */
-			/* ################### */
-			arr_out.push(el(
-				'div',
-				{className: "wp_mf_block " + props.className},
-				el(
-					SelectControl,
-					{
-						label: __("Link", 'lang_group'),
-						value: props.attributes.group_id,
-						options: convert_php_array_to_block_js(script_group_block_wp.group_id),
-						onChange: function(value)
-						{
-							props.setAttributes({group_id: value});
-						}
-					}
-				)
-			));
-			/* ################### */
-
-			/* Select */
-			/* ################### */
-			arr_out.push(el(
-				'div',
-				{className: "wp_mf_block " + props.className},
-				el(
-					SelectControl,
-					{
-						label: __("Display Input Label as", 'lang_group'),
-						value: props.attributes.group_label_type,
-						options: convert_php_array_to_block_js(script_group_block_wp.group_label_type),
-						onChange: function(value)
-						{
-							props.setAttributes({group_label_type: value});
-						}
-					}
-				)
-			));
-			/* ################### */
-
-			/* Select */
-			/* ################### */
-			arr_out.push(el(
-				'div',
-				{className: "wp_mf_block " + props.className},
-				el(
-					SelectControl,
-					{
-						label: __("Display Consent", 'lang_group'),
-						value: props.attributes.group_display_consent,
-						options: convert_php_array_to_block_js(script_group_block_wp.group_display_consent),
-						onChange: function(value)
-						{
-							props.setAttributes({group_display_consent: value});
-						}
-					}
-				)
-			));
-			/* ################### */
-
-			/* Text */
-			/* ################### */
-			arr_out.push(el(
-				'div',
-				{className: "wp_mf_block " + props.className},
-				el(
-					TextControl,
-					{
-						label: __("Button Text", 'lang_group'),
-						type: 'text',
-						value: props.attributes.group_button_text,
-						/*help: __("Description...", 'lang_group'),*/
-						placeholder: __("Join", 'lang_group'),
-						onChange: function(value)
-						{
-							props.setAttributes({group_button_text: value});
-						}
-					}
-				)
-			));
-			/* ################### */
-
-			/* Select */
-			/* ################### */
-			arr_out.push(el(
-				'div',
-				{className: "wp_mf_block " + props.className},
-				el(
-					SelectControl,
-					{
-						label: __("Button Icon", 'lang_group'),
-						value: props.attributes.group_button_icon,
-						options: convert_php_array_to_block_js(script_group_block_wp.group_button_icon),
-						onChange: function(value)
-						{
-							props.setAttributes({group_button_icon: value});
-						}
-					}
-				)
-			));
-			/* ################### */
-
-			return arr_out;
+				{className: 'wp_mf_block_container'},
+				[
+					el(
+						InspectorControls,
+						'div',
+						el(
+							TextControl,
+							{
+								label: script_group_block_wp.group_heading_label,
+								type: 'text',
+								value: props.attributes.group_heading,
+								onChange: function(value)
+								{
+									props.setAttributes({group_heading: value});
+								}
+							}
+						),
+						el(
+							TextControl,
+							{
+								label: script_group_block_wp.group_text_label,
+								type: 'text',
+								value: props.attributes.group_text,
+								onChange: function(value)
+								{
+									props.setAttributes({group_text: value});
+								}
+							}
+						),
+						el(
+							SelectControl,
+							{
+								label: script_group_block_wp.group_id_label,
+								value: props.attributes.group_id,
+								options: convert_php_array_to_block_js(script_group_block_wp.group_id),
+								onChange: function(value)
+								{
+									props.setAttributes({group_id: value});
+								}
+							}
+						),
+						el(
+							SelectControl,
+							{
+								label: script_group_block_wp.group_label_type_label,
+								value: props.attributes.group_label_type,
+								options: convert_php_array_to_block_js(script_group_block_wp.group_label_type),
+								onChange: function(value)
+								{
+									props.setAttributes({group_label_type: value});
+								}
+							}
+						),
+						el(
+							SelectControl,
+							{
+								label: script_group_block_wp.group_display_consent_label,
+								value: props.attributes.group_display_consent,
+								options: convert_php_array_to_block_js(script_group_block_wp.group_display_consent),
+								onChange: function(value)
+								{
+									props.setAttributes({group_display_consent: value});
+								}
+							}
+						),
+						el(
+							TextControl,
+							{
+								label: script_group_block_wp.group_button_text_label,
+								type: 'text',
+								value: props.attributes.group_button_text,
+								placeholder: script_group_block_wp.group_button_text_placeholder,
+								onChange: function(value)
+								{
+									props.setAttributes({group_button_text: value});
+								}
+							}
+						),
+						el(
+							SelectControl,
+							{
+								label: script_group_block_wp.group_button_icon_label,
+								value: props.attributes.group_button_icon,
+								options: convert_php_array_to_block_js(script_group_block_wp.group_button_icon),
+								onChange: function(value)
+								{
+									props.setAttributes({group_button_icon: value});
+								}
+							}
+						)
+					),
+					el(
+						'strong',
+						{className: props.className},
+						script_group_block_wp.block_title
+					)
+				]
+			);
 		},
 		save: function()
 		{

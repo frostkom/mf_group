@@ -1489,12 +1489,27 @@ class mf_group
 		$plugin_include_url = plugin_dir_url(__FILE__);
 		$plugin_version = get_plugin_version(__FILE__);
 
-		wp_register_script('script_group_block_wp', $plugin_include_url."block/script_wp.js", array('wp-blocks', 'wp-i18n', 'wp-element', 'wp-components', 'wp-editor'), $plugin_version);
+		wp_register_script('script_group_block_wp', $plugin_include_url."block/script_wp.js", array('wp-blocks', 'wp-element', 'wp-components', 'wp-editor', 'wp-block-editor'), $plugin_version);
 
 		$arr_data = array();
 		get_post_children(array('add_choose_here' => true, 'post_type' => $this->post_type, 'post_status' => '', 'where' => "post_status != 'trash'".(IS_EDITOR ? "" : " AND post_author = '".get_current_user_id()."'")), $arr_data);
 
-		wp_localize_script('script_group_block_wp', 'script_group_block_wp', array('group_id' => $arr_data, 'group_label_type' => $this->get_label_types_for_select(), 'group_display_consent' => get_yes_no_for_select(), 'group_button_icon' => $obj_base->get_icons_for_select()));
+		wp_localize_script('script_group_block_wp', 'script_group_block_wp', array(
+			'block_title' => __("Group", 'lang_group'),
+			'block_description' => __("Display a Group", 'lang_group'),
+			'group_heading_label' => __("Heading", 'lang_group'),
+			'group_text' => __("Text", 'lang_group'),
+			'group_id_label' => __("Link", 'lang_group'),
+			'group_id' => $arr_data,
+			'group_label_type_label' => __("Display Input Label as", 'lang_group'),
+			'group_label_type' => $this->get_label_types_for_select(),
+			'group_display_consent_label' => __("Display Consent", 'lang_group'),
+			'group_display_consent' => get_yes_no_for_select(),
+			'group_button_text_label' => __("Button Text", 'lang_group'),
+			'group_button_text_placeholder' => __("Join", 'lang_group'),
+			'group_button_icon_label' => __("Button Icon", 'lang_group'),
+			'group_button_icon' => $obj_base->get_icons_for_select(),
+		));
 
 		register_block_type('mf/group', array(
 			'editor_script' => 'script_group_block_wp',
