@@ -14,7 +14,6 @@
 			left: 50%;
 			position: absolute;
 			top: 0;
-			-webkit-transform: translateX(-50%);
 			transform: translateX(-50%);
 			width: 4px;
 		}
@@ -38,7 +37,6 @@
 				left: 50%;
 				margin: 0;
 				padding: 0 .3em .1em !important;
-				-webkit-transform: translateX(-50%);
 				transform: translateX(-50%);
 			}
 
@@ -53,7 +51,6 @@
 				position: absolute;
 				text-align: center;
 				top: 0;
-				-webkit-transform: translateX(-50%);
 				transform: translateX(-50%);
 				min-width: 40px;
 			}
