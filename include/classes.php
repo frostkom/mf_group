@@ -1659,18 +1659,17 @@ class mf_group
 		global $pagenow;
 
 		$plugin_include_url = plugin_dir_url(__FILE__);
-		$plugin_version = get_plugin_version(__FILE__);
 
 		if($pagenow == 'admin.php')
 		{
 			switch(check_var('page'))
 			{
 				case "mf_group/create/index.php":
-					mf_enqueue_script('script_group_wp', $plugin_include_url."script_wp.js", $plugin_version);
+					mf_enqueue_script('script_group_wp', $plugin_include_url."script_wp.js");
 				break;
 
 				case "mf_group/version/index.php":
-					mf_enqueue_style('style_group_timeline', $plugin_include_url."style_timeline.css", $plugin_version);
+					mf_enqueue_style('style_group_timeline', $plugin_include_url."style_timeline.css");
 				break;
 			}
 		}
@@ -1976,9 +1975,8 @@ class mf_group
 	function wp_head()
 	{
 		$plugin_include_url = plugin_dir_url(__FILE__);
-		$plugin_version = get_plugin_version(__FILE__);
 
-		mf_enqueue_style('style_group', $plugin_include_url."style.css", $plugin_version);
+		mf_enqueue_style('style_group', $plugin_include_url."style.css");
 	}
 
 	function get_emails_left_to_send($amount, $email, $type = '')
