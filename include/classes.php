@@ -1933,7 +1933,7 @@ class mf_group
 
 			if($group_id > 0)
 			{
-				$content_list .= "<li><a href='".admin_url("admin.php?page=mf_group/create/index.php&intGroupID=".$group_id)."'>".get_post_title($group_id)."</a> <span class='grey'>[mf_group id=".$group_id."]</span></li>";
+				$content_list .= "<li><a href='".admin_url("admin.php?page=mf_group/create/index.php&intGroupID=".$group_id)."'>".get_the_title($group_id)."</a> <span class='grey'>[mf_group id=".$group_id."]</span></li>";
 			}
 		}
 
