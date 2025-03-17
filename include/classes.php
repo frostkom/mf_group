@@ -1456,25 +1456,21 @@ class mf_group
 	{
 		load_plugin_textdomain('lang_group', false, str_replace("/include", "", dirname(plugin_basename(__FILE__)))."/lang/");
 
-		// Post Types
+		// Post types
 		#######################
-		$labels = array(
-			'name' => _x(__("Group", 'lang_group'), 'post type general name'),
-			'singular_name' => _x(__("Group", 'lang_group'), 'post type singular name'),
-			'menu_name' => __("Group", 'lang_group')
-		);
-
-		$args = array(
-			'labels' => $labels,
+		register_post_type($this->post_type, array(
+			'labels' => array(
+				'name' => _x(__("Group", 'lang_group'), 'post type general name'),
+				'singular_name' => _x(__("Group", 'lang_group'), 'post type singular name'),
+				'menu_name' => __("Group", 'lang_group')
+			),
 			'public' => true,
 			'show_in_menu' => false,
 			'exclude_from_search' => true,
 			'rewrite' => array(
 				'slug' => 'group',
 			),
-		);
-
-		register_post_type($this->post_type, $args);
+		));
 		#######################
 
 		// Blocks
