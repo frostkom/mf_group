@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description:
-Version: 5.11.21
+Version: 5.11.22
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://martinfors.se
@@ -71,6 +71,8 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 	add_filter('single_template', 'custom_templates_group');
 
 	add_filter('filter_is_file_used', array($obj_group, 'filter_is_file_used'));
+
+	add_action('wp_ajax_api_group_table_search', array($obj_group, 'api_group_table_search'));
 
 	function activate_group()
 	{

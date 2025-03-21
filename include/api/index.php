@@ -79,23 +79,6 @@ switch($type)
 			}
 		}
 	break;
-
-	case 'table_search':
-		if(is_user_logged_in())
-		{
-			$strSearch = check_var('s', 'char');
-
-			$result = $obj_group->get_groups(array('where' => " AND (post_title LIKE '%".esc_sql($strSearch)."%')", 'limit' => 0, 'amount' => 10));
-
-			if($wpdb->num_rows > 0)
-			{
-				foreach($result as $r)
-				{
-					$json_output[] = $r->post_title;
-				}
-			}
-		}
-	break;
 }
 
 echo json_encode($json_output);

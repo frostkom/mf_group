@@ -1961,6 +1961,24 @@ class mf_group
 		return $arr_used;
 	}
 
+	function api_group_table_search()
+	{
+		$json_output = array();
+
+		$strSearch = check_var('s', 'char');
+
+		$result = $this->get_groups(array('where' => " AND (post_title LIKE '%".esc_sql($strSearch)."%')", 'limit' => 0, 'amount' => 10));
+
+		foreach($result as $r)
+		{
+			$json_output[] = $r->post_title;
+		}
+
+		header("Content-Type: application/json");
+		echo json_encode($json_output);
+		die();
+	}
+
 	function wp_sitemaps_post_types($post_types)
 	{
 		unset($post_types[$this->post_type]);
@@ -2873,7 +2891,7 @@ if(class_exists('mf_list_table'))
 			$this->orderby_default = "post_title";
 
 			$this->arr_settings['has_autocomplete'] = true;
-			$this->arr_settings['plugin_name'] = $this->post_type;
+			$this->arr_settings['action'] = 'api_group_table_search';
 		}
 
 		function init_fetch()
