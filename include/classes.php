@@ -2077,6 +2077,8 @@ class mf_group
 
 	function shortcode_group($atts)
 	{
+		global $post;
+
 		$out = "";
 
 		/*extract(shortcode_atts(array(
@@ -2085,7 +2087,7 @@ class mf_group
 		
 		$out = $this->show_group_registration_form(array('id' => $id));*/
 
-		do_log(__FUNCTION__.": Add a block instead (".var_export($atts, true).")");
+		do_log(__FUNCTION__.": Add a block instead (#".$post->ID.", ".var_export($atts, true).")");
 
 		return $out;
 	}
