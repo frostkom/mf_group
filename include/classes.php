@@ -2077,11 +2077,17 @@ class mf_group
 
 	function shortcode_group($atts)
 	{
-		extract(shortcode_atts(array(
+		$out = "";
+
+		/*extract(shortcode_atts(array(
 			'id' => ''
 		), $atts));
+		
+		$out = $this->show_group_registration_form(array('id' => $id));*/
 
-		return $this->show_group_registration_form(array('id' => $id));
+		do_log(__FUNCTION__.": Add a block instead (".var_export($atts, true).")");
+
+		return $out;
 	}
 
 	function widgets_init()
