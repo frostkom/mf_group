@@ -1460,8 +1460,8 @@ class mf_group
 		#######################
 		register_post_type($this->post_type, array(
 			'labels' => array(
-				'name' => _x(__("Group", 'lang_group'), 'post type general name'),
-				'singular_name' => _x(__("Group", 'lang_group'), 'post type singular name'),
+				'name' => __("Group", 'lang_group'),
+				'singular_name' => __("Group", 'lang_group'),
 				'menu_name' => __("Group", 'lang_group')
 			),
 			'public' => true,
@@ -1883,7 +1883,7 @@ class mf_group
 		return $data;
 	}
 
-	function count_shortcode_button($count)
+	/*function count_shortcode_button($count)
 	{
 		if($count == 0)
 		{
@@ -1901,9 +1901,9 @@ class mf_group
 		}
 
 		return $count;
-	}
+	}*/
 
-	function get_shortcode_output($out)
+	/*function get_shortcode_output($out)
 	{
 		$arr_data = $this->get_for_select(array('return_to_metabox' => false));
 
@@ -1914,9 +1914,9 @@ class mf_group
 		}
 
 		return $out;
-	}
+	}*/
 
-	function get_shortcode_list($data)
+	/*function get_shortcode_list($data)
 	{
 		$post_id = $data[0];
 		$content_list = $data[1];
@@ -1934,7 +1934,7 @@ class mf_group
 		}
 
 		return array($post_id, $content_list);
-	}
+	}*/
 
 	function filter_is_file_used($arr_used)
 	{
@@ -2084,7 +2084,7 @@ class mf_group
 		/*extract(shortcode_atts(array(
 			'id' => ''
 		), $atts));
-		
+
 		$out = $this->show_group_registration_form(array('id' => $id));*/
 
 		do_log(__FUNCTION__.": Add a block instead (#".$post->ID.", ".var_export($atts, true).")");
@@ -2456,7 +2456,7 @@ class mf_group
 						//'post_status' => $this->public,
 						'post_status' => 'publish',
 						'post_title' => $this->name,
-						'meta_input' => array(
+						'meta_input' => apply_filters('filter_meta_input', array(
 							$this->meta_prefix.'api' => $this->api,
 							$this->meta_prefix.'api_filter' => $this->api_filter,
 							$this->meta_prefix.'acceptance_email' => $this->acceptance_email,
@@ -2472,7 +2472,7 @@ class mf_group
 							$this->meta_prefix.'owner_email' => $this->owner_email,
 							$this->meta_prefix.'help_page' => $this->help_page,
 							$this->meta_prefix.'archive_page' => $this->archive_page,
-						),
+						)),
 					);
 
 					if($this->id > 0)
