@@ -251,7 +251,7 @@ class mf_group
 		if(!isset($data['queue_id'])){		$data['queue_id'] = 0;}
 
 		$base_url = get_permalink($data['group_id']);
-		$base_url .= (preg_match("/\?/", $base_url) ? "&" : "?");
+		$base_url .= (strpos($base_url, "?") ? "&" : "?");
 
 		$out = "";
 
@@ -2087,7 +2087,7 @@ class mf_group
 
 		$out = $this->show_group_registration_form(array('id' => $id));*/
 
-		do_log(__FUNCTION__.": Add a block instead (#".$post->ID.", ".var_export($atts, true).")");
+		do_log(__FUNCTION__.": Add a block instead (#".$post->ID.", ".var_export($atts, true).")", 'publish', false);
 
 		return $out;
 	}
@@ -3860,6 +3860,8 @@ class widget_group extends WP_Widget
 
 	function widget($args, $instance)
 	{
+		do_log(__CLASS__."->".__FUNCTION__."(): Add a block instead", 'publish', false);
+
 		extract($args);
 		$instance = wp_parse_args((array)$instance, $this->arr_default);
 
