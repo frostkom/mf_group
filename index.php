@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description:
-Version: 5.11.27
+Version: 5.11.28
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://martinfors.se
@@ -178,56 +178,6 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 		update_columns($arr_update_column);
 		add_columns($arr_add_column);
 		add_index($arr_add_index);
-
-		$result = $wpdb->get_results("SELECT queueID, queueReceived FROM ".$wpdb->prefix."group_queue WHERE queueStatus = ''");
-
-		if($wpdb->num_rows > 0)
-		{
-			foreach($result as $r)
-			{
-				$intQueueID = $r->queueID;
-				$intQueueReceived = $r->queueReceived;
-
-				switch($intQueueReceived)
-				{
-					case -1:
-						$strQueueStatus = 'not_received';
-					break;
-
-					case 0:
-					default:
-						$strQueueStatus = 'not_viewed';
-					break;
-
-					case 1:
-						$strQueueStatus = 'viewed';
-					break;
-				}
-
-				$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_queue SET queueStatus = %s WHERE queueID = '%d'", $strQueueStatus, $intQueueID));
-			}
-		}
-
-		else
-		{
-			// Can only be dropped when it does not exist anywhere in the code
-			//$wpdb->query("ALTER TABLE [table] DROP COLUMN queueReceived");
-		}
-
-		delete_base(array(
-			'table' => "group_message",
-			'field_prefix' => "message",
-			'child_tables' => array(
-				'group_queue' => array(
-					'action' => 'delete',
-					'field_prefix' => "message",
-				),
-			),
-		));
-
-		mf_uninstall_plugin(array(
-			'options' => array('setting_group_versioning'),
-		));
 	}
 
 	function uninstall_group()

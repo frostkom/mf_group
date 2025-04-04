@@ -389,6 +389,56 @@ class mf_group
 
 		if($obj_cron->is_running == false)
 		{
+			$result = $wpdb->get_results("SELECT queueID, queueReceived FROM ".$wpdb->prefix."group_queue WHERE queueStatus = ''");
+
+			if($wpdb->num_rows > 0)
+			{
+				foreach($result as $r)
+				{
+					$intQueueID = $r->queueID;
+					$intQueueReceived = $r->queueReceived;
+
+					switch($intQueueReceived)
+					{
+						case -1:
+							$strQueueStatus = 'not_received';
+						break;
+
+						case 0:
+						default:
+							$strQueueStatus = 'not_viewed';
+						break;
+
+						case 1:
+							$strQueueStatus = 'viewed';
+						break;
+					}
+
+					$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_queue SET queueStatus = %s WHERE queueID = '%d'", $strQueueStatus, $intQueueID));
+				}
+			}
+
+			else
+			{
+				// Can only be dropped when it does not exist anywhere in the code
+				//$wpdb->query("ALTER TABLE [table] DROP COLUMN queueReceived");
+			}
+
+			delete_base(array(
+				'table' => "group_message",
+				'field_prefix' => "message",
+				'child_tables' => array(
+					'group_queue' => array(
+						'action' => 'delete',
+						'field_prefix' => "message",
+					),
+				),
+			));
+
+			mf_uninstall_plugin(array(
+				'options' => array('setting_group_versioning'),
+			));
+
 			// Make sure that it has been created in activate_group because this might be a new site that has just been created
 			if(does_table_exist($wpdb->prefix."group_message"))
 			{
