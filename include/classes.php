@@ -2147,7 +2147,10 @@ class mf_group
 
 	function widgets_init()
 	{
-		register_widget('widget_group');
+		if(wp_is_block_theme() == false)
+		{
+			register_widget('widget_group');
+		}
 	}
 
 	function fetch_request()

@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description:
-Version: 5.11.31
+Version: 5.11.32
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://martinfors.se
@@ -63,10 +63,7 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 
 	add_shortcode('mf_group', array($obj_group, 'shortcode_group'));
 
-	if(wp_is_block_theme() == false)
-	{
-		add_action('widgets_init', array($obj_group, 'widgets_init'));
-	}
+	add_action('widgets_init', array($obj_group, 'widgets_init'));
 
 	add_filter('single_template', 'custom_templates_group');
 
