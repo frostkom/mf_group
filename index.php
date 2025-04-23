@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description:
-Version: 5.11.32
+Version: 5.11.33
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://martinfors.se
@@ -127,9 +127,9 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 			queueID INT UNSIGNED NOT NULL AUTO_INCREMENT,
 			addressID INT UNSIGNED NOT NULL DEFAULT '0',
 			messageID INT UNSIGNED NOT NULL DEFAULT '0',
-			queueSent ENUM('0','1') NOT NULL DEFAULT '0',
-			queueReceived ENUM('-1', '0','1') NOT NULL DEFAULT '0',
-			queueStatus VARCHAR(20) NOT NULL DEFAULT '',
+			queueSent ENUM('0','1') NOT NULL DEFAULT '0',"
+			//."queueReceived ENUM('-1', '0','1') NOT NULL DEFAULT '0',"
+			."queueStatus VARCHAR(20) NOT NULL DEFAULT '',
 			queueStatusMessage TEXT,
 			queueCreated DATETIME NOT NULL,
 			queueSentTime DATETIME NOT NULL,
@@ -141,9 +141,11 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 
 		$arr_add_column[$wpdb->prefix."group_queue"] = array(
 			//'queueViewed' => "ALTER TABLE [table] ADD [column] DATETIME NOT NULL AFTER queueSentTime",
-			'queueStatus' => "ALTER TABLE [table] ADD [column] VARCHAR(20) NOT NULL DEFAULT '' AFTER queueReceived",
+			'queueStatus' => "ALTER TABLE [table] ADD [column] VARCHAR(20) NOT NULL DEFAULT '' AFTER queueSent",
 			//'queueStatusMessage' => "ALTER TABLE [table] ADD [column] TEXT AFTER queueStatus",
 		);
+
+		$arr_update_column[$wpdb->prefix."group_queue"]['queueReceived'] = "ALTER TABLE [table] DROP COLUMN [column]";
 
 		$wpdb->query("CREATE TABLE IF NOT EXISTS ".$wpdb->prefix."address2group (
 			addressID INT UNSIGNED NOT NULL,
@@ -200,7 +202,7 @@ function uninstall_group()
 
 	mf_uninstall_plugin(array(
 		'uploads' => $obj_group->post_type,
-		'options' => array('setting_emails_per_hour', 'setting_group_see_other_roles', 'setting_group_trace_links', 'setting_group_outgoing_text', 'setting_group_import', 'setting_group_debug', 'setting_group_log_file'),
+		'options' => array('setting_emails_per_hour', 'setting_group_see_other_roles', 'setting_group_trace_links', 'setting_group_outgoing_text', 'setting_group_import', 'setting_group_debug', 'setting_group_log_file', 'option_group_synced'),
 		'post_types' => array($obj_group->post_type),
 		'tables' => array('group_message', 'group_message_link', 'group_queue', 'address2group', 'group_version'),
 	));
