@@ -1307,7 +1307,7 @@ class mf_group
 					$post_url = get_permalink($intGroupContactPage);
 					$post_title = get_the_title($intGroupContactPage);
 
-					if($strAddressEmail != '')
+					/*if($strAddressEmail != '')
 					{
 						global $obj_form;
 
@@ -1320,14 +1320,14 @@ class mf_group
 
 						if($obj_form->id > 0)
 						{
-							$form_field_id = $obj_form->get_post_info()."_".$obj_form->get_form_email_field();
+							$form_field_id = $obj_form->get_post_info(array('select' => 'post_name'))."_".$obj_form->get_form_email_field();
 
 							if($form_field_id != '')
 							{
 								$post_url .= "?".$form_field_id."=".$strAddressEmail;
 							}
 						}
-					}
+					}*/
 
 					$out .= "<p><a href='".$post_url."'>".$post_title."</a></p>";
 				}
@@ -1934,59 +1934,6 @@ class mf_group
 
 		return $data;
 	}
-
-	/*function count_shortcode_button($count)
-	{
-		if($count == 0)
-		{
-			$tbl_group = new mf_group_table();
-
-			$tbl_group->select_data(array(
-				'select' => "ID",
-				'limit' => 0, 'amount' => 1,
-			));
-
-			if(count($tbl_group->data) > 0)
-			{
-				$count++;
-			}
-		}
-
-		return $count;
-	}*/
-
-	/*function get_shortcode_output($out)
-	{
-		$arr_data = $this->get_for_select(array('return_to_metabox' => false));
-
-		if(count($arr_data) > 1)
-		{
-			$out .= "<h3>".__("Choose a Group", 'lang_group')."</h3>"
-			.show_select(array('data' => $arr_data, 'xtra' => "rel='".$this->post_type."'"));
-		}
-
-		return $out;
-	}*/
-
-	/*function get_shortcode_list($data)
-	{
-		$post_id = $data[0];
-		$content_list = $data[1];
-
-		if($post_id > 0)
-		{
-			$post_content = mf_get_post_content($post_id);
-
-			$group_id = get_match("/\[mf_group id=(.*?)\]/", $post_content, false);
-
-			if($group_id > 0)
-			{
-				$content_list .= "<li><a href='".admin_url("admin.php?page=mf_group/create/index.php&intGroupID=".$group_id)."'>".get_the_title($group_id)."</a> <span class='grey'>[mf_group id=".$group_id."]</span></li>";
-			}
-		}
-
-		return array($post_id, $content_list);
-	}*/
 
 	function filter_is_file_used($arr_used)
 	{
