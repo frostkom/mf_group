@@ -389,35 +389,6 @@ class mf_group
 
 		if($obj_cron->is_running == false)
 		{
-			/*$result = $wpdb->get_results("SELECT queueID, queueReceived FROM ".$wpdb->prefix."group_queue WHERE queueStatus = ''");
-
-			if($wpdb->num_rows > 0)
-			{
-				foreach($result as $r)
-				{
-					$intQueueID = $r->queueID;
-					$intQueueReceived = $r->queueReceived;
-
-					switch($intQueueReceived)
-					{
-						case -1:
-							$strQueueStatus = 'not_received';
-						break;
-
-						case 0:
-						default:
-							$strQueueStatus = 'not_viewed';
-						break;
-
-						case 1:
-							$strQueueStatus = 'viewed';
-						break;
-					}
-
-					$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_queue SET queueStatus = %s WHERE queueID = '%d'", $strQueueStatus, $intQueueID));
-				}
-			}*/
-
 			delete_base(array(
 				'table' => "group_message",
 				'field_prefix' => "message",
