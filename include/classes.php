@@ -1708,7 +1708,7 @@ class mf_group
 	{
 		$menu_root = 'mf_group/';
 		$menu_start = $menu_root.'list/index.php';
-		$menu_capability = override_capability(array('page' => $menu_start, 'default' => 'edit_posts'));
+		$menu_capability = 'edit_posts';
 
 		$menu_title = __("Groups", 'lang_group');
 		add_menu_page("", $menu_title.$this->count_unsent_group(), $menu_capability, $menu_start, '', 'dashicons-groups', 99);
