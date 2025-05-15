@@ -1677,10 +1677,10 @@ class mf_group
 	{
 		global $pagenow;
 
-		$plugin_include_url = plugin_dir_url(__FILE__);
-
 		if($pagenow == 'admin.php')
 		{
+			$plugin_include_url = plugin_dir_url(__FILE__);
+
 			switch(check_var('page'))
 			{
 				case "mf_group/create/index.php":
@@ -2043,23 +2043,6 @@ class mf_group
 		}
 
 		return $datetime;
-	}
-
-	function shortcode_group($atts)
-	{
-		global $post;
-
-		$out = "";
-
-		/*extract(shortcode_atts(array(
-			'id' => ''
-		), $atts));
-
-		$out = $this->show_group_registration_form(array('id' => $id));*/
-
-		do_log(__FUNCTION__.": Add a block instead (#".$post->ID.", ".var_export($atts, true).")", 'publish', false);
-
-		return $out;
 	}
 
 	function widgets_init()
