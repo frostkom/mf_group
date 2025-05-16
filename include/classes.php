@@ -1910,21 +1910,24 @@ class mf_group
 	{
 		global $wpdb;
 
-		$result = $wpdb->get_results($wpdb->prepare("SELECT groupID, messageID FROM ".$wpdb->prefix."group_message WHERE messageDeleted = '0' AND (messageText LIKE %s OR messageText LIKE %s OR messageAttachment LIKE %s OR messageAttachment LIKE %s)", "%".$arr_used['file_url']."%", "%".$arr_used['file_thumb_url']."%", "%".$arr_used['file_url']."%", "%".$arr_used['file_thumb_url']."%"));
-		$rows = $wpdb->num_rows;
-
-		if($rows > 0)
+		if(does_table_exist($wpdb->prefix."group_message"))
 		{
-			$arr_used['amount'] += $rows;
+			$result = $wpdb->get_results($wpdb->prepare("SELECT groupID, messageID FROM ".$wpdb->prefix."group_message WHERE messageDeleted = '0' AND (messageText LIKE %s OR messageText LIKE %s OR messageAttachment LIKE %s OR messageAttachment LIKE %s)", "%".$arr_used['file_url']."%", "%".$arr_used['file_thumb_url']."%", "%".$arr_used['file_url']."%", "%".$arr_used['file_thumb_url']."%"));
+			$rows = $wpdb->num_rows;
 
-			foreach($result as $r)
+			if($rows > 0)
 			{
-				if($arr_used['example'] != '')
-				{
-					break;
-				}
+				$arr_used['amount'] += $rows;
 
-				$arr_used['example'] = admin_url("admin.php?page=mf_group/sent/index.php&intGroupID=".$r->groupID."&intMessageID=".$r->messageID);
+				foreach($result as $r)
+				{
+					if($arr_used['example'] != '')
+					{
+						break;
+					}
+
+					$arr_used['example'] = admin_url("admin.php?page=mf_group/sent/index.php&intGroupID=".$r->groupID."&intMessageID=".$r->messageID);
+				}
 			}
 		}
 
