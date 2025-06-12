@@ -56,7 +56,6 @@ get_header();
 				the_post();
 
 				$post_id = $post->ID;
-				//$post_status = $post->post_status;
 				$post_title = $post->post_title;
 
 				$post_allow_registration = get_post_meta_or_default($post_id, $obj_group->meta_prefix.'allow_registration', true, 'no');
@@ -68,7 +67,6 @@ get_header();
 				if(isset($_REQUEST['subscribe']))
 				{
 					$strSubscribeHash = check_var('subscribe', 'char');
-					//$strVerifyHash = check_var('verify', 'char');
 
 					$intGroupID = check_var('gid', 'int');
 					$strAddressEmail = check_var('aem', 'char');
@@ -242,33 +240,27 @@ get_header();
 
 				$post_content .= get_notification();
 
-				/*if($post_content != '' || $post_allow_registration == 'yes')
-				{*/
-					echo "<h1>".$post_title."</h1>
-					<section>";
+				echo "<h1>".$post_title."</h1>
+				<section>";
 
-						if($post_content != '')
-						{
-							echo $post_content;
-						}
+					if($post_content != '')
+					{
+						echo $post_content;
+					}
 
-						else if($post_allow_registration == 'yes')
-						{
-							echo $obj_group->show_group_registration_form(array('id' => $post_id));
-						}
+					else if($post_allow_registration == 'yes')
+					{
+						echo $obj_group->show_group_registration_form(array('id' => $post_id));
+					}
 
-						else
-						{
-							echo apply_filters('the_content', __("This group is closed for registration", 'lang_group'));
-						}
+					else
+					{
+						echo apply_filters('the_content', __("This group is closed for registration", 'lang_group'));
+					}
 
-					echo "</section>";
-				/*}
+				echo "</section>";
 
-				else
-				{
-					wp_redirect("/404/");
-				}*/
+				do_log("single-mf_group.php: Move this to a block instead");
 			}
 
 		echo "</article>";

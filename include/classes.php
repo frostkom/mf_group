@@ -1490,6 +1490,7 @@ class mf_group
 			'public' => true,
 			'show_in_menu' => false,
 			'exclude_from_search' => true,
+			'supports' => array('title'),
 			'rewrite' => array(
 				'slug' => 'group',
 			),
@@ -1904,6 +1905,197 @@ class mf_group
 		}
 
 		return $data;
+	}
+
+	function rwmb_meta_boxes($meta_boxes)
+	{
+		global $obj_base;
+
+		if(!isset($obj_base))
+		{
+			$obj_base = new mf_base();
+		}
+
+		$arr_data_page = array();
+		get_post_children(array('add_choose_here' => true), $arr_data_page);
+
+		$meta_boxes[] = array(
+			'id' => $this->meta_prefix.'api',
+			'title' => __("API", 'lang_group'),
+			'post_types' => array($this->post_type),
+			'context' => 'normal',
+			'priority' => 'low',
+			'fields' => array(
+				array(
+					'name' => __("Link", 'lang_group'),
+					'id' => $this->meta_prefix.'api',
+					'type' => 'textarea',
+				),
+				array(
+					'name' => __("Filter", 'lang_group'),
+					'id' => $this->meta_prefix.'api_filter',
+					'type' => 'textarea',
+					'placeholder' => "include:field=[value1,value2]",
+					/*'attributes' => array(
+						'condition_type' => 'hide_this_if',
+						'condition_selector' => $this->meta_prefix.'api',
+						'condition_value' => '',
+					),*/
+				),
+			),
+		);
+
+		//if($this->api == '')
+		$meta_boxes[] = array(
+			'id' => $this->meta_prefix.'acceptance_email',
+			'title' => __("Acceptance e-mail", 'lang_group'),
+			'post_types' => array($this->post_type),
+			'context' => 'normal',
+			'priority' => 'low',
+			'fields' => array(
+				array(
+					'name' => __("Send before adding to a group", 'lang_group'),
+					'id' => $this->meta_prefix.'acceptance_email',
+					'type' => 'select',
+					'options' => get_yes_no_for_select(),
+					'std' => 'no',
+					/*'attributes' => array(
+						'condition_type' => 'hide_this_if',
+						'condition_selector' => $this->meta_prefix.'api',
+						'condition_value' => '',
+					),*/
+				),
+
+				/*."<div class='display_acceptance_message'>"
+					.show_textfield(array('name' => 'strGroupAcceptanceSubject', 'text' => __("Subject", 'lang_group'), 'value' => $this->acceptance_subject, 'placeholder' => sprintf(__("Accept subscription to %s", 'lang_group'), $this->name)))
+					.show_wp_editor(array('name' => 'strGroupAcceptanceText', 'value' => $this->acceptance_text, 'description' => __("Example", 'lang_group').": ".sprintf(__("You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below.", 'lang_group'), $this->name)))
+				."</div>
+				<div class='display_reminder_message'>
+					<h3>".__("Reminder if the recipient has not yet accepted", 'lang_group')."</h3>"
+					.show_textfield(array('name' => 'strGroupReminderSubject', 'text' => __("Subject", 'lang_group'), 'value' => $this->reminder_subject, 'placeholder' => sprintf(__("Accept subscription to %s", 'lang_group'), $this->name)))
+					.show_wp_editor(array('name' => 'strGroupReminderText', 'value' => $this->reminder_text, 'description' => __("Example", 'lang_group').": ".sprintf(__("You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below.", 'lang_group'), $this->name)))
+				."</div>";*/
+			),
+		);
+
+		if(is_plugin_active("mf_email/index.php"))
+		{
+			if(!isset($obj_email))
+			{
+				$obj_email = new mf_email();
+			}
+
+			$arr_data_email = $obj_email->get_from_for_select();
+			//$arr_data_abuse = $obj_email->get_from_for_select(array('type' => 'abuse'));
+
+			$arr_fields = array();
+
+			if(count($arr_data_email) > 1)
+			{
+				$arr_fields[] = array(
+					'name' => __("Owner", 'lang_group'),
+					'id' => $this->meta_prefix.'owner_email',
+					'type' => 'select',
+					'options' => $arr_data_email,
+					//'std' => 'no',
+				);
+			}
+
+			/*if(count($arr_data_abuse) > 1)
+			{
+				$arr_fields[] = array(
+					'name' => __("Abuse", 'lang_group'),
+					'id' => $this->meta_prefix.'',
+					'type' => 'select',
+					'options' => $arr_data_abuse,
+					//'std' => 'no',
+					'description' => sprintf(__("You should have setup both %s and %s because these addresses are usually used for other servers when sending notices about spam. This is a great way of receiving and handling possible issues within your own domain", 'lang_group'), "abuse@domain.com", "postmaster@domain.com"),
+				);
+			}*/
+
+			$arr_fields[] = array(
+				'name' => __("Help Page", 'lang_group'),
+				'id' => $this->meta_prefix.'help_page',
+				'type' => 'select',
+				'options' => $arr_data_page,
+			);
+
+			$arr_fields[] = array(
+				'name' => __("Archive Page", 'lang_group'),
+				'id' => $this->meta_prefix.'archive_page',
+				'type' => 'select',
+				'options' => $arr_data_page,
+			);
+
+			$meta_boxes[] = array(
+				'id' => $this->meta_prefix.'about',
+				'title' => __("About the Group", 'lang_group'),
+				'post_types' => array($this->post_type),
+				'context' => 'normal',
+				'priority' => 'low',
+				'fields' => $arr_fields,
+			);
+		}
+
+		$description = "";
+
+		/*if($this->group_type == 'stop')
+		{
+			$description = "<i class='fa fa-exclamation-triangle yellow'></i> ".__("This will prevent messages to all recipients in this group regardless which group that you are sending to.", 'lang_group');
+		}*/
+
+		$arr_fields = array(
+			array(
+				'name' => __("Type", 'lang_group'),
+				'id' => $this->meta_prefix.'group_type',
+				'type' => 'select',
+				'options' => $this->get_types_for_select(),
+				'description' => $description,
+			),
+		);
+
+		$meta_boxes[] = array(
+			'id' => $this->meta_prefix.'settings',
+			'title' => __("Settings", 'lang_group'),
+			'post_types' => array($this->post_type),
+			'context' => 'side',
+			'priority' => 'low',
+			'fields' => $arr_fields,
+		);
+
+		/*
+			.show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupAllowRegistration', 'text' => __("Allow Registration", 'lang_group'), 'value' => $this->allow_registration))
+			."<div class='display_registration_fields'>"
+				.show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupVerifyAddress', 'text' => __("Verify that address is in Address book", 'lang_group'), 'value' => $this->verify_address))
+				.show_select(array('data' => $arr_data_page, 'name' => 'intGroupContactPage', 'text' => __("Contact Page", 'lang_group'), 'value' => $this->contact_page))
+				.show_select(array('data' => $this->get_registration_fields_for_select(), 'name' => 'arrGroupRegistrationFields[]', 'text' => __("Registration Fields", 'lang_group'), 'value' => $this->registration_fields))
+			."</div>"
+			.show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupVerifyLink', 'text' => __("Add Verify Link", 'lang_group'), 'value' => $this->verify_link, 'description' => __("In every message a hidden image/link is placed to see if the recipient has opened the message. This increases the risk of being classified as spam", 'lang_group')));
+
+			$amount_in_group = $this->amount_in_group();
+
+			if(!($this->id > 0) || $this->sync_users == 'yes' || $amount_in_group == 0)
+			{
+				$arr_data = array(
+					'no' => __("No", 'lang_group'),
+					'yes' => __("Users", 'lang_group'),
+				);
+
+				$arr_data = apply_filters('get_group_sync_type', $arr_data);
+
+				echo show_select(array('data' => $arr_data, 'name' => 'strGroupSyncUsers', 'text' => __("Synchronize", 'lang_group'), 'value' => $this->sync_users, 'description' => __("This will automatically add/remove addresses and their information to this group", 'lang_group')));
+			}
+
+			if($this->id > 0 && $this->api == '' && $this->allow_registration == 'no' && $this->sync_users == 'no' && $amount_in_group > 0)
+			{
+				echo show_button(array('name' => 'btnGroupRemoveRecipients', 'text' => __("Remove all recipients", 'lang_group'), 'class' => "button delete"))
+				.show_checkbox(array('name' => 'intGroupRemoveRecipientsConfirm', 'text' => __("Are you really sure?", 'lang_group'), 'value' => 1, 'description' => __("This will remove all recipients from this group and it is not possible to undo this action", 'lang_group')))
+				.wp_nonce_field('group_remove_recipients_'.$this->id, '_wpnonce_group_remove_recipients', true, false);
+			}
+
+		echo "</div>*/
+
+		return $meta_boxes;
 	}
 
 	function filter_is_file_used($arr_used)
