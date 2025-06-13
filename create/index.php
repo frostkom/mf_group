@@ -125,9 +125,14 @@ echo "<div class='wrap'>
 								$description = "<i class='fa fa-exclamation-triangle yellow'></i> ".__("This will prevent messages to all recipients in this group regardless which group that you are sending to.", 'lang_group');
 							}
 
-							echo show_select(array('data' => $obj_group->get_types_for_select(), 'name' => 'strGroupType', 'text' => __("Type", 'lang_group'), 'value' => $obj_group->group_type, 'description' => $description))
-							.show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupAllowRegistration', 'text' => __("Allow Registration", 'lang_group'), 'value' => $obj_group->allow_registration))
-							."<div class='display_registration_fields'>"
+							echo show_select(array('data' => $obj_group->get_types_for_select(), 'name' => 'strGroupType', 'text' => __("Type", 'lang_group'), 'value' => $obj_group->group_type, 'description' => $description));
+
+							if(wp_is_block_theme() == false)
+							{
+								echo show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupAllowRegistration', 'text' => __("Allow Registration", 'lang_group'), 'value' => $obj_group->allow_registration));
+							}
+
+							echo "<div class='display_registration_fields'>"
 								.show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupVerifyAddress', 'text' => __("Verify that address is in Address book", 'lang_group'), 'value' => $obj_group->verify_address))
 								.show_select(array('data' => $arr_data_page, 'name' => 'intGroupContactPage', 'text' => __("Contact Page", 'lang_group'), 'value' => $obj_group->contact_page))
 								.show_select(array('data' => $obj_group->get_registration_fields_for_select(), 'name' => 'arrGroupRegistrationFields[]', 'text' => __("Registration Fields", 'lang_group'), 'value' => $obj_group->registration_fields))

@@ -22,16 +22,6 @@
 				'type': 'string',
 				'default': ''
 			},
-			'group_heading':
-			{
-                'type': 'string',
-                'default': ''
-            },
-			'group_text':
-			{
-                'type': 'string',
-                'default': ''
-            },
 			'group_id':
 			{
                 'type': 'string',
@@ -94,30 +84,6 @@
 					el(
 						InspectorControls,
 						'div',
-						el(
-							TextControl,
-							{
-								label: script_group_block_wp.group_heading_label,
-								type: 'text',
-								value: props.attributes.group_heading,
-								onChange: function(value)
-								{
-									props.setAttributes({group_heading: value});
-								}
-							}
-						),
-						el(
-							TextControl,
-							{
-								label: script_group_block_wp.group_text_label,
-								type: 'text',
-								value: props.attributes.group_text,
-								onChange: function(value)
-								{
-									props.setAttributes({group_text: value});
-								}
-							}
-						),
 						el(
 							SelectControl,
 							{

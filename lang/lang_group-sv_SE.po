@@ -330,7 +330,7 @@ msgstr "Jag godkänner att denna webbsida sparar min ifyllda information, så at
 
 #: ../include/classes.php:1359
 msgid "Your Email Address"
-msgstr "Din epost"
+msgstr "Din e-postadress"
 
 #: ../include/classes.php:1410
 #: ../include/classes.php:3820

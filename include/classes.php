@@ -1418,17 +1418,23 @@ class mf_group
 
 				else
 				{
-					$out .= "<div class='flex_form'>"
-						.show_textfield(array('name' => 'strAddressEmail', 'placeholder' => __("Your Email Address", 'lang_group'), 'value' => $strAddressEmail, 'required' => true))
-						."<div".get_form_button_classes().">"
-							.show_button(array('name' => 'btnGroupJoin', 'text' => $data['button_text'].($data['button_icon'] != '' ? " <i class='".$data['button_icon']."'></i>" : "")))
-						."</div>
-					</div>";
+					/*$out .= "<div class='flex_form'>
+						<div>";*/
 
-					if($data['display_consent'] == 'yes')
-					{
-						$out .= show_checkbox(array('name' => 'intGroupConsent', 'text' => __("I consent to having this website store my submitted information, so that they can contact me as part of this group", 'lang_group'), 'value' => 1, 'required' => true));
-					}
+							$out .= show_textfield(array('name' => 'strAddressEmail', 'placeholder' => __("Your Email Address", 'lang_group'), 'value' => $strAddressEmail, 'required' => true));
+
+							if($data['display_consent'] == 'yes')
+							{
+								$out .= show_checkbox(array('name' => 'intGroupConsent', 'text' => __("I consent to having this website store my submitted information, so that they can contact me as part of this group", 'lang_group'), 'value' => 1, 'required' => true));
+							}
+
+						//$out .= "</div>";
+
+						$out .= "<div".get_form_button_classes().">"
+							.show_button(array('name' => 'btnGroupJoin', 'text' => $data['button_text'].($data['button_icon'] != '' ? " <i class='".$data['button_icon']."'></i>" : "")))
+						."</div>";
+
+					//$out .= "</div>";
 				}
 
 			$out .= "</form>";
@@ -1440,8 +1446,6 @@ class mf_group
 	function block_render_callback($attributes)
 	{
 		if(!isset($attributes['group_id'])){				$attributes['group_id'] = 0;}
-		if(!isset($attributes['group_heading'])){			$attributes['group_heading'] = '';}
-		if(!isset($attributes['group_text'])){				$attributes['group_text'] = '';}
 		if(!isset($attributes['group_label_type'])){		$attributes['group_label_type'] = '';}
 		if(!isset($attributes['group_display_consent'])){	$attributes['group_display_consent'] = 'yes';}
 		if(!isset($attributes['group_button_text'])){		$attributes['group_button_text'] = '';}
@@ -1451,15 +1455,9 @@ class mf_group
 
 		if($attributes['group_id'] > 0)
 		{
-			$out .= "<div".parse_block_attributes(array('class' => "widget widget_group", 'attributes' => $attributes)).">";
-
-				if($attributes['group_heading'] != '')
-				{
-					$out .= "<h3>".$attributes['group_heading']."</h3>";
-				}
-
-				$out .= "<div class='section'>"
-					.$this->show_group_registration_form(array('id' => $attributes['group_id'], 'text' => $attributes['group_text'], 'label_type' => $attributes['group_label_type'], 'display_consent' => $attributes['group_display_consent'], 'button_text' => $attributes['group_button_text'], 'button_icon' => $attributes['group_button_icon']))
+			$out .= "<div".parse_block_attributes(array('class' => "widget widget_group", 'attributes' => $attributes)).">
+				<div class='section'>"
+					.$this->show_group_registration_form(array('id' => $attributes['group_id'], 'label_type' => $attributes['group_label_type'], 'display_consent' => $attributes['group_display_consent'], 'button_text' => $attributes['group_button_text'], 'button_icon' => $attributes['group_button_icon']))
 				."</div>"
 			."</div>";
 		}
@@ -1487,7 +1485,7 @@ class mf_group
 				'singular_name' => __("Group", 'lang_group'),
 				'menu_name' => __("Group", 'lang_group')
 			),
-			'public' => true,
+			'public' => (wp_is_block_theme() == false),
 			'show_in_menu' => false,
 			'exclude_from_search' => true,
 			'supports' => array('title'),
@@ -1517,9 +1515,7 @@ class mf_group
 		wp_localize_script('script_group_block_wp', 'script_group_block_wp', array(
 			'block_title' => __("Group", 'lang_group'),
 			'block_description' => __("Display a Group", 'lang_group'),
-			'group_heading_label' => __("Heading", 'lang_group'),
-			'group_text' => __("Text", 'lang_group'),
-			'group_id_label' => __("Link", 'lang_group'),
+			'group_id_label' => __("Group", 'lang_group'),
 			'group_id' => $arr_data,
 			'group_label_type_label' => __("Display Input Label as", 'lang_group'),
 			'group_label_type' => $this->get_label_types_for_select(),
@@ -2064,8 +2060,12 @@ class mf_group
 		);
 
 		/*
-			.show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupAllowRegistration', 'text' => __("Allow Registration", 'lang_group'), 'value' => $this->allow_registration))
-			."<div class='display_registration_fields'>"
+			if(wp_is_block_theme() == false)
+			{
+				echo show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupAllowRegistration', 'text' => __("Allow Registration", 'lang_group'), 'value' => $this->allow_registration));
+			}
+
+			echo "<div class='display_registration_fields'>"
 				.show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupVerifyAddress', 'text' => __("Verify that address is in Address book", 'lang_group'), 'value' => $this->verify_address))
 				.show_select(array('data' => $arr_data_page, 'name' => 'intGroupContactPage', 'text' => __("Contact Page", 'lang_group'), 'value' => $this->contact_page))
 				.show_select(array('data' => $this->get_registration_fields_for_select(), 'name' => 'arrGroupRegistrationFields[]', 'text' => __("Registration Fields", 'lang_group'), 'value' => $this->registration_fields))
@@ -2151,12 +2151,12 @@ class mf_group
 		return $post_types;
 	}
 
-	function wp_head()
+	/*function wp_head()
 	{
 		$plugin_include_url = plugin_dir_url(__FILE__);
 
 		mf_enqueue_style('style_group', $plugin_include_url."style.css");
-	}
+	}*/
 
 	function get_emails_left_to_send($amount, $email, $type = '')
 	{
@@ -3176,6 +3176,37 @@ if(class_exists('mf_list_table'))
 						{
 							$actions['inactivate'] = "<a href='".wp_nonce_url($list_url."&btnGroupInactivate", 'group_inactivate_'.$post_id, '_wpnonce_group_inactivate')."'>".__("Inactivate", 'lang_group')."</a>";
 						}
+
+						$block_code = '<!-- wp:mf/group {"group_id":"'.$post_id.'"%} /-->';
+						$arr_ids = apply_filters('get_page_from_block_code', array(), $block_code);
+
+						if(count($arr_ids) > 0)
+						{
+							foreach($arr_ids as $post_id_temp)
+							{
+								if($this->check_allow_edit())
+								{
+									$actions['edit_page'] = "<a href='".admin_url("post.php?post=".$post_id_temp."&action=edit")."'>".__("Edit Page", 'lang_group')."</a>";
+								}
+
+								$actions['view_page'] = "<a href='".get_permalink($post_id_temp)."'>".__("View", 'lang_group')."</a>";
+							}
+						}
+
+						else
+						{
+							$post_allow_registration = get_post_meta($post_id, $this->meta_prefix.'allow_registration', true);
+
+							if($post_status == 'publish' && wp_is_block_theme() == false && $post_allow_registration == 'yes')
+							{
+								$post_url = get_permalink($post_id);
+
+								if($post_url != '')
+								{
+									$actions['view'] = "<a href='".$post_url."'>".__("View", 'lang_group')."</a>";
+								}
+							}
+						}
 					}
 
 					else
@@ -3196,13 +3227,13 @@ if(class_exists('mf_list_table'))
 
 				case 'post_status':
 					$arr_statuses = array(
-						'allow_registration' => array(
+						/*'allow_registration' => array(
 							'type' => 'bool',
 							'name' => __("Allow Registration", 'lang_group'),
 							'icon' => 'fa fa-globe',
 							'single' => true,
 							'link' => get_permalink($post_id),
-						),
+						),*/
 						'api' => array(
 							'type' => 'empty',
 							'name' => __("API Link", 'lang_group'),
