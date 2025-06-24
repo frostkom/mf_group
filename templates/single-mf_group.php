@@ -260,7 +260,7 @@ get_header();
 
 				echo "</section>";
 
-				do_log("single-mf_group.php: Move this to a block instead");
+				do_log("single-mf_group.php: Move this to a block instead (".var_export($_SERVER, true).")");
 			}
 
 		echo "</article>";
