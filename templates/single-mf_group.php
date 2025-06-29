@@ -260,7 +260,8 @@ get_header();
 
 				echo "</section>";
 
-				do_log("single-mf_group.php: Move this to a block instead (".var_export($_SERVER, true).")");
+				// This does not give any info so just let it be until all sites are using block themes
+				//do_log("single-mf_group.php: Move this to a block instead (".var_export($_SERVER, true).")");
 			}
 
 		echo "</article>";
