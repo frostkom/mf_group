@@ -11,7 +11,7 @@ $obj_group->fetch_request();
 echo $obj_group->save_data();
 $obj_group->get_from_db();
 
-$arr_data_page = array();
+$arr_data_page = [];
 get_post_children(array('add_choose_here' => true), $arr_data_page);
 
 echo "<div class='wrap'>

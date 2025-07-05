@@ -6,8 +6,8 @@ class mf_group
 	var $type;
 	var $post_type = 'mf_group';
 	var $meta_prefix;
-	var $arr_stop_list_groups = array();
-	var $arr_stop_list_recipients = array();
+	var $arr_stop_list_groups = [];
+	var $arr_stop_list_recipients = [];
 	var $group_month;
 	var $message_type;
 	var $group_id;
@@ -42,7 +42,7 @@ class mf_group
 	var $api_filter;
 	var $query_where = "";
 
-	function __construct($data = array())
+	function __construct($data = [])
 	{
 		if(!isset($data['id'])){	$data['id'] = 0;}
 		if(!isset($data['type'])){	$data['type'] = '';}
@@ -67,7 +67,7 @@ class mf_group
 		return (get_post_meta($group_id, $this->meta_prefix.'api', true) != '' || get_post_meta($group_id, $this->meta_prefix.'sync_users', true) != 'no');
 	}
 
-	function get_for_select($data = array())
+	function get_for_select($data = [])
 	{
 		if(!isset($data['add_choose_here'])){		$data['add_choose_here'] = true;}
 		if(!isset($data['include_amount'])){		$data['include_amount'] = true;}
@@ -79,7 +79,7 @@ class mf_group
 			'select' => "ID, post_title",
 		));
 
-		$arr_data = array();
+		$arr_data = [];
 
 		if(count($tbl_group->data) > 0)
 		{
@@ -134,7 +134,7 @@ class mf_group
 	{
 		global $wpdb;
 
-		$arr_data = array();
+		$arr_data = [];
 
 		$result = $wpdb->get_results($wpdb->prepare("SELECT SUBSTRING(versionCreated, 1, 7) AS versionMonth FROM ".$wpdb->prefix."group_version WHERE groupID = '%d' GROUP BY versionMonth ORDER BY versionMonth DESC", $this->id));
 
@@ -174,7 +174,7 @@ class mf_group
 		return $arr_data;
 	}
 
-	function get_types_for_select($data = array())
+	function get_types_for_select($data = [])
 	{
 		return array(
 			'normal' => __("Normal", 'lang_group'),
@@ -203,7 +203,7 @@ class mf_group
 		return $arr_data;
 	}
 
-	function get_groups($data = array())
+	function get_groups($data = [])
 	{
 		global $wpdb;
 
@@ -676,7 +676,7 @@ class mf_group
 								$intGroupID = $r->ID;
 								$sync_type = $r->meta_value;
 
-								$arr_addresses = array();
+								$arr_addresses = [];
 
 								switch($sync_type)
 								{
@@ -707,7 +707,7 @@ class mf_group
 									break;
 								}
 
-								$arr_address_ids = array();
+								$arr_address_ids = [];
 
 								foreach($arr_addresses as $arr_address)
 								{
@@ -785,7 +785,7 @@ class mf_group
 
 								$count_incoming = $count_found = $count_found_error = $count_inserted = $count_inserted_error = $count_added = $count_exists_in_group = $count_exists_in_array = $count_removed = $count_removed_error = 0;
 
-								$arr_address_ids = array();
+								$arr_address_ids = [];
 
 								foreach($arr_post_meta_api as $post_meta_api)
 								{
@@ -1486,6 +1486,7 @@ class mf_group
 				'menu_name' => __("Group", 'lang_group')
 			),
 			'public' => (wp_is_block_theme() == false),
+			'show_ui' => true,
 			'show_in_menu' => false,
 			'exclude_from_search' => true,
 			'supports' => array('title'),
@@ -1509,7 +1510,7 @@ class mf_group
 
 		wp_register_script('script_group_block_wp', $plugin_include_url."block/script_wp.js", array('wp-blocks', 'wp-element', 'wp-components', 'wp-editor', 'wp-block-editor'), $plugin_version, true);
 
-		$arr_data = array();
+		$arr_data = [];
 		get_post_children(array('add_choose_here' => true, 'post_type' => $this->post_type, 'post_status' => '', 'where' => "post_status != 'trash'".(IS_EDITOR ? "" : " AND post_author = '".get_current_user_id()."'")), $arr_data);
 
 		wp_localize_script('script_group_block_wp', 'script_group_block_wp', array(
@@ -1713,8 +1714,20 @@ class mf_group
 		$menu_title = __("List", 'lang_group');
 		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, $menu_start);
 
+		if(IS_SUPER_ADMIN)
+		{
+			$menu_title = __("List", 'lang_group')." (v2)";
+			add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, "edit.php?post_type=".$this->post_type);
+		}
+
 		$menu_title = __("Add New", 'lang_group');
 		add_submenu_page($menu_start, $menu_title, " - ".$menu_title, $menu_capability, $menu_root."create/index.php");
+
+		if(IS_SUPER_ADMIN)
+		{
+			$menu_title = __("Add New", 'lang_group')." (v2)";
+			add_submenu_page($menu_start, $menu_title, " - ".$menu_title, $menu_capability, "post-new.php?post_type=".$this->post_type);
+		}
 
 		$arr_data_temp = $this->get_for_select(array('add_choose_here' => false));
 
@@ -1735,9 +1748,6 @@ class mf_group
 			$menu_title = __("History", 'lang_group');
 			add_submenu_page($menu_root, $menu_title, $menu_title, $menu_capability, $menu_root.'version/index.php');
 		}
-
-		/*$menu_title = __("Help", 'lang_group');
-		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, $menu_root.'help/index.php');*/
 
 		if(IS_EDITOR)
 		{
@@ -1805,6 +1815,325 @@ class mf_group
 
 				echo get_notification();
 			}
+		}
+	}
+
+	function column_header($columns)
+	{
+		global $post_type;
+
+		unset($columns['date']);
+
+		switch($post_type)
+		{
+			case $this->post_type:
+				$columns['post_status'] = "";
+				$columns['amount'] = __("Amount", 'lang_group');
+				$columns['versioning'] = __("History", 'lang_group');
+
+				$rowsAddressesNotAccepted = $this->amount_in_group(array('id' => 0, 'accepted' => 0));
+
+				if($rowsAddressesNotAccepted > 0)
+				{
+					$columns['not_accepted'] = __("Not Accepted", 'lang_group');
+				}
+
+				$columns['unsubscribed'] = __("Unsubscribed", 'lang_group');
+				$columns['post_author'] = shorten_text(array('string' => __("User", 'lang_group'), 'limit' => 4));
+				$columns['sent'] = __("Sent", 'lang_group');
+			break;
+		}
+
+		return $columns;
+	}
+
+	function column_cell($column, $post_id)
+	{
+		global $wpdb, $post;
+
+		switch($post->post_type)
+		{
+			case $this->post_type:
+				$list_url = admin_url("admin.php?page=mf_group/list/index.php&intGroupID=".$post_id."&post_status=".check_var('post_status'));
+
+				switch($column)
+				{
+					case 'post_status':
+						$arr_statuses = array(
+							/*'allow_registration' => array(
+								'type' => 'bool',
+								'name' => __("Allow Registration", 'lang_group'),
+								'icon' => 'fa fa-globe',
+								'single' => true,
+								'link' => get_permalink($post_id),
+							),*/
+							'api' => array(
+								'type' => 'empty',
+								'name' => __("API Link", 'lang_group'),
+								'icon' => 'fas fa-network-wired',
+								'single' => true,
+							),
+							'api_filter' => array(
+								'type' => 'empty',
+								'name' => __("Filter API", 'lang_group'),
+								'icon' => 'fas fa-plus',
+								'single' => true,
+							),
+							'sync_users' => array(
+								'type' => 'bool',
+								'name' => __("Synchronize", 'lang_group'),
+								'icon' => 'fas fa-users',
+								'single' => true,
+							),
+							'verify_link' => array(
+								'type' => 'bool',
+								'name' => __("Add Verify Link", 'lang_group'),
+								'icon' => 'fas fa-link',
+								'single' => true,
+							),
+							'acceptance_email' => array(
+								'type' => 'bool',
+								'name' => __("Send before adding to a group", 'lang_group'),
+								'icon' => 'fa fa-paper-plane',
+								'single' => true,
+							),
+							'owner_email' => array(
+								'type' => 'empty',
+								'name' => __("Owner", 'lang_group'),
+								'icon' => 'fas fa-user-tie',
+								'single' => true,
+							),
+							'help_page' => array(
+								'type' => 'empty',
+								'name' => __("Help Page", 'lang_group'),
+								'icon' => 'far fa-question-circle',
+								'single' => true,
+							),
+							'archive_page' => array(
+								'type' => 'empty',
+								'name' => __("Archive Page", 'lang_group'),
+								'icon' => 'fas fa-archive',
+								'single' => true,
+							),
+						);
+
+						$i = 0;
+
+						foreach($arr_statuses as $key => $arr_value)
+						{
+							$post_meta = get_post_meta($post_id, $this->meta_prefix.$key, $arr_value['single']);
+
+							$do_display = false;
+
+							switch($arr_value['type'])
+							{
+								case 'bool':
+									if($post_meta != 'no' && $post_meta != '')
+									{
+										$do_display = true;
+									}
+								break;
+
+								case 'empty':
+									if($post_meta != '')
+									{
+										$do_display = true;
+									}
+								break;
+							}
+
+							if($do_display == true)
+							{
+								if($i > 0)
+								{
+									echo " ";
+								}
+
+								if(isset($arr_value['link']) && $arr_value['link'] != '')
+								{
+									echo "<a href='".$arr_value['link']."'>";
+								}
+
+									echo "<i class='".$arr_value['icon']." fa-lg blue' title='".$arr_value['name']."'></i>";
+
+								if(isset($arr_value['link']) && $arr_value['link'] != '')
+								{
+									echo "</a>";
+								}
+
+								$i++;
+							}
+						}
+					break;
+
+					case 'amount':
+						$amount = $this->amount_in_group(array('id' => $post_id));
+
+						$arr_actions = [];
+
+						if($post_status == 'publish')
+						{
+							$group_type = get_post_meta($post_id, $this->meta_prefix.'group_type', true);
+
+							if($amount > 0 && $group_type != 'stop')
+							{
+								$arr_actions['send_email'] = "<a href='".admin_url("admin.php?page=mf_group/send/index.php&intGroupID=".$post_id."&type=email")."' title='".__("Send e-mail to everyone in the group", 'lang_group')."'><i class='fa fa-paper-plane fa-lg'></i></a>";
+
+								$arr_actions = apply_filters('add_group_list_amount_actions', $arr_actions, $post_id);
+							}
+
+							if($this->is_synced($post_id) == false)
+							{
+								$arr_actions['addnremove'] = "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id."&strFilterIsMember&strFilterAccepted&strFilterUnsubscribed")."' title='".__("Add or remove", 'lang_group')."'><i class='fas fa-tasks fa-lg'></i></a>";
+
+								$arr_actions['import'] = "<a href='".admin_url("admin.php?page=mf_group/import/index.php&intGroupID=".$post_id)."' title='".__("Import Addresses", 'lang_group')."'><i class='fas fa-cloud-upload-alt fa-lg'></i></a>";
+							}
+
+							if($amount > 0)
+							{
+								$arr_actions['export_csv'] = "<a href='".wp_nonce_url($list_url."&btnExportRun&intExportType=".$post_id."&strExportFormat=csv", 'export_run', '_wpnonce_export_run')."' title='".__("Export", 'lang_group')." CSV'><i class='fas fa-file-csv fa-lg'></i></a>";
+
+								if(is_plugin_active("mf_phpexcel/index.php"))
+								{
+									$arr_actions['export_xls'] = "<a href='".wp_nonce_url($list_url."&btnExportRun&intExportType=".$post_id."&strExportFormat=xls", 'export_run', '_wpnonce_export_run')."' title='".__("Export", 'lang_group')." XLS'><i class='fas fa-file-excel fa-lg'></i></a>";
+								}
+							}
+						}
+
+						echo "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id."&strFilterIsMember=yes&strFilterAccepted=yes&strFilterUnsubscribed=no")."'>"
+							.$amount;
+
+							$amount_deleted = $this->amount_in_group(array('id' => $post_id, 'deleted' => 1));
+
+							if($amount_deleted > 0)
+							{
+								echo " <span class='grey' title='".__("Deleted", 'lang_group')."'>+ ".$amount_deleted."</span>";
+							}
+
+						echo "</a>";
+
+						if(count($arr_actions) > 0)
+						{
+							echo "<div class='row-actions'>";
+
+								foreach($arr_actions as $key => $action)
+								{
+									echo "<span class='".$key."'>".$action."</span>";
+								}
+
+							echo "</div>";
+						}
+					break;
+
+					case 'versioning':
+						$version_amount = $wpdb->get_var($wpdb->prepare("SELECT COUNT(versionID) FROM ".$wpdb->prefix."group_version WHERE groupID = '%d' LIMIT 0, 21", $post_id));
+
+						if($version_amount > 0)
+						{
+							echo "<a href='".admin_url("admin.php?page=mf_group/version/index.php&intGroupID=".$post_id)."'>".($version_amount > 20 ? "20+" : $version_amount)."</a>";
+						}
+					break;
+
+					case 'not_accepted':
+						$rowsAddressesNotAccepted = $this->amount_in_group(array('id' => $post_id, 'accepted' => 0));
+
+						if($rowsAddressesNotAccepted > 0)
+						{
+							echo "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id."&strFilterIsMember=yes&strFilterAccepted=no&strFilterUnsubscribed")."'>".$rowsAddressesNotAccepted."</a>";
+
+							$rowsAddresses2Remind = $this->amount_in_group(array('id' => $post_id, 'accepted' => 0, 'acceptance_sent' => date("Y-m-d H:i:s", strtotime("-1 week"))));
+
+							if($rowsAddresses2Remind > 0)
+							{
+								echo "<div class='row-actions'>
+									<a href='".wp_nonce_url($list_url."&btnGroupResend", 'group_resend_'.$post_id, '_wpnonce_group_resend')."' rel='confirm'>
+										<i class='fa fa-recycle fa-lg' title='".sprintf(__("There are %d subscribers that can be reminded again. Do you want to do that?", 'lang_group'), $rowsAddresses2Remind)."'></i>
+									</a>
+								</div>";
+							}
+						}
+					break;
+
+					case 'unsubscribed':
+						$rowsAddressesUnsubscribed = $this->amount_in_group(array('id' => $post_id, 'unsubscribed' => 1));
+
+						$dteMessageCreated = $wpdb->get_var($wpdb->prepare("SELECT messageCreated FROM ".$wpdb->prefix."group_message WHERE groupID = '%d' AND messageDeleted = '0' ORDER BY messageCreated DESC", $post_id));
+
+						if($rowsAddressesUnsubscribed > 0)
+						{
+							echo "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id."&strFilterIsMember=yes&strFilterAccepted=yes&strFilterUnsubscribed=yes")."'>".$rowsAddressesUnsubscribed."</a>";
+						}
+
+						if($post_status == 'publish' || $dteMessageCreated != '')
+						{
+							$user_data = get_userdata(get_current_user_id());
+
+							$user_email = $user_data->user_email;
+
+							echo "<div class='row-actions'>
+								<a href='".$this->get_group_url(array('type' => 'unsubscribe', 'group_id' => $post_id, 'email' => $user_email))."' rel='confirm'>".__("Test", 'lang_group')."</a>
+							</div>";
+						}
+					break;
+
+					case 'post_author':
+						echo get_user_info(array('id' => $post->post_author, 'type' => 'short_name'));
+					break;
+
+					case 'sent':
+						$dteMessageCreated = $wpdb->get_var($wpdb->prepare("SELECT messageCreated FROM ".$wpdb->prefix."group_message WHERE groupID = '%d' AND messageDeleted = '0' ORDER BY messageCreated DESC LIMIT 0, 1", $post_id));
+
+						if($dteMessageCreated > DEFAULT_DATE)
+						{
+							$arr_actions = [];
+
+							echo format_date($dteMessageCreated);
+
+							$arr_actions['sent'] = "<a href='".admin_url("admin.php?page=mf_group/sent/index.php&intGroupID=".$post_id)."'>".__("Sent", 'lang_group')."</a>";
+
+							$intMessageID = $wpdb->get_var($wpdb->prepare("SELECT messageID FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) WHERE groupID = '%d' AND messageDeleted = '0' AND queueSent = '0' GROUP BY messageID ORDER BY messageCreated DESC LIMIT 0, 1", $post_id));
+
+							if($intMessageID > 0)
+							{
+								$intMessageSent = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueSent = '1'", $intMessageID));
+								$intMessageNotSent = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueSent = '0'", $intMessageID));
+
+								if($intMessageSent == 0)
+								{
+									if($intMessageNotSent == 0)
+									{
+										echo "<i class='set_tr_color' rel='red'></i>";
+									}
+
+									else
+									{
+										echo "<div><i class='fa fa-spinner fa-spin fa-lg'></i> ".sprintf(__("Will be sent %s", 'lang_group'), get_next_cron())."</div>"
+										."<i class='set_tr_color' rel='yellow'></i>";
+									}
+								}
+
+								else if($intMessageSent < ($intMessageSent + $intMessageNotSent))
+								{
+									echo "&nbsp;<i class='fa fa-spinner fa-spin fa-lg'></i> ".__("Is sending", 'lang_group')
+									."<i class='set_tr_color' rel='yellow'></i>";
+								}
+							}
+
+							if(count($arr_actions) > 0)
+							{
+								echo "<div class='row-actions'>";
+
+									foreach($arr_actions as $key => $action)
+									{
+										echo "<span class='".$key."'>".$action."</span>";
+									}
+
+								echo "</div>";
+							}
+						}
+					break;
+				}
+			break;
 		}
 	}
 
@@ -1912,7 +2241,7 @@ class mf_group
 			$obj_base = new mf_base();
 		}
 
-		$arr_data_page = array();
+		$arr_data_page = [];
 		get_post_children(array('add_choose_here' => true), $arr_data_page);
 
 		$meta_boxes[] = array(
@@ -1932,11 +2261,11 @@ class mf_group
 					'id' => $this->meta_prefix.'api_filter',
 					'type' => 'textarea',
 					'placeholder' => "include:field=[value1,value2]",
-					/*'attributes' => array(
+					'attributes' => array(
 						'condition_type' => 'hide_this_if',
 						'condition_selector' => $this->meta_prefix.'api',
 						'condition_value' => '',
-					),*/
+					),
 				),
 			),
 		);
@@ -1961,16 +2290,51 @@ class mf_group
 						'condition_value' => '',
 					),*/
 				),
+				array(
+					'name' => __("Acceptance Subject", 'lang_group'),
+					'id' => $this->meta_prefix.'acceptance_subject',
+					'type' => 'text',
+					'placeholder' => __("Accept subscription to this group", 'lang_group'),
+					'attributes' => array(
+						'condition_type' => 'show_this_if',
+						'condition_selector' => $this->meta_prefix.'acceptance_email',
+						'condition_value' => 'yes',
+					),
+				),
+				array(
+					'name' => " - ".__("Text", 'lang_group'),
+					'id' => $this->meta_prefix.'acceptance_text',
+					'type' => 'textarea',
+					'placeholder' => __("You have been added to the group but will not get any messages until you have accepted this subscription by clicking the link below.", 'lang_group'),
+					'attributes' => array(
+						'condition_type' => 'show_this_if',
+						'condition_selector' => $this->meta_prefix.'acceptance_email',
+						'condition_value' => 'yes',
+					),
+				),
 
-				/*."<div class='display_acceptance_message'>"
-					.show_textfield(array('name' => 'strGroupAcceptanceSubject', 'text' => __("Subject", 'lang_group'), 'value' => $this->acceptance_subject, 'placeholder' => sprintf(__("Accept subscription to %s", 'lang_group'), $this->name)))
-					.show_wp_editor(array('name' => 'strGroupAcceptanceText', 'value' => $this->acceptance_text, 'description' => __("Example", 'lang_group').": ".sprintf(__("You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below.", 'lang_group'), $this->name)))
-				."</div>
-				<div class='display_reminder_message'>
-					<h3>".__("Reminder if the recipient has not yet accepted", 'lang_group')."</h3>"
-					.show_textfield(array('name' => 'strGroupReminderSubject', 'text' => __("Subject", 'lang_group'), 'value' => $this->reminder_subject, 'placeholder' => sprintf(__("Accept subscription to %s", 'lang_group'), $this->name)))
-					.show_wp_editor(array('name' => 'strGroupReminderText', 'value' => $this->reminder_text, 'description' => __("Example", 'lang_group').": ".sprintf(__("You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below.", 'lang_group'), $this->name)))
-				."</div>";*/
+				array(
+					'name' => __("Reminder Subject", 'lang_group'),
+					'id' => $this->meta_prefix.'reminder_subject',
+					'type' => 'text',
+					'placeholder' => __("Accept subscription to this group", 'lang_group'),
+					'attributes' => array(
+						'condition_type' => 'hide_this_if',
+						'condition_selector' => $this->meta_prefix.'acceptance_subject',
+						'condition_value' => '',
+					),
+				),
+				array(
+					'name' => " - ".__("Text", 'lang_group'),
+					'id' => $this->meta_prefix.'reminder_text',
+					'type' => 'textarea',
+					'placeholder' => __("You have been added to the group but will not get any messages until you have accepted this subscription by clicking the link below.", 'lang_group'),
+					'attributes' => array(
+						'condition_type' => 'hide_this_if',
+						'condition_selector' => $this->meta_prefix.'acceptance_subject',
+						'condition_value' => '',
+					),
+				),
 			),
 		);
 
@@ -1984,7 +2348,7 @@ class mf_group
 			$arr_data_email = $obj_email->get_from_for_select();
 			//$arr_data_abuse = $obj_email->get_from_for_select(array('type' => 'abuse'));
 
-			$arr_fields = array();
+			$arr_fields = [];
 
 			if(count($arr_data_email) > 1)
 			{
@@ -2050,6 +2414,85 @@ class mf_group
 			),
 		);
 
+		if(wp_is_block_theme() == false)
+		{
+			$arr_fields[] = array(
+				'name' => __("Allow Registration", 'lang_group'),
+				'id' => $this->meta_prefix.'allow_registration',
+				'type' => 'select',
+				'options' => get_yes_no_for_select(),
+			);
+
+			$arr_fields[] = array(
+				'name' => __("Verify that address is in Address book", 'lang_group'),
+				'id' => $this->meta_prefix.'verify_address',
+				'type' => 'select',
+				'options' => get_yes_no_for_select(),
+				'attributes' => array(
+					'condition_type' => 'show_this_if',
+					'condition_selector' => $this->meta_prefix.'allow_registration',
+					'condition_value' => 'yes',
+				),
+			);
+
+			$arr_fields[] = array(
+				'name' => __("Contact Page", 'lang_group'),
+				'id' => $this->meta_prefix.'contact_page',
+				'type' => 'select',
+				'options' => $arr_data_page,
+				'attributes' => array(
+					'condition_type' => 'show_this_if',
+					'condition_selector' => $this->meta_prefix.'allow_registration',
+					'condition_value' => 'yes',
+				),
+			);
+
+			$arr_registration_fields = $this->get_registration_fields_for_select();
+
+			$arr_fields[] = array(
+				'name' => __("Registration Fields", 'lang_group'),
+				'id' => $this->meta_prefix.'registration_fields',
+				'type' => 'select',
+				'options' => $arr_registration_fields,
+				'multiple' => true,
+				'attributes' => array(
+					'size' => get_select_size(array('count' => count($arr_registration_fields))),
+					'condition_type' => 'show_this_if',
+					'condition_selector' => $this->meta_prefix.'allow_registration',
+					'condition_value' => 'yes',
+				),
+			);
+		}
+
+		$arr_fields[] = array(
+			'name' => __("Add Verify Link", 'lang_group'),
+			'id' => $this->meta_prefix.'verify_link',
+			'type' => 'select',
+			'options' => get_yes_no_for_select(),
+			'desc' => __("In every message a hidden image/link is placed to see if the recipient has opened the message. This increases the risk of being classified as spam", 'lang_group'),
+		);
+
+		/*$amount_in_group = $this->amount_in_group();
+
+		if(!($this->id > 0) || $this->sync_users == 'yes' || $amount_in_group == 0)
+		{
+			$arr_data = array(
+				'no' => __("No", 'lang_group'),
+				'yes' => __("Users", 'lang_group'),
+			);
+
+			$arr_data = apply_filters('get_group_sync_type', $arr_data);
+
+			echo show_select(array('data' => $arr_data, 'name' => 'strGroupSyncUsers', 'text' => __("Synchronize", 'lang_group'), 'value' => $this->sync_users, 'description' => __("This will automatically add/remove addresses and their information to this group", 'lang_group')));
+		}
+
+		if($this->id > 0 && $this->api == '' && $this->allow_registration == 'no' && $this->sync_users == 'no' && $amount_in_group > 0)
+		{
+			echo show_button(array('name' => 'btnGroupRemoveRecipients', 'text' => __("Remove all recipients", 'lang_group'), 'class' => "button delete"))
+			.show_checkbox(array('name' => 'intGroupRemoveRecipientsConfirm', 'text' => __("Are you really sure?", 'lang_group'), 'value' => 1, 'description' => __("This will remove all recipients from this group and it is not possible to undo this action", 'lang_group')))
+			.wp_nonce_field('group_remove_recipients_'.$this->id, '_wpnonce_group_remove_recipients', true, false);
+		}*/
+
 		$meta_boxes[] = array(
 			'id' => $this->meta_prefix.'settings',
 			'title' => __("Settings", 'lang_group'),
@@ -2058,42 +2501,6 @@ class mf_group
 			'priority' => 'low',
 			'fields' => $arr_fields,
 		);
-
-		/*
-			if(wp_is_block_theme() == false)
-			{
-				echo show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupAllowRegistration', 'text' => __("Allow Registration", 'lang_group'), 'value' => $this->allow_registration));
-			}
-
-			echo "<div class='display_registration_fields'>"
-				.show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupVerifyAddress', 'text' => __("Verify that address is in Address book", 'lang_group'), 'value' => $this->verify_address))
-				.show_select(array('data' => $arr_data_page, 'name' => 'intGroupContactPage', 'text' => __("Contact Page", 'lang_group'), 'value' => $this->contact_page))
-				.show_select(array('data' => $this->get_registration_fields_for_select(), 'name' => 'arrGroupRegistrationFields[]', 'text' => __("Registration Fields", 'lang_group'), 'value' => $this->registration_fields))
-			."</div>"
-			.show_select(array('data' => get_yes_no_for_select(), 'name' => 'strGroupVerifyLink', 'text' => __("Add Verify Link", 'lang_group'), 'value' => $this->verify_link, 'description' => __("In every message a hidden image/link is placed to see if the recipient has opened the message. This increases the risk of being classified as spam", 'lang_group')));
-
-			$amount_in_group = $this->amount_in_group();
-
-			if(!($this->id > 0) || $this->sync_users == 'yes' || $amount_in_group == 0)
-			{
-				$arr_data = array(
-					'no' => __("No", 'lang_group'),
-					'yes' => __("Users", 'lang_group'),
-				);
-
-				$arr_data = apply_filters('get_group_sync_type', $arr_data);
-
-				echo show_select(array('data' => $arr_data, 'name' => 'strGroupSyncUsers', 'text' => __("Synchronize", 'lang_group'), 'value' => $this->sync_users, 'description' => __("This will automatically add/remove addresses and their information to this group", 'lang_group')));
-			}
-
-			if($this->id > 0 && $this->api == '' && $this->allow_registration == 'no' && $this->sync_users == 'no' && $amount_in_group > 0)
-			{
-				echo show_button(array('name' => 'btnGroupRemoveRecipients', 'text' => __("Remove all recipients", 'lang_group'), 'class' => "button delete"))
-				.show_checkbox(array('name' => 'intGroupRemoveRecipientsConfirm', 'text' => __("Are you really sure?", 'lang_group'), 'value' => 1, 'description' => __("This will remove all recipients from this group and it is not possible to undo this action", 'lang_group')))
-				.wp_nonce_field('group_remove_recipients_'.$this->id, '_wpnonce_group_remove_recipients', true, false);
-			}
-
-		echo "</div>*/
 
 		return $meta_boxes;
 	}
@@ -2128,7 +2535,7 @@ class mf_group
 
 	function api_group_table_search()
 	{
-		$json_output = array();
+		$json_output = [];
 
 		$strSearch = check_var('s', 'char');
 
@@ -2332,7 +2739,7 @@ class mf_group
 
 		if(count($this->arr_stop_list_recipients) == 0)
 		{
-			$this->arr_stop_list_groups = array();
+			$this->arr_stop_list_groups = [];
 
 			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND ".$wpdb->postmeta.".meta_key = %s AND ".$wpdb->postmeta.".meta_value = %s", $this->post_type, 'publish', $this->meta_prefix.'group_type', 'stop'));
 
@@ -2490,7 +2897,7 @@ class mf_group
 								$query_where .= " AND post_author = '".get_current_user_id()."'";
 							}
 
-							$arr_recipients = array();
+							$arr_recipients = [];
 							$arr_stop_list_recipients = $this->get_stop_list_recipients();
 
 							foreach($this->arr_group_id as $this->group_id)
@@ -2766,7 +3173,7 @@ class mf_group
 		return $wpdb->get_var($wpdb->prepare("SELECT messageFrom FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->posts." ON ".$wpdb->prefix."group_message.groupID = ".$wpdb->posts.".ID AND post_type = %s AND messageDeleted = '0' ORDER BY messageCreated DESC LIMIT 0, 1", $this->post_type));
 	}
 
-	function get_name($data = array())
+	function get_name($data = [])
 	{
 		global $wpdb;
 
@@ -2989,7 +3396,7 @@ class mf_group
 		}
 	}
 
-	function amount_in_group($data = array())
+	function amount_in_group($data = [])
 	{
 		global $wpdb;
 
@@ -3085,7 +3492,7 @@ if(class_exists('mf_list_table'))
 						'fields' => array('ID'),
 					));
 
-					$arr_users = array();
+					$arr_users = [];
 
 					foreach($users as $user)
 					{
@@ -3154,31 +3561,31 @@ if(class_exists('mf_list_table'))
 					$post_edit_url = "#";
 					$post_author = $item['post_author'];
 
-					$actions = array();
+					$arr_actions = [];
 
 					if($post_status != 'trash')
 					{
 						$post_edit_url = admin_url("admin.php?page=mf_group/create/index.php&intGroupID=".$post_id);
 
-						$actions['edit'] = "<a href='".$post_edit_url."'>".__("Edit", 'lang_group')."</a>";
+						$arr_actions['edit'] = "<a href='".$post_edit_url."'>".__("Edit", 'lang_group')."</a>";
 
 						if($post_author == get_current_user_id() || IS_ADMINISTRATOR)
 						{
-							$actions['delete'] = "<a href='".wp_nonce_url($list_url."&btnGroupDelete", 'group_delete_'.$post_id, '_wpnonce_group_delete')."'>".__("Delete", 'lang_group')."</a>";
+							$arr_actions['delete'] = "<a href='".wp_nonce_url($list_url."&btnGroupDelete", 'group_delete_'.$post_id, '_wpnonce_group_delete')."'>".__("Delete", 'lang_group')."</a>";
 						}
 
 						if($post_status == 'ignore')
 						{
-							$actions['activate'] = "<a href='".wp_nonce_url($list_url."&btnGroupActivate", 'group_activate_'.$post_id, '_wpnonce_group_activate')."'>".__("Activate", 'lang_group')."</a>";
+							$arr_actions['activate'] = "<a href='".wp_nonce_url($list_url."&btnGroupActivate", 'group_activate_'.$post_id, '_wpnonce_group_activate')."'>".__("Activate", 'lang_group')."</a>";
 						}
 
 						else
 						{
-							$actions['inactivate'] = "<a href='".wp_nonce_url($list_url."&btnGroupInactivate", 'group_inactivate_'.$post_id, '_wpnonce_group_inactivate')."'>".__("Inactivate", 'lang_group')."</a>";
+							$arr_actions['inactivate'] = "<a href='".wp_nonce_url($list_url."&btnGroupInactivate", 'group_inactivate_'.$post_id, '_wpnonce_group_inactivate')."'>".__("Inactivate", 'lang_group')."</a>";
 						}
 
 						$block_code = '<!-- wp:mf/group {"group_id":"'.$post_id.'"%} /-->';
-						$arr_ids = apply_filters('get_page_from_block_code', array(), $block_code);
+						$arr_ids = apply_filters('get_page_from_block_code', [], $block_code);
 
 						if(count($arr_ids) > 0)
 						{
@@ -3186,10 +3593,10 @@ if(class_exists('mf_list_table'))
 							{
 								if($this->check_allow_edit())
 								{
-									$actions['edit_page'] = "<a href='".admin_url("post.php?post=".$post_id_temp."&action=edit")."'>".__("Edit Page", 'lang_group')."</a>";
+									$arr_actions['edit_page'] = "<a href='".admin_url("post.php?post=".$post_id_temp."&action=edit")."'>".__("Edit Page", 'lang_group')."</a>";
 								}
 
-								$actions['view_page'] = "<a href='".get_permalink($post_id_temp)."'>".__("View", 'lang_group')."</a>";
+								$arr_actions['view_page'] = "<a href='".get_permalink($post_id_temp)."'>".__("View", 'lang_group')."</a>";
 							}
 						}
 
@@ -3203,7 +3610,7 @@ if(class_exists('mf_list_table'))
 
 								if($post_url != '')
 								{
-									$actions['view'] = "<a href='".$post_url."'>".__("View", 'lang_group')."</a>";
+									$arr_actions['view'] = "<a href='".$post_url."'>".__("View", 'lang_group')."</a>";
 								}
 							}
 						}
@@ -3211,7 +3618,7 @@ if(class_exists('mf_list_table'))
 
 					else
 					{
-						$actions['recover'] = "<a href='".admin_url("admin.php?page=mf_group/create/index.php&intGroupID=".$post_id."&recover")."'>".__("Recover", 'lang_group')."</a>";
+						$arr_actions['recover'] = "<a href='".admin_url("admin.php?page=mf_group/create/index.php&intGroupID=".$post_id."&recover")."'>".__("Recover", 'lang_group')."</a>";
 					}
 
 					if(get_post_meta($post_id, $obj_group->meta_prefix.'group_type', true) == 'stop')
@@ -3222,7 +3629,7 @@ if(class_exists('mf_list_table'))
 					}
 
 					$out .= "<a href='".$post_edit_url."'>".$item['post_title']."</a>"
-					.$this->row_actions($actions);
+					.$this->row_actions($arr_actions);
 				break;
 
 				case 'post_status':
@@ -3336,7 +3743,7 @@ if(class_exists('mf_list_table'))
 				case 'amount':
 					$amount = $obj_group->amount_in_group(array('id' => $post_id));
 
-					$actions = array();
+					$arr_actions = [];
 
 					if($post_status == 'publish')
 					{
@@ -3344,25 +3751,25 @@ if(class_exists('mf_list_table'))
 
 						if($amount > 0 && $group_type != 'stop')
 						{
-							$actions['send_email'] = "<a href='".admin_url("admin.php?page=mf_group/send/index.php&intGroupID=".$post_id."&type=email")."' title='".__("Send e-mail to everyone in the group", 'lang_group')."'><i class='fa fa-paper-plane fa-lg'></i></a>";
+							$arr_actions['send_email'] = "<a href='".admin_url("admin.php?page=mf_group/send/index.php&intGroupID=".$post_id."&type=email")."' title='".__("Send e-mail to everyone in the group", 'lang_group')."'><i class='fa fa-paper-plane fa-lg'></i></a>";
 
-							$actions = apply_filters('add_group_list_amount_actions', $actions, $post_id);
+							$arr_actions = apply_filters('add_group_list_amount_actions', $arr_actions, $post_id);
 						}
 
 						if($obj_group->is_synced($post_id) == false)
 						{
-							$actions['addnremove'] = "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id."&strFilterIsMember&strFilterAccepted&strFilterUnsubscribed")."' title='".__("Add or remove", 'lang_group')."'><i class='fas fa-tasks fa-lg'></i></a>";
+							$arr_actions['addnremove'] = "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id."&strFilterIsMember&strFilterAccepted&strFilterUnsubscribed")."' title='".__("Add or remove", 'lang_group')."'><i class='fas fa-tasks fa-lg'></i></a>";
 
-							$actions['import'] = "<a href='".admin_url("admin.php?page=mf_group/import/index.php&intGroupID=".$post_id)."' title='".__("Import Addresses", 'lang_group')."'><i class='fas fa-cloud-upload-alt fa-lg'></i></a>";
+							$arr_actions['import'] = "<a href='".admin_url("admin.php?page=mf_group/import/index.php&intGroupID=".$post_id)."' title='".__("Import Addresses", 'lang_group')."'><i class='fas fa-cloud-upload-alt fa-lg'></i></a>";
 						}
 
 						if($amount > 0)
 						{
-							$actions['export_csv'] = "<a href='".wp_nonce_url($list_url."&btnExportRun&intExportType=".$post_id."&strExportFormat=csv", 'export_run', '_wpnonce_export_run')."' title='".__("Export", 'lang_group')." CSV'><i class='fas fa-file-csv fa-lg'></i></a>";
+							$arr_actions['export_csv'] = "<a href='".wp_nonce_url($list_url."&btnExportRun&intExportType=".$post_id."&strExportFormat=csv", 'export_run', '_wpnonce_export_run')."' title='".__("Export", 'lang_group')." CSV'><i class='fas fa-file-csv fa-lg'></i></a>";
 
 							if(is_plugin_active("mf_phpexcel/index.php"))
 							{
-								$actions['export_xls'] = "<a href='".wp_nonce_url($list_url."&btnExportRun&intExportType=".$post_id."&strExportFormat=xls", 'export_run', '_wpnonce_export_run')."' title='".__("Export", 'lang_group')." XLS'><i class='fas fa-file-excel fa-lg'></i></a>";
+								$arr_actions['export_xls'] = "<a href='".wp_nonce_url($list_url."&btnExportRun&intExportType=".$post_id."&strExportFormat=xls", 'export_run', '_wpnonce_export_run')."' title='".__("Export", 'lang_group')." XLS'><i class='fas fa-file-excel fa-lg'></i></a>";
 							}
 						}
 					}
@@ -3378,7 +3785,7 @@ if(class_exists('mf_list_table'))
 						}
 
 					$out .= "</a>"
-					.$this->row_actions($actions);
+					.$this->row_actions($arr_actions);
 				break;
 
 				case 'versioning':
@@ -3441,11 +3848,11 @@ if(class_exists('mf_list_table'))
 
 					if($dteMessageCreated > DEFAULT_DATE)
 					{
-						$actions = array();
+						$arr_actions = [];
 
 						$out .= format_date($dteMessageCreated);
 
-						$actions['sent'] = "<a href='".admin_url("admin.php?page=mf_group/sent/index.php&intGroupID=".$post_id)."'>".__("Sent", 'lang_group')."</a>";
+						$arr_actions['sent'] = "<a href='".admin_url("admin.php?page=mf_group/sent/index.php&intGroupID=".$post_id)."'>".__("Sent", 'lang_group')."</a>";
 
 						$intMessageID = $wpdb->get_var($wpdb->prepare("SELECT messageID FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) WHERE groupID = '%d' AND messageDeleted = '0' AND queueSent = '0' GROUP BY messageID ORDER BY messageCreated DESC LIMIT 0, 1", $post_id));
 
@@ -3475,7 +3882,7 @@ if(class_exists('mf_list_table'))
 							}
 						}
 
-						$out .= $this->row_actions($actions);
+						$out .= $this->row_actions($arr_actions);
 					}
 				break;
 
@@ -3562,7 +3969,7 @@ if(class_exists('mf_list_table'))
 			switch($column_name)
 			{
 				case 'messageType':
-					$actions = array(
+					$arr_actions = array(
 						'view_data' => "<i class='fa fa-eye fa-lg' title='".__("View Content", 'lang_group')."'></i>",
 						'send_to_group' => "<a href='".admin_url("admin.php?page=mf_group/send/index.php&intGroupID=".$this->arr_settings['intGroupID']."&intMessageID=".$intMessageID2)."'><i class='fa fa-users fa-lg' title='".__("Send to group again", 'lang_group')."'></i></a>",
 						'send_email' => "<a href='".admin_url("admin.php?page=mf_email/send/index.php&intGroupMessageID=".$intMessageID2)."'><i class='fa fa-envelope fa-lg' title='".__("Send to e-mail", 'lang_group')."'></i></a>",
@@ -3584,13 +3991,13 @@ if(class_exists('mf_list_table'))
 					}
 
 					$out .= $strMessageType
-					.$this->row_actions($actions);
+					.$this->row_actions($arr_actions);
 				break;
 
 				case 'messageFrom':
 					$strMessageFrom = $item['messageFrom'];
 
-					$actions = array();
+					$arr_actions = [];
 
 					$strMessageFromName = "";
 
@@ -3598,11 +4005,11 @@ if(class_exists('mf_list_table'))
 					{
 						list($strMessageFromName, $strMessageFrom) = explode("|", $strMessageFrom);
 
-						$actions['from'] = $strMessageFromName;
+						$arr_actions['from'] = $strMessageFromName;
 					}
 
 					$out .= $strMessageFrom
-					.$this->row_actions($actions);
+					.$this->row_actions($arr_actions);
 				break;
 
 				case 'messageName':
@@ -3617,17 +4024,17 @@ if(class_exists('mf_list_table'))
 						$out .= shorten_text(array('string' => $item['messageText'], 'limit' => 20));
 					}
 
-					$actions = array();
+					$arr_actions = [];
 
 					if(IS_ADMINISTRATOR || $item['userID'] == get_current_user_id())
 					{
 						if($item['messageDeleted'] == 0)
 						{
-							$actions['delete'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/sent/index.php&btnMessageDelete&intGroupID=".$this->arr_settings['intGroupID']."&intMessageID=".$intMessageID2), 'message_delete_'.$intMessageID2, '_wpnonce_message_delete')."'>".__("Delete", 'lang_group')."</a>";
+							$arr_actions['delete'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/sent/index.php&btnMessageDelete&intGroupID=".$this->arr_settings['intGroupID']."&intMessageID=".$intMessageID2), 'message_delete_'.$intMessageID2, '_wpnonce_message_delete')."'>".__("Delete", 'lang_group')."</a>";
 						}
 					}
 
-					$out .= $this->row_actions($actions);
+					$out .= $this->row_actions($arr_actions);
 				break;
 
 				case 'messageSchedule':
@@ -3655,13 +4062,13 @@ if(class_exists('mf_list_table'))
 						$class = "yellow";
 					}
 
-					$actions = array();
+					$arr_actions = [];
 
 					if($intMessageSent > 0)
 					{
 						if($item['messageCreated'] > date("Y-m-d H:i:s", strtotime("-1 month")))
 						{
-							$actions['message'] = "<a href='".admin_url("admin.php?page=mf_group/message/index.php&intMessageID=".$intMessageID2)."'>".__("View", 'lang_group')."</a>";
+							$arr_actions['message'] = "<a href='".admin_url("admin.php?page=mf_group/message/index.php&intMessageID=".$intMessageID2)."'>".__("View", 'lang_group')."</a>";
 
 							$dteQueueSentTime_first = $wpdb->get_var($wpdb->prepare("SELECT MIN(queueSentTime) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueSent = '1'", $intMessageID2));
 
@@ -3671,27 +4078,27 @@ if(class_exists('mf_list_table'))
 
 								if($is_same_day)
 								{
-									$actions['sent'] = date("G:i", strtotime($dteQueueSentTime_first));
+									$arr_actions['sent'] = date("G:i", strtotime($dteQueueSentTime_first));
 								}
 
 								else
 								{
-									$actions['sent'] = format_date($dteQueueSentTime_first);
+									$arr_actions['sent'] = format_date($dteQueueSentTime_first);
 								}
 
 								$dteQueueSentTime_last = $wpdb->get_var($wpdb->prepare("SELECT MAX(queueSentTime) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueSent = '1'", $intMessageID2));
 
 								if($is_same_day)
 								{
-									if(date("G:i", strtotime($dteQueueSentTime_last)) != $actions['sent'])
+									if(date("G:i", strtotime($dteQueueSentTime_last)) != $arr_actions['sent'])
 									{
-										$actions['sent'] .= " - ".date("G:i", strtotime($dteQueueSentTime_last));
+										$arr_actions['sent'] .= " - ".date("G:i", strtotime($dteQueueSentTime_last));
 									}
 								}
 
 								else if($dteQueueSentTime_last > $dteQueueSentTime_first && format_date($dteQueueSentTime_last) != format_date($dteQueueSentTime_first))
 								{
-									$actions['sent'] .= " - ".format_date($dteQueueSentTime_last);
+									$arr_actions['sent'] .= " - ".format_date($dteQueueSentTime_last);
 								}
 							}
 						}
@@ -3702,27 +4109,27 @@ if(class_exists('mf_list_table'))
 
 						if($intMessageNotReceived > 0)
 						{
-							$actions['not_received'] = "<i class='fa fa-times red'></i> ".mf_format_number($intMessageNotReceived / $intMessageSent * 100, 1)."% ".__("Not Received", 'lang_group');
+							$arr_actions['not_received'] = "<i class='fa fa-times red'></i> ".mf_format_number($intMessageNotReceived / $intMessageSent * 100, 1)."% ".__("Not Received", 'lang_group');
 						}
 
 						if($intMessageDeferred > 0)
 						{
-							$actions['deferred'] = "<i class='fa fa-times red'></i> ".mf_format_number($intMessageDeferred / $intMessageSent * 100, 1)."% ".__("Deferred", 'lang_group');
+							$arr_actions['deferred'] = "<i class='fa fa-times red'></i> ".mf_format_number($intMessageDeferred / $intMessageSent * 100, 1)."% ".__("Deferred", 'lang_group');
 						}
 
 						if($intMessageViewed > 0 && get_option('setting_group_trace_links') == 'yes')
 						{
-							$actions['read'] = "<i class='fa fa-check green'></i> ".mf_format_number($intMessageViewed / $intMessageSent * 100, 1)."% ".__("Read", 'lang_group');
+							$arr_actions['read'] = "<i class='fa fa-check green'></i> ".mf_format_number($intMessageViewed / $intMessageSent * 100, 1)."% ".__("Read", 'lang_group');
 						}
 					}
 
 					if($intMessageNotSent > 0)
 					{
-						$actions['abort'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/sent/index.php&btnMessageAbort&intGroupID=".$this->arr_settings['intGroupID']."&intMessageID=".$intMessageID2), 'message_abort_'.$intMessageID2, '_wpnonce_message_abort')."'>".__("Abort", 'lang_group')."</a>";
+						$arr_actions['abort'] = "<a href='".wp_nonce_url(admin_url("admin.php?page=mf_group/sent/index.php&btnMessageAbort&intGroupID=".$this->arr_settings['intGroupID']."&intMessageID=".$intMessageID2), 'message_abort_'.$intMessageID2, '_wpnonce_message_abort')."'>".__("Abort", 'lang_group')."</a>";
 					}
 
 					$out .= $intMessageSent." / ".$intMessageTotal
-					.$this->row_actions($actions);
+					.$this->row_actions($arr_actions);
 
 					if($class != '')
 					{
@@ -3997,7 +4404,7 @@ if(class_exists('mf_export'))
 
 			foreach($result as $r)
 			{
-				$arr_data = array();
+				$arr_data = [];
 
 				foreach($does_data_exist as $key => $value)
 				{
@@ -4102,7 +4509,7 @@ class widget_group extends WP_Widget
 
 		$instance = wp_parse_args((array)$instance, $this->arr_default);
 
-		$arr_data = array();
+		$arr_data = [];
 		get_post_children(array('add_choose_here' => true, 'post_type' => $this->obj_group->post_type, 'post_status' => '', 'where' => "post_status != 'trash'".(IS_EDITOR ? "" : " AND post_author = '".get_current_user_id()."'")), $arr_data);
 
 		echo "<div class='mf_form'>"

@@ -14,7 +14,7 @@ if(!isset($obj_group))
 	$obj_group = new mf_group();
 }
 
-$json_output = array();
+$json_output = [];
 
 $type = check_var('type', 'char');
 
@@ -51,7 +51,7 @@ switch($type)
 			if($wpdb->num_rows > 0)
 			{
 				$json_output['success'] = true;
-				$json_output['data'] = array();
+				$json_output['data'] = [];
 
 				foreach($result as $r)
 				{

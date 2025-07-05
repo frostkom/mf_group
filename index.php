@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description:
-Version: 5.12.5
+Version: 5.12.6
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://martinfors.se
@@ -37,6 +37,9 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 		add_filter('filter_sites_table_pages', array($obj_group, 'filter_sites_table_pages'));
 
 		add_action('admin_notices', array($obj_group, 'admin_notices'));
+
+		add_filter('manage_'.$obj_group->post_type.'_posts_columns', array($obj_group, 'column_header'), 5);
+		add_action('manage_'.$obj_group->post_type.'_posts_custom_column', array($obj_group, 'column_cell'), 5, 2);
 
 		add_action('wp_trash_post', array($obj_group, 'wp_trash_post'));
 		add_action('deleted_user', array($obj_group, 'deleted_user'));
@@ -75,7 +78,7 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 
 		$default_charset = (DB_CHARSET != '' ? DB_CHARSET : 'utf8');
 
-		$arr_add_column = $arr_update_column = $arr_add_index = array();
+		$arr_add_column = $arr_update_column = $arr_add_index = [];
 
 		$wpdb->query("CREATE TABLE IF NOT EXISTS ".$wpdb->prefix."group_message (
 			messageID INT UNSIGNED NOT NULL AUTO_INCREMENT,

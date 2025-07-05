@@ -37,7 +37,7 @@ echo "<div class='wrap'>
 										$site_title = get_bloginfo('name');
 										$admin_email = get_bloginfo('admin_email');
 
-										$arr_data_from = array();
+										$arr_data_from = [];
 										$arr_data_from[''] = "-- ".__("Choose Here", 'lang_group')." --";
 
 										if($user_email != '')
@@ -109,7 +109,7 @@ echo "<div class='wrap'>
 
 					if($obj_group->message_type == "email")
 					{
-						$arr_data_source = array();
+						$arr_data_source = [];
 						get_post_children(array('add_choose_here' => true), $arr_data_source);
 
 						echo "<div class='postbox display_parent'>
