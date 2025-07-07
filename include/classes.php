@@ -1664,7 +1664,7 @@ class mf_group
 
 			if($rows > 0)
 			{
-				$count_message = "&nbsp;<i class='fa fa-spinner fa-spin'></i>";
+				$count_message = "&nbsp;".apply_filters('get_loading_animation', '');
 			}
 		}
 
@@ -2107,14 +2107,14 @@ class mf_group
 
 									else
 									{
-										echo "<div><i class='fa fa-spinner fa-spin fa-lg'></i> ".sprintf(__("Will be sent %s", 'lang_group'), get_next_cron())."</div>"
+										echo "<div>".apply_filters('get_loading_animation', '')." ".sprintf(__("Will be sent %s", 'lang_group'), get_next_cron())."</div>"
 										."<i class='set_tr_color' rel='yellow'></i>";
 									}
 								}
 
 								else if($intMessageSent < ($intMessageSent + $intMessageNotSent))
 								{
-									echo "&nbsp;<i class='fa fa-spinner fa-spin fa-lg'></i> ".__("Is sending", 'lang_group')
+									echo "&nbsp;".apply_filters('get_loading_animation', '')." ".__("Is sending", 'lang_group')
 									."<i class='set_tr_color' rel='yellow'></i>";
 								}
 							}
@@ -3870,14 +3870,14 @@ if(class_exists('mf_list_table'))
 
 								else
 								{
-									$out .= "<div><i class='fa fa-spinner fa-spin fa-lg'></i> ".sprintf(__("Will be sent %s", 'lang_group'), get_next_cron())."</div>"
+									$out .= "<div>".apply_filters('get_loading_animation', '')." ".sprintf(__("Will be sent %s", 'lang_group'), get_next_cron())."</div>"
 									."<i class='set_tr_color' rel='yellow'></i>";
 								}
 							}
 
 							else if($intMessageSent < ($intMessageSent + $intMessageNotSent))
 							{
-								$out .= "&nbsp;<i class='fa fa-spinner fa-spin fa-lg'></i> ".__("Is sending", 'lang_group')
+								$out .= "&nbsp;".apply_filters('get_loading_animation', '')." ".__("Is sending", 'lang_group')
 								."<i class='set_tr_color' rel='yellow'></i>";
 							}
 						}
