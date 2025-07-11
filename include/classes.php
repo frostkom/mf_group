@@ -1475,31 +1475,8 @@ class mf_group
 		);
 	}
 
-	function init()
+	function enqueue_block_editor_assets()
 	{
-		load_plugin_textdomain('lang_group', false, str_replace("/include", "", dirname(plugin_basename(__FILE__)))."/lang/");
-
-		// Post types
-		#######################
-		register_post_type($this->post_type, array(
-			'labels' => array(
-				'name' => __("Group", 'lang_group'),
-				'singular_name' => __("Group", 'lang_group'),
-				'menu_name' => __("Group", 'lang_group')
-			),
-			'public' => (wp_is_block_theme() == false),
-			'show_ui' => true,
-			'show_in_menu' => false,
-			'exclude_from_search' => true,
-			'supports' => array('title'),
-			'rewrite' => array(
-				'slug' => 'group',
-			),
-		));
-		#######################
-
-		// Blocks
-		#######################
 		global $obj_base;
 
 		if(!isset($obj_base))
@@ -1529,6 +1506,27 @@ class mf_group
 			'group_button_icon_label' => __("Button Icon", 'lang_group'),
 			'group_button_icon' => $obj_base->get_icons_for_select(),
 		));
+	}
+
+	function init()
+	{
+		load_plugin_textdomain('lang_group', false, str_replace("/include", "", dirname(plugin_basename(__FILE__)))."/lang/");
+
+		register_post_type($this->post_type, array(
+			'labels' => array(
+				'name' => __("Group", 'lang_group'),
+				'singular_name' => __("Group", 'lang_group'),
+				'menu_name' => __("Group", 'lang_group')
+			),
+			'public' => (wp_is_block_theme() == false),
+			'show_ui' => true,
+			'show_in_menu' => false,
+			'exclude_from_search' => true,
+			'supports' => array('title'),
+			'rewrite' => array(
+				'slug' => 'group',
+			),
+		));
 
 		register_block_type('mf/group', array(
 			'editor_script' => 'script_group_block_wp',
@@ -1536,7 +1534,6 @@ class mf_group
 			'render_callback' => array($this, 'block_render_callback'),
 			//'style' => 'style_base_block_wp',
 		));
-		#######################
 	}
 
 	function settings_group()
