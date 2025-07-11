@@ -77,6 +77,8 @@ class mf_group
 
 		$tbl_group->select_data(array(
 			'select' => "ID, post_title",
+			'debug' => true,
+			'debug_type' => 'log',
 		));
 
 		$arr_data = [];
@@ -2533,7 +2535,7 @@ class mf_group
 		return $arr_used;
 	}
 
-	function api_group_table_search()
+	/*function api_group_table_search()
 	{
 		$json_output = [];
 
@@ -2549,7 +2551,7 @@ class mf_group
 		header("Content-Type: application/json");
 		echo json_encode($json_output);
 		die();
-	}
+	}*/
 
 	function wp_sitemaps_post_types($post_types)
 	{
@@ -3457,7 +3459,7 @@ if(class_exists('mf_list_table'))
 			$this->orderby_default = "post_title";
 
 			$this->arr_settings['has_autocomplete'] = true;
-			$this->arr_settings['action'] = 'api_group_table_search';
+			//$this->arr_settings['action'] = 'api_group_table_search';
 		}
 
 		function init_fetch()
