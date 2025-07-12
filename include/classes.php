@@ -69,42 +69,38 @@ class mf_group
 
 	function get_for_select($data = [])
 	{
+		global $wpdb;
+
 		if(!isset($data['add_choose_here'])){		$data['add_choose_here'] = true;}
 		if(!isset($data['include_amount'])){		$data['include_amount'] = true;}
 		if(!isset($data['return_to_metabox'])){		$data['return_to_metabox'] = true;}
 
-		$tbl_group = new mf_group_table();
-
-		$tbl_group->select_data(array(
-			'select' => "ID, post_title",
-			'debug' => true,
-			'debug_type' => 'log',
-		));
+		$result = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title FROM ".$wpdb->posts." WHERE post_type = %s AND post_status NOT IN('trash', 'ignore') GROUP BY ID ORDER BY post_title ASC", $this->post_type));
 
 		$arr_data = [];
 
-		if(count($tbl_group->data) > 0)
+		if($wpdb->num_rows > 0)
 		{
 			if($data['add_choose_here'])
 			{
 				$arr_data[''] = "-- ".__("Choose Here", 'lang_group')." --";
 			}
 
-			foreach($tbl_group->data as $r)
+			foreach($result as $r)
 			{
 				if($data['include_amount'] == true)
 				{
-					$amount = $this->amount_in_group(array('id' => $r['ID']));
+					$amount = $this->amount_in_group(array('id' => $r->ID));
 
 					if($data['return_to_metabox'] == true)
 					{
-						$arr_data[$r['ID']] = $r['post_title']." (".$amount.")";
+						$arr_data[$r->ID] = $r->post_title." (".$amount.")";
 					}
 
 					else
 					{
-						$arr_data[$r['ID']] = array(
-							'name' => $r['post_title']." (".$amount.")",
+						$arr_data[$r->ID] = array(
+							'name' => $r->post_title." (".$amount.")",
 							'attributes' => array(
 								'amount' => $amount,
 							),
@@ -116,13 +112,13 @@ class mf_group
 				{
 					if($data['return_to_metabox'] == true)
 					{
-						$arr_data[$r['ID']] = $r['post_title'];
+						$arr_data[$r->ID] = $r->post_title;
 					}
 
 					else
 					{
-						$arr_data[$r['ID']] = array(
-							'name' => $r['post_title'],
+						$arr_data[$r->ID] = array(
+							'name' => $r->post_title,
 						);
 					}
 				}
@@ -1549,7 +1545,7 @@ class mf_group
 			'setting_group_outgoing_text' => __("Outgoing Text", 'lang_group'),
 		);
 
-		if(count($this->get_for_select()) > 0)
+		if(count($this->get_for_select(array('add_choose_here' => false))) > 0)
 		{
 			$arr_settings['setting_group_import'] = __("Add all imported to this group", 'lang_group');
 		}
@@ -2556,13 +2552,6 @@ class mf_group
 
 		return $post_types;
 	}
-
-	/*function wp_head()
-	{
-		$plugin_include_url = plugin_dir_url(__FILE__);
-
-		mf_enqueue_style('style_group', $plugin_include_url."style.css");
-	}*/
 
 	function get_emails_left_to_send($amount, $email, $type = '')
 	{
