@@ -3,15 +3,12 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description:
-Version: 5.13.2
+Version: 5.13.3
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://martinfors.se
 Text Domain: lang_group
 Domain Path: /lang
-
-Depends: MF Base, MF Address Book
-GitHub Plugin URI: frostkom/mf_group
 */
 
 if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') && is_plugin_active("mf_base/index.php") && is_plugin_active("mf_address/index.php"))
