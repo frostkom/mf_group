@@ -3,12 +3,14 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description:
-Version: 5.13.3
+Version: 5.13.4
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://martinfors.se
 Text Domain: lang_group
 Domain Path: /lang
+
+Requires Plugins: meta-box
 */
 
 if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') && is_plugin_active("mf_base/index.php") && is_plugin_active("mf_address/index.php"))
@@ -70,7 +72,11 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 	{
 		global $wpdb, $obj_group;
 
-		require_plugin("mf_address/index.php", "MF Address Book");
+		if(is_admin() && function_exists('is_plugin_active') && !is_plugin_active("mf_address/index.php"))
+		{
+			deactivate_plugins(plugin_basename(__FILE__));
+			wp_die(sprintf(__("You need to install the plugin %s first", 'lang_group'), "MF Address Book"));
+		}
 
 		$default_charset = (DB_CHARSET != '' ? DB_CHARSET : 'utf8');
 
