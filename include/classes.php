@@ -1276,28 +1276,6 @@ class mf_group
 					$post_url = get_permalink($intGroupContactPage);
 					$post_title = get_the_title($intGroupContactPage);
 
-					/*if($strAddressEmail != '')
-					{
-						global $obj_form;
-
-						if(!isset($obj_form))
-						{
-							$obj_form = new mf_form();
-						}
-
-						$obj_form->get_form_id_from_post_content($intGroupContactPage);
-
-						if($obj_form->id > 0)
-						{
-							$form_field_id = $obj_form->get_post_info(array('select' => 'post_name'))."_".$obj_form->get_form_email_field();
-
-							if($form_field_id != '')
-							{
-								$post_url .= "?".$form_field_id."=".$strAddressEmail;
-							}
-						}
-					}*/
-
 					$out .= "<p><a href='".$post_url."'>".$post_title."</a></p>";
 				}
 			}
