@@ -2569,12 +2569,15 @@ class mf_group
 				$query_where = " AND messageFrom LIKE '%".esc_sql($email)."'";
 			}
 
-			$wpdb->get_results("SELECT queueID FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) WHERE queueSent = '1' AND queueSentTime > DATE_SUB(NOW(), INTERVAL 1 HOUR)".$query_where);
-			$amount_temp -= $wpdb->num_rows;
-
-			if($type != '')
+			if(does_table_exist($wpdb->prefix."group_message"))
 			{
-				$this->emails_left_to_send[$type][$email] = $amount_temp;
+				$wpdb->get_results("SELECT queueID FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) WHERE queueSent = '1' AND queueSentTime > DATE_SUB(NOW(), INTERVAL 1 HOUR)".$query_where);
+				$amount_temp -= $wpdb->num_rows;
+
+				if($type != '')
+				{
+					$this->emails_left_to_send[$type][$email] = $amount_temp;
+				}
 			}
 		}
 
