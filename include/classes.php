@@ -1432,7 +1432,7 @@ class mf_group
 		if($attributes['group_id'] > 0)
 		{
 			$out .= "<div".parse_block_attributes(array('class' => "widget widget_group", 'attributes' => $attributes)).">
-				<div class='section'>"
+				<div>" // class='section'
 					.$this->show_group_registration_form(array('id' => $attributes['group_id'], 'label_type' => $attributes['group_label_type'], 'display_consent' => $attributes['group_display_consent'], 'button_text' => $attributes['group_button_text'], 'button_icon' => $attributes['group_button_icon']))
 				."</div>"
 			."</div>";
@@ -4435,7 +4435,7 @@ class widget_group extends WP_Widget
 					.$after_title;
 				}
 
-				echo "<div class='section'>"
+				echo "<div>" // class='section'
 					.$this->obj_group->show_group_registration_form(array('id' => $instance['group_id'], 'text' => $instance['group_text'], 'label_type' => $instance['group_label_type'], 'display_consent' => $instance['group_display_consent'], 'button_text' => $instance['group_button_text'], 'button_icon' => $instance['group_button_icon']))
 				."</div>"
 			.$after_widget;
