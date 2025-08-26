@@ -3368,7 +3368,7 @@ class mf_group
 	{
 		global $wpdb;
 
-		if(does_table_exist($wpdb->prefix."address2group"))
+		if(does_table_exist($wpdb->prefix."address") && does_table_exist($wpdb->prefix."address2group"))
 		{
 			if(!isset($data['id'])){				$data['id'] = $this->id;}
 			if(!isset($data['accepted'])){			$data['accepted'] = 1;}
