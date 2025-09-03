@@ -2982,7 +2982,7 @@ class mf_group
 						//'post_status' => $this->public,
 						'post_status' => 'publish',
 						'post_title' => $this->name,
-						'meta_input' => apply_filters('filter_meta_input', array(
+						'meta_input' => array(
 							$this->meta_prefix.'api' => $this->api,
 							$this->meta_prefix.'api_filter' => $this->api_filter,
 							$this->meta_prefix.'acceptance_email' => $this->acceptance_email,
@@ -2998,13 +2998,14 @@ class mf_group
 							$this->meta_prefix.'owner_email' => $this->owner_email,
 							$this->meta_prefix.'help_page' => $this->help_page,
 							$this->meta_prefix.'archive_page' => $this->archive_page,
-						)),
+						),
 					);
 
 					if($this->id > 0)
 					{
 						$post_data['ID'] = $this->id;
 						$post_data['post_modified'] = date("Y-m-d H:i:s");
+						$post_data['meta_input'] = apply_filters('filter_meta_input', $post_data['meta_input'], $post_data['ID']);
 
 						if(wp_update_post($post_data) > 0)
 						{
@@ -3019,6 +3020,8 @@ class mf_group
 
 					else
 					{
+						$post_data['meta_input'] = apply_filters('filter_meta_input', $post_data['meta_input']);
+
 						$this->id = wp_insert_post($post_data);
 
 						if($this->id > 0)
