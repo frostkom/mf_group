@@ -663,7 +663,7 @@ class mf_group
 					#############################
 					if($is_syncing == false)
 					{
-						$result = $wpdb->get_results($wpdb->prepare("SELECT ID, meta_value FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND meta_key = %s AND meta_value != %s", $this->post_type, 'publish', $this->meta_prefix.'sync_users', 'no'));
+						$result = $wpdb->get_results($wpdb->prepare("SELECT ID, meta_value FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND meta_key = %s AND meta_value != %s GROUP BY ID", $this->post_type, 'publish', $this->meta_prefix.'sync_users', 'no'));
 
 						if($wpdb->num_rows > 0)
 						{
@@ -760,7 +760,7 @@ class mf_group
 					#############################
 					if($is_syncing == false)
 					{
-						$result = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title, meta_value FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND meta_key = %s AND meta_value != ''", $this->post_type, 'publish', $this->meta_prefix.'api'));
+						$result = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title, meta_value FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND meta_key = %s AND meta_value != '' GROUP BY ID", $this->post_type, 'publish', $this->meta_prefix.'api'));
 
 						if($wpdb->num_rows > 0)
 						{
@@ -1742,7 +1742,7 @@ class mf_group
 	{
 		global $wpdb;
 
-		$post_id = $wpdb->get_var($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND ".$wpdb->postmeta.".meta_key = '".$this->meta_prefix."allow_registration' WHERE post_type = %s AND meta_value = %s", $this->post_type, 'yes'));
+		$post_id = $wpdb->get_var($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND ".$wpdb->postmeta.".meta_key = '".$this->meta_prefix."allow_registration' WHERE post_type = %s AND meta_value = %s GROUP BY ID", $this->post_type, 'yes'));
 
 		return ($post_id > 0);
 	}
@@ -2709,7 +2709,7 @@ class mf_group
 		{
 			$this->arr_stop_list_groups = [];
 
-			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND ".$wpdb->postmeta.".meta_key = %s AND ".$wpdb->postmeta.".meta_value = %s", $this->post_type, 'publish', $this->meta_prefix.'group_type', 'stop'));
+			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND ".$wpdb->postmeta.".meta_key = %s AND ".$wpdb->postmeta.".meta_value = %s GROUP BY ID", $this->post_type, 'publish', $this->meta_prefix.'group_type', 'stop'));
 
 			foreach($result as $r)
 			{
