@@ -1490,7 +1490,11 @@ class mf_group
 			'labels' => array(
 				'name' => __("Group", 'lang_group'),
 				'singular_name' => __("Group", 'lang_group'),
-				'menu_name' => __("Group", 'lang_group')
+				'menu_name' => __("Group", 'lang_group'),
+				'all_items' => __('List', 'lang_group'),
+				'edit_item' => __('Edit', 'lang_group'),
+				'view_item' => __('View', 'lang_group'),
+				'add_new_item' => __('Add New', 'lang_group'),
 			),
 			'public' => (wp_is_block_theme() == false),
 			'show_ui' => true,
