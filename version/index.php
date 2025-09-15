@@ -209,7 +209,7 @@ echo "<div class='wrap'>
 								if($obj_group->id > 0)
 								{
 									$group_label .= "<span>
-										<a href='".admin_url("admin.php?page=mf_group/create/index.php&intGroupID=".$obj_group->id)."' title='".__("Edit", 'lang_group')."'><i class='fa fa-wrench fa-lg'></i></a> "
+										<a href='".admin_url("post.php?post=".$obj_group->id."&action=edit")."' title='".__("Edit", 'lang_group')."'><i class='fa fa-wrench fa-lg'></i></a> "
 										."<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$obj_group->id."&strFilterIsMember=yes&strFilterAccepted=yes&strFilterUnsubscribed=no")."' title='".__("Add or remove", 'lang_group')."'><i class='fas fa-tasks fa-lg'></i></a>
 									</span>";
 								}

@@ -75,7 +75,7 @@ class mf_group
 		if(!isset($data['include_amount'])){		$data['include_amount'] = true;}
 		if(!isset($data['return_to_metabox'])){		$data['return_to_metabox'] = true;}
 
-		$result = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title FROM ".$wpdb->posts." WHERE post_type = %s AND post_status NOT IN('trash', 'ignore') GROUP BY ID ORDER BY post_title ASC", $this->post_type));
+		$result = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title FROM ".$wpdb->posts." WHERE post_type = %s AND post_status NOT IN('draft', 'trash', 'ignore') GROUP BY ID ORDER BY post_title ASC", $this->post_type));
 
 		$arr_data = [];
 
@@ -1076,7 +1076,7 @@ class mf_group
 
 									if(($count_in_group + $count_exists_in_array) != $count_incoming)
 									{
-										do_log("Group API Error: Wrong amount in group (<a href='".admin_url("admin.php?page=mf_group/create/index.php&intGroupID=".$post_id)."'>".$post_title."</a>) after sync (".$count_in_group." + ".$count_exists_in_array." != ".$count_incoming.")");
+										do_log("Group API Error: Wrong amount in group (<a href='".admin_url("post.php?post=".$post_id."&action=edit")."'>".$post_title."</a>) after sync (".$count_in_group." + ".$count_exists_in_array." != ".$count_incoming.")");
 									}
 								}
 								##################################
@@ -1170,272 +1170,250 @@ class mf_group
 		$obj_cron->end();
 	}
 
-	function show_group_registration_form($data)
+	function block_render_callback($attributes)
 	{
 		global $wpdb, $obj_address, $done_text, $error_text;
 
-		if(!isset($data['text'])){											$data['text'] = '';}
-		if(!isset($data['label_type'])){									$data['label_type'] = '';}
-		if(!isset($data['display_consent'])){								$data['display_consent'] = 'yes';}
-		if(!isset($data['button_text']) || $data['button_text'] == ''){		$data['button_text'] = __("Join", 'lang_group');}
-		if(!isset($data['button_icon'])){									$data['button_icon'] = '';}
-
-		$out = "";
-
-		if(!($data['id'] > 0))
-		{
-			$error_text = __("I could not find any group ID to display a form for", 'lang_group');
-		}
-
-		$arrGroupRegistrationFields = get_post_meta($data['id'], $this->meta_prefix.'registration_fields', true);
-
-		$strAddressName = check_var('strAddressName');
-		$intAddressZipCode = check_var('intAddressZipCode');
-		$strAddressCity = check_var('strAddressCity');
-		$intAddressCountry = check_var('intAddressCountry');
-		$strAddressAddress = check_var('strAddressAddress');
-		$strAddressTelNo = check_var('strAddressTelNo');
-		$strAddressEmail = check_var('strAddressEmail');
-		$strAddressExtra = check_var('strAddressExtra');
-
-		if(isset($_POST['btnGroupJoin']))
-		{
-			$strGroupVerifyAddress = get_post_meta($data['id'], $this->meta_prefix.'verify_address', true);
-
-			$query_where = $query_set = "";
-
-			if(is_array($arrGroupRegistrationFields) && count($arrGroupRegistrationFields) > 0)
-			{
-				if(in_array("name", $arrGroupRegistrationFields))
-				{
-					@list($strAddressFirstName, $strAddressSurName) = explode(" ", $strAddressName, 2);
-
-					$query_where .= ($query_where != '' ? " AND " : "")."addressFirstName = '".$strAddressFirstName."' AND addressSurName = '".$strAddressSurName."'";
-					$query_set .= ", addressFirstName = '".esc_sql($strAddressFirstName)."', addressSurName = '".esc_sql($strAddressSurName)."'";
-				}
-
-				if(in_array("address", $arrGroupRegistrationFields))
-				{
-					$query_where .= ($query_where != '' ? " AND " : "")."addressAddress = '".$strAddressAddress."'";
-					$query_set .= ", addressAddress = '".esc_sql($strAddressAddress)."'";
-				}
-
-				if(in_array("zip", $arrGroupRegistrationFields))
-				{
-					$query_where .= ($query_where != '' ? " AND " : "")."addressZipCode = '".$intAddressZipCode."'";
-					$query_set .= ", addressZipCode = '".esc_sql($intAddressZipCode)."'";
-				}
-
-				if(in_array("city", $arrGroupRegistrationFields))
-				{
-					$query_where .= ($query_where != '' ? " AND " : "")."addressCity = '".$strAddressCity."'";
-					$query_set .= ", addressCity = '".esc_sql($strAddressCity)."'";
-				}
-
-				if(in_array("country", $arrGroupRegistrationFields))
-				{
-					$query_where .= ($query_where != '' ? " AND " : "")."addressCountry = '".$intAddressCountry."'";
-					$query_set .= ", addressCountry = '".esc_sql($intAddressCountry)."'";
-				}
-
-				if(in_array("phone", $arrGroupRegistrationFields))
-				{
-					$query_where .= ($query_where != '' ? " AND " : "")."addressTelNo = '".$strAddressTelNo."'";
-					$query_set .= ", addressTelNo = '".esc_sql($strAddressTelNo)."'";
-				}
-
-				if(in_array("email", $arrGroupRegistrationFields))
-				{
-					$query_where .= ($query_where != '' ? " AND " : "")."addressEmail = '".$strAddressEmail."'";
-					$query_set .= ", addressEmail = '".esc_sql($strAddressEmail)."'";
-				}
-
-				if(in_array("extra", $arrGroupRegistrationFields))
-				{
-					$query_where .= ($query_where != '' ? " AND " : "")."addressExtra = '".$strAddressExtra."'";
-					$query_set .= ", addressExtra = '".esc_sql($strAddressExtra)."'";
-				}
-			}
-
-			else
-			{
-				$query_where .= ($query_where != '' ? " AND " : "")."addressEmail = '".$strAddressEmail."'";
-				$query_set .= ", addressEmail = '".esc_sql($strAddressEmail)."'";
-			}
-
-			$intAddressID = $this->check_if_address_exists($query_where);
-
-			if($strGroupVerifyAddress == "yes" && !($intAddressID > 0))
-			{
-				$out .= "<p>".__("The information that you entered is not in our register. Please contact the admin of this page to get your information submitted.", 'lang_group')."</p>";
-
-				$intGroupContactPage = get_post_meta($data['id'], $this->meta_prefix.'contact_page', true);
-
-				if($intGroupContactPage > 0)
-				{
-					$post_url = get_permalink($intGroupContactPage);
-					$post_title = get_the_title($intGroupContactPage);
-
-					$out .= "<p><a href='".$post_url."'>".$post_title."</a></p>";
-				}
-			}
-
-			else
-			{
-				if(!($intAddressID > 0))
-				{
-					$wpdb->query("INSERT INTO ".$wpdb->prefix."address SET addressPublic = '1'".$query_set.", addressCreated = NOW()");
-
-					$intAddressID = $wpdb->insert_id;
-				}
-
-				if($intAddressID > 0)
-				{
-					$this->add_address(array('address_id' => $intAddressID, 'group_id' => $data['id']));
-
-					$done_text = __("Thank you for showing your interest. You have been added to the group", 'lang_group');
-				}
-			}
-		}
-
-		if(isset($done_text) && $done_text != '' || isset($error_text) && $error_text != '')
-		{
-			$out .= get_notification();
-		}
-
-		else
-		{
-			$out .= "<form action='' method='post' class='mf_form'>";
-
-				if($data['text'] != '')
-				{
-					$out .= apply_filters('the_content', $data['text']);
-				}
-
-				if(is_array($arrGroupRegistrationFields) && count($arrGroupRegistrationFields) > 0)
-				{
-					switch($data['label_type'])
-					{
-						default:
-						case 'label':
-							$label_type = 'text';
-						break;
-
-						case 'placeholder':
-							$label_type = 'placeholder';
-						break;
-					}
-
-					if(in_array("name", $arrGroupRegistrationFields))
-					{
-						$out .= show_textfield(array('name' => 'strAddressName', $label_type => __("Name", 'lang_group'), 'value' => $strAddressName, 'required' => true));
-					}
-
-					if(in_array("address", $arrGroupRegistrationFields))
-					{
-						$out .= show_textfield(array('name' => 'strAddressAddress', $label_type => __("Address", 'lang_group'), 'value' => $strAddressAddress, 'required' => true));
-					}
-
-					if(in_array("zip", $arrGroupRegistrationFields))
-					{
-						$out .= show_textfield(array('type' => 'number', 'name' => 'intAddressZipCode', $label_type => __("Zip Code", 'lang_group'), 'value' => $intAddressZipCode, 'required' => true));
-					}
-
-					if(in_array("city", $arrGroupRegistrationFields))
-					{
-						$out .= show_textfield(array('name' => 'strAddressCity', $label_type => __("City", 'lang_group'), 'value' => $strAddressCity, 'required' => true));
-					}
-
-					if(in_array("country", $arrGroupRegistrationFields))
-					{
-						if(!isset($obj_address))
-						{
-							$obj_address = new mf_address();
-						}
-
-						switch($data['label_type'])
-						{
-							default:
-							case 'label':
-								$out .= show_select(array('data' => $obj_address->get_countries_for_select(), 'name' => 'intAddressCountry', 'text' => __("Country", 'lang_group'), 'value' => $intAddressCountry, 'required' => true));
-							break;
-
-							case 'placeholder':
-								$out .= show_select(array('data' => $obj_address->get_countries_for_select(array('choose_here_text' => __("Choose Country Here", 'lang_group'))), 'name' => 'intAddressCountry', 'value' => $intAddressCountry, 'required' => true));
-							break;
-						}
-					}
-
-					if(in_array("phone", $arrGroupRegistrationFields))
-					{
-						$out .= show_textfield(array('name' => 'strAddressTelNo', $label_type => __("Phone Number", 'lang_group'), 'value' => $strAddressTelNo, 'required' => true));
-					}
-
-					if(in_array("email", $arrGroupRegistrationFields))
-					{
-						$out .= show_textfield(array('name' => 'strAddressEmail', $label_type => __("E-mail", 'lang_group'), 'value' => $strAddressEmail, 'required' => true));
-					}
-
-					if(in_array("extra", $arrGroupRegistrationFields))
-					{
-						$out .= show_textfield(array('name' => 'strAddressExtra', $label_type => get_option_or_default('setting_address_extra', __("Extra", 'lang_group')), 'value' => $strAddressExtra, 'required' => true));
-					}
-
-					$out .= "<div".get_form_button_classes().">";
-
-						if($data['display_consent'] == 'yes')
-						{
-							$out .= show_checkbox(array('name' => 'intGroupConsent', 'text' => __("I consent to having this website store my submitted information, so that they can contact me as part of this group", 'lang_group'), 'value' => 1, 'required' => true));
-						}
-
-						$out .= show_button(array('name' => 'btnGroupJoin', 'text' => $data['button_text'].($data['button_icon'] != '' ? " <i class='".$data['button_icon']."'></i>" : "")))
-					."</div>";
-				}
-
-				else
-				{
-					/*$out .= "<div class='flex_form'>
-						<div>";*/
-
-							$out .= show_textfield(array('name' => 'strAddressEmail', 'placeholder' => __("Your Email Address", 'lang_group'), 'value' => $strAddressEmail, 'required' => true));
-
-							if($data['display_consent'] == 'yes')
-							{
-								$out .= show_checkbox(array('name' => 'intGroupConsent', 'text' => __("I consent to having this website store my submitted information, so that they can contact me as part of this group", 'lang_group'), 'value' => 1, 'required' => true));
-							}
-
-						//$out .= "</div>";
-
-						$out .= "<div".get_form_button_classes().">"
-							.show_button(array('name' => 'btnGroupJoin', 'text' => $data['button_text'].($data['button_icon'] != '' ? " <i class='".$data['button_icon']."'></i>" : "")))
-						."</div>";
-
-					//$out .= "</div>";
-				}
-
-			$out .= "</form>";
-		}
-
-		return $out;
-	}
-
-	function block_render_callback($attributes)
-	{
-		if(!isset($attributes['group_id'])){				$attributes['group_id'] = 0;}
-		if(!isset($attributes['group_label_type'])){		$attributes['group_label_type'] = '';}
-		if(!isset($attributes['group_display_consent'])){	$attributes['group_display_consent'] = 'yes';}
-		if(!isset($attributes['group_button_text'])){		$attributes['group_button_text'] = '';}
-		if(!isset($attributes['group_button_icon'])){		$attributes['group_button_icon'] = '';}
+		if(!isset($attributes['group_id'])){														$attributes['group_id'] = 0;}
+		if(!isset($attributes['group_label_type'])){												$attributes['group_label_type'] = '';}
+		if(!isset($attributes['group_display_consent'])){											$attributes['group_display_consent'] = 'yes';}
+		if(!isset($attributes['group_button_text']) || $attributes['group_button_text'] == ''){		$attributes['group_button_text'] = __("Join", 'lang_group');}
+		if(!isset($attributes['group_button_icon'])){												$attributes['group_button_icon'] = '';}
 
 		$out = "";
 
 		if($attributes['group_id'] > 0)
 		{
-			$out .= "<div".parse_block_attributes(array('class' => "widget widget_group", 'attributes' => $attributes)).">
-				<div>" // class='section'
-					.$this->show_group_registration_form(array('id' => $attributes['group_id'], 'label_type' => $attributes['group_label_type'], 'display_consent' => $attributes['group_display_consent'], 'button_text' => $attributes['group_button_text'], 'button_icon' => $attributes['group_button_icon']))
-				."</div>"
-			."</div>";
+			$out .= "<div".parse_block_attributes(array('class' => "widget widget_group", 'attributes' => $attributes)).">";
+
+				if(!($attributes['group_id'] > 0))
+				{
+					$error_text = __("I could not find any group ID to display a form for", 'lang_group');
+				}
+
+				$arrGroupRegistrationFields = get_post_meta($attributes['group_id'], $this->meta_prefix.'registration_fields', false);
+
+				if(!is_array($arrGroupRegistrationFields) || count($arrGroupRegistrationFields) == 0)
+				{
+					$arrGroupRegistrationFields = array('email');
+				}
+
+				$strAddressName = check_var('strAddressName');
+				$intAddressZipCode = check_var('intAddressZipCode');
+				$strAddressCity = check_var('strAddressCity');
+				$intAddressCountry = check_var('intAddressCountry');
+				$strAddressAddress = check_var('strAddressAddress');
+				$strAddressTelNo = check_var('strAddressTelNo');
+				$strAddressEmail = check_var('strAddressEmail');
+				$strAddressExtra = check_var('strAddressExtra');
+
+				if(isset($_POST['btnGroupJoin']))
+				{
+					$strGroupVerifyAddress = get_post_meta($attributes['group_id'], $this->meta_prefix.'verify_address', true);
+
+					$query_where = $query_set = "";
+
+					if(is_array($arrGroupRegistrationFields) && count($arrGroupRegistrationFields) > 0)
+					{
+						if(in_array("name", $arrGroupRegistrationFields))
+						{
+							@list($strAddressFirstName, $strAddressSurName) = explode(" ", $strAddressName, 2);
+
+							$query_where .= ($query_where != '' ? " AND " : "")."addressFirstName = '".$strAddressFirstName."' AND addressSurName = '".$strAddressSurName."'";
+							$query_set .= ", addressFirstName = '".esc_sql($strAddressFirstName)."', addressSurName = '".esc_sql($strAddressSurName)."'";
+						}
+
+						if(in_array("address", $arrGroupRegistrationFields))
+						{
+							$query_where .= ($query_where != '' ? " AND " : "")."addressAddress = '".$strAddressAddress."'";
+							$query_set .= ", addressAddress = '".esc_sql($strAddressAddress)."'";
+						}
+
+						if(in_array("zip", $arrGroupRegistrationFields))
+						{
+							$query_where .= ($query_where != '' ? " AND " : "")."addressZipCode = '".$intAddressZipCode."'";
+							$query_set .= ", addressZipCode = '".esc_sql($intAddressZipCode)."'";
+						}
+
+						if(in_array("city", $arrGroupRegistrationFields))
+						{
+							$query_where .= ($query_where != '' ? " AND " : "")."addressCity = '".$strAddressCity."'";
+							$query_set .= ", addressCity = '".esc_sql($strAddressCity)."'";
+						}
+
+						if(in_array("country", $arrGroupRegistrationFields))
+						{
+							$query_where .= ($query_where != '' ? " AND " : "")."addressCountry = '".$intAddressCountry."'";
+							$query_set .= ", addressCountry = '".esc_sql($intAddressCountry)."'";
+						}
+
+						if(in_array("phone", $arrGroupRegistrationFields))
+						{
+							$query_where .= ($query_where != '' ? " AND " : "")."addressTelNo = '".$strAddressTelNo."'";
+							$query_set .= ", addressTelNo = '".esc_sql($strAddressTelNo)."'";
+						}
+
+						if(in_array("email", $arrGroupRegistrationFields))
+						{
+							$query_where .= ($query_where != '' ? " AND " : "")."addressEmail = '".$strAddressEmail."'";
+							$query_set .= ", addressEmail = '".esc_sql($strAddressEmail)."'";
+						}
+
+						if(in_array("extra", $arrGroupRegistrationFields))
+						{
+							$query_where .= ($query_where != '' ? " AND " : "")."addressExtra = '".$strAddressExtra."'";
+							$query_set .= ", addressExtra = '".esc_sql($strAddressExtra)."'";
+						}
+					}
+
+					else
+					{
+						$query_where .= ($query_where != '' ? " AND " : "")."addressEmail = '".$strAddressEmail."'";
+						$query_set .= ", addressEmail = '".esc_sql($strAddressEmail)."'";
+					}
+
+					$intAddressID = $this->check_if_address_exists($query_where);
+
+					if($strGroupVerifyAddress == "yes" && !($intAddressID > 0))
+					{
+						$out .= "<p>".__("The information that you entered is not in our register. Please contact the admin of this page to get your information submitted.", 'lang_group')."</p>";
+
+						$intGroupContactPage = get_post_meta($attributes['group_id'], $this->meta_prefix.'contact_page', true);
+
+						if($intGroupContactPage > 0)
+						{
+							$post_url = get_permalink($intGroupContactPage);
+							$post_title = get_the_title($intGroupContactPage);
+
+							$out .= "<p><a href='".$post_url."'>".$post_title."</a></p>";
+						}
+					}
+
+					else
+					{
+						if(!($intAddressID > 0))
+						{
+							$wpdb->query("INSERT INTO ".$wpdb->prefix."address SET addressPublic = '1'".$query_set.", addressCreated = NOW()");
+
+							$intAddressID = $wpdb->insert_id;
+						}
+
+						if($intAddressID > 0)
+						{
+							$this->add_address(array('address_id' => $intAddressID, 'group_id' => $attributes['group_id']));
+
+							$done_text = __("Thank you for showing your interest. You have been added to the group", 'lang_group');
+						}
+					}
+				}
+
+				if(isset($done_text) && $done_text != '' || isset($error_text) && $error_text != '')
+				{
+					$out .= get_notification();
+				}
+
+				else
+				{
+					$out .= "<form action='' method='post' class='mf_form'>";
+
+						if(is_array($arrGroupRegistrationFields) && count($arrGroupRegistrationFields) > 0)
+						{
+							switch($attributes['group_label_type'])
+							{
+								default:
+								case 'label':
+									$label_type = 'text';
+								break;
+
+								case 'placeholder':
+									$label_type = 'placeholder';
+								break;
+							}
+
+							if(in_array("name", $arrGroupRegistrationFields))
+							{
+								$out .= show_textfield(array('name' => 'strAddressName', $label_type => __("Name", 'lang_group'), 'value' => $strAddressName, 'required' => true));
+							}
+
+							if(in_array("address", $arrGroupRegistrationFields))
+							{
+								$out .= show_textfield(array('name' => 'strAddressAddress', $label_type => __("Address", 'lang_group'), 'value' => $strAddressAddress, 'required' => true));
+							}
+
+							if(in_array("zip", $arrGroupRegistrationFields))
+							{
+								$out .= show_textfield(array('type' => 'number', 'name' => 'intAddressZipCode', $label_type => __("Zip Code", 'lang_group'), 'value' => $intAddressZipCode, 'required' => true));
+							}
+
+							if(in_array("city", $arrGroupRegistrationFields))
+							{
+								$out .= show_textfield(array('name' => 'strAddressCity', $label_type => __("City", 'lang_group'), 'value' => $strAddressCity, 'required' => true));
+							}
+
+							if(in_array("country", $arrGroupRegistrationFields))
+							{
+								if(!isset($obj_address))
+								{
+									$obj_address = new mf_address();
+								}
+
+								switch($attributes['group_label_type'])
+								{
+									default:
+									case 'label':
+										$out .= show_select(array('data' => $obj_address->get_countries_for_select(), 'name' => 'intAddressCountry', 'text' => __("Country", 'lang_group'), 'value' => $intAddressCountry, 'required' => true));
+									break;
+
+									case 'placeholder':
+										$out .= show_select(array('data' => $obj_address->get_countries_for_select(array('choose_here_text' => __("Choose Country Here", 'lang_group'))), 'name' => 'intAddressCountry', 'value' => $intAddressCountry, 'required' => true));
+									break;
+								}
+							}
+
+							if(in_array("phone", $arrGroupRegistrationFields))
+							{
+								$out .= show_textfield(array('name' => 'strAddressTelNo', $label_type => __("Phone Number", 'lang_group'), 'value' => $strAddressTelNo, 'required' => true));
+							}
+
+							if(in_array("email", $arrGroupRegistrationFields))
+							{
+								$out .= show_textfield(array('name' => 'strAddressEmail', $label_type => __("E-mail", 'lang_group'), 'value' => $strAddressEmail, 'required' => true));
+							}
+
+							if(in_array("extra", $arrGroupRegistrationFields))
+							{
+								$out .= show_textfield(array('name' => 'strAddressExtra', $label_type => get_option_or_default('setting_address_extra', __("Extra", 'lang_group')), 'value' => $strAddressExtra, 'required' => true));
+							}
+
+							$out .= "<div".get_form_button_classes().">";
+
+								if($attributes['group_display_consent'] == 'yes')
+								{
+									$out .= show_checkbox(array('name' => 'intGroupConsent', 'text' => __("I consent to having this website store my submitted information, so that they can contact me as part of this group", 'lang_group'), 'value' => 1, 'required' => true));
+								}
+
+								$out .= show_button(array('name' => 'btnGroupJoin', 'text' => ($attributes['group_button_icon'] != '' ? "<i class='".$attributes['group_button_icon']."'></i> " : "").$attributes['group_button_text']))
+							."</div>";
+						}
+
+						else
+						{
+							$out .= show_textfield(array('name' => 'strAddressEmail', 'placeholder' => __("Your Email Address", 'lang_group'), 'value' => $strAddressEmail, 'required' => true));
+
+							if($attributes['group_display_consent'] == 'yes')
+							{
+								$out .= show_checkbox(array('name' => 'intGroupConsent', 'text' => __("I consent to having this website store my submitted information, so that they can contact me as part of this group", 'lang_group'), 'value' => 1, 'required' => true));
+							}
+
+							$out .= "<div".get_form_button_classes().">"
+								.show_button(array('name' => 'btnGroupJoin', 'text' => ($attributes['group_button_icon'] != '' ? "<i class='".$attributes['group_button_icon']."'></i> " : "").$attributes['group_button_text']))
+							."</div>";
+						}
+
+					$out .= "</form>";
+				}
+
+			$out .= "</div>";
 		}
 
 		return $out;
@@ -1499,8 +1477,9 @@ class mf_group
 			'public' => (wp_is_block_theme() == false),
 			'show_ui' => true,
 			'show_in_menu' => false,
+			'show_in_rest' => true,
 			'exclude_from_search' => true,
-			'supports' => array('title'),
+			'supports' => array('title', 'editor'),
 			'rewrite' => array(
 				'slug' => 'group',
 			),
@@ -1582,7 +1561,7 @@ class mf_group
 		$setting_key = get_setting_key(__FUNCTION__);
 		$option = get_option($setting_key);
 
-		echo show_select(array('data' => $this->get_for_select(array('return_to_metabox' => false)), 'name' => $setting_key, 'value' => $option, 'suffix' => "<a href='".admin_url("admin.php?page=mf_group/create/index.php")."'><i class='fa fa-plus-circle fa-lg'></i></a>"));
+		echo show_select(array('data' => $this->get_for_select(array('return_to_metabox' => false)), 'name' => $setting_key, 'value' => $option, 'suffix' => "<a href='".admin_url("post-new.php?post_type=".$this->post_type)."'><i class='fa fa-plus-circle fa-lg'></i></a>"));
 	}
 
 	function setting_group_debug_callback()
@@ -1657,10 +1636,6 @@ class mf_group
 
 			switch(check_var('page'))
 			{
-				case "mf_group/create/index.php":
-					mf_enqueue_script('script_group_wp', $plugin_include_url."script_wp.js");
-				break;
-
 				case "mf_group/version/index.php":
 					mf_enqueue_style('style_group_timeline', $plugin_include_url."style_timeline.css");
 				break;
@@ -1681,29 +1656,29 @@ class mf_group
 	function admin_menu()
 	{
 		$menu_root = 'mf_group/';
-		$menu_start = $menu_root.'list/index.php';
+		$menu_start = "edit.php?post_type=".$this->post_type;
 		$menu_capability = 'edit_posts';
 
 		$menu_title = __("Groups", 'lang_group');
 		add_menu_page("", $menu_title.$this->count_unsent_group(), $menu_capability, $menu_start, '', 'dashicons-groups', 99);
 
 		$menu_title = __("List", 'lang_group');
-		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, $menu_start);
+		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, "edit.php?post_type=".$this->post_type);
 
-		if(IS_SUPER_ADMIN)
+		/*if(IS_SUPER_ADMIN)
 		{
-			$menu_title = __("List", 'lang_group')." (v2)";
-			add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, "edit.php?post_type=".$this->post_type);
-		}
+			$menu_title = __("List", 'lang_group')." (old)";
+			add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, $menu_root.'list/index.php');
+		}*/
 
 		$menu_title = __("Add New", 'lang_group');
-		add_submenu_page($menu_start, $menu_title, " - ".$menu_title, $menu_capability, $menu_root."create/index.php");
+		add_submenu_page($menu_start, $menu_title, " - ".$menu_title, $menu_capability, "post-new.php?post_type=".$this->post_type);
 
-		if(IS_SUPER_ADMIN)
+		/*if(IS_SUPER_ADMIN)
 		{
-			$menu_title = __("Add New", 'lang_group')." (v2)";
-			add_submenu_page($menu_start, $menu_title, " - ".$menu_title, $menu_capability, "post-new.php?post_type=".$this->post_type);
-		}
+			$menu_title = __("Add New", 'lang_group')." (old)";
+			add_submenu_page($menu_start, $menu_title, " - ".$menu_title, $menu_capability, $menu_root."create/index.php");
+		}*/
 
 		$arr_data_temp = $this->get_for_select(array('add_choose_here' => false));
 
@@ -1815,7 +1790,7 @@ class mf_group
 				}
 
 				$columns['unsubscribed'] = __("Unsubscribed", 'lang_group');
-				$columns['post_author'] = shorten_text(array('string' => __("User", 'lang_group'), 'limit' => 4));
+				$columns['post_author'] = __("Author", 'lang_group');
 				$columns['sent'] = __("Sent", 'lang_group');
 			break;
 		}
@@ -1830,7 +1805,9 @@ class mf_group
 		switch($post->post_type)
 		{
 			case $this->post_type:
-				$list_url = admin_url("admin.php?page=mf_group/list/index.php&intGroupID=".$post_id."&post_status=".check_var('post_status'));
+				$post_status = get_post_status($post_id);
+
+				$list_url = admin_url("edit.php?post_type=".$this->post_type."&intGroupID=".$post_id."&post_status=".check_var('post_status'));
 
 				switch($column)
 				{
@@ -1893,8 +1870,6 @@ class mf_group
 							),
 						);
 
-						$i = 0;
-
 						foreach($arr_statuses as $key => $arr_value)
 						{
 							$post_meta = get_post_meta($post_id, $this->meta_prefix.$key, $arr_value['single']);
@@ -1920,11 +1895,6 @@ class mf_group
 
 							if($do_display == true)
 							{
-								if($i > 0)
-								{
-									echo " ";
-								}
-
 								if(isset($arr_value['link']) && $arr_value['link'] != '')
 								{
 									echo "<a href='".$arr_value['link']."'>";
@@ -1934,10 +1904,8 @@ class mf_group
 
 								if(isset($arr_value['link']) && $arr_value['link'] != '')
 								{
-									echo "</a>";
+									echo "</a> ";
 								}
-
-								$i++;
 							}
 						}
 					break;
@@ -1953,25 +1921,25 @@ class mf_group
 
 							if($amount > 0 && $group_type != 'stop')
 							{
-								$arr_actions['send_email'] = "<a href='".admin_url("admin.php?page=mf_group/send/index.php&intGroupID=".$post_id."&type=email")."' title='".__("Send e-mail to everyone in the group", 'lang_group')."'><i class='fa fa-paper-plane fa-lg'></i></a>";
+								$arr_actions['send_email'] = "<a href='".admin_url("admin.php?page=mf_group/send/index.php&intGroupID=".$post_id."&type=email")."' title='".__("Send e-mail to everyone in the group", 'lang_group')."'><i class='fa fa-paper-plane fa-lg'></i></a> ";
 
 								$arr_actions = apply_filters('add_group_list_amount_actions', $arr_actions, $post_id);
 							}
 
 							if($this->is_synced($post_id) == false)
 							{
-								$arr_actions['addnremove'] = "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id."&strFilterIsMember&strFilterAccepted&strFilterUnsubscribed")."' title='".__("Add or remove", 'lang_group')."'><i class='fas fa-tasks fa-lg'></i></a>";
+								$arr_actions['addnremove'] = "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id."&strFilterIsMember&strFilterAccepted&strFilterUnsubscribed")."' title='".__("Add or remove", 'lang_group')."'><i class='fas fa-tasks fa-lg'></i></a> ";
 
-								$arr_actions['import'] = "<a href='".admin_url("admin.php?page=mf_group/import/index.php&intGroupID=".$post_id)."' title='".__("Import Addresses", 'lang_group')."'><i class='fas fa-cloud-upload-alt fa-lg'></i></a>";
+								$arr_actions['import'] = "<a href='".admin_url("admin.php?page=mf_group/import/index.php&intGroupID=".$post_id)."' title='".__("Import Addresses", 'lang_group')."'><i class='fas fa-cloud-upload-alt fa-lg'></i></a> ";
 							}
 
 							if($amount > 0)
 							{
-								$arr_actions['export_csv'] = "<a href='".wp_nonce_url($list_url."&btnExportRun&intExportType=".$post_id."&strExportFormat=csv", 'export_run', '_wpnonce_export_run')."' title='".__("Export", 'lang_group')." CSV'><i class='fas fa-file-csv fa-lg'></i></a>";
+								$arr_actions['export_csv'] = "<a href='".wp_nonce_url($list_url."&btnExportRun&intExportType=".$post_id."&strExportFormat=csv", 'export_run', '_wpnonce_export_run')."' title='".__("Export", 'lang_group')." CSV'><i class='fas fa-file-csv fa-lg'></i></a> ";
 
 								if(is_plugin_active("mf_phpexcel/index.php"))
 								{
-									$arr_actions['export_xls'] = "<a href='".wp_nonce_url($list_url."&btnExportRun&intExportType=".$post_id."&strExportFormat=xls", 'export_run', '_wpnonce_export_run')."' title='".__("Export", 'lang_group')." XLS'><i class='fas fa-file-excel fa-lg'></i></a>";
+									$arr_actions['export_xls'] = "<a href='".wp_nonce_url($list_url."&btnExportRun&intExportType=".$post_id."&strExportFormat=xls", 'export_run', '_wpnonce_export_run')."' title='".__("Export", 'lang_group')." XLS'><i class='fas fa-file-excel fa-lg'></i></a> ";
 								}
 							}
 						}
@@ -1986,7 +1954,7 @@ class mf_group
 								echo " <span class='grey' title='".__("Deleted", 'lang_group')."'>+ ".$amount_deleted."</span>";
 							}
 
-						echo "</a>";
+						echo "</a> ";
 
 						if(count($arr_actions) > 0)
 						{
@@ -2053,7 +2021,7 @@ class mf_group
 					break;
 
 					case 'post_author':
-						echo get_user_info(array('id' => $post->post_author, 'type' => 'short_name'));
+						echo get_user_info(array('id' => $post->post_author));
 					break;
 
 					case 'sent':
@@ -2206,6 +2174,27 @@ class mf_group
 		}
 
 		return $data;
+	}
+
+	function post_row_actions($arr_actions, $post)
+	{
+		if($post->post_type == $this->post_type)
+		{
+			$block_code = '<!-- wp:mf/group {"group_id":"'.$post->ID.'"%} /-->';
+			$arr_ids = apply_filters('get_page_from_block_code', [], $block_code);
+
+			if(count($arr_ids) > 0)
+			{
+				unset($arr_actions['view']);
+
+				foreach($arr_ids as $post_id)
+				{
+					$arr_actions['view_'.$post_id] = "<a href='".get_permalink($post_id)."'>".__("View", 'lang_group')."</a>";
+				}
+			}
+		}
+
+		return $arr_actions;
 	}
 
 	function rwmb_meta_boxes($meta_boxes)
@@ -2398,47 +2387,44 @@ class mf_group
 				'type' => 'select',
 				'options' => get_yes_no_for_select(),
 			);
-
-			$arr_fields[] = array(
-				'name' => __("Verify that address is in Address book", 'lang_group'),
-				'id' => $this->meta_prefix.'verify_address',
-				'type' => 'select',
-				'options' => get_yes_no_for_select(),
-				'attributes' => array(
-					'condition_type' => 'show_this_if',
-					'condition_selector' => $this->meta_prefix.'allow_registration',
-					'condition_value' => 'yes',
-				),
-			);
-
-			$arr_fields[] = array(
-				'name' => __("Contact Page", 'lang_group'),
-				'id' => $this->meta_prefix.'contact_page',
-				'type' => 'select',
-				'options' => $arr_data_page,
-				'attributes' => array(
-					'condition_type' => 'show_this_if',
-					'condition_selector' => $this->meta_prefix.'allow_registration',
-					'condition_value' => 'yes',
-				),
-			);
-
-			$arr_registration_fields = $this->get_registration_fields_for_select();
-
-			$arr_fields[] = array(
-				'name' => __("Registration Fields", 'lang_group'),
-				'id' => $this->meta_prefix.'registration_fields',
-				'type' => 'select',
-				'options' => $arr_registration_fields,
-				'multiple' => true,
-				'attributes' => array(
-					'size' => get_select_size(array('count' => count($arr_registration_fields))),
-					'condition_type' => 'show_this_if',
-					'condition_selector' => $this->meta_prefix.'allow_registration',
-					'condition_value' => 'yes',
-				),
-			);
 		}
+
+		$arr_fields[] = array(
+			'name' => __("Verify that address is in Address book", 'lang_group'),
+			'id' => $this->meta_prefix.'verify_address',
+			'type' => 'select',
+			'options' => get_yes_no_for_select(),
+			/*'attributes' => array(
+				'condition_type' => 'show_this_if',
+				'condition_selector' => $this->meta_prefix.'allow_registration',
+				'condition_value' => 'yes',
+			),*/
+		);
+
+		$arr_fields[] = array(
+			'name' => __("Contact Page", 'lang_group'),
+			'id' => $this->meta_prefix.'contact_page',
+			'type' => 'select',
+			'options' => $arr_data_page,
+			'attributes' => array(
+				'condition_type' => 'show_this_if',
+				'condition_selector' => $this->meta_prefix.'verify_address',
+				'condition_value' => 'yes',
+			),
+		);
+
+		$arr_registration_fields = $this->get_registration_fields_for_select();
+
+		$arr_fields[] = array(
+			'name' => __("Registration Fields", 'lang_group'),
+			'id' => $this->meta_prefix.'registration_fields',
+			'type' => 'select',
+			'options' => $arr_registration_fields,
+			'multiple' => true,
+			'attributes' => array(
+				'size' => get_select_size(array('count' => count($arr_registration_fields))),
+			),
+		);
 
 		$arr_fields[] = array(
 			'name' => __("Add Verify Link", 'lang_group'),
@@ -2654,7 +2640,7 @@ class mf_group
 				}
 			break;
 
-			case 'create':
+			/*case 'create':
 				$this->name = check_var('strGroupName');
 
 				$this->acceptance_email = check_var('strGroupAcceptanceEmail', 'char', true, 'no');
@@ -2679,7 +2665,7 @@ class mf_group
 				$this->id_copy = check_var('intGroupID_copy');
 				$this->api = check_var('strGroupAPI');
 				$this->api_filter = check_var('strGroupAPIFilter');
-			break;
+			break;*/
 
 			case 'sent':
 				$this->message_id = check_var('intMessageID');
@@ -2916,7 +2902,7 @@ class mf_group
 
 							if(count($arr_recipients) > 0)
 							{
-								mf_redirect(admin_url("admin.php?page=mf_group/list/index.php&sent"));
+								mf_redirect(admin_url("edit.php?post_type=".$this->post_type."&sent"));
 							}
 
 							else
@@ -2978,7 +2964,7 @@ class mf_group
 				}
 			break;
 
-			case 'create':
+			/*case 'create':
 				if(isset($_POST['btnGroupSave']) && wp_verify_nonce($_POST['_wpnonce_group_save'], 'group_save_'.$this->id))
 				{
 					$post_data = array(
@@ -2996,7 +2982,7 @@ class mf_group
 							$this->meta_prefix.'allow_registration' => $this->allow_registration,
 							$this->meta_prefix.'verify_address' => $this->verify_address,
 							$this->meta_prefix.'contact_page' => $this->contact_page,
-							$this->meta_prefix.'registration_fields' => $this->registration_fields,
+							//$this->meta_prefix.'registration_fields' => $this->registration_fields, // This will be saved in wrong format due to Meta Box
 							$this->meta_prefix.'verify_link' => $this->verify_link,
 							$this->meta_prefix.'sync_users' => $this->sync_users,
 							$this->meta_prefix.'owner_email' => $this->owner_email,
@@ -3069,7 +3055,7 @@ class mf_group
 						}
 					}
 				}
-			break;
+			break;*/
 
 			case 'sent':
 				if(isset($_REQUEST['btnMessageDelete']) && $this->message_id > 0 && wp_verify_nonce($_REQUEST['_wpnonce_message_delete'], 'message_delete_'.$this->message_id))
@@ -3093,52 +3079,6 @@ class mf_group
 		}
 
 		return $out;
-	}
-
-	function get_from_db()
-	{
-		global $wpdb;
-
-		switch($this->type)
-		{
-			case 'create':
-				if($this->id > 0)
-				{
-					$result = $wpdb->get_results($wpdb->prepare("SELECT post_status, post_title FROM ".$wpdb->posts." WHERE post_type = %s AND ID = '%d'".$this->query_where, $this->post_type, $this->id));
-
-					foreach($result as $r)
-					{
-						$this->public = $r->post_status;
-						$this->name = $r->post_title;
-
-						$this->api = get_post_meta($this->id, $this->meta_prefix.'api', true);
-						$this->api_filter = get_post_meta($this->id, $this->meta_prefix.'api_filter', true);
-
-						$this->acceptance_email = get_post_meta_or_default($this->id, $this->meta_prefix.'acceptance_email', true, 'no');
-						$this->acceptance_subject = get_post_meta($this->id, $this->meta_prefix.'acceptance_subject', true);
-						$this->acceptance_text = get_post_meta($this->id, $this->meta_prefix.'acceptance_text', true);
-
-						$this->group_type = get_post_meta($this->id, $this->meta_prefix.'group_type', true);
-						$this->allow_registration = get_post_meta_or_default($this->id, $this->meta_prefix.'allow_registration', true, 'no');
-
-						$this->verify_address = get_post_meta_or_default($this->id, $this->meta_prefix.'verify_address', true, 'no');
-						$this->contact_page = get_post_meta($this->id, $this->meta_prefix.'contact_page', true);
-						$this->registration_fields = get_post_meta($this->id, $this->meta_prefix.'registration_fields', true);
-						$this->verify_link = get_post_meta($this->id, $this->meta_prefix.'verify_link', true);
-						$this->sync_users = get_post_meta($this->id, $this->meta_prefix.'sync_users', true);
-
-						$this->owner_email = get_post_meta($this->id, $this->meta_prefix.'owner_email', true);
-						$this->help_page = get_post_meta($this->id, $this->meta_prefix.'help_page', true);
-						$this->archive_page = get_post_meta($this->id, $this->meta_prefix.'archive_page', true);
-
-						if($this->public == 'trash')
-						{
-							$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->posts." SET post_status = %s WHERE ID = '%d' AND post_type = %s".$this->query_where, 'publish', $this->id, $this->post_type));
-						}
-					}
-				}
-			break;
-		}
 	}
 
 	function get_from_last()
@@ -3415,464 +3355,6 @@ class mf_group
 
 if(class_exists('mf_list_table'))
 {
-	class mf_group_table extends mf_list_table
-	{
-		function set_default()
-		{
-			global $obj_group;
-
-			if(!isset($obj_group))
-			{
-				$obj_group = new mf_group();
-			}
-
-			$this->post_type = $obj_group->post_type;
-
-			$this->arr_settings['query_select_id'] = "ID";
-			$this->orderby_default = "post_title";
-
-			$this->arr_settings['has_autocomplete'] = true;
-			//$this->arr_settings['action'] = 'api_group_table_search';
-		}
-
-		function init_fetch()
-		{
-			global $obj_group;
-
-			if(!isset($obj_group))
-			{
-				$obj_group = new mf_group();
-			}
-
-			if($this->search != '')
-			{
-				$this->query_where .= ($this->query_where != '' ? " AND " : "")."(post_title LIKE '".$this->filter_search_before_like($this->search)."' OR SOUNDEX(post_title) = SOUNDEX('".$this->search."'))";
-			}
-
-			if(!IS_EDITOR)
-			{
-				$this->query_where .= ($this->query_where != '' ? " AND " : "")."post_author = '".get_current_user_id()."'";
-			}
-
-			else
-			{
-				$option = get_option('setting_group_see_other_roles', 'yes');
-
-				if($option == 'no')
-				{
-					$user_role = get_current_user_role();
-
-					$users = get_users(array(
-						'role' => $user_role,
-						'fields' => array('ID'),
-					));
-
-					$arr_users = [];
-
-					foreach($users as $user)
-					{
-						$arr_users[] = $user->ID;
-					}
-
-					$this->query_where .= ($this->query_where != '' ? " AND " : "")."post_author IN('".implode("','", $arr_users)."')";
-				}
-			}
-
-			$this->set_views(array(
-				'db_field' => 'post_status',
-				'types' => array(
-					'all' => __("All", 'lang_group'),
-					'publish' => __("Public", 'lang_group'),
-					'draft' => __("Not Public", 'lang_group'),
-					'ignore' => __("Inactive", 'lang_group'),
-					'trash' => __("Trash", 'lang_group')
-				),
-			));
-
-			$rowsAddressesNotAccepted = $obj_group->amount_in_group(array('id' => 0, 'accepted' => 0));
-
-			$arr_columns = array(
-				'cb' => '<input type="checkbox">',
-				'post_title' => __("Name", 'lang_group'),
-				'post_status' => "",
-				'amount' => __("Amount", 'lang_group'),
-				'versioning' => __("History", 'lang_group'),
-			);
-
-			if($rowsAddressesNotAccepted > 0)
-			{
-				$arr_columns['not_accepted'] = __("Not Accepted", 'lang_group');
-			}
-
-			$arr_columns['unsubscribed'] = __("Unsubscribed", 'lang_group');
-			$arr_columns['post_author'] = shorten_text(array('string' => __("User", 'lang_group'), 'limit' => 4));
-			$arr_columns['sent'] = __("Sent", 'lang_group');
-
-			$this->set_columns($arr_columns);
-
-			$this->set_sortable_columns(array(
-				'post_title',
-				//'amount',
-				'post_author',
-			));
-		}
-
-		function column_default($item, $column_name)
-		{
-			global $wpdb, $obj_group;
-
-			$out = "";
-
-			$post_id = $item['ID'];
-			$post_status = $item['post_status'];
-
-			$list_url = admin_url("admin.php?page=mf_group/list/index.php&intGroupID=".$post_id."&post_status=".check_var('post_status'));
-
-			$obj_group = new mf_group(array('id' => $post_id));
-
-			switch($column_name)
-			{
-				case 'post_title':
-					$post_edit_url = "#";
-					$post_author = $item['post_author'];
-
-					$arr_actions = [];
-
-					if($post_status != 'trash')
-					{
-						$post_edit_url = admin_url("admin.php?page=mf_group/create/index.php&intGroupID=".$post_id);
-
-						$arr_actions['edit'] = "<a href='".$post_edit_url."'>".__("Edit", 'lang_group')."</a>";
-
-						if($post_author == get_current_user_id() || IS_ADMINISTRATOR)
-						{
-							$arr_actions['delete'] = "<a href='".wp_nonce_url($list_url."&btnGroupDelete", 'group_delete_'.$post_id, '_wpnonce_group_delete')."'>".__("Delete", 'lang_group')."</a>";
-						}
-
-						if($post_status == 'ignore')
-						{
-							$arr_actions['activate'] = "<a href='".wp_nonce_url($list_url."&btnGroupActivate", 'group_activate_'.$post_id, '_wpnonce_group_activate')."'>".__("Activate", 'lang_group')."</a>";
-						}
-
-						else
-						{
-							$arr_actions['inactivate'] = "<a href='".wp_nonce_url($list_url."&btnGroupInactivate", 'group_inactivate_'.$post_id, '_wpnonce_group_inactivate')."'>".__("Inactivate", 'lang_group')."</a>";
-						}
-
-						$block_code = '<!-- wp:mf/group {"group_id":"'.$post_id.'"%} /-->';
-						$arr_ids = apply_filters('get_page_from_block_code', [], $block_code);
-
-						if(count($arr_ids) > 0)
-						{
-							foreach($arr_ids as $post_id_temp)
-							{
-								if($this->check_allow_edit())
-								{
-									$arr_actions['edit_page'] = "<a href='".admin_url("post.php?post=".$post_id_temp."&action=edit")."'>".__("Edit Page", 'lang_group')."</a>";
-								}
-
-								$arr_actions['view_page'] = "<a href='".get_permalink($post_id_temp)."'>".__("View", 'lang_group')."</a>";
-							}
-						}
-
-						else
-						{
-							$post_allow_registration = get_post_meta($post_id, $this->meta_prefix.'allow_registration', true);
-
-							if($post_status == 'publish' && wp_is_block_theme() == false && $post_allow_registration == 'yes')
-							{
-								$post_url = get_permalink($post_id);
-
-								if($post_url != '')
-								{
-									$arr_actions['view'] = "<a href='".$post_url."'>".__("View", 'lang_group')."</a>";
-								}
-							}
-						}
-					}
-
-					else
-					{
-						$arr_actions['recover'] = "<a href='".admin_url("admin.php?page=mf_group/create/index.php&intGroupID=".$post_id."&recover")."'>".__("Recover", 'lang_group')."</a>";
-					}
-
-					if(get_post_meta($post_id, $obj_group->meta_prefix.'group_type', true) == 'stop')
-					{
-						$out .= "<i class='fa fa-exclamation-triangle yellow' title='".__("This will prevent messages to all recipients in this group regardless which group that you are sending to.", 'lang_group')."'></i> ";
-
-						$out .= "<i class='set_tr_color' rel='red'></i>";
-					}
-
-					$out .= "<a href='".$post_edit_url."'>".$item['post_title']."</a>"
-					.$this->row_actions($arr_actions);
-				break;
-
-				case 'post_status':
-					$arr_statuses = array(
-						/*'allow_registration' => array(
-							'type' => 'bool',
-							'name' => __("Allow Registration", 'lang_group'),
-							'icon' => 'fa fa-globe',
-							'single' => true,
-							'link' => get_permalink($post_id),
-						),*/
-						'api' => array(
-							'type' => 'empty',
-							'name' => __("API Link", 'lang_group'),
-							'icon' => 'fas fa-network-wired',
-							'single' => true,
-						),
-						'api_filter' => array(
-							'type' => 'empty',
-							'name' => __("Filter API", 'lang_group'),
-							'icon' => 'fas fa-plus',
-							'single' => true,
-						),
-						'sync_users' => array(
-							'type' => 'bool',
-							'name' => __("Synchronize", 'lang_group'),
-							'icon' => 'fas fa-users',
-							'single' => true,
-						),
-						'verify_link' => array(
-							'type' => 'bool',
-							'name' => __("Add Verify Link", 'lang_group'),
-							'icon' => 'fas fa-link',
-							'single' => true,
-						),
-						'acceptance_email' => array(
-							'type' => 'bool',
-							'name' => __("Send before adding to a group", 'lang_group'),
-							'icon' => 'fa fa-paper-plane',
-							'single' => true,
-						),
-						'owner_email' => array(
-							'type' => 'empty',
-							'name' => __("Owner", 'lang_group'),
-							'icon' => 'fas fa-user-tie',
-							'single' => true,
-						),
-						'help_page' => array(
-							'type' => 'empty',
-							'name' => __("Help Page", 'lang_group'),
-							'icon' => 'far fa-question-circle',
-							'single' => true,
-						),
-						'archive_page' => array(
-							'type' => 'empty',
-							'name' => __("Archive Page", 'lang_group'),
-							'icon' => 'fas fa-archive',
-							'single' => true,
-						),
-					);
-
-					$i = 0;
-
-					foreach($arr_statuses as $key => $arr_value)
-					{
-						$post_meta = get_post_meta($post_id, $obj_group->meta_prefix.$key, $arr_value['single']);
-
-						$do_display = false;
-
-						switch($arr_value['type'])
-						{
-							case 'bool':
-								if($post_meta != 'no' && $post_meta != '')
-								{
-									$do_display = true;
-								}
-							break;
-
-							case 'empty':
-								if($post_meta != '')
-								{
-									$do_display = true;
-								}
-							break;
-						}
-
-						if($do_display == true)
-						{
-							if($i > 0)
-							{
-								$out .= " ";
-							}
-
-							if(isset($arr_value['link']) && $arr_value['link'] != '')
-							{
-								$out .= "<a href='".$arr_value['link']."'>";
-							}
-
-								$out .= "<i class='".$arr_value['icon']." fa-lg blue' title='".$arr_value['name']."'></i>";
-
-							if(isset($arr_value['link']) && $arr_value['link'] != '')
-							{
-								$out .= "</a>";
-							}
-
-							$i++;
-						}
-					}
-				break;
-
-				case 'amount':
-					$amount = $obj_group->amount_in_group(array('id' => $post_id));
-
-					$arr_actions = [];
-
-					if($post_status == 'publish')
-					{
-						$group_type = get_post_meta($post_id, $obj_group->meta_prefix.'group_type', true);
-
-						if($amount > 0 && $group_type != 'stop')
-						{
-							$arr_actions['send_email'] = "<a href='".admin_url("admin.php?page=mf_group/send/index.php&intGroupID=".$post_id."&type=email")."' title='".__("Send e-mail to everyone in the group", 'lang_group')."'><i class='fa fa-paper-plane fa-lg'></i></a>";
-
-							$arr_actions = apply_filters('add_group_list_amount_actions', $arr_actions, $post_id);
-						}
-
-						if($obj_group->is_synced($post_id) == false)
-						{
-							$arr_actions['addnremove'] = "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id."&strFilterIsMember&strFilterAccepted&strFilterUnsubscribed")."' title='".__("Add or remove", 'lang_group')."'><i class='fas fa-tasks fa-lg'></i></a>";
-
-							$arr_actions['import'] = "<a href='".admin_url("admin.php?page=mf_group/import/index.php&intGroupID=".$post_id)."' title='".__("Import Addresses", 'lang_group')."'><i class='fas fa-cloud-upload-alt fa-lg'></i></a>";
-						}
-
-						if($amount > 0)
-						{
-							$arr_actions['export_csv'] = "<a href='".wp_nonce_url($list_url."&btnExportRun&intExportType=".$post_id."&strExportFormat=csv", 'export_run', '_wpnonce_export_run')."' title='".__("Export", 'lang_group')." CSV'><i class='fas fa-file-csv fa-lg'></i></a>";
-
-							if(is_plugin_active("mf_phpexcel/index.php"))
-							{
-								$arr_actions['export_xls'] = "<a href='".wp_nonce_url($list_url."&btnExportRun&intExportType=".$post_id."&strExportFormat=xls", 'export_run', '_wpnonce_export_run')."' title='".__("Export", 'lang_group')." XLS'><i class='fas fa-file-excel fa-lg'></i></a>";
-							}
-						}
-					}
-
-					$out .= "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id."&strFilterIsMember=yes&strFilterAccepted=yes&strFilterUnsubscribed=no")."'>"
-						.$amount;
-
-						$amount_deleted = $obj_group->amount_in_group(array('id' => $post_id, 'deleted' => 1));
-
-						if($amount_deleted > 0)
-						{
-							$out .= " <span class='grey' title='".__("Deleted", 'lang_group')."'>+ ".$amount_deleted."</span>";
-						}
-
-					$out .= "</a>"
-					.$this->row_actions($arr_actions);
-				break;
-
-				case 'versioning':
-					$version_amount = $wpdb->get_var($wpdb->prepare("SELECT COUNT(versionID) FROM ".$wpdb->prefix."group_version WHERE groupID = '%d' LIMIT 0, 21", $post_id));
-
-					if($version_amount > 0)
-					{
-						$out .= "<a href='".admin_url("admin.php?page=mf_group/version/index.php&intGroupID=".$post_id)."'>".($version_amount > 20 ? "20+" : $version_amount)."</a>";
-					}
-				break;
-
-				case 'not_accepted':
-					$rowsAddressesNotAccepted = $obj_group->amount_in_group(array('id' => $post_id, 'accepted' => 0));
-
-					if($rowsAddressesNotAccepted > 0)
-					{
-						$out .= "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id."&strFilterIsMember=yes&strFilterAccepted=no&strFilterUnsubscribed")."'>".$rowsAddressesNotAccepted."</a>";
-
-						$rowsAddresses2Remind = $obj_group->amount_in_group(array('id' => $post_id, 'accepted' => 0, 'acceptance_sent' => date("Y-m-d H:i:s", strtotime("-1 week"))));
-
-						if($rowsAddresses2Remind > 0)
-						{
-							$out .= "<div class='row-actions'>
-								<a href='".wp_nonce_url($list_url."&btnGroupResend", 'group_resend_'.$post_id, '_wpnonce_group_resend')."' rel='confirm'>
-									<i class='fa fa-recycle fa-lg' title='".sprintf(__("There are %d subscribers that can be reminded again. Do you want to do that?", 'lang_group'), $rowsAddresses2Remind)."'></i>
-								</a>
-							</div>";
-						}
-					}
-				break;
-
-				case 'unsubscribed':
-					$rowsAddressesUnsubscribed = $obj_group->amount_in_group(array('id' => $post_id, 'unsubscribed' => 1));
-
-					$dteMessageCreated = $wpdb->get_var($wpdb->prepare("SELECT messageCreated FROM ".$wpdb->prefix."group_message WHERE groupID = '%d' AND messageDeleted = '0' ORDER BY messageCreated DESC", $post_id));
-
-					if($rowsAddressesUnsubscribed > 0)
-					{
-						$out .= "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id."&strFilterIsMember=yes&strFilterAccepted=yes&strFilterUnsubscribed=yes")."'>".$rowsAddressesUnsubscribed."</a>";
-					}
-
-					if($post_status == 'publish' || $dteMessageCreated != '')
-					{
-						$user_data = get_userdata(get_current_user_id());
-
-						$user_email = $user_data->user_email;
-
-						$out .= "<div class='row-actions'>
-							<a href='".$obj_group->get_group_url(array('type' => 'unsubscribe', 'group_id' => $post_id, 'email' => $user_email))."' rel='confirm'>".__("Test", 'lang_group')."</a>
-						</div>";
-					}
-				break;
-
-				case 'post_author':
-					$out .= get_user_info(array('id' => $item['post_author'], 'type' => 'short_name'));
-				break;
-
-				case 'sent':
-					$dteMessageCreated = $wpdb->get_var($wpdb->prepare("SELECT messageCreated FROM ".$wpdb->prefix."group_message WHERE groupID = '%d' AND messageDeleted = '0' ORDER BY messageCreated DESC LIMIT 0, 1", $post_id));
-
-					if($dteMessageCreated > DEFAULT_DATE)
-					{
-						$arr_actions = [];
-
-						$out .= format_date($dteMessageCreated);
-
-						$arr_actions['sent'] = "<a href='".admin_url("admin.php?page=mf_group/sent/index.php&intGroupID=".$post_id)."'>".__("Sent", 'lang_group')."</a>";
-
-						$intMessageID = $wpdb->get_var($wpdb->prepare("SELECT messageID FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) WHERE groupID = '%d' AND messageDeleted = '0' AND queueSent = '0' GROUP BY messageID ORDER BY messageCreated DESC LIMIT 0, 1", $post_id));
-
-						if($intMessageID > 0)
-						{
-							$intMessageSent = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueSent = '1'", $intMessageID));
-							$intMessageNotSent = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueSent = '0'", $intMessageID));
-
-							if($intMessageSent == 0)
-							{
-								if($intMessageNotSent == 0)
-								{
-									$out .= "<i class='set_tr_color' rel='red'></i>";
-								}
-
-								else
-								{
-									$out .= "<div>".apply_filters('get_loading_animation', '')." ".sprintf(__("Will be sent %s", 'lang_group'), get_next_cron())."</div>"
-									."<i class='set_tr_color' rel='yellow'></i>";
-								}
-							}
-
-							else if($intMessageSent < ($intMessageSent + $intMessageNotSent))
-							{
-								$out .= "&nbsp;".apply_filters('get_loading_animation', '')." ".__("Is sending", 'lang_group')
-								."<i class='set_tr_color' rel='yellow'></i>";
-							}
-						}
-
-						$out .= $this->row_actions($arr_actions);
-					}
-				break;
-
-				default:
-					if(isset($item[$column_name]))
-					{
-						$out .= $item[$column_name];
-					}
-				break;
-			}
-
-			return $out;
-		}
-	}
-
 	class mf_group_sent_table extends mf_list_table
 	{
 		function set_default()
@@ -4425,28 +3907,6 @@ class widget_group extends WP_Widget
 	function widget($args, $instance)
 	{
 		do_log(__CLASS__."->".__FUNCTION__."(): Add a block instead", 'publish', false);
-
-		extract($args);
-		$instance = wp_parse_args((array)$instance, $this->arr_default);
-
-		if($instance['group_id'] > 0)
-		{
-			echo apply_filters('filter_before_widget', $before_widget);
-
-				if($instance['group_heading'] != '')
-				{
-					$instance['group_heading'] = apply_filters('widget_title', $instance['group_heading'], $instance, $this->id_base);
-
-					echo $before_title
-						.$instance['group_heading']
-					.$after_title;
-				}
-
-				echo "<div>" // class='section'
-					.$this->obj_group->show_group_registration_form(array('id' => $instance['group_id'], 'text' => $instance['group_text'], 'label_type' => $instance['group_label_type'], 'display_consent' => $instance['group_display_consent'], 'button_text' => $instance['group_button_text'], 'button_icon' => $instance['group_button_icon']))
-				."</div>"
-			.$after_widget;
-		}
 	}
 
 	function update($new_instance, $old_instance)

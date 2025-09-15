@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description:
-Version: 5.13.12
+Version: 5.13.13
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://martinfors.se
@@ -48,6 +48,8 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 
 		add_filter('get_groups_to_send_to', array($obj_group, 'get_groups_to_send_to'));
 		add_filter('get_group_addresses', array($obj_group, 'get_group_addresses'));
+
+		add_filter('post_row_actions', array($obj_group, 'post_row_actions'), 10, 2);
 
 		add_action('rwmb_meta_boxes', array($obj_group, 'rwmb_meta_boxes'));
 	}
@@ -186,8 +188,6 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 
 		if($post->post_type == $obj_group->post_type)
 		{
-			// Get HTML from a generic page instead
-
 			$single_template = plugin_dir_path(__FILE__)."templates/single-".$post->post_type.".php";
 		}
 

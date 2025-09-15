@@ -250,7 +250,11 @@ get_header();
 
 					else if($post_allow_registration == 'yes')
 					{
-						echo $obj_group->show_group_registration_form(array('id' => $post_id));
+						// Maybe redirect to page if any has the block?
+
+						echo apply_filters('the_content', __("This is an old link and not in use anymore. An admin has been notified by this", 'lang_group'));
+
+						do_log("single-mf_group.php: Add a block instead (#".$post_id.")", 'publish', false);
 					}
 
 					else
@@ -259,9 +263,6 @@ get_header();
 					}
 
 				echo "</section>";
-
-				// This does not give any info so just let it be until all sites are using block themes
-				//do_log("single-mf_group.php: Move this to a block instead (".var_export($_SERVER, true).")");
 			}
 
 		echo "</article>";
