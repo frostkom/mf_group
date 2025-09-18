@@ -2495,24 +2495,6 @@ class mf_group
 		return $arr_used;
 	}
 
-	/*function api_group_table_search()
-	{
-		$json_output = [];
-
-		$strSearch = check_var('s', 'char');
-
-		$result = $this->get_groups(array('where' => " AND (post_title LIKE '%".esc_sql($strSearch)."%')", 'limit' => 0, 'amount' => 10));
-
-		foreach($result as $r)
-		{
-			$json_output[] = $r->post_title;
-		}
-
-		header("Content-Type: application/json");
-		echo json_encode($json_output);
-		die();
-	}*/
-
 	function wp_sitemaps_post_types($post_types)
 	{
 		unset($post_types[$this->post_type]);
@@ -2603,14 +2585,6 @@ class mf_group
 		}
 
 		return $datetime;
-	}
-
-	function widgets_init()
-	{
-		if(wp_is_block_theme() == false)
-		{
-			register_widget('widget_group');
-		}
 	}
 
 	function fetch_request()
@@ -3874,87 +3848,5 @@ if(class_exists('mf_export'))
 				$this->data[] = $arr_data;
 			}
 		}
-	}
-}
-
-class widget_group extends WP_Widget
-{
-	var $obj_group;
-	var $widget_ops;
-	var $arr_default = array(
-		'group_heading' => '',
-		'group_text' => '',
-		'group_id' => '',
-		'group_label_type' => '',
-		'group_display_consent' => 'yes',
-		'group_button_text' => '',
-		'group_button_icon' => '',
-	);
-
-	function __construct()
-	{
-		$this->obj_group = new mf_group();
-
-		$this->widget_ops = array(
-			'classname' => 'widget_group',
-			'description' => __("Display a group registration form", 'lang_group'),
-		);
-
-		parent::__construct('group-widget', __("Group", 'lang_group')." / ".__("Newsletter", 'lang_group'), $this->widget_ops);
-
-	}
-
-	function widget($args, $instance)
-	{
-		do_log(__CLASS__."->".__FUNCTION__."(): Add a block instead", 'publish', false);
-	}
-
-	function update($new_instance, $old_instance)
-	{
-		$instance = $old_instance;
-		$new_instance = wp_parse_args((array)$new_instance, $this->arr_default);
-
-		$instance['group_heading'] = sanitize_text_field($new_instance['group_heading']);
-		$instance['group_text'] = sanitize_text_field($new_instance['group_text']);
-		$instance['group_id'] = sanitize_text_field($new_instance['group_id']);
-		$instance['group_label_type'] = sanitize_text_field($new_instance['group_label_type']);
-		$instance['group_display_consent'] = sanitize_text_field($new_instance['group_display_consent']);
-		$instance['group_button_text'] = sanitize_text_field($new_instance['group_button_text']);
-		$instance['group_button_icon'] = sanitize_text_field($new_instance['group_button_icon']);
-
-		return $instance;
-	}
-
-	function get_label_types_for_select()
-	{
-		return array(
-			'label' => __("Label", 'lang_group'),
-			'placeholder' => __("Placeholder", 'lang_group'),
-		);
-	}
-
-	function form($instance)
-	{
-		global $obj_base;
-
-		if(!isset($obj_base))
-		{
-			$obj_base = new mf_base();
-		}
-
-		$instance = wp_parse_args((array)$instance, $this->arr_default);
-
-		$arr_data = [];
-		get_post_children(array('add_choose_here' => true, 'post_type' => $this->obj_group->post_type, 'post_status' => '', 'where' => "post_status != 'trash'".(IS_EDITOR ? "" : " AND post_author = '".get_current_user_id()."'")), $arr_data);
-
-		echo "<div class='mf_form'>"
-			.show_textfield(array('name' => $this->get_field_name('group_heading'), 'text' => __("Heading", 'lang_group'), 'value' => $instance['group_heading'], 'xtra' => " id='".$this->widget_ops['classname']."-title'"))
-			.show_textarea(array('name' => $this->get_field_name('group_text'), 'text' => __("Text", 'lang_group'), 'value' => $instance['group_text']))
-			.show_select(array('data' => $arr_data, 'name' => $this->get_field_name('group_id'), 'text' => __("Group", 'lang_group'), 'value' => $instance['group_id']))
-			.show_select(array('data' => $this->get_label_types_for_select(), 'name' => $this->get_field_name('group_label_type'), 'text' => __("Display Input Label as", 'lang_group'), 'value' => $instance['group_label_type']))
-			.show_select(array('data' => get_yes_no_for_select(), 'name' => $this->get_field_name('group_display_consent'), 'text' => __("Display Consent", 'lang_group'), 'value' => $instance['group_display_consent']))
-			.show_textfield(array('name' => $this->get_field_name('group_button_text'), 'text' => __("Button Text", 'lang_group'), 'value' => $instance['group_button_text'], 'placeholder' => __("Join", 'lang_group')))
-			.show_select(array('data' => $obj_base->get_icons_for_select(), 'name' => $this->get_field_name('group_button_icon'), 'text' => __("Button Icon", 'lang_group'), 'value' => $instance['group_button_icon']))
-		."</div>";
 	}
 }
