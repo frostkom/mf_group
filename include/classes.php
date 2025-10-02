@@ -1728,7 +1728,7 @@ class mf_group
 
 	function admin_notices()
 	{
-		global $wpdb, $error_text;
+		global $wpdb, $error_text, $done_text;
 
 		if(IS_ADMINISTRATOR && does_table_exist($wpdb->prefix."group_message"))
 		{
@@ -1763,10 +1763,68 @@ class mf_group
 				}
 
 				$error_text = __("There were unsent messages", 'lang_group')." (".$unsent_links.($rows == 6 ? "&hellip;" : "").")";
-
-				echo get_notification();
 			}
 		}
+
+		$screen = get_current_screen();
+
+		if($screen->post_type === $this->post_type)
+		{
+			if(isset($_GET['btnGroupResend']) && $this->id > 0 && wp_verify_nonce($_REQUEST['_wpnonce_group_resend'], 'group_resend_'.$this->id))
+			{
+				$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE addressDeleted = '0' AND groupID = '%d' AND groupAccepted = '0' AND groupUnsubscribed = '0' AND (groupAcceptanceSent IS null OR groupAcceptanceSent <= '%s') ORDER BY groupAcceptanceSent ASC".$this->get_message_query_limit(), $this->id, date("Y-m-d H:i:s", strtotime("-1 week"))));
+
+				$success = $fail = 0;
+
+				foreach($result as $r)
+				{
+					if($this->send_acceptance_message(array('type' => 'reminder', 'address_id' => $r->addressID, 'group_id' => $this->id)))
+					{
+						$success++;
+					}
+
+					else
+					{
+						$fail++;
+					}
+
+					if(($success + $fail) % 20 == 0)
+					{
+						sleep(1);
+						set_time_limit(60);
+					}
+				}
+
+				if($fail > 0)
+				{
+					$error_text = sprintf(__("%d messages were successful and %d failed", 'lang_group'), $success, $fail);
+				}
+
+				else
+				{
+					$done_text = sprintf(__("%d messages were sent", 'lang_group'), $success);
+				}
+			}
+
+			else if(isset($_GET['sent']))
+			{
+				$done_text = __("The information was sent", 'lang_group');
+			}
+
+			else if(isset($_GET['created']))
+			{
+				$done_text = __("The group was created", 'lang_group');
+			}
+
+			else if(isset($_GET['updated']))
+			{
+				$done_text = __("The group was updated", 'lang_group');
+			}
+
+			$obj_export = new mf_group_export();
+		}
+
+		echo get_notification();
 	}
 
 	function column_header($columns)
@@ -2235,7 +2293,6 @@ class mf_group
 			),
 		);
 
-		//if($this->api == '')
 		$meta_boxes[] = array(
 			'id' => $this->meta_prefix.'acceptance_email',
 			'title' => __("Acceptance e-mail", 'lang_group'),
@@ -2614,33 +2671,6 @@ class mf_group
 				}
 			break;
 
-			/*case 'create':
-				$this->name = check_var('strGroupName');
-
-				$this->acceptance_email = check_var('strGroupAcceptanceEmail', 'char', true, 'no');
-				$this->acceptance_subject = check_var('strGroupAcceptanceSubject');
-				$this->acceptance_text = check_var('strGroupAcceptanceText');
-				$this->reminder_subject = check_var('strGroupReminderSubject');
-				$this->reminder_text = check_var('strGroupReminderText');
-
-				$this->owner_email = check_var('intGroupOwnerEmail');
-				$this->help_page = check_var('intGroupHelpPage');
-				$this->archive_page = check_var('intGroupArchivePage');
-
-				$this->group_type = check_var('strGroupType');
-				$this->allow_registration = check_var('strGroupAllowRegistration', 'char', true, 'no');
-
-				$this->verify_address = check_var('strGroupVerifyAddress');
-				$this->contact_page = check_var('intGroupContactPage');
-				$this->registration_fields = check_var('arrGroupRegistrationFields');
-				$this->verify_link = check_var('strGroupVerifyLink', 'char', true, 'no');
-				$this->sync_users = check_var('strGroupSyncUsers', 'char', true, 'no');
-
-				$this->id_copy = check_var('intGroupID_copy');
-				$this->api = check_var('strGroupAPI');
-				$this->api_filter = check_var('strGroupAPIFilter');
-			break;*/
-
 			case 'sent':
 				$this->message_id = check_var('intMessageID');
 			break;
@@ -2699,46 +2729,8 @@ class mf_group
 
 		switch($this->type)
 		{
-			case 'table':
-				if(isset($_REQUEST['btnGroupDelete']) && $this->id > 0 && wp_verify_nonce($_REQUEST['_wpnonce_group_delete'], 'group_delete_'.$this->id))
-				{
-					if(wp_trash_post($this->id))
-					{
-						$this->remove_all_address($this->id);
-
-						$done_text = __("The information was deleted", 'lang_group');
-					}
-				}
-
-				else if(isset($_REQUEST['btnGroupActivate']) && $this->id > 0 && wp_verify_nonce($_REQUEST['_wpnonce_group_activate'], 'group_activate_'.$this->id))
-				{
-					$post_data = array(
-						'ID' => $this->id,
-						'post_status' => 'draft',
-						'post_modified' => date("Y-m-d H:i:s"),
-					);
-
-					if(wp_update_post($post_data) > 0)
-					{
-						$done_text = __("The group was activated", 'lang_group');
-					}
-				}
-
-				else if(isset($_REQUEST['btnGroupInactivate']) && $this->id > 0 && wp_verify_nonce($_REQUEST['_wpnonce_group_inactivate'], 'group_inactivate_'.$this->id))
-				{
-					$post_data = array(
-						'ID' => $this->id,
-						'post_status' => 'ignore',
-						'post_modified' => date("Y-m-d H:i:s"),
-					);
-
-					if(wp_update_post($post_data) > 0)
-					{
-						$done_text = __("The group was inactivated", 'lang_group');
-					}
-				}
-
-				else if(isset($_GET['btnGroupResend']) && $this->id > 0 && wp_verify_nonce($_REQUEST['_wpnonce_group_resend'], 'group_resend_'.$this->id))
+			/*case 'table':
+				if(isset($_GET['btnGroupResend']) && $this->id > 0 && wp_verify_nonce($_REQUEST['_wpnonce_group_resend'], 'group_resend_'.$this->id))
 				{
 					$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE addressDeleted = '0' AND groupID = '%d' AND groupAccepted = '0' AND groupUnsubscribed = '0' AND (groupAcceptanceSent IS null OR groupAcceptanceSent <= '%s') ORDER BY groupAcceptanceSent ASC".$this->get_message_query_limit(), $this->id, date("Y-m-d H:i:s", strtotime("-1 week"))));
 
@@ -2790,7 +2782,7 @@ class mf_group
 				}
 
 				$obj_export = new mf_group_export();
-			break;
+			break;*/
 
 			case 'form':
 				if(isset($_POST['btnGroupSend']) && count($this->arr_group_id) > 0 && wp_verify_nonce($_POST['_wpnonce_group_send'], 'group_send_'.$this->message_type))
@@ -2938,99 +2930,6 @@ class mf_group
 				}
 			break;
 
-			/*case 'create':
-				if(isset($_POST['btnGroupSave']) && wp_verify_nonce($_POST['_wpnonce_group_save'], 'group_save_'.$this->id))
-				{
-					$post_data = array(
-						'post_type' => $this->post_type,
-						//'post_status' => $this->public,
-						'post_status' => 'publish',
-						'post_title' => $this->name,
-						'meta_input' => array(
-							$this->meta_prefix.'api' => $this->api,
-							$this->meta_prefix.'api_filter' => $this->api_filter,
-							$this->meta_prefix.'acceptance_email' => $this->acceptance_email,
-							$this->meta_prefix.'acceptance_subject' => $this->acceptance_subject,
-							$this->meta_prefix.'acceptance_text' => $this->acceptance_text,
-							$this->meta_prefix.'group_type' => $this->group_type,
-							$this->meta_prefix.'allow_registration' => $this->allow_registration,
-							$this->meta_prefix.'verify_address' => $this->verify_address,
-							$this->meta_prefix.'contact_page' => $this->contact_page,
-							//$this->meta_prefix.'registration_fields' => $this->registration_fields, // This will be saved in wrong format due to Meta Box
-							$this->meta_prefix.'verify_link' => $this->verify_link,
-							$this->meta_prefix.'sync_users' => $this->sync_users,
-							$this->meta_prefix.'owner_email' => $this->owner_email,
-							$this->meta_prefix.'help_page' => $this->help_page,
-							$this->meta_prefix.'archive_page' => $this->archive_page,
-						),
-					);
-
-					if($this->id > 0)
-					{
-						$post_data['ID'] = $this->id;
-						$post_data['post_modified'] = date("Y-m-d H:i:s");
-						$post_data['meta_input'] = apply_filters('filter_meta_input', $post_data['meta_input'], $post_data['ID']);
-
-						if(wp_update_post($post_data) > 0)
-						{
-							mf_redirect(admin_url("admin.php?page=mf_group/list/index.php&updated"));
-						}
-
-						else
-						{
-							$error_text = __("The information was not submitted, contact an admin if this persists", 'lang_group');
-						}
-					}
-
-					else
-					{
-						$post_data['meta_input'] = apply_filters('filter_meta_input', $post_data['meta_input']);
-
-						$this->id = wp_insert_post($post_data);
-
-						if($this->id > 0)
-						{
-							if($this->id_copy > 0)
-							{
-								$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0'", $this->id_copy));
-
-								foreach($result as $r)
-								{
-									$intAddressID = $r->addressID;
-
-									$this->add_address(array('address_id' => $intAddressID, 'group_id' => $this->id));
-								}
-							}
-
-							mf_redirect(admin_url("admin.php?page=mf_group/list/index.php&created"));
-						}
-
-						else
-						{
-							$error_text = __("The information was not submitted, contact an admin if this persists", 'lang_group');
-						}
-					}
-				}
-
-				else if(isset($_POST['btnGroupRemoveRecipients']) && $this->id > 0 && wp_verify_nonce($_POST['_wpnonce_group_remove_recipients'], 'group_remove_recipients_'.$this->id))
-				{
-					if(isset($_POST['intGroupRemoveRecipientsConfirm']) && $_POST['intGroupRemoveRecipientsConfirm'] == 1)
-					{
-						$this->remove_all_address($this->id);
-
-						if($wpdb->rows_affected > 0)
-						{
-							$done_text = __("I removed all the recipients from this group", 'lang_group');
-						}
-
-						else
-						{
-							$error_text = __("I could not remove the recipients from this group", 'lang_group');
-						}
-					}
-				}
-			break;*/
-
 			case 'sent':
 				if(isset($_REQUEST['btnMessageDelete']) && $this->message_id > 0 && wp_verify_nonce($_REQUEST['_wpnonce_message_delete'], 'message_delete_'.$this->message_id))
 				{
@@ -3045,10 +2944,6 @@ class mf_group
 
 					$done_text = __("The message was aborted", 'lang_group');
 				}
-			break;
-
-			case 'message':
-
 			break;
 		}
 
@@ -3602,8 +3497,6 @@ if(class_exists('mf_list_table'))
 			$this->post_type = '';
 
 			$this->arr_settings['query_select_id'] = "queueID";
-			//$this->arr_settings['query_all_id'] = "0";
-			//$this->arr_settings['query_trash_id'] = "1";
 			$this->orderby_default = "queueSentTime ASC, queueID";
 			$this->orderby_default_order = "ASC";
 
