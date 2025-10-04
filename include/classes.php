@@ -1768,7 +1768,7 @@ class mf_group
 
 		$screen = get_current_screen();
 
-		if($screen->post_type === $this->post_type)
+		if(isset($screen->post_type) && $screen->post_type === $this->post_type)
 		{
 			if(isset($_GET['btnGroupResend']) && $this->id > 0 && wp_verify_nonce($_REQUEST['_wpnonce_group_resend'], 'group_resend_'.$this->id))
 			{
