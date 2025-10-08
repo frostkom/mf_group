@@ -2048,7 +2048,7 @@ class mf_group
 							if($rowsAddresses2Remind > 0)
 							{
 								echo "<div class='row-actions'>
-									<a href='".wp_nonce_url($list_url."&btnGroupResend", 'group_resend_'.$post_id, '_wpnonce_group_resend')."' rel='confirm'>
+									<a href='".wp_nonce_url($list_url."&btnGroupResend", 'group_resend_'.$post_id, '_wpnonce_group_resend')."'".make_link_confirm().">
 										<i class='fa fa-recycle fa-lg' title='".sprintf(__("There are %d subscribers that can be reminded again. Do you want to do that?", 'lang_group'), $rowsAddresses2Remind)."'></i>
 									</a>
 								</div>";
@@ -2073,7 +2073,7 @@ class mf_group
 							$user_email = $user_data->user_email;
 
 							echo "<div class='row-actions'>
-								<a href='".$this->get_group_url(array('type' => 'unsubscribe', 'group_id' => $post_id, 'email' => $user_email))."' rel='confirm'>".__("Test", 'lang_group')."</a>
+								<a href='".$this->get_group_url(array('type' => 'unsubscribe', 'group_id' => $post_id, 'email' => $user_email))."'".make_link_confirm().">".__("Test", 'lang_group')."</a>
 							</div>";
 						}
 					break;

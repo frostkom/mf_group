@@ -214,11 +214,11 @@ echo "<div class='wrap'>
 									</span>";
 								}
 
-								echo show_select(array('data' => $arr_data_groups, 'name' => 'intGroupID', 'text' => $group_label, 'value' => $obj_group->id, 'xtra' => " rel='submit_change'"));
+								echo show_select(array('data' => $arr_data_groups, 'name' => 'intGroupID', 'text' => $group_label, 'value' => $obj_group->id, 'xtra' => "rel='submit_change'"));
 
 								if($obj_group->id > 0)
 								{
-									echo show_select(array('data' => $arr_data_months, 'name' => 'strGroupMonth', 'text' => __("Month", 'lang_group'), 'value' => $obj_group->group_month, 'xtra' => " rel='submit_change'"));
+									echo show_select(array('data' => $arr_data_months, 'name' => 'strGroupMonth', 'text' => __("Month", 'lang_group'), 'value' => $obj_group->group_month, 'xtra' => "rel='submit_change'"));
 								}
 
 								echo show_button(array('text' => __("Change", 'lang_group')))
