@@ -1732,7 +1732,7 @@ class mf_group
 
 		if(IS_ADMINISTRATOR && does_table_exist($wpdb->prefix."group_message"))
 		{
-			$result = $wpdb->get_results("SELECT messageType, addressID, addressFirstName, addressSurName, addressEmail, addressCellNo FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) INNER JOIN ".$wpdb->prefix."address USING (addressID) WHERE queueSent = '0' AND queueCreated < DATE_SUB(NOW(), INTERVAL 3 HOUR) LIMIT 0, 6");
+			$result = $wpdb->get_results("SELECT groupID, messageType, addressID, addressFirstName, addressSurName, addressEmail, addressCellNo FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) INNER JOIN ".$wpdb->prefix."address USING (addressID) WHERE queueSent = '0' AND (queueCreated > DATE_SUB(NOW(), INTERVAL 1 WEEK) AND queueCreated < DATE_SUB(NOW(), INTERVAL 3 HOUR)) LIMIT 0, 6");
 			$rows = $wpdb->num_rows;
 
 			if($rows > 0)
@@ -1745,6 +1745,7 @@ class mf_group
 				{
 					if($i < 5)
 					{
+						$intGroupID = $r->groupID;
 						$strMessageType = $r->messageType;
 						$intAddressID = $r->addressID;
 						$strAddressFirstName = $r->addressFirstName;
@@ -1752,11 +1753,13 @@ class mf_group
 						$emlAddressEmail = $r->addressEmail;
 						$strAddressCellNo = $r->addressCellNo;
 
+						$strGroupName = get_the_title($intGroupID);
+
 						$strAddressName = ($strAddressFirstName != '' ? $strAddressFirstName." " : "")
 							.($strAddressSurName != '' ? $strAddressSurName." " : "")
 							."&lt;".($strMessageType == "email" ? $emlAddressEmail : $strAddressCellNo)."&gt;";
 
-						$unsent_links .= ($unsent_links != '' ? ", " : "")."<a href='".admin_url("admin.php?page=mf_address/create/index.php&intAddressID=".$intAddressID)."'>".$strAddressName."</a>";
+						$unsent_links .= ($unsent_links != '' ? ", " : "")."<a href='".admin_url("edit.php?s=".$strGroupName."&post_type=".$this->post_type)."'>".$strGroupName."</a> -> <a href='".admin_url("admin.php?page=mf_address/create/index.php&intAddressID=".$intAddressID)."'>".$strAddressName."</a>";
 
 						$i++;
 					}
@@ -1979,25 +1982,25 @@ class mf_group
 
 							if($amount > 0 && $group_type != 'stop')
 							{
-								$arr_actions['send_email'] = "<a href='".admin_url("admin.php?page=mf_group/send/index.php&intGroupID=".$post_id."&type=email")."' title='".__("Send e-mail to everyone in the group", 'lang_group')."'><i class='fa fa-paper-plane fa-lg'></i></a> ";
+								$arr_actions['send_email'] = "<a href='".admin_url("admin.php?page=mf_group/send/index.php&intGroupID=".$post_id."&type=email")."' title='".__("Send e-mail to everyone in the group", 'lang_group')."'><i class='fa fa-paper-plane fa-lg'></i></a>";
 
 								$arr_actions = apply_filters('add_group_list_amount_actions', $arr_actions, $post_id);
 							}
 
 							if($this->is_synced($post_id) == false)
 							{
-								$arr_actions['addnremove'] = "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id."&strFilterIsMember&strFilterAccepted&strFilterUnsubscribed")."' title='".__("Add or remove", 'lang_group')."'><i class='fas fa-tasks fa-lg'></i></a> ";
+								$arr_actions['addnremove'] = "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id."&strFilterIsMember&strFilterAccepted&strFilterUnsubscribed")."' title='".__("Add or remove", 'lang_group')."'><i class='fas fa-tasks fa-lg'></i></a>";
 
-								$arr_actions['import'] = "<a href='".admin_url("admin.php?page=mf_group/import/index.php&intGroupID=".$post_id)."' title='".__("Import Addresses", 'lang_group')."'><i class='fas fa-cloud-upload-alt fa-lg'></i></a> ";
+								$arr_actions['import'] = "<a href='".admin_url("admin.php?page=mf_group/import/index.php&intGroupID=".$post_id)."' title='".__("Import Addresses", 'lang_group')."'><i class='fas fa-cloud-upload-alt fa-lg'></i></a>";
 							}
 
 							if($amount > 0)
 							{
-								$arr_actions['export_csv'] = "<a href='".wp_nonce_url($list_url."&btnExportRun&intExportType=".$post_id."&strExportFormat=csv", 'export_run', '_wpnonce_export_run')."' title='".__("Export", 'lang_group')." CSV'><i class='fas fa-file-csv fa-lg'></i></a> ";
+								$arr_actions['export_csv'] = "<a href='".wp_nonce_url($list_url."&btnExportRun&intExportType=".$post_id."&strExportFormat=csv", 'export_run', '_wpnonce_export_run')."' title='".__("Export", 'lang_group')." CSV'><i class='fas fa-file-csv fa-lg'></i></a>";
 
 								if(is_plugin_active("mf_phpexcel/index.php"))
 								{
-									$arr_actions['export_xls'] = "<a href='".wp_nonce_url($list_url."&btnExportRun&intExportType=".$post_id."&strExportFormat=xls", 'export_run', '_wpnonce_export_run')."' title='".__("Export", 'lang_group')." XLS'><i class='fas fa-file-excel fa-lg'></i></a> ";
+									$arr_actions['export_xls'] = "<a href='".wp_nonce_url($list_url."&btnExportRun&intExportType=".$post_id."&strExportFormat=xls", 'export_run', '_wpnonce_export_run')."' title='".__("Export", 'lang_group')." XLS'><i class='fas fa-file-excel fa-lg'></i></a>";
 								}
 							}
 						}
@@ -2012,15 +2015,24 @@ class mf_group
 								echo " <span class='grey' title='".__("Deleted", 'lang_group')."'>+ ".$amount_deleted."</span>";
 							}
 
-						echo "</a> ";
+						echo "</a>";
 
 						if(count($arr_actions) > 0)
 						{
 							echo "<div class='row-actions'>";
 
+								$i = 0;
+
 								foreach($arr_actions as $key => $action)
 								{
+									if($i > 0)
+									{
+										echo " ";
+									}
+
 									echo "<span class='".$key."'>".$action."</span>";
+
+									$i++;
 								}
 
 							echo "</div>";
