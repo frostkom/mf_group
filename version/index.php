@@ -202,7 +202,7 @@ echo "<div class='wrap'>
 					<div class='postbox'>
 						<h3 class='hndle'><span>".__("Groups", 'lang_group')."</span></h3>
 						<div class='inside'>
-							<form".apply_filters('get_form_attr', " method='get'", ['class' => ["mf_settings"]]).">";
+							<form".apply_filters('get_form_attr', " method='get'").">";
 
 								$group_label = __("Group", 'lang_group');
 
