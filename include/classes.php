@@ -1314,7 +1314,7 @@ class mf_group
 
 				else
 				{
-					$out .= "<form action='' method='post' class='mf_form'>";
+					$out .= "<form".apply_filters('get_form_attr', "").">";
 
 						if(is_array($arrGroupRegistrationFields) && count($arrGroupRegistrationFields) > 0)
 						{

@@ -153,7 +153,7 @@ get_header();
 
 									else
 									{
-										$post_content .= "<form method='post' action='' class='mf_form'>
+										$post_content .= "<form".apply_filters('get_form_attr', "").">
 											<p>".__("Are you sure that you want to unsubscribe?", 'lang_group')."</p>
 											<div".get_form_button_classes().">"
 												.show_button(array('name' => 'btnUnsubscribe', 'text' => __("Unsubscribe", 'lang_group')))
