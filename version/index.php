@@ -4,6 +4,8 @@ $obj_group = new mf_group(array('type' => 'version'));
 $obj_group->fetch_request();
 //echo $obj_group->save_data();
 
+do_action('load_font_awesome');
+
 echo "<div class='wrap'>
 	<h2>".__("History", 'lang_group')."</h2>"
 	.get_notification()

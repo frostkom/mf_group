@@ -1834,6 +1834,8 @@ class mf_group
 	{
 		global $post_type;
 
+		do_action('load_font_awesome');
+
 		unset($columns['date']);
 
 		switch($post_type)
@@ -2435,6 +2437,8 @@ class mf_group
 
 		/*if($this->group_type == 'stop')
 		{
+			do_action('load_font_awesome');
+
 			$description = "<i class='fa fa-exclamation-triangle yellow'></i> ".__("This will prevent messages to all recipients in this group regardless which group that you are sending to.", 'lang_group');
 		}*/
 
@@ -3259,6 +3263,8 @@ if(class_exists('mf_list_table'))
 		function init_fetch()
 		{
 			global $wpdb, $obj_group;
+
+			do_action('load_font_awesome');
 
 			$this->query_where .= "groupID = '".esc_sql($this->arr_settings['intGroupID'])."'";
 
