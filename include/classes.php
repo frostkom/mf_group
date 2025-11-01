@@ -4,7 +4,7 @@ class mf_group
 {
 	var $id;
 	var $type;
-	var $post_type = 'mf_group';
+	var $post_type = __CLASS__;
 	var $meta_prefix;
 	var $arr_stop_list_groups = [];
 	var $arr_stop_list_recipients = [];

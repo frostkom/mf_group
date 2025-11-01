@@ -51,7 +51,7 @@ echo "<div class='wrap'>
 										}
 									}
 
-									echo "<div class='flex_flow'>
+									echo "<div".apply_filters('get_flex_flow', "").">
 										<div>"
 											.show_select(array('data' => $arr_data_from, 'name' => 'strMessageFrom', 'text' => __("From", 'lang_group'), 'value' => $obj_group->message_from, 'required' => true))
 											.show_textfield(array('name' => 'strMessageName', 'text' => __("Subject", 'lang_group'), 'value' => $obj_group->message_name, 'required' => true, 'maxlength' => 200))
@@ -97,7 +97,7 @@ echo "<div class='wrap'>
 								echo $result['html'];
 							}
 
-							echo "<div class='flex_flow'>"
+							echo "<div".apply_filters('get_flex_flow', "").">"
 								.show_textfield(array('type' => 'date', 'name' => 'dteMessageScheduleDate', 'text' => __("Schedule", 'lang_group'), 'value' => $obj_group->message_schedule_date, 'placeholder' => date("Y-m-d")))
 								.show_textfield(array('type' => 'time', 'name' => 'dteMessageScheduleTime', 'text' => "&nbsp;", 'value' => $obj_group->message_schedule_time, 'placeholder' => date("H:i")))
 							."</div>
