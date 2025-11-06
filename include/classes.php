@@ -2745,61 +2745,6 @@ class mf_group
 
 		switch($this->type)
 		{
-			/*case 'table':
-				if(isset($_GET['btnGroupResend']) && $this->id > 0 && wp_verify_nonce($_REQUEST['_wpnonce_group_resend'], 'group_resend_'.$this->id))
-				{
-					$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE addressDeleted = '0' AND groupID = '%d' AND groupAccepted = '0' AND groupUnsubscribed = '0' AND (groupAcceptanceSent IS null OR groupAcceptanceSent <= '%s') ORDER BY groupAcceptanceSent ASC".$this->get_message_query_limit(), $this->id, date("Y-m-d H:i:s", strtotime("-1 week"))));
-
-					$success = $fail = 0;
-
-					foreach($result as $r)
-					{
-						if($this->send_acceptance_message(array('type' => 'reminder', 'address_id' => $r->addressID, 'group_id' => $this->id)))
-						{
-							$success++;
-						}
-
-						else
-						{
-							$fail++;
-						}
-
-						if(($success + $fail) % 20 == 0)
-						{
-							sleep(1);
-							set_time_limit(60);
-						}
-					}
-
-					if($fail > 0)
-					{
-						$error_text = sprintf(__("%d messages were successful and %d failed", 'lang_group'), $success, $fail);
-					}
-
-					else
-					{
-						$done_text = sprintf(__("%d messages were sent", 'lang_group'), $success);
-					}
-				}
-
-				else if(isset($_GET['sent']))
-				{
-					$done_text = __("The information was sent", 'lang_group');
-				}
-
-				else if(isset($_GET['created']))
-				{
-					$done_text = __("The group was created", 'lang_group');
-				}
-
-				else if(isset($_GET['updated']))
-				{
-					$done_text = __("The group was updated", 'lang_group');
-				}
-
-				$obj_export = new mf_group_export();
-			break;*/
-
 			case 'form':
 				if(isset($_POST['btnGroupSend']) && count($this->arr_group_id) > 0 && wp_verify_nonce($_POST['_wpnonce_group_send'], 'group_send_'.$this->message_type))
 				{

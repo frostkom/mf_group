@@ -5,7 +5,7 @@
 		SelectControl = wp.components.SelectControl,
 		TextControl = wp.components.TextControl,
 		MediaUpload = wp.blockEditor.MediaUpload,
-	    Button = wp.components.Button,
+		Button = wp.components.Button,
 		MediaUploadCheck = wp.blockEditor.MediaUploadCheck,
 		InspectorControls = wp.blockEditor.InspectorControls;
 
@@ -24,29 +24,29 @@
 			},
 			'group_id':
 			{
-                'type': 'string',
-                'default': ''
-            },
+				'type': 'string',
+				'default': ''
+			},
 			'group_label_type':
 			{
-                'type': 'string',
-                'default': ''
-            },
+				'type': 'string',
+				'default': ''
+			},
 			'group_display_consent':
 			{
-                'type': 'string',
-                'default': ''
-            },
+				'type': 'string',
+				'default': ''
+			},
 			'group_button_text':
 			{
-                'type': 'string',
-                'default': ''
-            },
+				'type': 'string',
+				'default': ''
+			},
 			'group_button_icon':
 			{
-                'type': 'string',
-                'default': ''
-            }
+				'type': 'string',
+				'default': ''
+			}
 		},
 		'supports':
 		{
