@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description:
-Version: 5.13.26
+Version: 5.13.27
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://martinfors.se
@@ -118,17 +118,12 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 			KEY linkUrl (linkUrl)
 		) DEFAULT CHARSET=".$default_charset);
 
-		$arr_add_column[$wpdb->prefix."group_message_link"] = array(
-			//'linkUsed' => "ALTER TABLE [table] ADD [column] DATETIME AFTER linkUrl",
-		);
-
 		$wpdb->query("CREATE TABLE IF NOT EXISTS ".$wpdb->prefix."group_queue (
 			queueID INT UNSIGNED NOT NULL AUTO_INCREMENT,
 			addressID INT UNSIGNED NOT NULL DEFAULT '0',
 			messageID INT UNSIGNED NOT NULL DEFAULT '0',
-			queueSent ENUM('0','1') NOT NULL DEFAULT '0',"
-			//."queueReceived ENUM('-1', '0','1') NOT NULL DEFAULT '0',"
-			."queueStatus VARCHAR(20) NOT NULL DEFAULT '',
+			queueSent ENUM('0','1') NOT NULL DEFAULT '0',
+			queueStatus VARCHAR(20) NOT NULL DEFAULT '',
 			queueStatusMessage TEXT,
 			queueCreated DATETIME NOT NULL,
 			queueSentTime DATETIME NOT NULL,
@@ -139,12 +134,12 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 		) DEFAULT CHARSET=".$default_charset);
 
 		$arr_add_column[$wpdb->prefix."group_queue"] = array(
-			//'queueViewed' => "ALTER TABLE [table] ADD [column] DATETIME NOT NULL AFTER queueSentTime",
 			'queueStatus' => "ALTER TABLE [table] ADD [column] VARCHAR(20) NOT NULL DEFAULT '' AFTER queueSent",
-			//'queueStatusMessage' => "ALTER TABLE [table] ADD [column] TEXT AFTER queueStatus",
 		);
 
-		$arr_update_column[$wpdb->prefix."group_queue"]['queueReceived'] = "ALTER TABLE [table] DROP COLUMN [column]";
+		$arr_update_column[$wpdb->prefix."group_queue"] = array(
+			'queueReceived' => "ALTER TABLE [table] DROP COLUMN [column]"
+		);
 
 		$wpdb->query("CREATE TABLE IF NOT EXISTS ".$wpdb->prefix."address2group (
 			addressID INT UNSIGNED NOT NULL,

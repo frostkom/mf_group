@@ -64,7 +64,48 @@ class mf_group
 
 	function is_synced($group_id)
 	{
-		return (get_post_meta($group_id, $this->meta_prefix.'api', true) != '' || get_post_meta($group_id, $this->meta_prefix.'sync_users', true) != 'no');
+		return (get_post_meta($group_id, $this->meta_prefix.'api', true) != ''); // || get_post_meta($group_id, $this->meta_prefix.'sync_users', true) != 'no'
+	}
+
+	function amount_in_group($data = [])
+	{
+		global $wpdb;
+
+		if(does_table_exist($wpdb->prefix."address") && does_table_exist($wpdb->prefix."address2group"))
+		{
+			if(!isset($data['id'])){				$data['id'] = $this->id;}
+			if(!isset($data['accepted'])){			$data['accepted'] = 1;}
+			if(!isset($data['acceptance_sent'])){	$data['acceptance_sent'] = '';}
+			if(!isset($data['unsubscribed'])){		$data['unsubscribed'] = 0;}
+			if(!isset($data['deleted'])){			$data['deleted'] = 0;}
+
+			$query_where = "";
+
+			if($data['id'] > 0)
+			{
+				$query_where .= " AND groupID = '".esc_sql($data['id'])."'";
+			}
+
+			if($data['acceptance_sent'] > DEFAULT_DATE)
+			{
+				$query_where .= " AND (groupAcceptanceSent IS null OR groupAcceptanceSent <= '".esc_sql($data['acceptance_sent'])."')";
+			}
+
+			/* Display filtered number of addresses after Stop list has been accounted for */
+			$arr_stop_list_recipients = $this->get_stop_list_recipients();
+
+			if(!in_array($data['id'], $this->arr_stop_list_groups) && count($arr_stop_list_recipients) > 0)
+			{
+				$query_where .= " AND addressID NOT IN('".implode("','", $arr_stop_list_recipients)."')";
+			}
+
+			return $wpdb->get_var($wpdb->prepare("SELECT COUNT(addressID) FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE addressDeleted = '%d' AND groupAccepted = '%d' AND groupUnsubscribed = '%d'".$query_where, $data['deleted'], $data['accepted'], $data['unsubscribed']));
+		}
+
+		else
+		{
+			return 0;
+		}
 	}
 
 	function get_for_select($data = [])
@@ -661,7 +702,7 @@ class mf_group
 
 					/* Add users to groups that are set to synchronize */
 					#############################
-					if($is_syncing == false)
+					/*if($is_syncing == false)
 					{
 						$result = $wpdb->get_results($wpdb->prepare("SELECT ID, meta_value FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND meta_key = %s AND meta_value != %s GROUP BY ID", $this->post_type, 'publish', $this->meta_prefix.'sync_users', 'no'));
 
@@ -753,7 +794,7 @@ class mf_group
 								}
 							}
 						}
-					}
+					}*/
 					#############################
 
 					/* Synchronize with API */
@@ -3138,47 +3179,6 @@ class mf_group
 		else
 		{
 			return false;
-		}
-	}
-
-	function amount_in_group($data = [])
-	{
-		global $wpdb;
-
-		if(does_table_exist($wpdb->prefix."address") && does_table_exist($wpdb->prefix."address2group"))
-		{
-			if(!isset($data['id'])){				$data['id'] = $this->id;}
-			if(!isset($data['accepted'])){			$data['accepted'] = 1;}
-			if(!isset($data['acceptance_sent'])){	$data['acceptance_sent'] = '';}
-			if(!isset($data['unsubscribed'])){		$data['unsubscribed'] = 0;}
-			if(!isset($data['deleted'])){			$data['deleted'] = 0;}
-
-			$query_where = "";
-
-			if($data['id'] > 0)
-			{
-				$query_where .= " AND groupID = '".esc_sql($data['id'])."'";
-			}
-
-			if($data['acceptance_sent'] > DEFAULT_DATE)
-			{
-				$query_where .= " AND (groupAcceptanceSent IS null OR groupAcceptanceSent <= '".esc_sql($data['acceptance_sent'])."')";
-			}
-
-			/* Display filtered number of addresses after Stop list has been accounted for */
-			$arr_stop_list_recipients = $this->get_stop_list_recipients();
-
-			if(!in_array($data['id'], $this->arr_stop_list_groups) && count($arr_stop_list_recipients) > 0)
-			{
-				$query_where .= " AND addressID NOT IN('".implode("','", $arr_stop_list_recipients)."')";
-			}
-
-			return $wpdb->get_var($wpdb->prepare("SELECT COUNT(addressID) FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE addressDeleted = '%d' AND groupAccepted = '%d' AND groupUnsubscribed = '%d'".$query_where, $data['deleted'], $data['accepted'], $data['unsubscribed']));
-		}
-
-		else
-		{
-			return 0;
 		}
 	}
 }
