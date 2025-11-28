@@ -2293,8 +2293,7 @@ class mf_group
 	{
 		if($post->post_type == $this->post_type)
 		{
-			$block_code = '<!-- wp:mf/group {"group_id":"'.$post->ID.'"%} /-->';
-			$arr_ids = apply_filters('get_page_from_block_code', [], $block_code);
+			$arr_ids = apply_filters('get_page_from_block_code', [], '<!-- wp:mf/group {"group_id":"'.$post->ID.'"%} /-->');
 
 			if(count($arr_ids) > 0)
 			{
