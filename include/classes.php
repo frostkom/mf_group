@@ -20,26 +20,8 @@ class mf_group
 	var $message_schedule_time;
 	var $message_text_source;
 	var $message_attachment;
-	var $public;
-	var $name;
-	var $acceptance_email;
-	var $acceptance_subject;
-	var $acceptance_text;
-	var $reminder_subject;
-	var $reminder_text;
-	var $owner_email;
-	var $help_page;
-	var $archive_page;
-	var $group_type;
-	var $allow_registration;
-	var $verify_address;
-	var $contact_page;
-	var $registration_fields;
-	var $verify_link;
-	var $sync_users;
-	var $id_copy;
-	var $api;
-	var $api_filter;
+	//var $public;
+	//var $name;
 	var $query_where = "";
 
 	function __construct($data = [])
@@ -64,7 +46,9 @@ class mf_group
 
 	function is_synced($group_id)
 	{
-		return (get_post_meta($group_id, $this->meta_prefix.'api', true) != ''); // || get_post_meta($group_id, $this->meta_prefix.'sync_users', true) != 'no'
+		$sync_users = get_post_meta($group_id, $this->meta_prefix.'sync_users', true);
+
+		return (get_post_meta($group_id, $this->meta_prefix.'api', true) != '' || ($sync_users != 'no' && $sync_users != ''));
 	}
 
 	function amount_in_group($data = [])
@@ -696,15 +680,15 @@ class mf_group
 				}
 				#############################
 
-				if(get_option('option_group_synced') < date("Y-m-d H:i:s", strtotime("-4 hour")))
+				if(get_option('option_group_synced') < date("Y-m-d H:i:s", strtotime("-1 hour")))
 				{
 					$is_syncing = false;
 
 					/* Add users to groups that are set to synchronize */
 					#############################
-					/*if($is_syncing == false)
+					if($is_syncing == false)
 					{
-						$result = $wpdb->get_results($wpdb->prepare("SELECT ID, meta_value FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id WHERE post_type = %s AND post_status = %s AND meta_key = %s AND meta_value != %s GROUP BY ID", $this->post_type, 'publish', $this->meta_prefix.'sync_users', 'no'));
+						$result = $wpdb->get_results($wpdb->prepare("SELECT ID, meta_value FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND meta_key = %s WHERE post_type = %s AND post_status = %s AND (meta_value != %s AND meta_value != '') GROUP BY ID", $this->meta_prefix.'sync_users', $this->post_type, 'publish', 'no'));
 
 						if($wpdb->num_rows > 0)
 						{
@@ -720,9 +704,38 @@ class mf_group
 								switch($sync_type)
 								{
 									case 'yes':
-										$users = get_users(array('fields' => 'all'));
+										$arr_users = get_users(array('fields' => array('ID', 'display_name', 'first_name', 'last_name', 'user_email')));
 
-										foreach($users as $user)
+										foreach($arr_users as $user)
+										{
+											$strUserFirstName = $user->first_name;
+											$strUserSurName = $user->last_name;
+											$strUserEmail = $user->user_email;
+
+											if($strUserFirstName == '' || $strUserSurName == '')
+											{
+												@list($strUserFirstName, $strUserSurName) = explode(" ", $user->display_name, 2);
+											}
+
+											$arr_addresses[] = array(
+												'email' => $strUserEmail,
+												'first_name' => $strUserFirstName,
+												'sur_name' => $strUserSurName,
+											);
+										}
+									break;
+
+									case 'administrator':
+									case 'editor':
+									case 'author':
+									case 'subscriber':
+									case 'reader':
+										$arr_users = get_users(array(
+											'fields' => array('ID', 'display_name', 'first_name', 'last_name', 'user_email'),
+											'role__in' => array($sync_type),
+										));
+
+										foreach($arr_users as $user)
 										{
 											$strUserFirstName = $user->first_name;
 											$strUserSurName = $user->last_name;
@@ -784,17 +797,14 @@ class mf_group
 								{
 									$result_addresses = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address2group WHERE groupID = '%d' AND addressID NOT IN ('".implode("','", $arr_address_ids)."')", $intGroupID));
 
-									if($wpdb->num_rows > 0)
+									foreach($result_addresses as $r)
 									{
-										foreach($result_addresses as $r)
-										{
-											$this->remove_address(array('address_id' => $r->addressID, 'group_id' => $intGroupID));
-										}
+										$this->remove_address(array('address_id' => $r->addressID, 'group_id' => $intGroupID));
 									}
 								}
 							}
 						}
-					}*/
+					}
 					#############################
 
 					/* Synchronize with API */
@@ -1974,6 +1984,8 @@ class mf_group
 							),
 						);
 
+						$i = 0;
+
 						foreach($arr_statuses as $key => $arr_value)
 						{
 							$post_meta = get_post_meta($post_id, $this->meta_prefix.$key, $arr_value['single']);
@@ -1999,6 +2011,11 @@ class mf_group
 
 							if($do_display == true)
 							{
+								if($i > 0)
+								{
+									echo "&nbsp;";
+								}
+
 								if(isset($arr_value['link']) && $arr_value['link'] != '')
 								{
 									echo "<a href='".$arr_value['link']."'>";
@@ -2008,8 +2025,10 @@ class mf_group
 
 								if(isset($arr_value['link']) && $arr_value['link'] != '')
 								{
-									echo "</a> ";
+									echo "</a>";
 								}
+
+								$i++;
 							}
 						}
 					break;
@@ -2083,11 +2102,13 @@ class mf_group
 					break;
 
 					case 'versioning':
-						$version_amount = $wpdb->get_var($wpdb->prepare("SELECT COUNT(versionID) FROM ".$wpdb->prefix."group_version WHERE groupID = '%d' LIMIT 0, 21", $post_id));
+						$version_display_limit = 200;
+
+						$version_amount = $wpdb->get_var($wpdb->prepare("SELECT COUNT(versionID) FROM ".$wpdb->prefix."group_version WHERE groupID = '%d' LIMIT 0, ".($version_display_limit + 1), $post_id));
 
 						if($version_amount > 0)
 						{
-							echo "<a href='".admin_url("admin.php?page=mf_group/version/index.php&intGroupID=".$post_id)."'>".($version_amount > 20 ? "20+" : $version_amount)."</a>";
+							echo "<a href='".admin_url("admin.php?page=mf_group/version/index.php&intGroupID=".$post_id)."'>".($version_amount > $version_display_limit ? $version_display_limit."+" : $version_amount)."</a>";
 						}
 					break;
 
@@ -2475,13 +2496,6 @@ class mf_group
 
 		$description = "";
 
-		/*if($this->group_type == 'stop')
-		{
-			do_action('load_font_awesome');
-
-			$description = "<i class='fa fa-exclamation-triangle yellow'></i> ".__("This will prevent messages to all recipients in this group regardless which group that you are sending to.", 'lang_group');
-		}*/
-
 		$arr_fields = array(
 			array(
 				'name' => __("Type", 'lang_group'),
@@ -2546,27 +2560,34 @@ class mf_group
 			'options' => get_yes_no_for_select(),
 			'desc' => __("In every message a hidden image/link is placed to see if the recipient has opened the message. This increases the risk of being classified as spam", 'lang_group'),
 		);
+		
+		$arr_data = array(
+			'no' => __("No", 'lang_group'),
+			'yes' => __("All Users", 'lang_group'),
+			//'administrator' => __("Administrator", 'lang_group'),
+			//'editor' => __("Editor", 'lang_group'),
+			//'subscriber' => __("Subscriber", 'lang_group'),
+		);
 
-		/*$amount_in_group = $this->amount_in_group();
+		global $wp_roles;
 
-		if(!($this->id > 0) || $this->sync_users == 'yes' || $amount_in_group == 0)
+		if(isset($wp_roles) && is_array($wp_roles->roles))
 		{
-			$arr_data = array(
-				'no' => __("No", 'lang_group'),
-				'yes' => __("Users", 'lang_group'),
-			);
-
-			$arr_data = apply_filters('get_group_sync_type', $arr_data);
-
-			echo show_select(array('data' => $arr_data, 'name' => 'strGroupSyncUsers', 'text' => __("Synchronize", 'lang_group'), 'value' => $this->sync_users, 'description' => __("This will automatically add/remove addresses and their information to this group", 'lang_group')));
+			foreach($wp_roles->roles as $key => $arr_role)
+			{
+				$arr_data[$key] = $arr_role['name'];
+			}
 		}
 
-		if($this->id > 0 && $this->api == '' && $this->allow_registration == 'no' && $this->sync_users == 'no' && $amount_in_group > 0)
-		{
-			echo show_button(array('name' => 'btnGroupRemoveRecipients', 'text' => __("Remove all recipients", 'lang_group'), 'class' => "button delete"))
-			.show_checkbox(array('name' => 'intGroupRemoveRecipientsConfirm', 'text' => __("Are you really sure?", 'lang_group'), 'value' => 1, 'description' => __("This will remove all recipients from this group and it is not possible to undo this action", 'lang_group')))
-			.wp_nonce_field('group_remove_recipients_'.$this->id, '_wpnonce_group_remove_recipients', true, false);
-		}*/
+		$arr_data = apply_filters('get_group_sync_type', $arr_data);
+
+		$arr_fields[] = array(
+			'name' => __("Synchronize", 'lang_group'),
+			'id' => $this->meta_prefix.'sync_users',
+			'type' => 'select',
+			'options' => $arr_data,
+			'desc' => __("This will automatically add/remove addresses and their information in this group", 'lang_group'),
+		);
 
 		$meta_boxes[] = array(
 			'id' => $this->meta_prefix.'settings',
