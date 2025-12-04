@@ -6,8 +6,9 @@ class mf_group
 	var $type;
 	var $post_type = __CLASS__;
 	var $meta_prefix;
-	var $arr_stop_list_groups = [];
-	var $arr_stop_list_recipients = [];
+	//var $arr_stop_list_groups = [];
+	//var $arr_stop_list_recipients = [];
+	var $arr_stop_list = [];
 	var $group_month;
 	var $message_type;
 	var $group_id;
@@ -51,11 +52,37 @@ class mf_group
 		return (get_post_meta($group_id, $this->meta_prefix.'api', true) != '' || ($sync_users != 'no' && $sync_users != ''));
 	}
 
+	function get_stop_list_recipients()
+	{
+		global $wpdb;
+
+		if(!isset($this->arr_stop_list['recipients']))
+		{
+			$this->arr_stop_list['groups'] = $this->arr_stop_list['recipients'] = [];
+
+			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND meta_key = %s WHERE post_type = %s AND post_status = %s AND meta_value = %s GROUP BY ID", $this->meta_prefix.'group_type', $this->post_type, 'publish', 'stop'));
+
+			foreach($result as $r)
+			{
+				$this->arr_stop_list['groups'][] = $r->ID;
+
+				$result_address = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address2group WHERE groupID = '%d'", $r->ID));
+
+				foreach($result_address as $r)
+				{
+					$this->arr_stop_list['recipients'][] = $r->addressID;
+				}
+			}
+		}
+
+		//return $this->arr_stop_list['recipients'];
+	}
+
 	function amount_in_group($data = [])
 	{
 		global $wpdb;
 
-		if(does_table_exist($wpdb->prefix."address") && does_table_exist($wpdb->prefix."address2group"))
+		if(apply_filters('does_table_exist', false, $wpdb->prefix."address") && apply_filters('does_table_exist', false, $wpdb->prefix."address2group"))
 		{
 			if(!isset($data['id'])){				$data['id'] = $this->id;}
 			if(!isset($data['accepted'])){			$data['accepted'] = 1;}
@@ -76,11 +103,11 @@ class mf_group
 			}
 
 			/* Display filtered number of addresses after Stop list has been accounted for */
-			$arr_stop_list_recipients = $this->get_stop_list_recipients();
+			$this->get_stop_list_recipients();
 
-			if(!in_array($data['id'], $this->arr_stop_list_groups) && count($arr_stop_list_recipients) > 0)
+			if(!in_array($data['id'], $this->arr_stop_list['groups']) && count($this->arr_stop_list['recipients']) > 0)
 			{
-				$query_where .= " AND addressID NOT IN('".implode("','", $arr_stop_list_recipients)."')";
+				$query_where .= " AND addressID NOT IN('".implode("','", $this->arr_stop_list['recipients'])."')";
 			}
 
 			return $wpdb->get_var($wpdb->prepare("SELECT COUNT(addressID) FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE addressDeleted = '%d' AND groupAccepted = '%d' AND groupUnsubscribed = '%d'".$query_where, $data['deleted'], $data['accepted'], $data['unsubscribed']));
@@ -100,7 +127,7 @@ class mf_group
 		if(!isset($data['include_amount'])){		$data['include_amount'] = true;}
 		if(!isset($data['return_to_metabox'])){		$data['return_to_metabox'] = true;}
 
-		$result = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title FROM ".$wpdb->posts." WHERE post_type = %s AND post_status NOT IN('draft', 'trash', 'ignore') GROUP BY ID ORDER BY post_title ASC", $this->post_type));
+		$result = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title FROM ".$wpdb->posts." WHERE post_type = %s AND post_status = %s GROUP BY ID ORDER BY post_title ASC", $this->post_type, 'publish')); //NOT IN('draft', 'trash', 'ignore')
 
 		$arr_data = [];
 
@@ -428,7 +455,7 @@ class mf_group
 			));
 
 			// Make sure that it has been created in activate_group because this might be a new site that has just been created
-			if(does_table_exist($wpdb->prefix."group_message"))
+			if(apply_filters('does_table_exist', false, $wpdb->prefix."group_message"))
 			{
 				/* Send group messages */
 				#############################
@@ -1664,7 +1691,7 @@ class mf_group
 
 		$count_message = "";
 
-		if(does_table_exist($wpdb->prefix."group_message"))
+		if(apply_filters('does_table_exist', false, $wpdb->prefix."group_message"))
 		{
 			$rows = $wpdb->get_var("SELECT COUNT(queueID) FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) WHERE queueSent = '0' AND messageDeleted = '0'".($id > 0 ? " AND groupID = '".esc_sql($id)."'" : ""));
 
@@ -1708,7 +1735,7 @@ class mf_group
 	{
 		$menu_root = 'mf_group/';
 		$menu_start = "edit.php?post_type=".$this->post_type;
-		$menu_capability = 'edit_posts';
+		$menu_capability = 'edit_pages';
 
 		$menu_title = __("Groups", 'lang_group');
 		add_menu_page("", $menu_title.$this->count_unsent_group(), $menu_capability, $menu_start, '', 'dashicons-groups', 99);
@@ -1781,7 +1808,7 @@ class mf_group
 	{
 		global $wpdb, $error_text, $done_text;
 
-		if(IS_ADMINISTRATOR && does_table_exist($wpdb->prefix."group_message"))
+		if(IS_ADMINISTRATOR && apply_filters('does_table_exist', false, $wpdb->prefix."group_message"))
 		{
 			$result = $wpdb->get_results("SELECT groupID, messageType, addressID, addressFirstName, addressSurName, addressEmail, addressCellNo FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) INNER JOIN ".$wpdb->prefix."address USING (addressID) WHERE queueSent = '0' AND (queueCreated > DATE_SUB(NOW(), INTERVAL 1 WEEK) AND queueCreated < DATE_SUB(NOW(), INTERVAL 3 HOUR)) LIMIT 0, 6");
 			$rows = $wpdb->num_rows;
@@ -2605,7 +2632,7 @@ class mf_group
 	{
 		global $wpdb;
 
-		if(does_table_exist($wpdb->prefix."group_message"))
+		if(apply_filters('does_table_exist', false, $wpdb->prefix."group_message"))
 		{
 			$result = $wpdb->get_results($wpdb->prepare("SELECT groupID, messageID FROM ".$wpdb->prefix."group_message WHERE messageDeleted = '0' AND (messageText LIKE %s OR messageText LIKE %s OR messageAttachment LIKE %s OR messageAttachment LIKE %s)", "%".$arr_used['file_url']."%", "%".$arr_used['file_thumb_url']."%", "%".$arr_used['file_url']."%", "%".$arr_used['file_thumb_url']."%"));
 			$rows = $wpdb->num_rows;
@@ -2639,15 +2666,16 @@ class mf_group
 	function get_emails_left_to_send($amount, $email, $type = '')
 	{
 		global $wpdb;
+		
+		$amount_temp = 0;
 
 		if($type != '' && isset($this->emails_left_to_send[$type][$email]))
 		{
 			$amount_temp = $this->emails_left_to_send[$type][$email];
 		}
 
-		else
+		else if(apply_filters('does_table_exist', false, $wpdb->prefix."group_message"))
 		{
-			$amount_temp = 0;
 			$query_where = "";
 
 			if($email == '')
@@ -2675,15 +2703,12 @@ class mf_group
 				$query_where = " AND messageFrom LIKE '%".esc_sql($email)."'";
 			}
 
-			if(does_table_exist($wpdb->prefix."group_message"))
-			{
-				$wpdb->get_results("SELECT queueID FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) WHERE queueSent = '1' AND queueSentTime > DATE_SUB(NOW(), INTERVAL 1 HOUR)".$query_where);
-				$amount_temp -= $wpdb->num_rows;
+			$wpdb->get_results("SELECT queueID FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) WHERE queueSent = '1' AND queueSentTime > DATE_SUB(NOW(), INTERVAL 1 HOUR)".$query_where);
+			$amount_temp -= $wpdb->num_rows;
 
-				if($type != '')
-				{
-					$this->emails_left_to_send[$type][$email] = $amount_temp;
-				}
+			if($type != '')
+			{
+				$this->emails_left_to_send[$type][$email] = $amount_temp;
 			}
 		}
 
@@ -2772,32 +2797,6 @@ class mf_group
 		return "<p><a href='[unsubscribe_link]'>".__("If you do not want to get these messages in the future click this link to unsubscribe", 'lang_group')."</a></p>";
 	}
 
-	function get_stop_list_recipients()
-	{
-		global $wpdb;
-
-		if(count($this->arr_stop_list_recipients) == 0)
-		{
-			$this->arr_stop_list_groups = [];
-
-			$result = $wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND meta_key = %s WHERE post_type = %s AND post_status = %s AND meta_value = %s GROUP BY ID", $this->meta_prefix.'group_type', $this->post_type, 'publish', 'stop'));
-
-			foreach($result as $r)
-			{
-				$this->arr_stop_list_groups[] = $r->ID;
-
-				$result_address = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address2group WHERE groupID = '%d'", $r->ID));
-
-				foreach($result_address as $r)
-				{
-					$this->arr_stop_list_recipients[] = $r->addressID;
-				}
-			}
-		}
-
-		return $this->arr_stop_list_recipients;
-	}
-
 	function save_data()
 	{
 		global $wpdb, $error_text, $done_text;
@@ -2844,7 +2843,7 @@ class mf_group
 							}
 
 							$arr_recipients = [];
-							$arr_stop_list_recipients = $this->get_stop_list_recipients();
+							$this->get_stop_list_recipients();
 
 							foreach($this->arr_group_id as $this->group_id)
 							{
@@ -2869,7 +2868,7 @@ class mf_group
 											$strAddressEmail = $r->addressEmail;
 											$strAddressCellNo = $r->addressCellNo;
 
-											if(!in_array($intAddressID, $arr_recipients) && !in_array($intAddressID, $arr_stop_list_recipients) && ($this->message_type == "email" && $strAddressEmail != "" || $this->message_type == "sms" && $strAddressCellNo != ""))
+											if(!in_array($intAddressID, $arr_recipients) && !in_array($intAddressID, $this->arr_stop_list['recipients']) && ($this->message_type == "email" && $strAddressEmail != "" || $this->message_type == "sms" && $strAddressCellNo != ""))
 											{
 												$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->prefix."group_queue SET addressID = '%d', messageID = '%d', queueCreated = NOW()", $intAddressID, $this->message_id));
 
