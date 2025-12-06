@@ -6,8 +6,6 @@ class mf_group
 	var $type;
 	var $post_type = __CLASS__;
 	var $meta_prefix;
-	//var $arr_stop_list_groups = [];
-	//var $arr_stop_list_recipients = [];
 	var $arr_stop_list = [];
 	var $group_month;
 	var $message_type;
@@ -126,8 +124,16 @@ class mf_group
 		if(!isset($data['add_choose_here'])){		$data['add_choose_here'] = true;}
 		if(!isset($data['include_amount'])){		$data['include_amount'] = true;}
 		if(!isset($data['return_to_metabox'])){		$data['return_to_metabox'] = true;}
+		if(!isset($data['limit'])){					$data['limit'] = 0;}
 
-		$result = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title FROM ".$wpdb->posts." WHERE post_type = %s AND post_status = %s GROUP BY ID ORDER BY post_title ASC", $this->post_type, 'publish')); //NOT IN('draft', 'trash', 'ignore')
+		$query_limit = "";
+
+		if($data['limit'] > 0)
+		{
+			$query_limit = " LIMIT 0, ".esc_sql($data['limit']);
+		}
+
+		$result = $wpdb->get_results($wpdb->prepare("SELECT ID, post_title FROM ".$wpdb->posts." WHERE post_type = %s AND post_status = %s GROUP BY ID ORDER BY post_title ASC".$query_limit, $this->post_type, 'publish'));
 
 		$arr_data = [];
 
@@ -1583,7 +1589,7 @@ class mf_group
 			'setting_group_outgoing_text' => __("Outgoing Text", 'lang_group'),
 		);
 
-		if(count($this->get_for_select(array('add_choose_here' => false))) > 0)
+		if(count($this->get_for_select(array('add_choose_here' => false, 'limit' => 1))) > 0)
 		{
 			$arr_settings['setting_group_import'] = __("Add all imported to this group", 'lang_group');
 		}
@@ -1758,9 +1764,7 @@ class mf_group
 			add_submenu_page($menu_start, $menu_title, " - ".$menu_title, $menu_capability, $menu_root."create/index.php");
 		}*/
 
-		$arr_data_temp = $this->get_for_select(array('add_choose_here' => false));
-
-		if(count($arr_data_temp) > 0)
+		if(count($this->get_for_select(array('add_choose_here' => false, 'limit' => 1))) > 0)
 		{
 			$menu_title = __("Send Message", 'lang_group');
 			add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, $menu_root."send/index.php");
