@@ -58,13 +58,13 @@ class mf_group
 		{
 			$this->arr_stop_list['groups'] = $this->arr_stop_list['recipients'] = [];
 
-			$result = $obj_base->cache_query($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND meta_key = %s WHERE post_type = %s AND post_status = %s AND meta_value = %s GROUP BY ID", $this->meta_prefix.'group_type', $this->post_type, 'publish', 'stop'));
+			$result = $obj_base->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND meta_key = %s WHERE post_type = %s AND post_status = %s AND meta_value = %s GROUP BY ID", $this->meta_prefix.'group_type', $this->post_type, 'publish', 'stop'));
 
 			foreach($result as $r)
 			{
 				$this->arr_stop_list['groups'][] = $r->ID;
 
-				$result_address = $obj_base->cache_query($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address2group WHERE groupID = '%d'", $r->ID));
+				$result_address = $obj_base->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address2group WHERE groupID = '%d'", $r->ID));
 
 				foreach($result_address as $r)
 				{
@@ -106,7 +106,7 @@ class mf_group
 				$query_where .= " AND addressID NOT IN('".implode("','", $this->arr_stop_list['recipients'])."')";
 			}
 
-			$result = $obj_base->cache_query($wpdb->prepare("SELECT COUNT(addressID) FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE addressDeleted = '%d' AND groupAccepted = '%d' AND groupUnsubscribed = '%d'".$query_where, $data['deleted'], $data['accepted'], $data['unsubscribed']), 'get_var');
+			$result = $obj_base->get_var($wpdb->prepare("SELECT COUNT(addressID) FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE addressDeleted = '%d' AND groupAccepted = '%d' AND groupUnsubscribed = '%d'".$query_where, $data['deleted'], $data['accepted'], $data['unsubscribed']));
 
 			return $result;
 		}
@@ -133,7 +133,7 @@ class mf_group
 			$query_limit = " LIMIT 0, ".esc_sql($data['limit']);
 		}
 
-		$result = $obj_base->cache_query($wpdb->prepare("SELECT ID, post_title FROM ".$wpdb->posts." WHERE post_type = %s AND post_status = %s GROUP BY ID ORDER BY post_title ASC".$query_limit, $this->post_type, 'publish'));
+		$result = $obj_base->get_results($wpdb->prepare("SELECT ID, post_title FROM ".$wpdb->posts." WHERE post_type = %s AND post_status = %s GROUP BY ID ORDER BY post_title ASC".$query_limit, $this->post_type, 'publish'));
 
 		$arr_data = [];
 
@@ -2707,7 +2707,7 @@ class mf_group
 				$query_where = " AND messageFrom LIKE '%".esc_sql($email)."'";
 			}
 
-			$result = $obj_base->cache_query("SELECT queueID FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) WHERE queueSent = '1' AND queueSentTime > DATE_SUB(NOW(), INTERVAL 1 HOUR)".$query_where);
+			$result = $obj_base->get_results("SELECT queueID FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) WHERE queueSent = '1' AND queueSentTime > DATE_SUB(NOW(), INTERVAL 1 HOUR)".$query_where);
 			$amount_temp -= count($result);
 
 			if($type != '')
@@ -2988,7 +2988,7 @@ class mf_group
 
 		if(!isset($data['id'])){	$data['id'] = $this->id;}
 
-		return $obj_base->cache_query($wpdb->prepare("SELECT post_title FROM ".$wpdb->posts." WHERE post_type = %s AND ID = '%d'", $this->post_type, $data['id']), 'get_var');
+		return $obj_base->get_var($wpdb->prepare("SELECT post_title FROM ".$wpdb->posts." WHERE post_type = %s AND ID = '%d'", $this->post_type, $data['id']));
 	}
 
 	function check_if_address_exists($query_where)
