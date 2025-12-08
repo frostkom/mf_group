@@ -19,9 +19,8 @@ class mf_group
 	var $message_schedule_time;
 	var $message_text_source;
 	var $message_attachment;
-	//var $public;
-	//var $name;
 	var $query_where = "";
+	var $emails_left_to_send = [];
 
 	function __construct($data = [])
 	{
@@ -1703,7 +1702,7 @@ class mf_group
 
 			if($rows > 0)
 			{
-				$count_message = "&nbsp;".apply_filters('get_loading_animation', '');
+				$count_message = "&nbsp;".apply_filters('get_loading_animation', '', ['class' => '']);
 			}
 		}
 
@@ -2216,14 +2215,14 @@ class mf_group
 
 									else
 									{
-										echo "<div>".apply_filters('get_loading_animation', '')." ".sprintf(__("Will be sent %s", 'lang_group'), get_next_cron())."</div>"
+										echo "<div>".apply_filters('get_loading_animation', '', ['class' => ''])." ".sprintf(__("Will be sent %s", 'lang_group'), get_next_cron())."</div>"
 										."<i class='set_tr_color' rel='yellow'></i>";
 									}
 								}
 
 								else if($intMessageSent < ($intMessageSent + $intMessageNotSent))
 								{
-									echo "&nbsp;".apply_filters('get_loading_animation', '')." ".__("Is sending", 'lang_group')
+									echo "&nbsp;".apply_filters('get_loading_animation', '', ['class' => ''])." ".__("Is sending", 'lang_group')
 									."<i class='set_tr_color' rel='yellow'></i>";
 								}
 							}
