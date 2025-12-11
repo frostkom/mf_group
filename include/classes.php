@@ -21,6 +21,7 @@ class mf_group
 	var $message_attachment;
 	var $query_where = "";
 	var $emails_left_to_send = [];
+	var $queue_id;
 
 	function __construct($data = [])
 	{
@@ -305,7 +306,24 @@ class mf_group
 		if(!isset($data['message_id'])){	$data['message_id'] = 0;}
 		if(!isset($data['queue_id'])){		$data['queue_id'] = 0;}
 
-		$base_url = get_permalink($data['group_id']);
+		$base_url = "";
+
+		$arr_ids = apply_filters('get_page_from_block_code', [], '<!-- wp:mf/group {"group_id":"'.$data['group_id'].'"%} /-->');
+
+		if(count($arr_ids) > 0)
+		{
+			foreach($arr_ids as $post_id)
+			{
+				$base_url = get_permalink($post_id);
+				break;
+			}
+		}
+
+		if($base_url == '')
+		{
+			$base_url = get_permalink($data['group_id']);
+		}
+
 		$base_url .= (strpos($base_url, "?") ? "&" : "?");
 
 		$out = "";
@@ -1263,241 +1281,435 @@ class mf_group
 		if(!isset($attributes['group_button_text']) || $attributes['group_button_text'] == ''){		$attributes['group_button_text'] = __("Join", 'lang_group');}
 		if(!isset($attributes['group_button_icon'])){												$attributes['group_button_icon'] = '';}
 
-		$out = "";
+		$out = "<div".parse_block_attributes(array('class' => "widget widget_group", 'attributes' => $attributes)).">";
+			
+			if($attributes['group_id'] > 0)
+			{
+				$post_content = "";
 
-		if($attributes['group_id'] > 0)
-		{
-			$out .= "<div".parse_block_attributes(array('class' => "widget widget_group", 'attributes' => $attributes)).">";
+				$post_allow_registration = get_post_meta($attributes['group_id'], $this->meta_prefix.'allow_registration', false);
 
-				if(!($attributes['group_id'] > 0))
+				if($post_allow_registration == 'yes')
 				{
-					$error_text = __("I could not find any group ID to display a form for", 'lang_group');
-				}
+					$arr_registration_fields = get_post_meta($attributes['group_id'], $this->meta_prefix.'registration_fields', false);
 
-				$arrGroupRegistrationFields = get_post_meta($attributes['group_id'], $this->meta_prefix.'registration_fields', false);
-
-				if(!is_array($arrGroupRegistrationFields) || count($arrGroupRegistrationFields) == 0)
-				{
-					$arrGroupRegistrationFields = array('email');
-				}
-
-				$strAddressName = check_var('strAddressName');
-				$intAddressZipCode = check_var('intAddressZipCode');
-				$strAddressCity = check_var('strAddressCity');
-				$intAddressCountry = check_var('intAddressCountry');
-				$strAddressAddress = check_var('strAddressAddress');
-				$strAddressTelNo = check_var('strAddressTelNo');
-				$strAddressEmail = check_var('strAddressEmail');
-				$strAddressExtra = check_var('strAddressExtra');
-
-				if(isset($_POST['btnGroupJoin']))
-				{
-					$strGroupVerifyAddress = get_post_meta($attributes['group_id'], $this->meta_prefix.'verify_address', true);
-
-					$query_where = $query_set = "";
-
-					if(is_array($arrGroupRegistrationFields) && count($arrGroupRegistrationFields) > 0)
+					if(!is_array($arr_registration_fields) || count($arr_registration_fields) == 0)
 					{
-						if(in_array("name", $arrGroupRegistrationFields))
-						{
-							@list($strAddressFirstName, $strAddressSurName) = explode(" ", $strAddressName, 2);
+						$arr_registration_fields = array('email');
+					}
 
-							$query_where .= ($query_where != '' ? " AND " : "")."addressFirstName = '".$strAddressFirstName."' AND addressSurName = '".$strAddressSurName."'";
-							$query_set .= ", addressFirstName = '".esc_sql($strAddressFirstName)."', addressSurName = '".esc_sql($strAddressSurName)."'";
+					$strAddressName = check_var('strAddressName');
+					$intAddressZipCode = check_var('intAddressZipCode');
+					$strAddressCity = check_var('strAddressCity');
+					$intAddressCountry = check_var('intAddressCountry');
+					$strAddressAddress = check_var('strAddressAddress');
+					$strAddressTelNo = check_var('strAddressTelNo');
+					$strAddressEmail = check_var('strAddressEmail');
+					$strAddressExtra = check_var('strAddressExtra');
+
+					if(isset($_POST['btnGroupJoin']))
+					{
+						$strGroupVerifyAddress = get_post_meta($attributes['group_id'], $this->meta_prefix.'verify_address', true);
+
+						$query_where = $query_set = "";
+
+						if(is_array($arr_registration_fields) && count($arr_registration_fields) > 0)
+						{
+							if(in_array("name", $arr_registration_fields))
+							{
+								@list($strAddressFirstName, $strAddressSurName) = explode(" ", $strAddressName, 2);
+
+								$query_where .= ($query_where != '' ? " AND " : "")."addressFirstName = '".$strAddressFirstName."' AND addressSurName = '".$strAddressSurName."'";
+								$query_set .= ", addressFirstName = '".esc_sql($strAddressFirstName)."', addressSurName = '".esc_sql($strAddressSurName)."'";
+							}
+
+							if(in_array("address", $arr_registration_fields))
+							{
+								$query_where .= ($query_where != '' ? " AND " : "")."addressAddress = '".$strAddressAddress."'";
+								$query_set .= ", addressAddress = '".esc_sql($strAddressAddress)."'";
+							}
+
+							if(in_array("zip", $arr_registration_fields))
+							{
+								$query_where .= ($query_where != '' ? " AND " : "")."addressZipCode = '".$intAddressZipCode."'";
+								$query_set .= ", addressZipCode = '".esc_sql($intAddressZipCode)."'";
+							}
+
+							if(in_array("city", $arr_registration_fields))
+							{
+								$query_where .= ($query_where != '' ? " AND " : "")."addressCity = '".$strAddressCity."'";
+								$query_set .= ", addressCity = '".esc_sql($strAddressCity)."'";
+							}
+
+							if(in_array("country", $arr_registration_fields))
+							{
+								$query_where .= ($query_where != '' ? " AND " : "")."addressCountry = '".$intAddressCountry."'";
+								$query_set .= ", addressCountry = '".esc_sql($intAddressCountry)."'";
+							}
+
+							if(in_array("phone", $arr_registration_fields))
+							{
+								$query_where .= ($query_where != '' ? " AND " : "")."addressTelNo = '".$strAddressTelNo."'";
+								$query_set .= ", addressTelNo = '".esc_sql($strAddressTelNo)."'";
+							}
+
+							if(in_array("email", $arr_registration_fields))
+							{
+								$query_where .= ($query_where != '' ? " AND " : "")."addressEmail = '".$strAddressEmail."'";
+								$query_set .= ", addressEmail = '".esc_sql($strAddressEmail)."'";
+							}
+
+							if(in_array("extra", $arr_registration_fields))
+							{
+								$query_where .= ($query_where != '' ? " AND " : "")."addressExtra = '".$strAddressExtra."'";
+								$query_set .= ", addressExtra = '".esc_sql($strAddressExtra)."'";
+							}
 						}
 
-						if(in_array("address", $arrGroupRegistrationFields))
-						{
-							$query_where .= ($query_where != '' ? " AND " : "")."addressAddress = '".$strAddressAddress."'";
-							$query_set .= ", addressAddress = '".esc_sql($strAddressAddress)."'";
-						}
-
-						if(in_array("zip", $arrGroupRegistrationFields))
-						{
-							$query_where .= ($query_where != '' ? " AND " : "")."addressZipCode = '".$intAddressZipCode."'";
-							$query_set .= ", addressZipCode = '".esc_sql($intAddressZipCode)."'";
-						}
-
-						if(in_array("city", $arrGroupRegistrationFields))
-						{
-							$query_where .= ($query_where != '' ? " AND " : "")."addressCity = '".$strAddressCity."'";
-							$query_set .= ", addressCity = '".esc_sql($strAddressCity)."'";
-						}
-
-						if(in_array("country", $arrGroupRegistrationFields))
-						{
-							$query_where .= ($query_where != '' ? " AND " : "")."addressCountry = '".$intAddressCountry."'";
-							$query_set .= ", addressCountry = '".esc_sql($intAddressCountry)."'";
-						}
-
-						if(in_array("phone", $arrGroupRegistrationFields))
-						{
-							$query_where .= ($query_where != '' ? " AND " : "")."addressTelNo = '".$strAddressTelNo."'";
-							$query_set .= ", addressTelNo = '".esc_sql($strAddressTelNo)."'";
-						}
-
-						if(in_array("email", $arrGroupRegistrationFields))
+						else
 						{
 							$query_where .= ($query_where != '' ? " AND " : "")."addressEmail = '".$strAddressEmail."'";
 							$query_set .= ", addressEmail = '".esc_sql($strAddressEmail)."'";
 						}
 
-						if(in_array("extra", $arrGroupRegistrationFields))
+						$intAddressID = $this->check_if_address_exists($query_where);
+
+						if($strGroupVerifyAddress == "yes" && !($intAddressID > 0))
 						{
-							$query_where .= ($query_where != '' ? " AND " : "")."addressExtra = '".$strAddressExtra."'";
-							$query_set .= ", addressExtra = '".esc_sql($strAddressExtra)."'";
+							$out .= "<p>".__("The information that you entered is not in our register. Please contact the admin of this page to get your information submitted.", 'lang_group')."</p>";
+
+							$intGroupContactPage = get_post_meta($attributes['group_id'], $this->meta_prefix.'contact_page', true);
+
+							if($intGroupContactPage > 0)
+							{
+								$post_url = get_permalink($intGroupContactPage);
+								$post_title = get_the_title($intGroupContactPage);
+
+								$out .= "<p><a href='".$post_url."'>".$post_title."</a></p>";
+							}
+						}
+
+						else
+						{
+							if(!($intAddressID > 0))
+							{
+								$wpdb->query("INSERT INTO ".$wpdb->prefix."address SET addressPublic = '1'".$query_set.", addressCreated = NOW()");
+
+								$intAddressID = $wpdb->insert_id;
+							}
+
+							if($intAddressID > 0)
+							{
+								$this->add_address(array('address_id' => $intAddressID, 'group_id' => $attributes['group_id']));
+
+								$done_text = __("Thank you for showing your interest. You have been added to the group", 'lang_group');
+							}
 						}
 					}
+				}
 
-					else
+				if(isset($_REQUEST['subscribe']))
+				{
+					$strSubscribeHash = check_var('subscribe', 'char');
+
+					$intGroupID = check_var('gid', 'int');
+					$strAddressEmail = check_var('aem', 'char');
+
+					$hash_temp = md5((defined('NONCE_SALT') ? NONCE_SALT : '').$intGroupID.$strAddressEmail);
+
+					if($strSubscribeHash == $hash_temp)
 					{
-						$query_where .= ($query_where != '' ? " AND " : "")."addressEmail = '".$strAddressEmail."'";
-						$query_set .= ", addressEmail = '".esc_sql($strAddressEmail)."'";
-					}
-
-					$intAddressID = $this->check_if_address_exists($query_where);
-
-					if($strGroupVerifyAddress == "yes" && !($intAddressID > 0))
-					{
-						$out .= "<p>".__("The information that you entered is not in our register. Please contact the admin of this page to get your information submitted.", 'lang_group')."</p>";
-
-						$intGroupContactPage = get_post_meta($attributes['group_id'], $this->meta_prefix.'contact_page', true);
-
-						if($intGroupContactPage > 0)
-						{
-							$post_url = get_permalink($intGroupContactPage);
-							$post_title = get_the_title($intGroupContactPage);
-
-							$out .= "<p><a href='".$post_url."'>".$post_title."</a></p>";
-						}
-					}
-
-					else
-					{
-						if(!($intAddressID > 0))
-						{
-							$wpdb->query("INSERT INTO ".$wpdb->prefix."address SET addressPublic = '1'".$query_set.", addressCreated = NOW()");
-
-							$intAddressID = $wpdb->insert_id;
-						}
+						$intAddressID = $wpdb->get_var($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressEmail = %s AND addressDeleted = '0' AND groupAccepted = '0' LIMIT 0, 1", $intGroupID, $strAddressEmail));
 
 						if($intAddressID > 0)
 						{
-							$this->add_address(array('address_id' => $intAddressID, 'group_id' => $attributes['group_id']));
+							if($this->accept_address(array('address_id' => $intAddressID, 'group_id' => $intGroupID)))
+							{
+								$done_text = __("You have successfully subscribed", 'lang_group');
+							}
 
-							$done_text = __("Thank you for showing your interest. You have been added to the group", 'lang_group');
+							else
+							{
+								$error_text = __("You have already accepted to be a part of the group", 'lang_group');
+							}
 						}
+
+						else
+						{
+							$error_text = __("Either you are not part of the group or you have already accepted to be a part of the group", 'lang_group');
+						}
+					}
+
+					else
+					{
+						$error_text = __("Something went wrong. Please contact an admin if the problem persists", 'lang_group');
+					}
+				}
+
+				else if(isset($_REQUEST['unsubscribe']) || isset($_REQUEST['verify']))
+				{
+					$intGroupSentAmount = $wpdb->get_var($wpdb->prepare("SELECT COUNT(groupID) FROM ".$wpdb->prefix."group_message WHERE groupID = '%d' AND messageDeleted = '0'", $attributes['group_id']));
+
+					if($post_allow_registration == 'yes' || $intGroupSentAmount > 0)
+					{
+						$strUnsubscribeHash = check_var('unsubscribe', 'char');
+						$strVerifyHash = check_var('verify', 'char');
+						$intQueueID = check_var('qid', 'int');
+
+						$intGroupID = check_var('gid', 'int');
+						$strAddressEmail = check_var('aem', 'char');
+
+						if($intQueueID > 0)
+						{
+							$result = $wpdb->get_results($wpdb->prepare("SELECT groupID, addressEmail FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."group_queue USING (addressID) INNER JOIN ".$wpdb->prefix."group_message USING (messageID) WHERE queueID = '%d'", $intQueueID));
+
+							foreach($result as $r)
+							{
+								$intGroupID = $r->groupID;
+								$strAddressEmail = $r->addressEmail;
+							}
+						}
+
+						$hash_temp = md5((defined('NONCE_SALT') ? NONCE_SALT : '').$intGroupID.$strAddressEmail);
+
+						if($strUnsubscribeHash != '')
+						{
+							if($strUnsubscribeHash == $hash_temp)
+							{
+								$intAddressID = $wpdb->get_var($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressEmail = %s AND addressDeleted = '0' AND groupUnsubscribed = '0' LIMIT 0, 1", $intGroupID, $strAddressEmail));
+
+								if($intAddressID > 0)
+								{
+									if(isset($_POST['btnUnsubscribe']))
+									{
+										if($this->unsubscribe_address(array('address_id' => $intAddressID, 'group_id' => $intGroupID)))
+										{
+											$done_text = __("You have been successfully unsubscribed", 'lang_group');
+										}
+
+										else
+										{
+											do_log("Unsubscribe Error: ".$wpdb->last_query);
+
+											$done_text = __("I could not unsubscribe you. An admin has been notified about this", 'lang_group');
+										}
+									}
+
+									else
+									{
+										$post_content .= "<form".apply_filters('get_form_attr', "").">
+											<p>".__("Are you sure that you want to unsubscribe?", 'lang_group')."</p>
+											<div".get_form_button_classes().">"
+												.show_button(array('name' => 'btnUnsubscribe', 'text' => __("Unsubscribe", 'lang_group')))
+											."</div>"
+											.input_hidden(array('name' => 'unsubscribe', 'value' => $strUnsubscribeHash))
+											.input_hidden(array('name' => 'gid', 'value' => $intGroupID))
+											.input_hidden(array('name' => 'aem', 'value' => $strAddressEmail))
+										."</form>";
+									}
+								}
+
+								else
+								{
+									$error_text = __("Either you are not part of the group or you have already unsubscribed from it", 'lang_group');
+								}
+							}
+
+							else
+							{
+								$error_text = __("Something went wrong. Please contact an admin if the problem persists", 'lang_group');
+							}
+						}
+
+						if($strUnsubscribeHash != '' && $strUnsubscribeHash == $hash_temp || $strVerifyHash != '' && $strVerifyHash == $hash_temp)
+						{
+							$this->set_received(array('queue_id' => $intQueueID));
+						}
+					}
+				}
+
+				else if(isset($_REQUEST['view_in_browser']))
+				{
+					$strViewHash = check_var('view_in_browser', 'char');
+					$intQueueID = check_var('qid', 'int');
+
+					if($intQueueID > 0)
+					{
+						$result = $wpdb->get_results($wpdb->prepare("SELECT groupID, messageID, addressEmail FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."group_queue USING (addressID) INNER JOIN ".$wpdb->prefix."group_message USING (messageID) WHERE queueID = '%d'", $intQueueID));
+
+						foreach($result as $r)
+						{
+							$intGroupID = $r->groupID;
+							$intMessageID = $r->messageID;
+							$strAddressEmail = $r->addressEmail;
+						}
+					}
+
+					else
+					{
+						$intGroupID = check_var('gid', 'int');
+						$intMessageID = check_var('mid', 'int');
+						$strAddressEmail = check_var('aem', 'char');
+					}
+
+					$hash_temp = md5((defined('NONCE_SALT') ? NONCE_SALT : '').$intGroupID.$strAddressEmail.$intMessageID);
+
+					if($strViewHash == $hash_temp)
+					{
+						$result = $wpdb->get_results($wpdb->prepare("SELECT messageName, messageText FROM ".$wpdb->prefix."group_message WHERE messageID = '%d'", $intMessageID));
+
+						foreach($result as $r)
+						{
+							$strMessageName = $r->messageName;
+							$strMessageText = stripslashes(apply_filters('the_content', $r->messageText));
+
+							$view_in_browser_url = $this->get_group_url(array('type' => 'view_in_browser', 'group_id' => $intGroupID, 'message_id' => $intMessageID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
+							$unsubscribe_url = $this->get_group_url(array('type' => 'unsubscribe', 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
+
+							$arr_exclude = array("[view_in_browser_link]", "[message_name]", "[unsubscribe_link]");
+							$arr_include = array($view_in_browser_url, $strMessageName, $unsubscribe_url);
+
+							$post_title = $strMessageName;
+							$post_content = str_replace($arr_exclude, $arr_include, $strMessageText);
+
+							$this->set_received(array('queue_id' => $intQueueID));
+						}
+					}
+
+					else
+					{
+						$error_text = __("Something went wrong. Please contact an admin if the problem persists", 'lang_group');
 					}
 				}
 
 				if(isset($done_text) && $done_text != '' || isset($error_text) && $error_text != '')
 				{
-					$out .= get_notification();
+					$out .= get_notification(array('add_container' => true));
 				}
 
 				else
 				{
-					$out .= "<form".apply_filters('get_form_attr', "").">";
+					if($post_content != '')
+					{
+						$out .= $post_content;
+					}
 
-						if(is_array($arrGroupRegistrationFields) && count($arrGroupRegistrationFields) > 0)
-						{
-							switch($attributes['group_label_type'])
+					else if($post_allow_registration == 'yes')
+					{
+						$out .= "<form".apply_filters('get_form_attr', "").">";
+
+							if(is_array($arr_registration_fields) && count($arr_registration_fields) > 0)
 							{
-								default:
-								case 'label':
-									$label_type = 'text';
-								break;
-
-								case 'placeholder':
-									$label_type = 'placeholder';
-								break;
-							}
-
-							if(in_array("name", $arrGroupRegistrationFields))
-							{
-								$out .= show_textfield(array('name' => 'strAddressName', $label_type => __("Name", 'lang_group'), 'value' => $strAddressName, 'required' => true));
-							}
-
-							if(in_array("address", $arrGroupRegistrationFields))
-							{
-								$out .= show_textfield(array('name' => 'strAddressAddress', $label_type => __("Address", 'lang_group'), 'value' => $strAddressAddress, 'required' => true));
-							}
-
-							if(in_array("zip", $arrGroupRegistrationFields))
-							{
-								$out .= show_textfield(array('type' => 'number', 'name' => 'intAddressZipCode', $label_type => __("Zip Code", 'lang_group'), 'value' => $intAddressZipCode, 'required' => true));
-							}
-
-							if(in_array("city", $arrGroupRegistrationFields))
-							{
-								$out .= show_textfield(array('name' => 'strAddressCity', $label_type => __("City", 'lang_group'), 'value' => $strAddressCity, 'required' => true));
-							}
-
-							if(in_array("country", $arrGroupRegistrationFields))
-							{
-								if(!isset($obj_address))
-								{
-									$obj_address = new mf_address();
-								}
-
 								switch($attributes['group_label_type'])
 								{
 									default:
 									case 'label':
-										$out .= show_select(array('data' => $obj_address->get_countries_for_select(), 'name' => 'intAddressCountry', 'text' => __("Country", 'lang_group'), 'value' => $intAddressCountry, 'required' => true));
+										$label_type = 'text';
 									break;
 
 									case 'placeholder':
-										$out .= show_select(array('data' => $obj_address->get_countries_for_select(array('choose_here_text' => __("Choose Country Here", 'lang_group'))), 'name' => 'intAddressCountry', 'value' => $intAddressCountry, 'required' => true));
+										$label_type = 'placeholder';
 									break;
 								}
+
+								if(in_array("name", $arr_registration_fields))
+								{
+									$out .= show_textfield(array('name' => 'strAddressName', $label_type => __("Name", 'lang_group'), 'value' => $strAddressName, 'required' => true));
+								}
+
+								if(in_array("address", $arr_registration_fields))
+								{
+									$out .= show_textfield(array('name' => 'strAddressAddress', $label_type => __("Address", 'lang_group'), 'value' => $strAddressAddress, 'required' => true));
+								}
+
+								if(in_array("zip", $arr_registration_fields))
+								{
+									$out .= show_textfield(array('type' => 'number', 'name' => 'intAddressZipCode', $label_type => __("Zip Code", 'lang_group'), 'value' => $intAddressZipCode, 'required' => true));
+								}
+
+								if(in_array("city", $arr_registration_fields))
+								{
+									$out .= show_textfield(array('name' => 'strAddressCity', $label_type => __("City", 'lang_group'), 'value' => $strAddressCity, 'required' => true));
+								}
+
+								if(in_array("country", $arr_registration_fields))
+								{
+									if(!isset($obj_address))
+									{
+										$obj_address = new mf_address();
+									}
+
+									switch($attributes['group_label_type'])
+									{
+										default:
+										case 'label':
+											$out .= show_select(array('data' => $obj_address->get_countries_for_select(), 'name' => 'intAddressCountry', 'text' => __("Country", 'lang_group'), 'value' => $intAddressCountry, 'required' => true));
+										break;
+
+										case 'placeholder':
+											$out .= show_select(array('data' => $obj_address->get_countries_for_select(array('choose_here_text' => __("Choose Country Here", 'lang_group'))), 'name' => 'intAddressCountry', 'value' => $intAddressCountry, 'required' => true));
+										break;
+									}
+								}
+
+								if(in_array("phone", $arr_registration_fields))
+								{
+									$out .= show_textfield(array('name' => 'strAddressTelNo', $label_type => __("Phone Number", 'lang_group'), 'value' => $strAddressTelNo, 'required' => true));
+								}
+
+								if(in_array("email", $arr_registration_fields))
+								{
+									$out .= show_textfield(array('name' => 'strAddressEmail', $label_type => __("E-mail", 'lang_group'), 'value' => $strAddressEmail, 'required' => true));
+								}
+
+								if(in_array("extra", $arr_registration_fields))
+								{
+									$out .= show_textfield(array('name' => 'strAddressExtra', $label_type => get_option_or_default('setting_address_extra', __("Extra", 'lang_group')), 'value' => $strAddressExtra, 'required' => true));
+								}
+
+								$out .= "<div".get_form_button_classes().">";
+
+									if($attributes['group_display_consent'] == 'yes')
+									{
+										$out .= show_checkbox(array('name' => 'intGroupConsent', 'text' => __("I consent to having this website store my submitted information, so that they can contact me as part of this group", 'lang_group'), 'value' => 1, 'required' => true));
+									}
+
+									$out .= show_button(array('name' => 'btnGroupJoin', 'text' => ($attributes['group_button_icon'] != '' ? "<i class='".$attributes['group_button_icon']."'></i> " : "").$attributes['group_button_text']))
+								."</div>";
 							}
 
-							if(in_array("phone", $arrGroupRegistrationFields))
+							else
 							{
-								$out .= show_textfield(array('name' => 'strAddressTelNo', $label_type => __("Phone Number", 'lang_group'), 'value' => $strAddressTelNo, 'required' => true));
-							}
-
-							if(in_array("email", $arrGroupRegistrationFields))
-							{
-								$out .= show_textfield(array('name' => 'strAddressEmail', $label_type => __("E-mail", 'lang_group'), 'value' => $strAddressEmail, 'required' => true));
-							}
-
-							if(in_array("extra", $arrGroupRegistrationFields))
-							{
-								$out .= show_textfield(array('name' => 'strAddressExtra', $label_type => get_option_or_default('setting_address_extra', __("Extra", 'lang_group')), 'value' => $strAddressExtra, 'required' => true));
-							}
-
-							$out .= "<div".get_form_button_classes().">";
+								$out .= show_textfield(array('name' => 'strAddressEmail', 'placeholder' => __("Your Email Address", 'lang_group'), 'value' => $strAddressEmail, 'required' => true));
 
 								if($attributes['group_display_consent'] == 'yes')
 								{
 									$out .= show_checkbox(array('name' => 'intGroupConsent', 'text' => __("I consent to having this website store my submitted information, so that they can contact me as part of this group", 'lang_group'), 'value' => 1, 'required' => true));
 								}
 
-								$out .= show_button(array('name' => 'btnGroupJoin', 'text' => ($attributes['group_button_icon'] != '' ? "<i class='".$attributes['group_button_icon']."'></i> " : "").$attributes['group_button_text']))
-							."</div>";
-						}
-
-						else
-						{
-							$out .= show_textfield(array('name' => 'strAddressEmail', 'placeholder' => __("Your Email Address", 'lang_group'), 'value' => $strAddressEmail, 'required' => true));
-
-							if($attributes['group_display_consent'] == 'yes')
-							{
-								$out .= show_checkbox(array('name' => 'intGroupConsent', 'text' => __("I consent to having this website store my submitted information, so that they can contact me as part of this group", 'lang_group'), 'value' => 1, 'required' => true));
+								$out .= "<div".get_form_button_classes().">"
+									.show_button(array('name' => 'btnGroupJoin', 'text' => ($attributes['group_button_icon'] != '' ? "<i class='".$attributes['group_button_icon']."'></i> " : "").$attributes['group_button_text']))
+								."</div>";
 							}
 
-							$out .= "<div".get_form_button_classes().">"
-								.show_button(array('name' => 'btnGroupJoin', 'text' => ($attributes['group_button_icon'] != '' ? "<i class='".$attributes['group_button_icon']."'></i> " : "").$attributes['group_button_text']))
-							."</div>";
-						}
+						$out .= "</form>";
+					}
 
-					$out .= "</form>";
+					else
+					{
+						$error_text = __("This group is closed for registration", 'lang_group');
+					}
 				}
+			}
 
-			$out .= "</div>";
-		}
+			else
+			{
+				$error_text = __("I could not find any group ID to display a form for", 'lang_group');
+			}
+			
+			$out .= get_notification(array('add_container' => true));
+
+		$out .= "</div>";
 
 		return $out;
 	}
@@ -1557,7 +1769,7 @@ class mf_group
 				'view_item' => __('View', 'lang_group'),
 				'add_new_item' => __('Add New', 'lang_group'),
 			),
-			'public' => (wp_is_block_theme() == false),
+			'public' => true, //(wp_is_block_theme() == false) // Has to be active since unsubscribe links go there
 			'show_ui' => true,
 			'show_in_menu' => false,
 			'show_in_rest' => true,

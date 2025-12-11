@@ -1,5 +1,6 @@
 <?php
 
+// Used through [redirect]
 if(isset($_REQUEST['redirect']))
 {
 	$strViewHash = check_var('redirect', 'char');
@@ -252,7 +253,7 @@ get_header();
 					{
 						// Maybe redirect to page if any has the block?
 
-						echo apply_filters('the_content', __("This is an old link and not in use anymore. An admin has been notified by this", 'lang_group'));
+						echo apply_filters('the_content', __("This is an old link and not in use anymore. An admin has been notified about this", 'lang_group'));
 
 						do_log("single-mf_group.php: Add a block instead (<a href='".admin_url("post.php?post=".$post_id."&action=edit")."'>#".$post_id."</a>)", 'publish', false);
 					}
