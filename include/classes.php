@@ -758,8 +758,8 @@ class mf_group
 
 										foreach($arr_users as $user)
 										{
-											$strUserFirstName = $user->first_name;
-											$strUserSurName = $user->last_name;
+											$strUserFirstName = (isset($user->first_name) ? $user->first_name : "");
+											$strUserSurName = (isset($user->last_name) ? $user->last_name : "");
 											$strUserEmail = $user->user_email;
 
 											if($strUserFirstName == '' || $strUserSurName == '')
@@ -1282,7 +1282,7 @@ class mf_group
 		if(!isset($attributes['group_button_icon'])){												$attributes['group_button_icon'] = '';}
 
 		$out = "<div".parse_block_attributes(array('class' => "widget widget_group", 'attributes' => $attributes)).">";
-			
+
 			if($attributes['group_id'] > 0)
 			{
 				$post_content = "";
@@ -1706,7 +1706,7 @@ class mf_group
 			{
 				$error_text = __("I could not find any group ID to display a form for", 'lang_group');
 			}
-			
+
 			$out .= get_notification(array('add_container' => true));
 
 		$out .= "</div>";
