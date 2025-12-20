@@ -730,8 +730,15 @@ class mf_group
 				}
 				#############################
 
-				if(get_option('option_group_synced') < date("Y-m-d H:i:s", strtotime("-1 hour")))
+				$option_group_synced = get_option('option_group_synced');
+				$option_group_synced_seconds = get_option('option_group_synced_seconds', 100);
+
+				//do_log(__FUNCTION__.": ".$option_group_synced." < ".date("Y-m-d H:i:s", strtotime("-".($option_group_synced_seconds + 10)." second")));
+
+				if($option_group_synced < date("Y-m-d H:i:s", strtotime("-".($option_group_synced_seconds + 10)." second")))
 				{
+					$sync_start = date("Y-m-d H:i:s");
+
 					$is_syncing = false;
 
 					/* Add users to groups that are set to synchronize */
@@ -756,21 +763,24 @@ class mf_group
 									case 'yes':
 										$arr_users = get_users(array('fields' => array('ID', 'display_name', 'first_name', 'last_name', 'user_email')));
 
-										foreach($arr_users as $user)
+										foreach($arr_users as $user_data)
 										{
-											$strUserFirstName = (isset($user->first_name) ? $user->first_name : "");
-											$strUserSurName = (isset($user->last_name) ? $user->last_name : "");
-											$strUserEmail = $user->user_email;
+											$user_first_name = (isset($user_data->first_name) ? $user_data->first_name : "");
+											$user_sur_name = (isset($user_data->last_name) ? $user_data->last_name : "");
+											$user_email = $user_data->user_email;
 
-											if($strUserFirstName == '' || $strUserSurName == '')
+											$user_phone = get_the_author_meta('profile_phone', $user_data->ID);
+
+											if($user_first_name == '' || $user_sur_name == '')
 											{
-												@list($strUserFirstName, $strUserSurName) = explode(" ", $user->display_name, 2);
+												@list($user_first_name, $user_sur_name) = explode(" ", $user_data->display_name, 2);
 											}
 
 											$arr_addresses[] = array(
-												'email' => $strUserEmail,
-												'first_name' => $strUserFirstName,
-												'sur_name' => $strUserSurName,
+												'first_name' => $user_first_name,
+												'sur_name' => $user_sur_name,
+												'email' => $user_email,
+												'phone' => $user_phone,
 											);
 										}
 									break;
@@ -785,21 +795,25 @@ class mf_group
 											'role__in' => array($sync_type),
 										));
 
-										foreach($arr_users as $user)
+										foreach($arr_users as $user_data)
 										{
-											$strUserFirstName = $user->first_name;
-											$strUserSurName = $user->last_name;
-											$strUserEmail = $user->user_email;
+											$user_first_name = $user_data->first_name;
+											$user_sur_name = $user_data->last_name;
+											$user_email = $user_data->user_email;
 
-											if($strUserFirstName == '' || $strUserSurName == '')
+											$user_phone = get_the_author_meta('profile_phone', $user_data->ID);
+
+											if($user_first_name == '' || $user_sur_name == '')
 											{
-												@list($strUserFirstName, $strUserSurName) = explode(" ", $user->display_name, 2);
+												@list($user_first_name, $user_sur_name) = explode(" ", $user_data->display_name, 2);
 											}
 
 											$arr_addresses[] = array(
-												'email' => $strUserEmail,
-												'first_name' => $strUserFirstName,
-												'sur_name' => $strUserSurName,
+												'email' => $user_email,
+												'first_name' => $user_first_name,
+												'sur_name' => $user_sur_name,
+												'email' => $user_email,
+												'phone' => $user_phone,
 											);
 										}
 									break;
@@ -819,12 +833,12 @@ class mf_group
 
 										if($intAddressID > 0)
 										{
-											$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."address SET addressFirstName = %s, addressSurName = %s WHERE addressID = '%d'", $arr_address['first_name'], $arr_address['sur_name'], $intAddressID));
+											$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."address SET addressFirstName = %s, addressSurName = %s, addressCellNo = %s WHERE addressID = '%d'", $arr_address['first_name'], $arr_address['sur_name'], $arr_address['phone'], $intAddressID));
 										}
 
 										else
 										{
-											$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->prefix."address SET addressFirstName = %s, addressSurName = %s, addressEmail = %s, addressCreated = NOW()", $arr_address['first_name'], $arr_address['sur_name'], $arr_address['email']));
+											$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->prefix."address SET addressFirstName = %s, addressSurName = %s, addressEmail = %s, addressCellNo = %s, addressCreated = NOW()", $arr_address['first_name'], $arr_address['sur_name'], $arr_address['email'], $arr_address['phone']));
 
 											$intAddressID = $wpdb->insert_id;
 										}
@@ -1191,7 +1205,10 @@ class mf_group
 					}
 					#############################
 
-					update_option('option_group_synced', date("Y-m-d H:i:s"), false);
+					$sync_end = date("Y-m-d H:i:s");
+
+					update_option('option_group_synced', $sync_end, false);
+					update_option('option_group_synced_seconds', time_between_dates(array('start' => $sync_start, 'end' => $sync_end, 'type' => 'ceil', 'return' => 'seconds')), false);
 				}
 
 				// Get error log
@@ -2189,7 +2206,8 @@ class mf_group
 								'single' => true,
 							),
 							'sync_users' => array(
-								'type' => 'bool',
+								'type' => 'option',
+								'option' => 'option_group_synced',
 								'name' => __("Synchronize", 'lang_group'),
 								'icon' => 'fas fa-users',
 								'single' => true,
@@ -2234,6 +2252,8 @@ class mf_group
 
 							$do_display = false;
 
+							$title = $arr_value['name'];
+
 							switch($arr_value['type'])
 							{
 								case 'bool':
@@ -2247,6 +2267,15 @@ class mf_group
 									if($post_meta != '')
 									{
 										$do_display = true;
+									}
+								break;
+
+								case 'option':
+									if($post_meta != 'no' && $post_meta != '')
+									{
+										$do_display = true;
+
+										$title .= " (".get_option($arr_value['option']).")";
 									}
 								break;
 							}
@@ -2263,7 +2292,7 @@ class mf_group
 									echo "<a href='".$arr_value['link']."'>";
 								}
 
-									echo "<i class='".$arr_value['icon']." fa-lg blue' title='".$arr_value['name']."'></i>";
+									echo "<i class='".$arr_value['icon']." fa-lg blue' title='".$title."'></i>";
 
 								if(isset($arr_value['link']) && $arr_value['link'] != '')
 								{
