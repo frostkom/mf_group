@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description:
-Version: 5.13.37
+Version: 5.13.38
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://martinfors.se
@@ -30,13 +30,13 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 		register_activation_hook(__FILE__, 'activate_group');
 		register_uninstall_hook(__FILE__, 'uninstall_group');
 
+		add_action('admin_notices', array($obj_group, 'admin_notices'));
+
 		add_action('admin_init', array($obj_group, 'settings_group'));
 		add_action('admin_init', array($obj_group, 'admin_init'), 0);
 		add_action('admin_menu', array($obj_group, 'admin_menu'));
 
 		add_filter('filter_sites_table_pages', array($obj_group, 'filter_sites_table_pages'));
-
-		add_action('admin_notices', array($obj_group, 'admin_notices'));
 
 		add_filter('manage_'.$obj_group->post_type.'_posts_columns', array($obj_group, 'column_header'), 5);
 		add_action('manage_'.$obj_group->post_type.'_posts_custom_column', array($obj_group, 'column_cell'), 5, 2);
@@ -177,7 +177,7 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 	{
 		global $post, $obj_group;
 
-		if($post->post_type == $obj_group->post_type)
+		if($post->post_type == $obj_group->post_type && $obj_group->has_template() == false)
 		{
 			$single_template = plugin_dir_path(__FILE__)."templates/single-".$post->post_type.".php";
 		}

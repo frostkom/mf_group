@@ -1300,6 +1300,16 @@ class mf_group
 
 		$out = "<div".parse_block_attributes(array('class' => "widget widget_group", 'attributes' => $attributes)).">";
 
+			if($attributes['group_id'] == 0)
+			{
+				global $post;
+
+				if(isset($post->ID) && $post->ID > 0)
+				{
+					$attributes['group_id'] = $post->ID;
+				}
+			}
+
 			if($attributes['group_id'] > 0)
 			{
 				$post_content = "";
@@ -1724,9 +1734,8 @@ class mf_group
 				$error_text = __("I could not find any group ID to display a form for", 'lang_group');
 			}
 
-			$out .= get_notification(array('add_container' => true));
-
-		$out .= "</div>";
+			$out .= get_notification(array('add_container' => true))
+		."</div>";
 
 		return $out;
 	}
@@ -1802,6 +1811,133 @@ class mf_group
 			'editor_style' => 'style_base_block_wp',
 			'render_callback' => array($this, 'block_render_callback'),
 		));
+	}
+
+	function has_template()
+	{
+		global $wpdb;
+
+		$wpdb->get_results($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." WHERE post_type = %s AND post_name = %s LIMIT 0, 1", 'wp_template', 'single-'.$this->post_type));
+
+		return ($wpdb->num_rows > 0);
+	}
+
+	function admin_notices()
+	{
+		global $wpdb, $done_text, $notice_text, $error_text;
+
+		if($done_text == '' && $notice_text == '' && $error_text == '')
+		{
+			$screen = get_current_screen();
+
+			if(isset($screen->post_type) && $screen->post_type === $this->post_type)
+			{
+				if(isset($_GET['btnGroupResend']) && $this->id > 0 && wp_verify_nonce($_REQUEST['_wpnonce_group_resend'], 'group_resend_'.$this->id))
+				{
+					$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE addressDeleted = '0' AND groupID = '%d' AND groupAccepted = '0' AND groupUnsubscribed = '0' AND (groupAcceptanceSent IS null OR groupAcceptanceSent <= '%s') ORDER BY groupAcceptanceSent ASC".$this->get_message_query_limit(), $this->id, date("Y-m-d H:i:s", strtotime("-1 week"))));
+
+					$success = $fail = 0;
+
+					foreach($result as $r)
+					{
+						if($this->send_acceptance_message(array('type' => 'reminder', 'address_id' => $r->addressID, 'group_id' => $this->id)))
+						{
+							$success++;
+						}
+
+						else
+						{
+							$fail++;
+						}
+
+						if(($success + $fail) % 20 == 0)
+						{
+							sleep(1);
+							set_time_limit(60);
+						}
+					}
+
+					if($fail > 0)
+					{
+						$error_text = sprintf(__("%d messages were successful and %d failed", 'lang_group'), $success, $fail);
+					}
+
+					else
+					{
+						$done_text = sprintf(__("%d messages were sent", 'lang_group'), $success);
+					}
+				}
+
+				else if(isset($_GET['sent']))
+				{
+					$done_text = __("The information was sent", 'lang_group');
+				}
+
+				else if(isset($_GET['created']))
+				{
+					$done_text = __("The group was created", 'lang_group');
+				}
+
+				else if(isset($_GET['updated']))
+				{
+					$done_text = __("The group was updated", 'lang_group');
+				}
+
+				$obj_export = new mf_group_export();
+			}
+		}
+
+		if(IS_ADMINISTRATOR)
+		{
+			if($done_text == '' && $notice_text == '' && $error_text == '')
+			{
+				if($this->has_template() == false)
+				{
+					$notice_text = sprintf(__("You need to %screate a single template%s for Groups", 'lang_group'), "<a href='".admin_url("site-editor.php?p=/template")."'>", "</a>");
+				}
+			}
+
+			if($done_text == '' && $notice_text == '' && $error_text == '' && apply_filters('does_table_exist', false, $wpdb->prefix."group_message"))
+			{
+				$result = $wpdb->get_results("SELECT groupID, messageType, addressID, addressFirstName, addressSurName, addressEmail, addressCellNo FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) INNER JOIN ".$wpdb->prefix."address USING (addressID) WHERE queueSent = '0' AND (queueCreated > DATE_SUB(NOW(), INTERVAL 1 WEEK) AND queueCreated < DATE_SUB(NOW(), INTERVAL 3 HOUR)) LIMIT 0, 6");
+				$rows = $wpdb->num_rows;
+
+				if($rows > 0)
+				{
+					$unsent_links = "";
+
+					$i = 0;
+
+					foreach($result as $r)
+					{
+						if($i < 5)
+						{
+							$intGroupID = $r->groupID;
+							$strMessageType = $r->messageType;
+							$intAddressID = $r->addressID;
+							$strAddressFirstName = $r->addressFirstName;
+							$strAddressSurName = $r->addressSurName;
+							$emlAddressEmail = $r->addressEmail;
+							$strAddressCellNo = $r->addressCellNo;
+
+							$strGroupName = get_the_title($intGroupID);
+
+							$strAddressName = ($strAddressFirstName != '' ? $strAddressFirstName." " : "")
+								.($strAddressSurName != '' ? $strAddressSurName." " : "")
+								."&lt;".($strMessageType == "email" ? $emlAddressEmail : $strAddressCellNo)."&gt;";
+
+							$unsent_links .= ($unsent_links != '' ? ", " : "")."<a href='".admin_url("edit.php?s=".$strGroupName."&post_type=".$this->post_type)."'>".$strGroupName."</a> -> <a href='".admin_url("admin.php?page=mf_address/create/index.php&intAddressID=".$intAddressID)."'>".$strAddressName."</a>";
+
+							$i++;
+						}
+					}
+
+					$error_text = __("There were unsent messages", 'lang_group')." (".$unsent_links.($rows == 6 ? "&hellip;" : "").")";
+				}
+			}
+		}
+
+		echo get_notification();
 	}
 
 	function settings_group()
@@ -2034,110 +2170,6 @@ class mf_group
 		$post_id = $wpdb->get_var($wpdb->prepare("SELECT ID FROM ".$wpdb->posts." INNER JOIN ".$wpdb->postmeta." ON ".$wpdb->posts.".ID = ".$wpdb->postmeta.".post_id AND meta_key = '".$this->meta_prefix."allow_registration' WHERE post_type = %s AND meta_value = %s GROUP BY ID", $this->post_type, 'yes'));
 
 		return ($post_id > 0);
-	}
-
-	function admin_notices()
-	{
-		global $wpdb, $error_text, $done_text;
-
-		if(IS_ADMINISTRATOR && apply_filters('does_table_exist', false, $wpdb->prefix."group_message"))
-		{
-			$result = $wpdb->get_results("SELECT groupID, messageType, addressID, addressFirstName, addressSurName, addressEmail, addressCellNo FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) INNER JOIN ".$wpdb->prefix."address USING (addressID) WHERE queueSent = '0' AND (queueCreated > DATE_SUB(NOW(), INTERVAL 1 WEEK) AND queueCreated < DATE_SUB(NOW(), INTERVAL 3 HOUR)) LIMIT 0, 6");
-			$rows = $wpdb->num_rows;
-
-			if($rows > 0)
-			{
-				$unsent_links = "";
-
-				$i = 0;
-
-				foreach($result as $r)
-				{
-					if($i < 5)
-					{
-						$intGroupID = $r->groupID;
-						$strMessageType = $r->messageType;
-						$intAddressID = $r->addressID;
-						$strAddressFirstName = $r->addressFirstName;
-						$strAddressSurName = $r->addressSurName;
-						$emlAddressEmail = $r->addressEmail;
-						$strAddressCellNo = $r->addressCellNo;
-
-						$strGroupName = get_the_title($intGroupID);
-
-						$strAddressName = ($strAddressFirstName != '' ? $strAddressFirstName." " : "")
-							.($strAddressSurName != '' ? $strAddressSurName." " : "")
-							."&lt;".($strMessageType == "email" ? $emlAddressEmail : $strAddressCellNo)."&gt;";
-
-						$unsent_links .= ($unsent_links != '' ? ", " : "")."<a href='".admin_url("edit.php?s=".$strGroupName."&post_type=".$this->post_type)."'>".$strGroupName."</a> -> <a href='".admin_url("admin.php?page=mf_address/create/index.php&intAddressID=".$intAddressID)."'>".$strAddressName."</a>";
-
-						$i++;
-					}
-				}
-
-				$error_text = __("There were unsent messages", 'lang_group')." (".$unsent_links.($rows == 6 ? "&hellip;" : "").")";
-			}
-		}
-
-		$screen = get_current_screen();
-
-		if(isset($screen->post_type) && $screen->post_type === $this->post_type)
-		{
-			if(isset($_GET['btnGroupResend']) && $this->id > 0 && wp_verify_nonce($_REQUEST['_wpnonce_group_resend'], 'group_resend_'.$this->id))
-			{
-				$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE addressDeleted = '0' AND groupID = '%d' AND groupAccepted = '0' AND groupUnsubscribed = '0' AND (groupAcceptanceSent IS null OR groupAcceptanceSent <= '%s') ORDER BY groupAcceptanceSent ASC".$this->get_message_query_limit(), $this->id, date("Y-m-d H:i:s", strtotime("-1 week"))));
-
-				$success = $fail = 0;
-
-				foreach($result as $r)
-				{
-					if($this->send_acceptance_message(array('type' => 'reminder', 'address_id' => $r->addressID, 'group_id' => $this->id)))
-					{
-						$success++;
-					}
-
-					else
-					{
-						$fail++;
-					}
-
-					if(($success + $fail) % 20 == 0)
-					{
-						sleep(1);
-						set_time_limit(60);
-					}
-				}
-
-				if($fail > 0)
-				{
-					$error_text = sprintf(__("%d messages were successful and %d failed", 'lang_group'), $success, $fail);
-				}
-
-				else
-				{
-					$done_text = sprintf(__("%d messages were sent", 'lang_group'), $success);
-				}
-			}
-
-			else if(isset($_GET['sent']))
-			{
-				$done_text = __("The information was sent", 'lang_group');
-			}
-
-			else if(isset($_GET['created']))
-			{
-				$done_text = __("The group was created", 'lang_group');
-			}
-
-			else if(isset($_GET['updated']))
-			{
-				$done_text = __("The group was updated", 'lang_group');
-			}
-
-			$obj_export = new mf_group_export();
-		}
-
-		echo get_notification();
 	}
 
 	function column_header($columns)
