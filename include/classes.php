@@ -1795,7 +1795,7 @@ class mf_group
 				'view_item' => __("View", 'lang_group'),
 				'add_new_item' => __("Add New", 'lang_group'),
 			),
-			'public' => true, //(wp_is_block_theme() == false) // Has to be active since unsubscribe links go there
+			'public' => true,
 			'show_ui' => true,
 			'show_in_menu' => false,
 			'show_in_rest' => true,
@@ -1889,12 +1889,9 @@ class mf_group
 
 		if(IS_ADMINISTRATOR)
 		{
-			if($done_text == '' && $notice_text == '' && $error_text == '')
+			if($done_text == '' && $notice_text == '' && $error_text == '' && wp_is_block_theme() == true && $this->has_template() == false)
 			{
-				if($this->has_template() == false)
-				{
-					$notice_text = sprintf(__("You need to %screate a single template%s for Groups", 'lang_group'), "<a href='".admin_url("site-editor.php?p=/template")."'>", "</a>");
-				}
+				$notice_text = sprintf(__("You need to %screate a single template%s for Groups", 'lang_group'), "<a href='".admin_url("site-editor.php?p=/template")."'>", "</a>");
 			}
 
 			if($done_text == '' && $notice_text == '' && $error_text == '' && apply_filters('does_table_exist', false, $wpdb->prefix."group_message"))
