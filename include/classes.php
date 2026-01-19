@@ -915,27 +915,27 @@ class mf_group
 									switch($headers['http_code'])
 									{
 										case 200:
-											$json = json_decode($content, true);
+											$arr_json = json_decode($content, true);
 
 											$log_message_2 = __("The status was wrong in the Group API", 'lang_group');
 
-											switch($json['status'])
+											switch($arr_json['status'])
 											{
 												case true:
 												case 'true':
-													$count_incoming_temp = count($json['data']);
+													$count_incoming_temp = count($arr_json['data']);
 													$count_incoming += $count_incoming_temp;
 
-													if(isset($json['data']) && $count_incoming_temp > 0)
+													if(isset($arr_json['data']) && $count_incoming_temp > 0)
 													{
 														if(get_option('setting_group_debug') == 'yes')
 														{
-															do_log("Group API - ".$post_title." - Returned: ".$post_meta_api." -> ".htmlspecialchars(var_export($json['data'], true)));
+															do_log("Group API - ".$post_title." - Returned: ".$post_meta_api." -> ".htmlspecialchars(var_export($arr_json['data'], true)));
 														}
 
 														// Insert or update in group
 														##################################
-														foreach($json['data'] as $item)
+														foreach($arr_json['data'] as $item)
 														{
 															if(isset($item['memberSSN']) || isset($item['email']))
 															{
@@ -1128,7 +1128,7 @@ class mf_group
 												break;
 
 												default:
-													do_log($log_message_2.": ".$post_meta_api." -> ".htmlspecialchars(var_export($json, true)));
+													do_log($log_message_2.": ".$post_meta_api." -> ".htmlspecialchars(var_export($arr_json, true)));
 												break;
 											}
 
