@@ -829,16 +829,18 @@ class mf_group
 								{
 									if($arr_address['email'] != '')
 									{
+										if(!isset($arr_address['extra'])){	$arr_address['extra'] = "";}
+
 										$intAddressID = $wpdb->get_var($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address WHERE addressEmail = %s", $arr_address['email']));
 
 										if($intAddressID > 0)
 										{
-											$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."address SET addressFirstName = %s, addressSurName = %s, addressCellNo = %s WHERE addressID = '%d'", $arr_address['first_name'], $arr_address['sur_name'], $arr_address['phone'], $intAddressID));
+											$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."address SET addressFirstName = %s, addressSurName = %s, addressCellNo = %s, addressExtra = %s WHERE addressID = '%d'", $arr_address['first_name'], $arr_address['sur_name'], $arr_address['phone'], $arr_address['extra'], $intAddressID));
 										}
 
 										else
 										{
-											$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->prefix."address SET addressFirstName = %s, addressSurName = %s, addressEmail = %s, addressCellNo = %s, addressCreated = NOW()", $arr_address['first_name'], $arr_address['sur_name'], $arr_address['email'], $arr_address['phone']));
+											$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->prefix."address SET addressFirstName = %s, addressSurName = %s, addressEmail = %s, addressCellNo = %s, addressExtra = %s, addressCreated = NOW()", $arr_address['first_name'], $arr_address['sur_name'], $arr_address['email'], $arr_address['phone'], $arr_address['extra']));
 
 											$intAddressID = $wpdb->insert_id;
 										}
