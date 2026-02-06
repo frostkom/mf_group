@@ -83,7 +83,7 @@ echo "<div class='wrap'>
 				</div>
 				<div id='postbox-container-1'>
 					<div class='postbox'>"
-						//."<h3 class='hndle'>".__("Send", 'lang_group')."</h3>"
+						."<h3 class='hndle'>".__("Send", 'lang_group')."</h3>"
 						."<div class='inside'>"
 							.show_button(array('name' => 'btnGroupSend', 'text' => __("Send", 'lang_group')));
 
