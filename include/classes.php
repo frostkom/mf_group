@@ -5,6 +5,7 @@ class mf_group
 	var $id;
 	var $type;
 	var $post_type = __CLASS__;
+	var $post_type_templates;
 	var $meta_prefix;
 	var $arr_stop_list = [];
 	var $group_month;
@@ -39,6 +40,8 @@ class mf_group
 		}
 
 		$this->type = $data['type'];
+
+		$this->post_type_templates = $this->post_type.'_templates';
 
 		$this->meta_prefix = $this->post_type.'_';
 	}
@@ -1807,6 +1810,24 @@ class mf_group
 				'slug' => 'group',
 			),
 		));
+		
+		register_post_type($this->post_type_templates, array(
+			'labels' => array(
+				'name' => __("Group Templates", 'lang_group'),
+				'singular_name' => __("Group Template", 'lang_group'),
+				'menu_name' => __("Group Templates", 'lang_group'),
+				'all_items' => __("List", 'lang_group'),
+				'edit_item' => __("Edit", 'lang_group'),
+				'view_item' => __("View", 'lang_group'),
+				'add_new_item' => __("Add New", 'lang_group'),
+			),
+			'public' => false,
+			'show_ui' => true,
+			'show_in_menu' => false,
+			'show_in_rest' => true,
+			'exclude_from_search' => true,
+			'supports' => array('title', 'editor'),
+		));
 
 		register_block_type('mf/group', array(
 			'editor_script' => 'script_group_block_wp',
@@ -2120,6 +2141,9 @@ class mf_group
 
 		$menu_title = __("Add New", 'lang_group');
 		add_submenu_page($menu_start, $menu_title, " - ".$menu_title, $menu_capability, "post-new.php?post_type=".$this->post_type);
+
+		$menu_title = __("Templates", 'lang_group');
+		add_submenu_page($menu_start, $menu_title, " - ".$menu_title, $menu_capability, "post-new.php?post_type=".$this->post_type_templates);
 
 		/*if(IS_SUPER_ADMIN)
 		{
@@ -3193,7 +3217,7 @@ class mf_group
 
 				else if($this->message_text_source > 0)
 				{
-					$this->message_text = $wpdb->get_var($wpdb->prepare("SELECT post_content FROM ".$wpdb->posts." WHERE post_type = %s AND post_status = %s AND ID = '%d'", 'page', 'publish', $this->message_text_source));
+					$this->message_text = $wpdb->get_var($wpdb->prepare("SELECT post_content FROM ".$wpdb->posts." WHERE post_type = %s AND post_status = %s AND ID = '%d'", $this->post_type_templates, 'publish', $this->message_text_source));
 
 					$this->message_text = str_replace("[name]", get_user_info(), $this->message_text);
 

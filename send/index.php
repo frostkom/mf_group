@@ -110,13 +110,18 @@ echo "<div class='wrap'>
 					if($obj_group->message_type == "email")
 					{
 						$arr_data_source = [];
-						get_post_children(array('add_choose_here' => true), $arr_data_source);
+						get_post_children(array('add_choose_here' => true, 'post_type' => $obj_group->post_type_templates), $arr_data_source);
 
 						echo "<div class='postbox display_parent'>
 							<h3 class='hndle'>".__("Advanced", 'lang_group')."</h3>
-							<div class='inside'>"
-								.show_select(array('data' => $arr_data_source, 'name' => 'intEmailTextSource', 'text' => __("Text Source", 'lang_group'), 'xtra' => "rel='submit_change'")) // class='is_disabled' disabled
-								.get_media_button(array('name' => 'strMessageAttachment', 'value' => $obj_group->message_attachment));
+							<div class='inside'>";
+
+								if(count($arr_data_source) > 1)
+								{
+									echo show_select(array('data' => $arr_data_source, 'name' => 'intEmailTextSource', 'text' => __("Text Source", 'lang_group'), 'xtra' => "rel='submit_change'"));
+								}
+
+								echo get_media_button(array('name' => 'strMessageAttachment', 'value' => $obj_group->message_attachment));
 
 								if($obj_group->message_text == '' || $obj_group->message_text != '' && !preg_match("/\[view_in_browser_link\]/", $obj_group->message_text))
 								{

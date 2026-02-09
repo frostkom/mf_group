@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: Add support for groups and sending e-mails to multiple people
-Version: 5.13.42
+Version: 5.14.0
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://martinfors.se
@@ -195,7 +195,7 @@ function uninstall_group()
 	mf_uninstall_plugin(array(
 		'uploads' => $obj_group->post_type,
 		'options' => array('setting_emails_per_hour', 'setting_group_see_other_roles', 'setting_group_trace_links', 'setting_group_outgoing_text', 'setting_group_import', 'setting_group_debug', 'setting_group_log_file', 'option_group_synced', 'option_group_synced_seconds'),
-		'post_types' => array($obj_group->post_type),
+		'post_types' => array($obj_group->post_type, $obj_group->post_type_templates),
 		'tables' => array('group_message', 'group_message_link', 'group_queue', 'address2group', 'group_version'),
 	));
 }
