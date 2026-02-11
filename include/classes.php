@@ -1824,7 +1824,7 @@ class mf_group
 			'public' => false,
 			'show_ui' => true,
 			'show_in_menu' => false,
-			'show_in_rest' => true,
+			'show_in_rest' => false,
 			'exclude_from_search' => true,
 			'supports' => array('title', 'editor'),
 		));
@@ -2143,6 +2143,9 @@ class mf_group
 		add_submenu_page($menu_start, $menu_title, " - ".$menu_title, $menu_capability, "post-new.php?post_type=".$this->post_type);
 
 		$menu_title = __("Templates", 'lang_group');
+		add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, "edit.php?post_type=".$this->post_type_templates);
+
+		$menu_title = __("Add New", 'lang_group');
 		add_submenu_page($menu_start, $menu_title, " - ".$menu_title, $menu_capability, "post-new.php?post_type=".$this->post_type_templates);
 
 		/*if(IS_SUPER_ADMIN)
@@ -3219,6 +3222,20 @@ class mf_group
 				{
 					$this->message_text = $wpdb->get_var($wpdb->prepare("SELECT post_content FROM ".$wpdb->posts." WHERE post_type = %s AND post_status = %s AND ID = '%d'", $this->post_type_templates, 'publish', $this->message_text_source));
 
+					$this->message_text = apply_filters('the_content', $this->message_text);
+					$this->message_text = do_blocks($this->message_text);
+
+					/*$arr_blocks = parse_blocks($this->message_text_source);
+    
+					// Initialize an empty string for the HTML content
+					$html_content = "";
+
+					// Loop through each block and render it
+					foreach($arr_blocks as $block)
+					{
+						$html_content .= render_block($block);
+					}*/
+
 					$this->message_text = str_replace("[name]", get_user_info(), $this->message_text);
 
 					if(is_plugin_active("mf_email/index.php"))
@@ -3790,9 +3807,9 @@ if(class_exists('mf_list_table'))
 
 		function init_fetch()
 		{
-			global $wpdb; //, $obj_group
+			global $wpdb;
 
-			$this->query_where .= "wp_group_queue.messageID = '".esc_sql($this->arr_settings['intMessageID'])."'";
+			$this->query_where .= $wpdb->prefix."group_queue.messageID = '".esc_sql($this->arr_settings['intMessageID'])."'";
 
 			if($this->search != '')
 			{
@@ -3834,8 +3851,6 @@ if(class_exists('mf_list_table'))
 			global $wpdb, $obj_group;
 
 			$out = "";
-
-			//$intMessageID2 = $item['messageID'];
 
 			switch($column_name)
 			{
@@ -3917,7 +3932,7 @@ if(class_exists('mf_list_table'))
 				case 'queueSentTime':
 					if($item[$column_name] > DEFAULT_DATE)
 					{
-						if($item['queueSent'] == 1) // && $item[$column_name] > $this->arr_settings['sent_datetime_temp']
+						if($item['queueSent'] == 1)
 						{
 							$sent_date = date("Y-m-d", strtotime($item[$column_name]));
 

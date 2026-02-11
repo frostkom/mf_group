@@ -12,7 +12,7 @@ echo "<div class='wrap'>
 
 	$tbl_group->select_data(array(
 		'select' => "addressID, addressFirstName, addressSurName, messageType, addressEmail, addressCellNo, queueSent, queueStatus, queueStatusMessage, queueSentTime, queueViewed",
-		'join' => " INNER JOIN ".$wpdb->prefix."address USING (addressID) INNER JOIN ".$wpdb->prefix."group_message ON ".$wpdb->prefix."group_queue.messageID = ".$wpdb->prefix."group_message.messageID",
+		'join' => " INNER JOIN ".$wpdb->prefix."address USING (addressID) INNER JOIN ".$wpdb->prefix."group_message ON ".$wpdb->prefix."group_queue.messageID = ".$wpdb->prefix."group_message.messageID", // INNER JOIN ".$wpdb->prefix."group_queue ON ".$wpdb->prefix."address.addressID = ".$wpdb->prefix."group_queue.addressID
 		//'debug' => true,
 	));
 
