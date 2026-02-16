@@ -525,10 +525,11 @@ class mf_group
 								$strMessageAttachment = $r->messageAttachment;
 								$intUserID = $r->userID;
 
-								if($strMessageType == 'email' && get_option('setting_group_trace_links', 'yes') == 'yes')
+								/*if($strMessageType == 'email' && get_option('setting_group_trace_links', 'yes') == 'yes')
 								{
+									// This does convert image URLs aswell, so it needs to be fixed before use
 									$strMessageText = $this->convert_links(array('message_text' => $strMessageText));
-								}
+								}*/
 							}
 
 							$intMessageID_temp = $intMessageID;
@@ -1810,7 +1811,7 @@ class mf_group
 				'slug' => 'group',
 			),
 		));
-		
+
 		register_post_type($this->post_type_templates, array(
 			'labels' => array(
 				'name' => __("Group Templates", 'lang_group'),
@@ -1969,7 +1970,7 @@ class mf_group
 		$arr_settings = array(
 			'setting_emails_per_hour' => __("Outgoing e-mails per hour", 'lang_group'),
 			'setting_group_see_other_roles' => __("See groups created by other roles", 'lang_group'),
-			'setting_group_trace_links' => __("Trace links", 'lang_group'),
+			//'setting_group_trace_links' => __("Trace links", 'lang_group'),
 			'setting_group_outgoing_text' => __("Outgoing Text", 'lang_group'),
 		);
 
@@ -2000,13 +2001,13 @@ class mf_group
 		echo show_textfield(array('type' => 'number', 'name' => $setting_key, 'value' => $option, 'suffix' => __("0 or empty means infinte", 'lang_group')));
 	}
 
-	function setting_group_trace_links_callback()
+	/*function setting_group_trace_links_callback()
 	{
 		$setting_key = get_setting_key(__FUNCTION__);
 		$option = get_option($setting_key, 'yes');
 
 		echo show_select(array('data' => get_yes_no_for_select(), 'name' => $setting_key, 'value' => $option, 'description' => __("This will replace links with an internal URL so that you can see which recepients have opened the messages", 'lang_group')));
-	}
+	}*/
 
 	function setting_group_see_other_roles_callback()
 	{
@@ -3741,10 +3742,10 @@ if(class_exists('mf_list_table'))
 							$arr_actions['deferred'] = "<i class='fa fa-times red'></i> ".mf_format_number($intMessageDeferred / $intMessageSent * 100, 1)."% ".__("Deferred", 'lang_group');
 						}
 
-						if($intMessageViewed > 0 && get_option('setting_group_trace_links') == 'yes')
+						/*if($intMessageViewed > 0 && get_option('setting_group_trace_links') == 'yes')
 						{
 							$arr_actions['read'] = "<i class='fa fa-check green'></i> ".mf_format_number($intMessageViewed / $intMessageSent * 100, 1)."% ".__("Read", 'lang_group');
-						}
+						}*/
 					}
 
 					if($intMessageNotSent > 0)
