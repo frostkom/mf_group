@@ -21,7 +21,6 @@ class mf_group
 	var $message_text_source;
 	var $message_attachment;
 	var $query_where = "";
-	var $emails_left_to_send = [];
 	var $queue_id;
 
 	function __construct($data = [])
@@ -595,7 +594,11 @@ class mf_group
 
 									if($send == true)
 									{
-										if(apply_filters('get_emails_left_to_send', 0, $strMessageFrom, 'group') > 0)
+										$arr_email_left_to_send = apply_filters('get_emails_left_to_send', []);
+
+										do_log(__FUNCTION__.": ".var_export($arr_email_left_to_send, true)." left to send to");
+
+										if($arr_email_left_to_send['amount_left'] > 0)
 										{
 											$view_in_browser_url = $this->get_group_url(array('type' => 'view_in_browser', 'group_id' => $intGroupID, 'message_id' => $intMessageID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
 											$unsubscribe_url = $this->get_group_url(array('type' => 'unsubscribe', 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
@@ -672,7 +675,7 @@ class mf_group
 
 										else
 										{
-											$hourly_release_time = apply_filters('get_hourly_release_time', '', $strMessageFrom);
+											$hourly_release_time = apply_filters('get_hourly_release_time', '');
 											$mins = time_between_dates(array('start' => $hourly_release_time, 'end' => date("Y-m-d H:i:s"), 'type' => 'round', 'return' => 'minutes'));
 
 											do_log("E-mails from ".$strMessageFrom." were rejected. Wait for ".$mins." mins (".$wpdb->last_query.")");
@@ -1995,8 +1998,7 @@ class mf_group
 	function setting_emails_per_hour_callback()
 	{
 		$setting_key = get_setting_key(__FUNCTION__);
-		settings_save_site_wide($setting_key);
-		$option = get_site_option($setting_key, get_option($setting_key, 200));
+		$option = get_option($setting_key, 200);
 
 		echo show_textfield(array('type' => 'number', 'name' => $setting_key, 'value' => $option, 'suffix' => __("0 or empty means infinte", 'lang_group')));
 	}
@@ -2966,64 +2968,25 @@ class mf_group
 		return $post_types;
 	}
 
-	function get_emails_left_to_send($amount, $email, $type = '')
+	function get_emails_left_to_send($data = [])
 	{
 		global $wpdb, $obj_base;
 
-		$amount_temp = 0;
+		if(!isset($data['amount_limit'])){	$data['amount_limit'] = get_option_or_default('setting_emails_per_hour', 200);}
+		if(!isset($data['amount_sent'])){	$data['amount_sent'] = 0;}
 
-		if($type != '' && isset($this->emails_left_to_send[$type][$email]))
+		if(apply_filters('does_table_exist', false, $wpdb->prefix."group_message"))
 		{
-			$amount_temp = $this->emails_left_to_send[$type][$email];
+			$result = $obj_base->get_results("SELECT queueID FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) WHERE queueSent = '1' AND queueSentTime > DATE_SUB(NOW(), INTERVAL 1 HOUR)");
+			$data['amount_sent'] += count($result);
 		}
 
-		else if(apply_filters('does_table_exist', false, $wpdb->prefix."group_message"))
-		{
-			$query_where = "";
+		$data['amount_left'] = ($data['amount_limit'] - $data['amount_sent']);
 
-			if($email == '')
-			{
-				$emails_per_hour = get_option_or_default('setting_emails_per_hour');
-
-				if($emails_per_hour > 0)
-				{
-					$amount_temp += $emails_per_hour;
-				}
-
-				else if($amount == 0)
-				{
-					$amount_temp += 10000;
-				}
-			}
-
-			else
-			{
-				if($amount == 0)
-				{
-					$amount_temp += 10000;
-				}
-
-				$query_where = " AND messageFrom LIKE '%".esc_sql($email)."'";
-			}
-
-			$result = $obj_base->get_results("SELECT queueID FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) WHERE queueSent = '1' AND queueSentTime > DATE_SUB(NOW(), INTERVAL 1 HOUR)".$query_where);
-			$amount_temp -= count($result);
-
-			if($type != '')
-			{
-				$this->emails_left_to_send[$type][$email] = $amount_temp;
-			}
-		}
-
-		if($type != '')
-		{
-			$this->emails_left_to_send[$type][$email]--;
-		}
-
-		return ($amount + $amount_temp);
+		return $data;
 	}
 
-	function get_hourly_release_time($datetime, $email)
+	function get_hourly_release_time($datetime)
 	{
 		global $wpdb;
 
@@ -3032,14 +2995,7 @@ class mf_group
 			$datetime = date("Y-m-d H:i:s");
 		}
 
-		$query_where = "";
-
-		if($email != '')
-		{
-			$query_where = " AND messageFrom LIKE '%".esc_sql($email)."'";
-		}
-
-		$datetime_temp = $wpdb->get_var("SELECT queueSentTime FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) WHERE queueSent = '1' AND queueSentTime > DATE_SUB(NOW(), INTERVAL 1 HOUR)".$query_where." ORDER BY queueSentTime ASC LIMIT 0, 1");
+		$datetime_temp = $wpdb->get_var("SELECT queueSentTime FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) WHERE queueSent = '1' AND queueSentTime > DATE_SUB(NOW(), INTERVAL 1 HOUR) ORDER BY queueSentTime ASC LIMIT 0, 1");
 
 		if($datetime_temp > DEFAULT_DATE && $datetime_temp < $datetime)
 		{
@@ -3320,11 +3276,11 @@ class mf_group
 	{
 		$query_limit = "";
 
-		$emails_left_to_send = apply_filters('get_emails_left_to_send', 0, '');
+		$arr_emails_left_to_send = apply_filters('get_emails_left_to_send', []);
 
-		if($emails_left_to_send > -1)
+		if($arr_emails_left_to_send['amount_left'] >= 0)
 		{
-			$query_limit = " LIMIT 0, ".$emails_left_to_send;
+			$query_limit = " LIMIT 0, ".$arr_emails_left_to_send['amount_left'];
 		}
 
 		return $query_limit;
