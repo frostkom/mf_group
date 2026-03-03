@@ -596,7 +596,7 @@ class mf_group
 									{
 										$arr_email_left_to_send = apply_filters('get_emails_left_to_send', []);
 
-										do_log(__FUNCTION__.": ".var_export($arr_email_left_to_send, true)." left to send to");
+										//do_log(__FUNCTION__.": ".var_export($arr_email_left_to_send, true)." left to send to");
 
 										if($arr_email_left_to_send['amount_left'] > 0)
 										{
@@ -676,7 +676,7 @@ class mf_group
 										else
 										{
 											$hourly_release_time = apply_filters('get_hourly_release_time', '');
-											$mins = time_between_dates(array('start' => $hourly_release_time, 'end' => date("Y-m-d H:i:s"), 'type' => 'round', 'return' => 'minutes'));
+											$mins = time_between_dates(array('start' => $hourly_release_time, 'end' => current_time('mysql'), 'type' => 'round', 'return' => 'minutes'));
 
 											do_log("E-mails from ".$strMessageFrom." were rejected. Wait for ".$mins." mins (".$wpdb->last_query.")");
 										}
@@ -728,11 +728,14 @@ class mf_group
 						}
 					}
 
-					switch($strMessageType)
+					if(isset($strMessageType))
 					{
-						case 'email':
-							do_action('group_after_send');
-						break;
+						switch($strMessageType)
+						{
+							case 'email':
+								do_action('group_after_send');
+							break;
+						}
 					}
 				}
 				#############################
@@ -744,7 +747,7 @@ class mf_group
 
 				if($option_group_synced < date("Y-m-d H:i:s", strtotime("-".($option_group_synced_seconds + 10)." second")))
 				{
-					$sync_start = date("Y-m-d H:i:s");
+					$sync_start = current_time('mysql');
 
 					$is_syncing = false;
 
@@ -1214,7 +1217,7 @@ class mf_group
 					}
 					#############################
 
-					$sync_end = date("Y-m-d H:i:s");
+					$sync_end = current_time('mysql');
 
 					update_option('option_group_synced', $sync_end, false);
 					update_option('option_group_synced_seconds', time_between_dates(array('start' => $sync_start, 'end' => $sync_end, 'type' => 'ceil', 'return' => 'seconds')), false);
@@ -2992,7 +2995,7 @@ class mf_group
 
 		if($datetime == '')
 		{
-			$datetime = date("Y-m-d H:i:s");
+			$datetime = current_time('mysql');
 		}
 
 		$datetime_temp = $wpdb->get_var("SELECT queueSentTime FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) WHERE queueSent = '1' AND queueSentTime > DATE_SUB(NOW(), INTERVAL 1 HOUR) ORDER BY queueSentTime ASC LIMIT 0, 1");
@@ -3789,7 +3792,8 @@ if(class_exists('mf_list_table'))
 
 			$arr_columns = array(
 				//'cb' => '<input type="checkbox">',
-				'addressID' => __("Address", 'lang_group'),
+				'addressID' => __("Name", 'lang_group'),
+				'addressTo' => __("To", 'lang_group'),
 				'queueStatus' => __("Status", 'lang_group'),
 				//'queueCreated' => __("Created", 'lang_group'),
 				'queueSentTime' => __("Sent", 'lang_group'),
@@ -3814,25 +3818,24 @@ if(class_exists('mf_list_table'))
 				case 'addressID':
 					if($item['addressFirstName'] != '' || $item['addressSurName'] != '')
 					{
-						$out .= $item['addressFirstName']." ".$item['addressSurName'];
+						$out .= $item['addressFirstName']." ".$item['addressSurName']." ";
 					}
+				break;
 
-					else
+				case 'addressTo':
+					switch($item['messageType'])
 					{
-						switch($item['messageType'])
-						{
-							case 'email':
-								$out .= $item['addressEmail'];
-							break;
+						case 'email':
+							$out .= $item['addressEmail'];
+						break;
 
-							default:
-								//
-							break;
+						case 'sms':
+							$out .= $item['addressCellNo'];
+						break;
 
-							case 'sms':
-								$out .= $item['addressCellNo'];
-							break;
-						}
+						default:
+							$out .= __("Unknown", 'lang_group').": ".$item['messageType'];
+						break;
 					}
 				break;
 
@@ -3875,7 +3878,8 @@ if(class_exists('mf_list_table'))
 
 					else
 					{
-						$out .= "<i class='fa fa-times red' title='".__("Not Sent", 'lang_group')."'></i> ";
+						//$out .= "<i class='fa fa-times red' title='".__("Not Sent", 'lang_group')."'></i> ";
+						$out .= apply_filters('get_loading_animation', '', ['class' => '']);
 					}
 				break;
 
