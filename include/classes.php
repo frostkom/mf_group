@@ -377,12 +377,12 @@ class mf_group
 		$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_queue SET queueSent = '1', queueSentTime = NOW() WHERE queueID = '%d'", $intQueueID));
 	}
 
-	function get_email_address_from_id($id)
+	/*function get_email_address_from_id($id)
 	{
 		global $wpdb;
 
 		return $wpdb->get_var($wpdb->prepare("SELECT emailAddress FROM ".$wpdb->base_prefix."email WHERE emailID = '%d'", $id));
-	}
+	}*/
 
 	function check_if_exists($data)
 	{
@@ -493,7 +493,6 @@ class mf_group
 					$intGroupID = $r->groupID;
 
 					$strGroupVerifyLink = get_post_meta($intGroupID, $this->meta_prefix.'verify_link', true);
-
 					$intGroupOwnerEmail = get_post_meta($intGroupID, $this->meta_prefix.'owner_email', true);
 					$intGroupHelpPage = get_post_meta($intGroupID, $this->meta_prefix.'help_page', true);
 					$intGroupArchivePage = get_post_meta($intGroupID, $this->meta_prefix.'archive_page', true);
@@ -502,12 +501,13 @@ class mf_group
 
 					$intMessageID_temp = 0;
 
-					$resultAddresses = $wpdb->get_results($wpdb->prepare("SELECT queueID, messageID, addressEmail, addressCellNo FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."group_queue USING (addressID) INNER JOIN ".$wpdb->prefix."group_message USING (messageID) WHERE groupID = '%d' AND messageDeleted = '0' AND queueSent = '0' ORDER BY messageType ASC, queueCreated ASC".$this->get_message_query_limit(), $intGroupID));
+					$resultAddresses = $wpdb->get_results($wpdb->prepare("SELECT queueID, messageID, addressFirstName, addressEmail, addressCellNo FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."group_queue USING (addressID) INNER JOIN ".$wpdb->prefix."group_message USING (messageID) WHERE groupID = '%d' AND messageDeleted = '0' AND queueSent = '0' ORDER BY messageType ASC, queueCreated ASC".$this->get_message_query_limit(), $intGroupID));
 
 					foreach($resultAddresses as $r)
 					{
 						$intQueueID = $r->queueID;
 						$intMessageID = $r->messageID;
+						$strAddressFirstName = $r->addressFirstName;
 						$strAddressEmail = trim($r->addressEmail);
 						$strAddressCellNo = $r->addressCellNo;
 
@@ -545,6 +545,7 @@ class mf_group
 
 									else
 									{
+										//$strMessageFromName = apply_filters('get_email_name_from_address', $strMessageFrom); // Already handled in $obj_email->use_smtp_settings()
 										$strMessageFromName = $strMessageFrom;
 									}
 
@@ -564,10 +565,6 @@ class mf_group
 									do_action('group_init_message', array('group_id' => $intGroupID, 'message_id' => $intMessageID, 'from_name' => $strMessageFromName, 'from' => $strMessageFrom, 'subject' => $strMessageName, 'content' => $strMessageText, 'alt_content' => $strMessageText));
 								break;
 
-								default:
-									do_action('group_init_other');
-								break;
-
 								/*case 'sms':
 									//Must be here to make sure that send_sms() is loaded
 									##################
@@ -581,6 +578,10 @@ class mf_group
 
 									$obj_sms = new mf_sms();
 								break;*/
+
+								default:
+									do_action('group_init_other');
+								break;
 							}
 						}
 
@@ -589,27 +590,41 @@ class mf_group
 							case 'email':
 								if($strAddressEmail != '' && is_domain_valid($strAddressEmail))
 								{
-									$send = true;
-									$send = apply_filters('group_before_send', $send, array('group_id' => $intGroupID, 'to' => $strAddressEmail, 'message_id' => $intMessageID, 'queue_id' => $intQueueID));
+									$send = apply_filters('group_before_send', true, array('group_id' => $intGroupID, 'to' => $strAddressEmail, 'message_id' => $intMessageID, 'queue_id' => $intQueueID));
 
 									if($send == true)
 									{
 										$arr_email_left_to_send = apply_filters('get_emails_left_to_send', []);
 
-										//do_log(__FUNCTION__.": ".var_export($arr_email_left_to_send, true)." left to send to");
-
 										if($arr_email_left_to_send['amount_left'] > 0)
 										{
+											do_log(__FUNCTION__.": ".var_export($arr_email_left_to_send, true)." left to send to", 'publish', false);
+
 											$view_in_browser_url = $this->get_group_url(array('type' => 'view_in_browser', 'group_id' => $intGroupID, 'message_id' => $intMessageID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
 											$unsubscribe_url = $this->get_group_url(array('type' => 'unsubscribe', 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
 
 											$mail_headers = "From: ".$strMessageFromName." <".$strMessageFrom.">\r\n";
+
+											// Already handled in $obj_email->use_smtp_settings()
+											/*$strMessageReplyTo = apply_filters('get_email_reply_to_from_address', $strMessageFrom);
+
+											if($strMessageReplyTo != '' && $strMessageReplyTo != $strMessageFrom)
+											{
+												$mail_headers .= "Reply-To: ".$strMessageFromName." <".$strMessageReplyTo.">\r\n";
+											}*/
+
 											$mail_headers .= "List-Unsubscribe: <".$unsubscribe_url.">\r\n";
 											//$mail_headers .= "List-Subscribe: ".$subscribe_email."<".$group_url.">\r\n";
 
 											if($intGroupOwnerEmail > 0)
 											{
-												$mail_headers .= "List-Owner: <mailto:".$this->get_email_address_from_id($intGroupOwnerEmail).">\r\n";
+												//$strGroupOwnerEmail = $this->get_email_address_from_id($intGroupOwnerEmail);
+												$strGroupOwnerEmail = apply_filters('get_email_address_from_id', $intGroupOwnerEmail);
+
+												if(strpos($strGroupOwnerEmail, "@") !== false)
+												{
+													$mail_headers .= "List-Owner: <mailto:".$strGroupOwnerEmail.">\r\n";
+												}
 											}
 
 											if($intGroupHelpPage > 0)
@@ -630,8 +645,8 @@ class mf_group
 											$mail_to = $strAddressEmail;
 											$mail_subject = $strMessageName;
 
-											$arr_exclude = array("[view_in_browser_link]", "[message_name]", "[unsubscribe_link]");
-											$arr_include = array($view_in_browser_url, $strMessageName, $unsubscribe_url);
+											$arr_exclude = array("[view_in_browser_link]", "[message_name]", "[unsubscribe_link]", "[first_name]");
+											$arr_include = array($view_in_browser_url, $strMessageName, $unsubscribe_url, $strAddressFirstName);
 
 											$mail_content = str_replace($arr_exclude, $arr_include, $strMessageText);
 
@@ -673,13 +688,13 @@ class mf_group
 											}
 										}
 
-										else
+										/*else
 										{
 											$hourly_release_time = apply_filters('get_hourly_release_time', '');
 											$mins = time_between_dates(array('start' => $hourly_release_time, 'end' => current_time('mysql'), 'type' => 'round', 'return' => 'minutes'));
 
 											do_log("E-mails from ".$strMessageFrom." were rejected. Wait for ".$mins." mins (".$wpdb->last_query.")");
-										}
+										}*/
 									}
 								}
 
@@ -2003,7 +2018,9 @@ class mf_group
 		$setting_key = get_setting_key(__FUNCTION__);
 		$option = get_option($setting_key, 200);
 
-		echo show_textfield(array('type' => 'number', 'name' => $setting_key, 'value' => $option, 'suffix' => __("0 or empty means infinte", 'lang_group')));
+		$arr_emails_left_to_send = apply_filters('get_emails_left_to_send', []);
+
+		echo show_textfield(array('type' => 'number', 'name' => $setting_key, 'value' => $option, 'suffix' => __("0 or empty means infinte", 'lang_group'), 'description' => sprintf(__("There are right now %d left to send", 'lang_group'), (isset($arr_emails_left_to_send['amount_left']) ? $arr_emails_left_to_send['amount_left'] : $option))));
 	}
 
 	/*function setting_group_trace_links_callback()
@@ -3281,7 +3298,7 @@ class mf_group
 
 		$arr_emails_left_to_send = apply_filters('get_emails_left_to_send', []);
 
-		if($arr_emails_left_to_send['amount_left'] >= 0)
+		if($arr_emails_left_to_send['amount_left'] > 0)
 		{
 			$query_limit = " LIMIT 0, ".$arr_emails_left_to_send['amount_left'];
 		}
