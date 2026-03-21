@@ -377,13 +377,6 @@ class mf_group
 		$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_queue SET queueSent = '1', queueSentTime = NOW() WHERE queueID = '%d'", $intQueueID));
 	}
 
-	/*function get_email_address_from_id($id)
-	{
-		global $wpdb;
-
-		return $wpdb->get_var($wpdb->prepare("SELECT emailAddress FROM ".$wpdb->base_prefix."email WHERE emailID = '%d'", $id));
-	}*/
-
 	function check_if_exists($data)
 	{
 		global $wpdb;
@@ -545,7 +538,6 @@ class mf_group
 
 									else
 									{
-										//$strMessageFromName = apply_filters('get_email_name_from_address', $strMessageFrom); // Already handled in $obj_email->use_smtp_settings()
 										$strMessageFromName = $strMessageFrom;
 									}
 
@@ -604,21 +596,11 @@ class mf_group
 											$unsubscribe_url = $this->get_group_url(array('type' => 'unsubscribe', 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
 
 											$mail_headers = "From: ".$strMessageFromName." <".$strMessageFrom.">\r\n";
-
-											// Already handled in $obj_email->use_smtp_settings()
-											/*$strMessageReplyTo = apply_filters('get_email_reply_to_from_address', $strMessageFrom);
-
-											if($strMessageReplyTo != '' && $strMessageReplyTo != $strMessageFrom)
-											{
-												$mail_headers .= "Reply-To: ".$strMessageFromName." <".$strMessageReplyTo.">\r\n";
-											}*/
-
 											$mail_headers .= "List-Unsubscribe: <".$unsubscribe_url.">\r\n";
 											//$mail_headers .= "List-Subscribe: ".$subscribe_email."<".$group_url.">\r\n";
 
 											if($intGroupOwnerEmail > 0)
 											{
-												//$strGroupOwnerEmail = $this->get_email_address_from_id($intGroupOwnerEmail);
 												$strGroupOwnerEmail = apply_filters('get_email_address_from_id', $intGroupOwnerEmail);
 
 												if(strpos($strGroupOwnerEmail, "@") !== false)
