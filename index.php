@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: Add support for groups and sending e-mails to multiple people
-Version: 5.14.5
+Version: 5.14.6
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://martinfors.se
@@ -97,18 +97,6 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 			PRIMARY KEY (messageID),
 			KEY groupID (groupID)
 		) DEFAULT CHARSET=".$default_charset);
-
-		$arr_add_column[$wpdb->prefix."group_message"] = array(
-			//'' => "ALTER TABLE [table] ADD [column]  AFTER ",
-		);
-
-		$arr_update_column[$wpdb->base_prefix."group_message"] = array(
-			//'' => "ALTER TABLE [table] CHANGE [column] [column] )",
-		);
-
-		$arr_add_index[$wpdb->prefix."group_message"] = array(
-			//'' => "ALTER TABLE [table] ADD INDEX [column] ([column])",
-		);
 
 		$wpdb->query("CREATE TABLE IF NOT EXISTS ".$wpdb->prefix."group_message_link (
 			linkID INT UNSIGNED NOT NULL AUTO_INCREMENT,

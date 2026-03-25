@@ -1809,7 +1809,7 @@ class mf_group
 			'show_in_menu' => false,
 			'show_in_rest' => true,
 			'exclude_from_search' => true,
-			'supports' => array('title', 'editor'),
+			'supports' => array('title', 'editor', 'revisions'),
 			'rewrite' => array(
 				'slug' => 'group',
 			),
@@ -1830,7 +1830,7 @@ class mf_group
 			'show_in_menu' => false,
 			'show_in_rest' => false,
 			'exclude_from_search' => true,
-			'supports' => array('title', 'editor'),
+			'supports' => array('title', 'editor', 'revisions'),
 		));
 
 		register_block_type('mf/group', array(
