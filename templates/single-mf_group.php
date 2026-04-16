@@ -59,7 +59,7 @@ get_header();
 				$post_id = $post->ID;
 				$post_title = $post->post_title;
 
-				$post_allow_registration = get_post_meta_or_default($post_id, $obj_group->meta_prefix.'allow_registration', true, 'no');
+				$post_allow_registration = get_post_meta($post_id, $obj_group->meta_prefix.'allow_registration', true);
 
 				$post_content = "";
 

@@ -3,7 +3,7 @@
 Plugin Name: MF Group
 Plugin URI: https://github.com/frostkom/mf_group
 Description: Add support for groups and sending e-mails to multiple people
-Version: 5.14.6
+Version: 5.14.7
 Licence: GPLv2 or later
 Author: Martin Fors
 Author URI: https://martinfors.se
@@ -52,6 +52,7 @@ if(!function_exists('is_plugin_active') || function_exists('is_plugin_active') &
 		add_filter('post_row_actions', array($obj_group, 'post_row_actions'), 10, 2);
 
 		add_action('rwmb_meta_boxes', array($obj_group, 'rwmb_meta_boxes'));
+		add_filter('get_post_types_for_metabox', array($obj_group, 'get_post_types_for_metabox'), 10, 2);
 	}
 
 	else

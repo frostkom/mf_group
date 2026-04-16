@@ -1323,7 +1323,7 @@ class mf_group
 			{
 				$post_content = "";
 
-				$post_allow_registration = get_post_meta($attributes['group_id'], $this->meta_prefix.'allow_registration', false);
+				$post_allow_registration = get_post_meta($attributes['group_id'], $this->meta_prefix.'allow_registration', true);
 
 				if($post_allow_registration == 'yes')
 				{
@@ -2840,15 +2840,12 @@ class mf_group
 			),
 		);
 
-		if(wp_is_block_theme() == false)
-		{
-			$arr_fields[] = array(
-				'name' => __("Allow Registration", 'lang_group'),
-				'id' => $this->meta_prefix.'allow_registration',
-				'type' => 'select',
-				'options' => get_yes_no_for_select(),
-			);
-		}
+		$arr_fields[] = array(
+			'name' => __("Allow Registration", 'lang_group'),
+			'id' => $this->meta_prefix.'allow_registration',
+			'type' => 'select',
+			'options' => get_yes_no_for_select(),
+		);
 
 		$arr_fields[] = array(
 			'name' => __("Verify that address is in Address book", 'lang_group'),
@@ -2933,6 +2930,13 @@ class mf_group
 		);
 
 		return $meta_boxes;
+	}
+
+	function get_post_types_for_metabox($array)
+	{
+		$array[] = $this->post_type;
+
+		return $array;
 	}
 
 	function filter_is_file_used($arr_used)
