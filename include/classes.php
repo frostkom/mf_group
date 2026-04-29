@@ -1351,7 +1351,7 @@ class mf_group
 
 						if(is_array($arr_registration_fields) && count($arr_registration_fields) > 0)
 						{
-							if(in_array("name", $arr_registration_fields))
+							if(in_array('name', $arr_registration_fields))
 							{
 								@list($strAddressFirstName, $strAddressSurName) = explode(" ", $strAddressName, 2);
 
@@ -1359,43 +1359,43 @@ class mf_group
 								$query_set .= ", addressFirstName = '".esc_sql($strAddressFirstName)."', addressSurName = '".esc_sql($strAddressSurName)."'";
 							}
 
-							if(in_array("address", $arr_registration_fields))
+							if(in_array('address', $arr_registration_fields))
 							{
 								$query_where .= ($query_where != '' ? " AND " : "")."addressAddress = '".$strAddressAddress."'";
 								$query_set .= ", addressAddress = '".esc_sql($strAddressAddress)."'";
 							}
 
-							if(in_array("zip", $arr_registration_fields))
+							if(in_array('zip', $arr_registration_fields))
 							{
 								$query_where .= ($query_where != '' ? " AND " : "")."addressZipCode = '".$intAddressZipCode."'";
 								$query_set .= ", addressZipCode = '".esc_sql($intAddressZipCode)."'";
 							}
 
-							if(in_array("city", $arr_registration_fields))
+							if(in_array('city', $arr_registration_fields))
 							{
 								$query_where .= ($query_where != '' ? " AND " : "")."addressCity = '".$strAddressCity."'";
 								$query_set .= ", addressCity = '".esc_sql($strAddressCity)."'";
 							}
 
-							if(in_array("country", $arr_registration_fields))
+							if(in_array('country', $arr_registration_fields))
 							{
 								$query_where .= ($query_where != '' ? " AND " : "")."addressCountry = '".$intAddressCountry."'";
 								$query_set .= ", addressCountry = '".esc_sql($intAddressCountry)."'";
 							}
 
-							if(in_array("phone", $arr_registration_fields))
+							if(in_array('phone', $arr_registration_fields))
 							{
 								$query_where .= ($query_where != '' ? " AND " : "")."addressTelNo = '".$strAddressTelNo."'";
 								$query_set .= ", addressTelNo = '".esc_sql($strAddressTelNo)."'";
 							}
 
-							if(in_array("email", $arr_registration_fields))
+							if(in_array('email', $arr_registration_fields))
 							{
 								$query_where .= ($query_where != '' ? " AND " : "")."addressEmail = '".$strAddressEmail."'";
 								$query_set .= ", addressEmail = '".esc_sql($strAddressEmail)."'";
 							}
 
-							if(in_array("extra", $arr_registration_fields))
+							if(in_array('extra', $arr_registration_fields))
 							{
 								$query_where .= ($query_where != '' ? " AND " : "")."addressExtra = '".$strAddressExtra."'";
 								$query_set .= ", addressExtra = '".esc_sql($strAddressExtra)."'";
@@ -1648,27 +1648,27 @@ class mf_group
 									break;
 								}
 
-								if(in_array("name", $arr_registration_fields))
+								if(in_array('name', $arr_registration_fields))
 								{
 									$out .= show_textfield(array('name' => 'strAddressName', $label_type => __("Name", 'lang_group'), 'value' => $strAddressName, 'required' => true));
 								}
 
-								if(in_array("address", $arr_registration_fields))
+								if(in_array('address', $arr_registration_fields))
 								{
 									$out .= show_textfield(array('name' => 'strAddressAddress', $label_type => __("Address", 'lang_group'), 'value' => $strAddressAddress, 'required' => true));
 								}
 
-								if(in_array("zip", $arr_registration_fields))
+								if(in_array('zip', $arr_registration_fields))
 								{
 									$out .= show_textfield(array('type' => 'number', 'name' => 'intAddressZipCode', $label_type => __("Zip Code", 'lang_group'), 'value' => $intAddressZipCode, 'required' => true));
 								}
 
-								if(in_array("city", $arr_registration_fields))
+								if(in_array('city', $arr_registration_fields))
 								{
 									$out .= show_textfield(array('name' => 'strAddressCity', $label_type => __("City", 'lang_group'), 'value' => $strAddressCity, 'required' => true));
 								}
 
-								if(in_array("country", $arr_registration_fields))
+								if(in_array('country', $arr_registration_fields))
 								{
 									if(!isset($obj_address))
 									{
@@ -1688,17 +1688,17 @@ class mf_group
 									}
 								}
 
-								if(in_array("phone", $arr_registration_fields))
+								if(in_array('phone', $arr_registration_fields))
 								{
 									$out .= show_textfield(array('name' => 'strAddressTelNo', $label_type => __("Phone Number", 'lang_group'), 'value' => $strAddressTelNo, 'required' => true));
 								}
 
-								if(in_array("email", $arr_registration_fields))
+								if(in_array('email', $arr_registration_fields))
 								{
 									$out .= show_textfield(array('name' => 'strAddressEmail', $label_type => __("E-mail", 'lang_group'), 'value' => $strAddressEmail, 'required' => true));
 								}
 
-								if(in_array("extra", $arr_registration_fields))
+								if(in_array('extra', $arr_registration_fields))
 								{
 									$out .= show_textfield(array('name' => 'strAddressExtra', $label_type => get_option_or_default('setting_address_extra', __("Extra", 'lang_group')), 'value' => $strAddressExtra, 'required' => true));
 								}
