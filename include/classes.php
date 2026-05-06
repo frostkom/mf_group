@@ -740,9 +740,7 @@ class mf_group
 				$option_group_synced = get_option('option_group_synced');
 				$option_group_synced_seconds = get_option('option_group_synced_seconds', 100);
 
-				//do_log(__FUNCTION__.": ".$option_group_synced." < ".date("Y-m-d H:i:s", strtotime("-".($option_group_synced_seconds + 10)." second")));
-
-				if($option_group_synced < date("Y-m-d H:i:s", strtotime("-".($option_group_synced_seconds + 10)." second")))
+				if($option_group_synced < date("Y-m-d H:i:s", strtotime(current_time('mysql')." -".($option_group_synced_seconds + 10)." second")))
 				{
 					$sync_start = current_time('mysql');
 
@@ -1861,7 +1859,7 @@ class mf_group
 			{
 				if(isset($_GET['btnGroupResend']) && $this->id > 0 && wp_verify_nonce($_REQUEST['_wpnonce_group_resend'], 'group_resend_'.$this->id))
 				{
-					$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE addressDeleted = '0' AND groupID = '%d' AND groupAccepted = '0' AND groupUnsubscribed = '0' AND (groupAcceptanceSent IS null OR groupAcceptanceSent <= '%s') ORDER BY groupAcceptanceSent ASC".$this->get_message_query_limit(), $this->id, date("Y-m-d H:i:s", strtotime("-1 week"))));
+					$result = $wpdb->get_results($wpdb->prepare("SELECT addressID FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE addressDeleted = '0' AND groupID = '%d' AND groupAccepted = '0' AND groupUnsubscribed = '0' AND (groupAcceptanceSent IS null OR groupAcceptanceSent <= '%s') ORDER BY groupAcceptanceSent ASC".$this->get_message_query_limit(), $this->id, date("Y-m-d H:i:s", strtotime(current_time('mysql')." -1 week"))));
 
 					$success = $fail = 0;
 
@@ -2453,7 +2451,7 @@ class mf_group
 						{
 							echo "<a href='".admin_url("admin.php?page=mf_address/list/index.php&intGroupID=".$post_id."&strFilterIsMember=yes&strFilterAccepted=no&strFilterUnsubscribed")."'>".$rowsAddressesNotAccepted."</a>";
 
-							$rowsAddresses2Remind = $this->amount_in_group(array('id' => $post_id, 'accepted' => 0, 'acceptance_sent' => date("Y-m-d H:i:s", strtotime("-1 week"))));
+							$rowsAddresses2Remind = $this->amount_in_group(array('id' => $post_id, 'accepted' => 0, 'acceptance_sent' => date("Y-m-d H:i:s", strtotime(current_time('mysql')." -1 week"))));
 
 							if($rowsAddresses2Remind > 0)
 							{
@@ -3653,7 +3651,7 @@ if(class_exists('mf_list_table'))
 
 					if($intMessageSent > 0)
 					{
-						if($item['messageCreated'] > date("Y-m-d H:i:s", strtotime("-1 month")))
+						if($item['messageCreated'] > date("Y-m-d H:i:s", strtotime(current_time('mysql')." -1 month")))
 						{
 							$arr_actions['message'] = "<a href='".admin_url("admin.php?page=mf_group/message/index.php&intMessageID=".$intMessageID2)."'>".__("View", 'lang_group')."</a>";
 
@@ -3661,7 +3659,7 @@ if(class_exists('mf_list_table'))
 
 							if($dteQueueSentTime_first > DEFAULT_DATE)
 							{
-								$is_same_day = ($item['messageCreated'] < date("Y-m-d H:i:s", strtotime("-7 day")) && date("Y-m-d", strtotime($item['messageCreated'])) == date("Y-m-d", strtotime($dteQueueSentTime_first)));
+								$is_same_day = ($item['messageCreated'] < date("Y-m-d H:i:s", strtotime(current_time('mysql')." -7 day")) && date("Y-m-d", strtotime($item['messageCreated'])) == date("Y-m-d", strtotime($dteQueueSentTime_first)));
 
 								if($is_same_day)
 								{
