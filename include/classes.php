@@ -2175,7 +2175,7 @@ class mf_group
 			add_submenu_page($menu_root, $menu_title, $menu_title, $menu_capability, $menu_root.'version/index.php');
 		}
 
-		if(IS_EDITOR)
+		if(IS_ADMINISTRATOR)
 		{
 			$menu_title = __("Settings", 'lang_group');
 			add_submenu_page($menu_start, $menu_title, $menu_title, $menu_capability, admin_url("options-general.php?page=settings_mf_base#settings_group"));
