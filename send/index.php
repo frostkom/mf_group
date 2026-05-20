@@ -127,19 +127,21 @@ echo "<div class='wrap'>
 								{
 									echo show_button(array('name' => 'btnGroupAddViewInBrowser', 'text' => __("Add Link to View in Browser", 'lang_group'), 'class' => "button"));
 
-									$shortcode = $obj_group->get_add_view_in_browser_code();
+									/*$shortcode = $obj_group->get_add_view_in_browser_code();
 
-									echo show_textfield(array('text' => __("Shortcode", 'lang_group'), 'value' => $shortcode, 'xtra_class' => "display_on_hover", 'xtra' => "readonly onclick='this.select()'"));
+									echo show_textfield(array('text' => __("Shortcode", 'lang_group'), 'value' => $shortcode, 'xtra_class' => "display_on_hover", 'xtra' => "readonly onclick='this.select()'"));*/
 								}
 
 								if($obj_group->message_text == '' || $obj_group->message_text != '' && !preg_match("/\[unsubscribe_link\]/", $obj_group->message_text))
 								{
 									echo show_button(array('name' => 'btnGroupAddUnsubscribe', 'text' => __("Add Unsubscribe Link", 'lang_group'), 'class' => "button"));
 
-									$shortcode = $obj_group->get_unsubscribe_code();
+									/*$shortcode = $obj_group->get_unsubscribe_code();
 
-									echo show_textfield(array('text' => __("Shortcode", 'lang_group'), 'value' => $shortcode, 'xtra_class' => "display_on_hover", 'xtra' => "readonly onclick='this.select()'"));
+									echo show_textfield(array('text' => __("Shortcode", 'lang_group'), 'value' => $shortcode, 'xtra_class' => "display_on_hover", 'xtra' => "readonly onclick='this.select()'"));*/
 								}
+
+								echo apply_filters('filter_group_send_buttons', '');
 
 							echo "</div>
 						</div>";

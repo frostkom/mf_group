@@ -627,10 +627,19 @@ class mf_group
 											$mail_to = $strAddressEmail;
 											$mail_subject = $strMessageName;
 
-											$arr_exclude = array("[view_in_browser_link]", "[message_name]", "[unsubscribe_link]", "[first_name]");
-											$arr_include = array($view_in_browser_url, $strMessageName, $unsubscribe_url, $strAddressFirstName);
+											$arr_replacement = [
+												'exclude' => [],
+												'include' => [],
+											];
 
-											$mail_content = str_replace($arr_exclude, $arr_include, $strMessageText);
+											$arr_replacement['exclude'][] = "[view_in_browser_link]";	$arr_replacement['include'][] = $view_in_browser_url;
+											$arr_replacement['exclude'][] = "[message_name]";			$arr_replacement['include'][] = $strMessageName;
+											$arr_replacement['exclude'][] = "[unsubscribe_link]";		$arr_replacement['include'][] = $unsubscribe_url;
+											$arr_replacement['exclude'][] = "[first_name]";				$arr_replacement['include'][] = $strAddressFirstName;
+
+											$arr_replacement = apply_filters('filter_group_send_short_codes', $arr_replacement, array('email' => $strAddressEmail));
+
+											$mail_content = str_replace($arr_replacement['exclude'], $arr_replacement['include'], $strMessageText);
 
 											if($strGroupVerifyLink == 'yes')
 											{
@@ -1569,13 +1578,14 @@ class mf_group
 
 					if($intQueueID > 0)
 					{
-						$result = $wpdb->get_results($wpdb->prepare("SELECT groupID, messageID, addressEmail FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."group_queue USING (addressID) INNER JOIN ".$wpdb->prefix."group_message USING (messageID) WHERE queueID = '%d'", $intQueueID));
+						$result = $wpdb->get_results($wpdb->prepare("SELECT groupID, messageID, addressEmail, addressFirstName FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."group_queue USING (addressID) INNER JOIN ".$wpdb->prefix."group_message USING (messageID) WHERE queueID = '%d'", $intQueueID));
 
 						foreach($result as $r)
 						{
 							$intGroupID = $r->groupID;
 							$intMessageID = $r->messageID;
 							$strAddressEmail = $r->addressEmail;
+							$strAddressFirstName = $r->addressFirstName;
 						}
 					}
 
@@ -1584,6 +1594,7 @@ class mf_group
 						$intGroupID = check_var('gid', 'int');
 						$intMessageID = check_var('mid', 'int');
 						$strAddressEmail = check_var('aem', 'char');
+						$strAddressFirstName = "";
 					}
 
 					$hash_temp = md5((defined('NONCE_SALT') ? NONCE_SALT : '').$intGroupID.$strAddressEmail.$intMessageID);
@@ -1600,11 +1611,20 @@ class mf_group
 							$view_in_browser_url = $this->get_group_url(array('type' => 'view_in_browser', 'group_id' => $intGroupID, 'message_id' => $intMessageID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
 							$unsubscribe_url = $this->get_group_url(array('type' => 'unsubscribe', 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
 
-							$arr_exclude = array("[view_in_browser_link]", "[message_name]", "[unsubscribe_link]");
-							$arr_include = array($view_in_browser_url, $strMessageName, $unsubscribe_url);
+							$arr_replacement = [
+								'exclude' => [],
+								'include' => [],
+							];
+
+							$arr_replacement['exclude'][] = "[view_in_browser_link]";	$arr_replacement['include'][] = $view_in_browser_url;
+							$arr_replacement['exclude'][] = "[message_name]";			$arr_replacement['include'][] = $strMessageName;
+							$arr_replacement['exclude'][] = "[unsubscribe_link]";		$arr_replacement['include'][] = $unsubscribe_url;
+							$arr_replacement['exclude'][] = "[first_name]";				$arr_replacement['include'][] = $strAddressFirstName;
+
+							$arr_replacement = apply_filters('filter_group_send_short_codes', $arr_replacement, array('email' => $strAddressEmail));
 
 							$post_title = $strMessageName;
-							$post_content = str_replace($arr_exclude, $arr_include, $strMessageText);
+							$post_content = str_replace($arr_replacement['exclude'], $arr_replacement['include'], $strMessageText);
 
 							$this->set_received(array('queue_id' => $intQueueID));
 						}
