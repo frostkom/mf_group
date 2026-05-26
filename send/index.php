@@ -107,15 +107,15 @@ echo "<div class='wrap'>
 						."</div>
 					</div>";
 
-					if($obj_group->message_type == "email")
-					{
-						$arr_data_source = [];
-						get_post_children(array('add_choose_here' => true, 'post_type' => $obj_group->post_type_templates), $arr_data_source);
+					$arr_data_source = [];
+					get_post_children(array('add_choose_here' => true, 'post_type' => $obj_group->post_type_templates), $arr_data_source);
 
-						echo "<div class='postbox display_parent'>
-							<h3 class='hndle'>".__("Advanced", 'lang_group')."</h3>
-							<div class='inside'>";
+					echo "<div class='postbox display_parent'>
+						<h3 class='hndle'>".__("Advanced", 'lang_group')."</h3>
+						<div class='inside'>";
 
+							if($obj_group->message_type == "email")
+							{
 								if(count($arr_data_source) > 1)
 								{
 									echo show_select(array('data' => $arr_data_source, 'name' => 'intEmailTextSource', 'text' => __("Text Source", 'lang_group'), 'xtra' => "rel='submit_change'"));
@@ -140,12 +140,12 @@ echo "<div class='wrap'>
 
 									echo show_textfield(array('text' => __("Shortcode", 'lang_group'), 'value' => $shortcode, 'xtra_class' => "display_on_hover", 'xtra' => "readonly onclick='this.select()'"));*/
 								}
+							}
 
-								echo apply_filters('filter_group_send_buttons', '');
+							echo apply_filters('filter_group_send_buttons', '');
 
-							echo "</div>
-						</div>";
-					}
+						echo "</div>
+					</div>";
 
 				echo "</div>
 			<div>

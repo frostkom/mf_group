@@ -557,20 +557,6 @@ class mf_group
 									do_action('group_init_message', array('group_id' => $intGroupID, 'message_id' => $intMessageID, 'from_name' => $strMessageFromName, 'from' => $strMessageFrom, 'subject' => $strMessageName, 'content' => $strMessageText, 'alt_content' => $strMessageText));
 								break;
 
-								/*case 'sms':
-									//Must be here to make sure that send_sms() is loaded
-									##################
-									require_once(ABSPATH."wp-admin/includes/plugin.php");
-
-									if(is_plugin_active("mf_sms/index.php"))
-									{
-										require_once(ABSPATH."wp-content/plugins/mf_sms/include/classes.php");
-									}
-									##################
-
-									$obj_sms = new mf_sms();
-								break;*/
-
 								default:
 									do_action('group_init_other');
 								break;
@@ -624,9 +610,6 @@ class mf_group
 												$mail_headers .= "List-Archive: <".get_permalink($intGroupArchivePage).">\r\n";
 											}
 
-											$mail_to = $strAddressEmail;
-											$mail_subject = $strMessageName;
-
 											$arr_replacement = [
 												'exclude' => [],
 												'include' => [],
@@ -639,16 +622,16 @@ class mf_group
 
 											$arr_replacement = apply_filters('filter_group_send_short_codes', $arr_replacement, array('email' => $strAddressEmail));
 
-											$mail_content = str_replace($arr_replacement['exclude'], $arr_replacement['include'], $strMessageText);
+											$strMessageText = str_replace($arr_replacement['exclude'], $arr_replacement['include'], $strMessageText);
 
 											if($strGroupVerifyLink == 'yes')
 											{
-												$mail_content .= "<img src='".$this->get_group_url(array('type' => 'verify', 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID))."' style='height: 0; visibility: hidden; width: 0'>";
+												$strMessageText .= "<img src='".$this->get_group_url(array('type' => 'verify', 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID))."' style='height: 0; visibility: hidden; width: 0'>";
 											}
 
-											if(strpos($mail_content, "[redirect]"))
+											if(strpos($strMessageText, "[redirect]"))
 											{
-												$mail_content = str_replace("[redirect]", $this->get_group_url(array('type' => 'redirect', 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'message_id' => $intMessageID, 'queue_id' => $intQueueID)), $mail_content);
+												$strMessageText = str_replace("[redirect]", $this->get_group_url(array('type' => 'redirect', 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'message_id' => $intMessageID, 'queue_id' => $intQueueID)), $strMessageText);
 											}
 
 											list($mail_attachment, $rest) = get_attachment_to_send($strMessageAttachment);
@@ -663,9 +646,9 @@ class mf_group
 												$sent = send_email(array(
 													'from' => $strMessageFrom,
 													'from_name' => $strMessageFromName,
-													'to' => $mail_to,
-													'subject' => $mail_subject,
-													'content' => $mail_content,
+													'to' => $strAddressEmail,
+													'subject' => $strMessageName,
+													'content' => $strMessageText,
 													'headers' => $mail_headers,
 													'attachment' => $mail_attachment,
 													'save_log' => (is_array($setting_email_log) && in_array('group', $setting_email_log)),
@@ -696,6 +679,20 @@ class mf_group
 							break;
 
 							default:
+								$arr_replacement = [
+									'exclude' => [],
+									'include' => [],
+								];
+
+								//$arr_replacement['exclude'][] = "[view_in_browser_link]";	$arr_replacement['include'][] = $view_in_browser_url;
+								//$arr_replacement['exclude'][] = "[message_name]";			$arr_replacement['include'][] = $strMessageName;
+								//$arr_replacement['exclude'][] = "[unsubscribe_link]";		$arr_replacement['include'][] = $unsubscribe_url;
+								$arr_replacement['exclude'][] = "[first_name]";				$arr_replacement['include'][] = $strAddressFirstName;
+
+								$arr_replacement = apply_filters('filter_group_send_short_codes', $arr_replacement, array('email' => $strAddressEmail));
+
+								$strMessageText = str_replace($arr_replacement['exclude'], $arr_replacement['include'], $strMessageText);
+
 								$success = apply_filters('group_send_other', array(
 									'from' => $strMessageFrom,
 									'to' => $strAddressCellNo,
@@ -3348,13 +3345,12 @@ class mf_group
 		$strAddressEmail = $obj_address->get_address($data['address_id']);
 		$strGroupName = $this->get_name(array('id' => $data['group_id']));
 
-		$mail_to = $strAddressEmail;
 		$mail_subject = sprintf($strGroupAcceptanceSubject, $strGroupName);
 		$mail_content = apply_filters('the_content', sprintf($strGroupAcceptanceText, $strGroupName));
 
 		$mail_content .= "<p><a href='".$this->get_group_url(array('type' => 'subscribe', 'group_id' => $data['group_id'], 'email' => $strAddressEmail))."'>".__("Accept Link", 'lang_group')."</a></p>";
 
-		$sent = send_email(array('to' => $mail_to, 'subject' => $mail_subject, 'content' => $mail_content));
+		$sent = send_email(array('to' => $strAddressEmail, 'subject' => $mail_subject, 'content' => $mail_content));
 
 		if($sent)
 		{
