@@ -610,6 +610,11 @@ class mf_group
 												$mail_headers .= "List-Archive: <".get_permalink($intGroupArchivePage).">\r\n";
 											}
 
+											// Needs to be here so that everyone gets unique messages
+											$mail_to = $strAddressEmail;
+											$mail_subject = $strMessageName;
+											$mail_content = $strMessageText;
+
 											$arr_replacement = [
 												'exclude' => [],
 												'include' => [],
@@ -622,16 +627,16 @@ class mf_group
 
 											$arr_replacement = apply_filters('filter_group_send_short_codes', $arr_replacement, array('email' => $strAddressEmail));
 
-											$strMessageText = str_replace($arr_replacement['exclude'], $arr_replacement['include'], $strMessageText);
+											$mail_content = str_replace($arr_replacement['exclude'], $arr_replacement['include'], $mail_content);
 
 											if($strGroupVerifyLink == 'yes')
 											{
-												$strMessageText .= "<img src='".$this->get_group_url(array('type' => 'verify', 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID))."' style='height: 0; visibility: hidden; width: 0'>";
+												$mail_content .= "<img src='".$this->get_group_url(array('type' => 'verify', 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID))."' style='height: 0; visibility: hidden; width: 0'>";
 											}
 
-											if(strpos($strMessageText, "[redirect]"))
+											if(strpos($mail_content, "[redirect]"))
 											{
-												$strMessageText = str_replace("[redirect]", $this->get_group_url(array('type' => 'redirect', 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'message_id' => $intMessageID, 'queue_id' => $intQueueID)), $strMessageText);
+												$mail_content = str_replace("[redirect]", $this->get_group_url(array('type' => 'redirect', 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'message_id' => $intMessageID, 'queue_id' => $intQueueID)), $mail_content);
 											}
 
 											list($mail_attachment, $rest) = get_attachment_to_send($strMessageAttachment);
@@ -646,9 +651,9 @@ class mf_group
 												$sent = send_email(array(
 													'from' => $strMessageFrom,
 													'from_name' => $strMessageFromName,
-													'to' => $strAddressEmail,
-													'subject' => $strMessageName,
-													'content' => $strMessageText,
+													'to' => $mail_to,
+													'subject' => $mail_subject,
+													'content' => $mail_content,
 													'headers' => $mail_headers,
 													'attachment' => $mail_attachment,
 													'save_log' => (is_array($setting_email_log) && in_array('group', $setting_email_log)),
@@ -691,12 +696,12 @@ class mf_group
 
 								$arr_replacement = apply_filters('filter_group_send_short_codes', $arr_replacement, array('email' => $strAddressEmail));
 
-								$strMessageText = str_replace($arr_replacement['exclude'], $arr_replacement['include'], $strMessageText);
+								$mail_content = str_replace($arr_replacement['exclude'], $arr_replacement['include'], $strMessageText);
 
 								$success = apply_filters('group_send_other', array(
 									'from' => $strMessageFrom,
 									'to' => $strAddressCellNo,
-									'message' => $strMessageText,
+									'message' => $mail_content,
 									'user_id' => $intUserID,
 								));
 
@@ -709,25 +714,9 @@ class mf_group
 
 								else
 								{
-									do_log("Not sent to ".$strAddressCellNo.", ".shorten_text(array('string' => htmlspecialchars($strMessageText), 'limit' => 10)));
+									do_log("Not sent to ".$strAddressCellNo.", ".shorten_text(array('string' => htmlspecialchars($mail_content), 'limit' => 10)));
 								}
 							break;
-
-							/*case 'sms':
-								list($sent, $message) = $obj_sms->send_sms(array('from' => $strMessageFrom, 'to' => $strAddressCellNo, 'text' => $strMessageText, 'user_id' => $intUserID));
-
-								if($sent)
-								{
-									$this->set_message_sent($intQueueID);
-
-									do_log("Not sent to ".$strAddressCellNo, 'trash');
-								}
-
-								else
-								{
-									do_log("Not sent to ".$strAddressCellNo.", ".shorten_text(array('string' => htmlspecialchars($strMessageText), 'limit' => 10)));
-								}
-							break;*/
 						}
 					}
 
