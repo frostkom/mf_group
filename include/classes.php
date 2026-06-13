@@ -2773,7 +2773,7 @@ class mf_group
 			),
 		);
 
-		if(is_plugin_active("mf_email/index.php"))
+		if(is_plugin_active("mf_email/index.php") && class_exists('mf_email'))
 		{
 			if(!isset($obj_email))
 			{
