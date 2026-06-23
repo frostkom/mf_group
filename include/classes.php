@@ -576,7 +576,10 @@ class mf_group
 
 										if($arr_email_left_to_send['amount_left'] > 0)
 										{
-											do_log(__FUNCTION__.": ".var_export($arr_email_left_to_send, true)." left to send to", 'publish', false);
+											if(get_option('setting_group_debug') == 'yes')
+											{
+												do_log(__FUNCTION__.": ".var_export($arr_email_left_to_send, true)." left to send to", 'publish', false);
+											}
 
 											$view_in_browser_url = $this->get_group_url(array('type' => 'view_in_browser', 'group_id' => $intGroupID, 'message_id' => $intMessageID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
 											$unsubscribe_url = $this->get_group_url(array('type' => 'unsubscribe', 'group_id' => $intGroupID, 'email' => $strAddressEmail, 'queue_id' => $intQueueID));
@@ -2497,41 +2500,59 @@ class mf_group
 					break;
 
 					case 'sent':
-						$dteMessageCreated = $wpdb->get_var($wpdb->prepare("SELECT messageCreated FROM ".$wpdb->prefix."group_message WHERE groupID = '%d' AND messageDeleted = '0' ORDER BY messageCreated DESC LIMIT 0, 1", $post_id));
+						$result = $wpdb->get_results($wpdb->prepare("SELECT messageSchedule, messageCreated FROM ".$wpdb->prefix."group_message WHERE groupID = '%d' AND messageDeleted = '0' ORDER BY messageCreated DESC LIMIT 0, 1", $post_id));
 
-						if($dteMessageCreated > DEFAULT_DATE)
+						if($wpdb->num_rows > 0)
 						{
 							$arr_actions = [];
 
-							echo format_date($dteMessageCreated);
-
 							$arr_actions['sent'] = "<a href='".admin_url("admin.php?page=mf_group/sent/index.php&intGroupID=".$post_id)."'>".__("Sent", 'lang_group')."</a>";
 
-							$intMessageID = $wpdb->get_var($wpdb->prepare("SELECT messageID FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) WHERE groupID = '%d' AND messageDeleted = '0' AND queueSent = '0' GROUP BY messageID ORDER BY messageCreated DESC LIMIT 0, 1", $post_id));
-
-							if($intMessageID > 0)
+							foreach($result as $r)
 							{
-								$intMessageSent = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueSent = '1'", $intMessageID));
-								$intMessageNotSent = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueSent = '0'", $intMessageID));
+								$dteMessageSchedule = $r->messageSchedule;
+								$dteMessageCreated = $r->messageCreated;
 
-								if($intMessageSent == 0)
+								if($dteMessageCreated > DEFAULT_DATE)
 								{
-									if($intMessageNotSent == 0)
-									{
-										echo "<i class='set_tr_color' rel='red'></i>";
-									}
+									echo format_date($dteMessageCreated);
 
-									else
-									{
-										echo "<div>".apply_filters('get_loading_animation', '', ['class' => ''])." ".sprintf(__("Will be sent %s", 'lang_group'), get_next_cron())."</div>"
-										."<i class='set_tr_color' rel='yellow'></i>";
-									}
-								}
+									$intMessageID = $wpdb->get_var($wpdb->prepare("SELECT messageID FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) WHERE groupID = '%d' AND messageDeleted = '0' AND queueSent = '0' GROUP BY messageID ORDER BY messageCreated DESC LIMIT 0, 1", $post_id));
 
-								else if($intMessageSent < ($intMessageSent + $intMessageNotSent))
-								{
-									echo "&nbsp;".apply_filters('get_loading_animation', '', ['class' => ''])." ".__("Is sending", 'lang_group')
-									."<i class='set_tr_color' rel='yellow'></i>";
+									if($intMessageID > 0)
+									{
+										$intMessageSent = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueSent = '1'", $intMessageID));
+										$intMessageNotSent = $wpdb->get_var($wpdb->prepare("SELECT COUNT(queueID) FROM ".$wpdb->prefix."group_queue WHERE messageID = '%d' AND queueSent = '0'", $intMessageID));
+
+										if($intMessageSent == 0)
+										{
+											if($intMessageNotSent == 0)
+											{
+												echo "<i class='set_tr_color' rel='red'></i>";
+											}
+
+											else
+											{
+												if($dteMessageSchedule > DEFAULT_DATE)
+												{
+													echo "<div>".sprintf(__("Will be sent %s", 'lang_group'), format_date($dteMessageSchedule))."</div>"
+													."<i class='set_tr_color' rel='yellow'></i>";
+												}
+
+												else
+												{
+													echo "<div>".apply_filters('get_loading_animation', '', ['class' => ''])." ".sprintf(__("Will be sent %s", 'lang_group'), get_next_cron())."</div>"
+													."<i class='set_tr_color' rel='yellow'></i>";
+												}
+											}
+										}
+
+										else if($intMessageSent < ($intMessageSent + $intMessageNotSent))
+										{
+											echo "&nbsp;".apply_filters('get_loading_animation', '', ['class' => ''])." ".__("Is sending", 'lang_group')
+											."<i class='set_tr_color' rel='yellow'></i>";
+										}
+									}
 								}
 							}
 
@@ -3028,7 +3049,7 @@ class mf_group
 				$this->message_name = check_var('strMessageName');
 				$this->message_text = check_var('strMessageText', 'raw');
 				$this->message_schedule_date = check_var('dteMessageScheduleDate');
-				$this->message_schedule_time = check_var('dteMessageScheduleTime');
+				$this->message_schedule_time = check_var('strMessageScheduleTime');
 				$this->message_text_source = check_var('intEmailTextSource');
 				$this->message_attachment = check_var('strMessageAttachment');
 
@@ -3603,7 +3624,6 @@ if(class_exists('mf_list_table'))
 				break;
 
 				case 'messageName':
-
 					if($item['messageName'] != '')
 					{
 						$out .= stripslashes(stripslashes($item['messageName']));

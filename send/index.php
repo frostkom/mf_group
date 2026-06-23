@@ -99,7 +99,7 @@ echo "<div class='wrap'>
 
 							echo "<div".apply_filters('get_flex_flow', "").">"
 								.show_textfield(array('type' => 'date', 'name' => 'dteMessageScheduleDate', 'text' => __("Schedule", 'lang_group'), 'value' => $obj_group->message_schedule_date, 'placeholder' => date("Y-m-d")))
-								.show_textfield(array('type' => 'time', 'name' => 'dteMessageScheduleTime', 'text' => "&nbsp;", 'value' => $obj_group->message_schedule_time, 'placeholder' => date("H:i")))
+								.show_textfield(array('type' => 'time', 'name' => 'strMessageScheduleTime', 'text' => "&nbsp;", 'value' => $obj_group->message_schedule_time, 'placeholder' => date("H:i")))
 							."</div>
 							<p class='description'>".__("Choose date and time to send the message", 'lang_group')."</p>"
 							.wp_nonce_field('group_send_'.$obj_group->message_type, '_wpnonce_group_send', true, false)
