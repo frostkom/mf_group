@@ -717,7 +717,7 @@ class mf_group
 
 								else
 								{
-									do_log("Not sent to ".$strAddressCellNo.", ".shorten_text(array('string' => htmlspecialchars($mail_content), 'limit' => 10)));
+									//do_log("Not sent to ".$strAddressCellNo.", ".shorten_text(array('string' => htmlspecialchars($mail_content), 'limit' => 10)));
 								}
 							break;
 						}
