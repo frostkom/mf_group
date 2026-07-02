@@ -1930,7 +1930,7 @@ class mf_group
 
 			if($done_text == '' && $notice_text == '' && $error_text == '' && apply_filters('does_table_exist', false, $wpdb->prefix."group_message"))
 			{
-				$result = $wpdb->get_results("SELECT groupID, messageType, addressID, addressFirstName, addressSurName, addressEmail, addressCellNo FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) INNER JOIN ".$wpdb->prefix."address USING (addressID) WHERE queueSent = '0' AND (queueCreated > DATE_SUB(NOW(), INTERVAL 1 WEEK) AND queueCreated < DATE_SUB(NOW(), INTERVAL 3 HOUR)) LIMIT 0, 6");
+				$result = $wpdb->get_results($wpdb->prepare("SELECT groupID, messageType, addressID, addressFirstName, addressSurName, addressEmail, addressCellNo FROM ".$wpdb->prefix."group_message INNER JOIN ".$wpdb->prefix."group_queue USING (messageID) INNER JOIN ".$wpdb->prefix."address USING (addressID) WHERE queueSent = '0' AND ((messageSchedule > %s AND messageSchedule < DATE_SUB(NOW(), INTERVAL 3 HOUR)) AND queueCreated > DATE_SUB(NOW(), INTERVAL 1 WEEK) AND queueCreated < DATE_SUB(NOW(), INTERVAL 3 HOUR)) LIMIT 0, 6", DEFAULT_DATE));
 				$rows = $wpdb->num_rows;
 
 				if($rows > 0)
