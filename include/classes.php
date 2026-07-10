@@ -3190,6 +3190,11 @@ class mf_group
 					}
 				}
 
+				else if(isset($_POST['btnGroupAddFirstName']))
+				{
+					$this->message_text .= "[first_name]";
+				}
+
 				else if(isset($_POST['btnGroupAddViewInBrowser']))
 				{
 					if($this->message_type == 'email')

@@ -123,8 +123,15 @@ echo "<div class='wrap'>
 
 								echo get_media_button(array('name' => 'strMessageAttachment', 'value' => $obj_group->message_attachment));
 
+								if($obj_group->message_text == '' || $obj_group->message_text != '' && !preg_match("/\[first_name\]/", $obj_group->message_text))
+								{
+									echo "<br>";
+									echo show_button(array('name' => 'btnGroupAddFirstName', 'text' => __("Add First Name", 'lang_group'), 'class' => "button"));
+								}
+
 								if($obj_group->message_text == '' || $obj_group->message_text != '' && !preg_match("/\[view_in_browser_link\]/", $obj_group->message_text))
 								{
+									echo "<br>";
 									echo show_button(array('name' => 'btnGroupAddViewInBrowser', 'text' => __("Add Link to View in Browser", 'lang_group'), 'class' => "button"));
 
 									/*$shortcode = $obj_group->get_add_view_in_browser_code();
@@ -134,6 +141,7 @@ echo "<div class='wrap'>
 
 								if($obj_group->message_text == '' || $obj_group->message_text != '' && !preg_match("/\[unsubscribe_link\]/", $obj_group->message_text))
 								{
+									echo "<br>";
 									echo show_button(array('name' => 'btnGroupAddUnsubscribe', 'text' => __("Add Unsubscribe Link", 'lang_group'), 'class' => "button"));
 
 									/*$shortcode = $obj_group->get_unsubscribe_code();
