@@ -283,7 +283,7 @@ class mf_group
 		);
 	}
 
-	function set_received($data)
+	function set_viewed($data)
 	{
 		global $wpdb;
 
@@ -295,7 +295,7 @@ class mf_group
 			{
 				$intAddressID = $r->addressID;
 
-				$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_queue SET queueStatus = 'viewed', queueViewed = NOW() WHERE queueID = '%d'", $data['queue_id']));
+				$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_queue SET queueStatus = %s, queueViewed = NOW() WHERE queueID = '%d'", 'viewed', $data['queue_id']));
 
 				$obj_address = new mf_address(array('id' => $intAddressID));
 				$obj_address->update_errors(array('action' => 'reset'));
@@ -374,7 +374,7 @@ class mf_group
 	{
 		global $wpdb;
 
-		$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_queue SET queueSent = '1', queueSentTime = NOW() WHERE queueID = '%d'", $intQueueID));
+		$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_queue SET queueSent = '%s', queueSentTime = NOW() WHERE queueID = '%d'", 1, $intQueueID));
 	}
 
 	function check_if_exists($data)
@@ -1555,7 +1555,7 @@ class mf_group
 
 						if($strUnsubscribeHash != '' && $strUnsubscribeHash == $hash_temp || $strVerifyHash != '' && $strVerifyHash == $hash_temp)
 						{
-							$this->set_received(array('queue_id' => $intQueueID));
+							$this->set_viewed(array('queue_id' => $intQueueID));
 						}
 					}
 				}
@@ -1615,7 +1615,7 @@ class mf_group
 							$post_title = $strMessageName;
 							$post_content = str_replace($arr_replacement['exclude'], $arr_replacement['include'], $strMessageText);
 
-							$this->set_received(array('queue_id' => $intQueueID));
+							$this->set_viewed(array('queue_id' => $intQueueID));
 						}
 					}
 

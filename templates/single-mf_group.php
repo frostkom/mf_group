@@ -33,7 +33,7 @@ if(isset($_REQUEST['redirect']))
 		$strLinkUrl = $wpdb->get_var($wpdb->prepare("SELECT linkUrl FROM ".$wpdb->prefix."group_message_link WHERE linkID = '%d'", $intLinkID));
 
 		$wpdb->query($wpdb->prepare("UPDATE ".$wpdb->prefix."group_message_link SET linkUsed = NOW() WHERE linkID = '%d'", $intLinkID));
-		$obj_group->set_received(array('queue_id' => $intQueueID));
+		$obj_group->set_viewed(array('queue_id' => $intQueueID));
 
 		mf_redirect($strLinkUrl);
 	}
@@ -180,7 +180,7 @@ get_header();
 
 						if($strUnsubscribeHash != '' && $strUnsubscribeHash == $hash_temp || $strVerifyHash != '' && $strVerifyHash == $hash_temp)
 						{
-							$obj_group->set_received(array('queue_id' => $intQueueID));
+							$obj_group->set_viewed(array('queue_id' => $intQueueID));
 						}
 					}
 				}
@@ -229,7 +229,7 @@ get_header();
 							$post_title = $strMessageName;
 							$post_content = str_replace($arr_exclude, $arr_include, $strMessageText);
 
-							$obj_group->set_received(array('queue_id' => $intQueueID));
+							$obj_group->set_viewed(array('queue_id' => $intQueueID));
 						}
 					}
 
