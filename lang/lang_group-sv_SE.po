@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-10 08:09+0100\n"
+"POT-Creation-Date: 2026-08-13 08:27+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Martin Fors\n"
 "Language-Team: \n"
@@ -63,7 +63,7 @@ msgid "Choose Here"
 msgstr "Välj här"
 
 #: ../include/classes.php:230
-#: ../include/classes.php:3551
+#: ../include/classes.php:3570
 msgid "All"
 msgstr "Alla"
 
@@ -77,7 +77,7 @@ msgstr "Stopplista"
 
 #: ../include/classes.php:246
 #: ../include/classes.php:1660
-#: ../include/classes.php:3826
+#: ../include/classes.php:3845
 msgid "Name"
 msgstr "Namn"
 
@@ -103,7 +103,7 @@ msgstr "Telefonnummer"
 
 #: ../include/classes.php:251
 #: ../include/classes.php:1705
-#: ../include/classes.php:3597
+#: ../include/classes.php:3616
 msgid "E-mail"
 msgstr "E-post"
 
@@ -262,7 +262,7 @@ msgstr "Redigera"
 #: ../include/classes.php:1811
 #: ../include/classes.php:1832
 #: ../include/classes.php:2684
-#: ../include/classes.php:3686
+#: ../include/classes.php:3705
 msgid "View"
 msgstr "Visa"
 
@@ -381,9 +381,9 @@ msgstr "Skicka meddelande"
 #: ../include/classes.php:2174
 #: ../include/classes.php:2237
 #: ../include/classes.php:2509
-#: ../include/classes.php:3562
-#: ../include/classes.php:3830
-#: ../include/classes.php:3876
+#: ../include/classes.php:3581
+#: ../include/classes.php:3849
+#: ../include/classes.php:3895
 #: ../sent/index.php:8
 msgid "Sent"
 msgstr "Skickat"
@@ -539,7 +539,7 @@ msgid "About the Group"
 msgstr "Om gruppen"
 
 #: ../include/classes.php:2860
-#: ../include/classes.php:3558
+#: ../include/classes.php:3577
 msgid "Type"
 msgstr "Typ"
 
@@ -593,110 +593,110 @@ msgstr "Du måste fylla i en text att skicka"
 msgid "You are trying to send attachments of a total of %s. I suggest that you send the attachments as inline links instead of attachments. This way I do not have to send too much data which might slow down the server or make it timeout due to memory limits and it also makes the recipients not have to recieve that much in their inboxes."
 msgstr "Du försöker skicka bifogade filer på total %s. Jag föreslår att du skickar filer som länkar i meddelandet istället som bifogade filer. På detta sätt så slipper jag skicka så mycket data som i sin tur slöar ner servern och det gör också att mottagarnas inboxar tar längre tid att fylla."
 
-#: ../include/classes.php:3175
-msgid "There was an error when saving the message"
-msgstr "Det blev ett fel när meddelandet skulle sparas"
+#: ../include/classes.php:3184
+msgid "I could not save the message to the group. If the problem persists, contact an administrator."
+msgstr "Jag kunde inte spara meddelandet för gruppen. Om problemet kvarstår, kontakt en administratör."
 
-#: ../include/classes.php:3187
-msgid "The message was not sent to anybody"
-msgstr "Meddelandet skickades inte till någon"
+#: ../include/classes.php:3201
+msgid "I could not find any addresses to send to. If the problem persists, contact an administrator."
+msgstr "Jag kunde inte hitta någon adress att skicka till. Om problemet kvarstår, kontakt en administratör."
 
-#: ../include/classes.php:3268
+#: ../include/classes.php:3287
 msgid "The message was deleted"
 msgstr "Meddelandet togs bort"
 
-#: ../include/classes.php:3275
+#: ../include/classes.php:3294
 msgid "The message was aborted"
 msgstr "Meddelandet avbröts"
 
-#: ../include/classes.php:3352
+#: ../include/classes.php:3371
 #, php-format
 msgid "Accept subscription to %s"
 msgstr "Bekräfta prenumeration till %s"
 
-#: ../include/classes.php:3353
+#: ../include/classes.php:3372
 #, php-format
 msgid "You have been added to the group %s but will not get any messages until you have accepted this subscription by clicking the link below."
 msgstr "Du har blivit tillagd i gruppen %s men kommer inte att få några meddelanden förrän du har bekräftat prenumerationen genom att klicka på länken nedan."
 
-#: ../include/classes.php:3366
+#: ../include/classes.php:3385
 msgid "Accept Link"
 msgstr "Bekräftelselänk"
 
-#: ../include/classes.php:3552
+#: ../include/classes.php:3571
 msgid "Trash"
 msgstr "Papperskorg"
 
-#: ../include/classes.php:3559
+#: ../include/classes.php:3578
 #: ../send/index.php:56
 msgid "From"
 msgstr "Från"
 
-#: ../include/classes.php:3560
+#: ../include/classes.php:3579
 msgid "Content"
 msgstr "Innehåll"
 
-#: ../include/classes.php:3561
+#: ../include/classes.php:3580
 msgid "Scheduled"
 msgstr "Schemalagd"
 
-#: ../include/classes.php:3563
+#: ../include/classes.php:3582
 msgid "Created"
 msgstr "Skapad"
 
-#: ../include/classes.php:3589
+#: ../include/classes.php:3608
 msgid "View Content"
 msgstr "Visa innehåll"
 
-#: ../include/classes.php:3590
+#: ../include/classes.php:3609
 msgid "Send to group again"
 msgstr "Skicka till grupp igen"
 
-#: ../include/classes.php:3591
+#: ../include/classes.php:3610
 msgid "Send to e-mail"
 msgstr "Skicka till e-post"
 
-#: ../include/classes.php:3648
+#: ../include/classes.php:3667
 msgid "Delete"
 msgstr "Radera"
 
-#: ../include/classes.php:3727
-#: ../include/classes.php:3883
+#: ../include/classes.php:3746
+#: ../include/classes.php:3902
 msgid "Not Received"
 msgstr "Inte mottagen"
 
-#: ../include/classes.php:3732
-#: ../include/classes.php:3892
+#: ../include/classes.php:3751
+#: ../include/classes.php:3911
 msgid "Deferred"
 msgstr "Nekade"
 
-#: ../include/classes.php:3743
+#: ../include/classes.php:3762
 msgid "Abort"
 msgstr "Avbryt"
 
-#: ../include/classes.php:3827
+#: ../include/classes.php:3846
 #: ../send/index.php:59
 msgid "To"
 msgstr "Till"
 
-#: ../include/classes.php:3828
+#: ../include/classes.php:3847
 msgid "Status"
 msgstr ""
 
-#: ../include/classes.php:3868
+#: ../include/classes.php:3887
 msgid "Unknown"
 msgstr "Okänd"
 
-#: ../include/classes.php:3888
+#: ../include/classes.php:3907
 msgid "Not Viewed"
 msgstr "Inte läst"
 
-#: ../include/classes.php:3898
+#: ../include/classes.php:3917
 #, php-format
 msgid "Viewed %s"
 msgstr "Läst %s"
 
-#: ../include/classes.php:3903
+#: ../include/classes.php:3922
 msgid "Viewed"
 msgstr "Läst"
 
@@ -810,6 +810,12 @@ msgstr "Månad"
 #: ../version/index.php:226
 msgid "Change"
 msgstr "Byt"
+
+#~ msgid "There was an error when saving the message"
+#~ msgstr "Det blev ett fel när meddelandet skulle sparas"
+
+#~ msgid "The message was not sent to anybody"
+#~ msgstr "Meddelandet skickades inte till någon"
 
 #~ msgid "Shortcode"
 #~ msgstr "Kortkod"

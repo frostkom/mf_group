@@ -3134,6 +3134,7 @@ class mf_group
 
 							$arr_recipients = [];
 							$this->get_stop_list_recipients();
+							$str_recipients_debug = "";
 
 							foreach($this->arr_group_id as $this->group_id)
 							{
@@ -3145,12 +3146,15 @@ class mf_group
 									$dteMessageSchedule = ($this->message_schedule_date != '' && $this->message_schedule_time != '' ? $this->message_schedule_date." ".$this->message_schedule_time : '');
 
 									$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->prefix."group_message SET groupID = '%d', messageType = %s, messageFrom = %s, messageName = %s, messageText = %s, messageAttachment = %s, messageSchedule = %s, messageCreated = NOW(), userID = '%d'", $this->group_id, $this->message_type, $this->message_from, $this->message_name, $this->message_text, $this->message_attachment, $dteMessageSchedule, get_current_user_id()));
-
 									$this->message_id = $wpdb->insert_id;
+
+									$str_recipients_debug = ($str_recipients_debug != '' ? ", " : "")."Create message: ".$wpdb->last_query;
 
 									if($this->message_id > 0)
 									{
 										$result = $wpdb->get_results($wpdb->prepare("SELECT addressID, addressEmail, addressCellNo FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' AND groupAccepted = '1' AND groupUnsubscribed = '0'", $this->group_id));
+
+										$str_recipients_debug = ($str_recipients_debug != '' ? ", " : "")."Select addresses: ".$wpdb->last_query;
 
 										foreach($result as $r)
 										{
@@ -3166,13 +3170,23 @@ class mf_group
 												{
 													$arr_recipients[] = $intAddressID;
 												}
+
+												else
+												{
+													$str_recipients_debug = ($str_recipients_debug != '' ? ", " : "")."No address added to the queue: ".$wpdb->last_query;
+												}
 											}
 										}
 									}
 
 									else
 									{
-										$error_text = __("There was an error when saving the message", 'lang_group');
+										$error_text = __("I could not save the message to the group. If the problem persists, contact an administrator.", 'lang_group');
+
+										if(IS_SUPER_ADMIN)
+										{
+											$error_text .= " (".$str_recipients_debug.")";
+										}
 									}
 								}
 							}
@@ -3182,9 +3196,14 @@ class mf_group
 								mf_redirect(admin_url("edit.php?post_type=".$this->post_type."&sent"));
 							}
 
-							else
+							else if($error_text == "")
 							{
-								$error_text = __("The message was not sent to anybody", 'lang_group');
+								$error_text = __("I could not find any addresses to send to. If the problem persists, contact an administrator.", 'lang_group');
+
+								if(IS_SUPER_ADMIN)
+								{
+									$error_text .= " (".$str_recipients_debug.")";
+								}
 							}
 						}
 					}
