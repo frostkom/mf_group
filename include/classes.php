@@ -3148,13 +3148,13 @@ class mf_group
 									$wpdb->query($wpdb->prepare("INSERT INTO ".$wpdb->prefix."group_message SET groupID = '%d', messageType = %s, messageFrom = %s, messageName = %s, messageText = %s, messageAttachment = %s, messageSchedule = %s, messageCreated = NOW(), userID = '%d'", $this->group_id, $this->message_type, $this->message_from, $this->message_name, $this->message_text, $this->message_attachment, $dteMessageSchedule, get_current_user_id()));
 									$this->message_id = $wpdb->insert_id;
 
-									$str_recipients_debug = ($str_recipients_debug != '' ? ", " : "")."Create message: ".$wpdb->last_query;
+									$str_recipients_debug .= ($str_recipients_debug != '' ? ", " : "")."Create message: ".$wpdb->last_query;
 
 									if($this->message_id > 0)
 									{
 										$result = $wpdb->get_results($wpdb->prepare("SELECT addressID, addressEmail, addressCellNo FROM ".$wpdb->prefix."address INNER JOIN ".$wpdb->prefix."address2group USING (addressID) WHERE groupID = '%d' AND addressDeleted = '0' AND groupAccepted = '1' AND groupUnsubscribed = '0'", $this->group_id));
 
-										$str_recipients_debug = ($str_recipients_debug != '' ? ", " : "")."Select addresses: ".$wpdb->last_query;
+										$str_recipients_debug .= ($str_recipients_debug != '' ? ", " : "")."Select addresses: ".$wpdb->last_query;
 
 										foreach($result as $r)
 										{
@@ -3173,7 +3173,7 @@ class mf_group
 
 												else
 												{
-													$str_recipients_debug = ($str_recipients_debug != '' ? ", " : "")."No address added to the queue: ".$wpdb->last_query;
+													$str_recipients_debug .= ($str_recipients_debug != '' ? ", " : "")."No address added to the queue: ".$wpdb->last_query;
 												}
 											}
 										}
