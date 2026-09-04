@@ -551,7 +551,7 @@ class mf_group
 
 									if(get_option('setting_group_debug') == 'yes')
 									{
-										do_log("Group Init Message: About to send message (".$intGroupID.", ".$strMessageFrom.", ".$strMessageName.")");
+										do_log(__FUNCTION__." - group_init_message: #".$intGroupID.", ".$strMessageFrom.", ".$strMessageName);
 									}
 
 									do_action('group_init_message', array('group_id' => $intGroupID, 'message_id' => $intMessageID, 'from_name' => $strMessageFromName, 'from' => $strMessageFrom, 'subject' => $strMessageName, 'content' => $strMessageText, 'alt_content' => $strMessageText));
@@ -568,6 +568,11 @@ class mf_group
 							case 'email':
 								if($strAddressEmail != '' && is_domain_valid($strAddressEmail))
 								{
+									if(get_option('setting_group_debug') == 'yes')
+									{
+										do_log(__FUNCTION__." - group_before_send: #".$intGroupID.", ".$strMessageFrom.", ".$strMessageName);
+									}
+
 									$send = apply_filters('group_before_send', true, array('group_id' => $intGroupID, 'to' => $strAddressEmail, 'message_id' => $intMessageID, 'queue_id' => $intQueueID));
 
 									if($send == true)
@@ -898,7 +903,7 @@ class mf_group
 
 								if(get_option('setting_group_debug') == 'yes')
 								{
-									do_log("Group API - ".$post_title." - Sync: ".var_export($arr_post_meta_api, true));
+									do_log(__FUNCTION__." - ".$post_title." - Sync: ".var_export($arr_post_meta_api, true));
 								}
 
 								$count_incoming = $count_found = $count_found_error = $count_inserted = $count_inserted_error = $count_added = $count_exists_in_group = $count_exists_in_array = $count_removed = $count_removed_error = 0;
@@ -935,7 +940,7 @@ class mf_group
 													{
 														if(get_option('setting_group_debug') == 'yes')
 														{
-															do_log("Group API - ".$post_title." - Returned: ".$post_meta_api." -> ".htmlspecialchars(var_export($arr_json['data'], true)));
+															do_log(__FUNCTION__." - ".$post_title." - Returned: ".$post_meta_api." -> ".htmlspecialchars(var_export($arr_json['data'], true)));
 														}
 
 														// Insert or update in group
@@ -991,7 +996,7 @@ class mf_group
 															{
 																if(get_option('setting_group_debug') == 'yes')
 																{
-																	do_log("Group API - ".$post_title." - Filter Type: ".$post_meta_api_filter);
+																	do_log(__FUNCTION__." - ".$post_title." - Filter Type: ".$post_meta_api_filter);
 																}
 
 																list($filter_type, $filter_rest) = explode(":", $post_meta_api_filter);
@@ -1005,7 +1010,7 @@ class mf_group
 																		{
 																			if(get_option('setting_group_debug') == 'yes')
 																			{
-																				do_log("Group API - ".$post_title." - Filter Include: ".$filter_field." != ".var_export($arr_filter_values, true));
+																				do_log(__FUNCTION__." - ".$post_title." - Filter Include: ".$filter_field." != ".var_export($arr_filter_values, true));
 																			}
 
 																			$do_save = false;
@@ -1017,7 +1022,7 @@ class mf_group
 																		{
 																			if(get_option('setting_group_debug') == 'yes')
 																			{
-																				do_log("Group API - ".$post_title." - Filter Exclude: ".$filter_field." == ".var_export($arr_filter_values, true));
+																				do_log(__FUNCTION__." - ".$post_title." - Filter Exclude: ".$filter_field." == ".var_export($arr_filter_values, true));
 																			}
 
 																			$do_save = false;
@@ -1054,7 +1059,7 @@ class mf_group
 
 																			if(get_option('setting_group_debug') == 'yes')
 																			{
-																				do_log("Group API - ".$post_title." - Insert address: ".$intAddressID_temp." (".$strAddressFirstName." ".$strAddressSurName.")");
+																				do_log(__FUNCTION__." - ".$post_title." - Insert address: ".$intAddressID_temp." (".$strAddressFirstName." ".$strAddressSurName.")");
 																			}
 
 																			$result = $this->check_if_exists(array('birthdate' => $strAddressBirthDate, 'email' => $strAddressEmail));
@@ -1089,7 +1094,7 @@ class mf_group
 
 																					if(get_option('setting_group_debug') == 'yes')
 																					{
-																						do_log("Group API - ".$post_title." - Add to group: ".$intAddressID." (".$strAddressFirstName." ".$strAddressSurName.")");
+																						do_log(__FUNCTION__." - ".$post_title." - Add to group: ".$intAddressID." (".$strAddressFirstName." ".$strAddressSurName.")");
 																					}
 
 																					$count_added++;
@@ -1114,7 +1119,7 @@ class mf_group
 
 																	else// if(get_option('setting_group_debug') == 'yes')
 																	{
-																		do_log("Group API Error - ".$post_title." - No rows found with Birthdate or E-mail: ".$wpdb->last_query);
+																		do_log(__FUNCTION__." Error - ".$post_title." - No rows found with Birthdate or E-mail: ".$wpdb->last_query);
 
 																		$count_found_error++;
 																	}
@@ -1165,7 +1170,7 @@ class mf_group
 											{
 												if(get_option('setting_group_debug') == 'yes')
 												{
-													do_log("Group API - Remove from group: ".$intAddressID." (".$strAddressFirstName." ".$strAddressSurName.") from ".$post_title);
+													do_log(__FUNCTION__." - Remove from group: ".$intAddressID." (".$strAddressFirstName." ".$strAddressSurName.") from ".$post_title);
 												}
 
 												if($this->remove_address(array('address_id' => $intAddressID, 'group_id' => $post_id)))
@@ -1183,7 +1188,7 @@ class mf_group
 
 									else if(get_option('setting_group_debug') == 'yes')
 									{
-										do_log("Group API - ".$post_title." - No rows found to remove (Address array): ".$wpdb->last_query);
+										do_log(__FUNCTION__." - ".$post_title." - No rows found to remove (Address array): ".$wpdb->last_query);
 									}
 								}
 								##################################
@@ -1196,14 +1201,14 @@ class mf_group
 
 									if(($count_in_group + $count_exists_in_array) != $count_incoming)
 									{
-										do_log("Group API Error: Wrong amount in group (<a href='".admin_url("post.php?post=".$post_id."&action=edit")."'>".$post_title."</a>) after sync (".$count_in_group." + ".$count_exists_in_array." != ".$count_incoming.")");
+										do_log(__FUNCTION__." - Wrong amount in group: (<a href='".admin_url("post.php?post=".$post_id."&action=edit")."'>".$post_title."</a>) after sync (".$count_in_group." + ".$count_exists_in_array." != ".$count_incoming.")");
 									}
 								}
 								##################################
 
 								if(get_option('setting_group_debug') == 'yes')
 								{
-									do_log("Group API - ".$post_title." - Report: ".$count_found."/".$count_incoming." found with ".$count_found_error." errors. ".$count_inserted." inserted with ".$count_inserted_error." errors. ".$count_added." added, ".$count_exists_in_group." (+".$count_exists_in_array." duplicates) exists and ".$count_removed." removed with ".$count_removed_error." errors");
+									do_log(__FUNCTION__." - ".$post_title." - Report: ".$count_found."/".$count_incoming." found with ".$count_found_error." errors. ".$count_inserted." inserted with ".$count_inserted_error." errors. ".$count_added." added, ".$count_exists_in_group." (+".$count_exists_in_array." duplicates) exists and ".$count_removed." removed with ".$count_removed_error." errors");
 								}
 							}
 						}
@@ -2009,7 +2014,7 @@ class mf_group
 
 		$arr_emails_left_to_send = apply_filters('get_emails_left_to_send', []);
 
-		echo show_textfield(array('type' => 'number', 'name' => $setting_key, 'value' => $option, 'suffix' => __("0 or empty means infinte", 'lang_group'), 'description' => sprintf(__("There are right now %d left to send", 'lang_group'), (isset($arr_emails_left_to_send['amount_left']) ? $arr_emails_left_to_send['amount_left'] : $option))));
+		echo show_textfield(array('type' => 'number', 'name' => $setting_key, 'value' => $option, 'description' => sprintf(__("There are right now %d left to send", 'lang_group'), (isset($arr_emails_left_to_send['amount_left']) ? $arr_emails_left_to_send['amount_left'] : $option)))); //, 'suffix' => __("0 or empty means infinte", 'lang_group')
 	}
 
 	/*function setting_group_trace_links_callback()
