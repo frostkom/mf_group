@@ -2962,7 +2962,7 @@ class mf_group
 		return $meta_boxes;
 	}
 
-	function get_post_types_for_metabox($array)
+	function get_post_types_ignore($array, $type)
 	{
 		$array[] = $this->post_type;
 
