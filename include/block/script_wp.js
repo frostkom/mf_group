@@ -7,6 +7,7 @@
 		MediaUpload = wp.blockEditor.MediaUpload,
 		Button = wp.components.Button,
 		MediaUploadCheck = wp.blockEditor.MediaUploadCheck,
+		PanelBody = wp.components.PanelBody,
 		InspectorControls = wp.blockEditor.InspectorControls;
 
 	registerBlockType('mf/group',
@@ -83,67 +84,71 @@
 				[
 					el(
 						InspectorControls,
-						'div',
+						{key: 'inspector'},
 						el(
-							SelectControl,
-							{
-								label: script_group_block_wp.group_id_label,
-								value: props.attributes.group_id,
-								options: convert_php_array_to_block_js(script_group_block_wp.group_id),
-								onChange: function(value)
+							PanelBody,
+							{title: script_group_block_wp.block_title, initialOpen: true},
+							el(
+								SelectControl,
 								{
-									props.setAttributes({group_id: value});
+									label: script_group_block_wp.group_id_label,
+									value: props.attributes.group_id,
+									options: convert_php_array_to_block_js(script_group_block_wp.group_id),
+									onChange: function(value)
+									{
+										props.setAttributes({group_id: value});
+									}
 								}
-							}
-						),
-						el(
-							SelectControl,
-							{
-								label: script_group_block_wp.group_label_type_label,
-								value: props.attributes.group_label_type,
-								options: convert_php_array_to_block_js(script_group_block_wp.group_label_type),
-								onChange: function(value)
+							),
+							el(
+								SelectControl,
 								{
-									props.setAttributes({group_label_type: value});
+									label: script_group_block_wp.group_label_type_label,
+									value: props.attributes.group_label_type,
+									options: convert_php_array_to_block_js(script_group_block_wp.group_label_type),
+									onChange: function(value)
+									{
+										props.setAttributes({group_label_type: value});
+									}
 								}
-							}
-						),
-						el(
-							SelectControl,
-							{
-								label: script_group_block_wp.group_display_consent_label,
-								value: props.attributes.group_display_consent,
-								options: convert_php_array_to_block_js(script_group_block_wp.group_display_consent),
-								onChange: function(value)
+							),
+							el(
+								SelectControl,
 								{
-									props.setAttributes({group_display_consent: value});
+									label: script_group_block_wp.group_display_consent_label,
+									value: props.attributes.group_display_consent,
+									options: convert_php_array_to_block_js(script_group_block_wp.group_display_consent),
+									onChange: function(value)
+									{
+										props.setAttributes({group_display_consent: value});
+									}
 								}
-							}
-						),
-						el(
-							TextControl,
-							{
-								label: script_group_block_wp.group_button_text_label,
-								type: 'text',
-								value: props.attributes.group_button_text,
-								placeholder: script_group_block_wp.group_button_text_placeholder,
-								onChange: function(value)
+							),
+							el(
+								TextControl,
 								{
-									props.setAttributes({group_button_text: value});
+									label: script_group_block_wp.group_button_text_label,
+									type: 'text',
+									value: props.attributes.group_button_text,
+									placeholder: script_group_block_wp.group_button_text_placeholder,
+									onChange: function(value)
+									{
+										props.setAttributes({group_button_text: value});
+									}
 								}
-							}
-						),
-						el(
-							SelectControl,
-							{
-								label: script_group_block_wp.group_button_icon_label,
-								value: props.attributes.group_button_icon,
-								options: convert_php_array_to_block_js(script_group_block_wp.group_button_icon),
-								onChange: function(value)
+							),
+							el(
+								SelectControl,
 								{
-									props.setAttributes({group_button_icon: value});
+									label: script_group_block_wp.group_button_icon_label,
+									value: props.attributes.group_button_icon,
+									options: convert_php_array_to_block_js(script_group_block_wp.group_button_icon),
+									onChange: function(value)
+									{
+										props.setAttributes({group_button_icon: value});
+									}
 								}
-							}
+							)
 						)
 					),
 					el(
